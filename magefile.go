@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/shurcooL/vfsgen"
 	// mg contains helpful utility functions, like Deps
@@ -16,13 +17,15 @@ import (
 // var Default = Build
 
 func Deploy() error {
+	mg.Deps(TemplatesBindata)
 	fmt.Println("Deploying...")
-	return sh.Run("gcloud", "functions", "deploy", "Registration", "--source", "api", "--runtime", "go111", "--trigger-http")
+	return sh.Run("gcloud", "functions", "deploy", "Registration", "--source", "src", "--runtime", "go111", "--trigger-http")
 }
 
 func TemplatesBindata() error {
-	return vfsgen.Generate(http.Dir("templates"), vfsgen.Options{
-		Filename:     "templates/vfsdata.go",
+	fmt.Println("Generating Bindata")
+	return vfsgen.Generate(http.Dir("src/templates"), vfsgen.Options{
+		Filename:     "src/templates/vfsdata.go",
 		PackageName:  "templates",
 		VariableName: "Assets",
 	})
