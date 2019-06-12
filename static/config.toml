@@ -1,5 +1,5 @@
 # Site settings
-baseurl = "/"
+baseurl = "https://daytonswingsmackdown.com"
 languageCode = "en-us"
 title = "Dayton Swing Smackdown"
 theme = "syna"
@@ -46,8 +46,8 @@ googleAnalytics = ""
     pro = false
 
   [params.colors]
-    primary = "#00838F"
-    secondary = "#868e96"
+    primary = "#ab0000"
+    secondary = "#c8b99c"
     success = "#008f54"
     info = "#00c9dc"
     warning = "#fdf314"
