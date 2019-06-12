@@ -1,0 +1,12 @@
+{{- $fragment := .self.Params -}}
+{{- $name := strings.TrimSuffix ".md" (replace .self.Name "/index.md" "") -}}
+{{- $bg := $fragment.background | default "secondary" }}
+<section id="{{ $name }}">
+  <div class="overlay container-fluid
+    {{- printf " bg-%s" $bg -}}
+  ">
+	  <center>
+		  <iframe src="{{- $fragment.google }}" width="800" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
+	  </center>
+  </div>
+</section>

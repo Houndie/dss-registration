@@ -1,0 +1,145 @@
+# Site settings
+baseurl = "/"
+languageCode = "en-us"
+title = "Dayton Swing Smackdown"
+theme = "syna"
+enableGitInfo = true
+version = "0.1"
+
+[outputs]
+  home = ["HTML", "JSON"]
+
+[frontmatter]
+date = ["date", "lastmod"]
+lastmod = ["lastmod", ":git", "date"]
+
+# Google Analytics tracking
+googleAnalytics = ""
+
+[params]
+  name = "Dayton Swing Smackdown"
+  description = "Home of the Battle of the Swing Cities Team Competition"
+
+  [params.style]
+    #background = "secondary"
+
+  # Theme customizations
+  # Assets relative to 'static/'
+  [params.custom]
+    favicon = "favicon.ico"
+    favicon_ico_sizes = "16x16 32x32"
+    favicon_png = "favicon.png"
+    favicon_svg = "favicon.svg"
+
+  # Piwik tracking
+  [params.analytics.piwik]
+    #url = ""
+    #id = ""
+    #domain = "" # Track subdomains via "*.example.com"
+    # Optional hash for integrity check
+    #hash = "sha512-RfeD0pacGTqy9m7U6PgehQfS4cc7SIt+e+P+H5e848kEvB/RW84CUGO3O4O3LNbxjevym6KPUZ8muPsMrI8WIw=="
+
+  # Optional, global disable switch for fontawesome related files
+  # For custom fontawesome js files use the custom.js method
+  [params.fontawesome]
+    disabled = false
+    pro = false
+
+  [params.colors]
+    primary = "#00838F"
+    secondary = "#868e96"
+    success = "#008f54"
+    info = "#00c9dc"
+    warning = "#fdf314"
+    danger = "#dc1200"
+    light = "#f8f9fa"
+    dark = "#343a40"
+
+# main/prepend/postpend menus are displayed in nav fragment.
+# Keep an eye out for updates. These will be moved out to make navbar more
+# configurable.
+
+[[menu.main]]
+  url = "#"
+  name = "Registration"
+  identifier = "registration"
+  weight = 10
+
+#[[menu.main]]
+#  url = "/"
+#  name = "Register Now"
+#  parent = "registration"
+#  weight = 10
+
+[[menu.main]]
+  url = "/pricing_and_tshirts"
+  name = "Pricing & T-Shirts"
+  parent = "registration"
+  weight = 20
+
+[[menu.main]]
+  url = "/housing"
+  name = "Housing"
+  parent = "registration"
+  weight = 30
+
+[[menu.main]]
+  url = "/classes"
+  name = "Classes"
+  weight = 20
+
+[[menu.main]]
+  url = "/instructors"
+  name = "Instructors"
+  weight = 30
+
+[[menu.main]]
+  url = "#"
+  name = "Competitions"
+  identitifer = "Competitions"
+  weight = 40
+
+[[menu.main]]
+  url = "/competition_info"
+  name = "Competition Info"
+  parent = "Competitions"
+  weight = 10
+
+[[menu.main]]
+  url = "#"
+  name = "Venues"
+  identitifer = "Venues"
+  weight = 50
+
+[[menu.main]]
+  url = "/event_venues"
+  name = "Event Venues"
+  parent = "Venues"
+  weight = 10
+
+[[menu.main]]
+  url = "/local_faire"
+  name = "Local Faire"
+  parent = "Venues"
+  weight = 20
+
+[[menu.main]]
+  url = "/music"
+  name = "Music"
+  weight = 60
+
+[[menu.main]]
+  url = "/schedule"
+  name = "Schedule"
+  weight = 70
+
+[[menu.main]]
+  url = "/safety"
+  name = "Safety"
+  weight = 80
+
+[[menu.footer_social]]
+  weight = 20
+  name = "facebook"
+  pre = "fab fa-facebook-f"
+  url = "https://www.facebook.com/Dayton-Swing-Smackdown-120632558063863"
