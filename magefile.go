@@ -43,3 +43,9 @@ func BuildStatic() error {
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }
+
+func DeployStatic() error {
+	mg.Deps(BuildStatic)
+	fmt.Println("Deploying static site")
+	return sh.Run("gsutil", "-m", "rsync", "-R", "static/public", "gs://daytonswingsmackdown.com")
+}
