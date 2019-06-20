@@ -9,7 +9,7 @@ weight = 1200
 
 [asset]
   title = "Logo Title"
-  image = "logo.svg"
+  image = "logo.png"
   text = "Logo Subtext"
   url = "#"
 +++

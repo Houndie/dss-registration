@@ -1,13 +1,2 @@
 github.com/magefile/mage v1.8.0 h1:mzL+xIopvPURVBwHG9A50JcjBO+xV3b5iZ7khFRI+5E=
 github.com/magefile/mage v1.8.0/go.mod h1:IUDi13rsHje59lecXokTfGX0QIzO45uVPlXnJYsXepA=
-github.com/shurcooL/httpfs v0.0.0-20190527155220-6a4d4a70508b h1:4kg1wyftSKxLtnPAvcRWakIPpokB9w780/KwrNLnfPA=
-github.com/shurcooL/httpfs v0.0.0-20190527155220-6a4d4a70508b/go.mod h1:ZY1cvUeJuFPAdZ/B6v7RHavJWZn2YPVFQ1OSXhCGOkg=
-github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd h1:ug7PpSOB5RBPK1Kg6qskGBoP3Vnj/aNYFTznWvlkGo0=
-github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd/go.mod h1:TrYk7fJVaAttu97ZZKrO9UbRa8izdowaMIZcxYMbVaw=
-golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
-golang.org/x/net v0.0.0-20190311183353-d8887717615a/go.mod h1:t9HGtf8HONx5eT2rtn7q6eTqICYqUVnKs3thJo3Qplg=
-golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
-golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
-golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
-golang.org/x/tools v0.0.0-20190612232758-d4e310b4a8a5 h1:WfRBLVK37R+k1gUOKuZX8JtangyEXmuopHz5tazlZRo=
-golang.org/x/tools v0.0.0-20190612232758-d4e310b4a8a5/go.mod h1:/rFqwRUd4F7ZHNgwSSTFct+R/Kf4OFW1sUzUTQQTgfc=

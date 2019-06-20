@@ -6,14 +6,12 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"net/http"
 	"os"
 	"os/exec"
 	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/shurcooL/vfsgen"
 )
 
 const (
@@ -82,18 +80,9 @@ func bucketName() (string, error) {
 // var Default = Build
 
 func DeployDynamic() error {
-	mg.Deps(productionCheck, TemplatesBindata)
+	mg.Deps(productionCheck)
 	fmt.Println("Deploying...")
-	return sh.Run("gcloud", "functions", "deploy", "Registration", "--source", "src", "--runtime", "go111", "--trigger-http")
-}
-
-func TemplatesBindata() error {
-	fmt.Println("Generating Bindata")
-	return vfsgen.Generate(http.Dir("src/templates"), vfsgen.Options{
-		Filename:     "src/templates/vfsdata.go",
-		PackageName:  "templates",
-		VariableName: "Assets",
-	})
+	return sh.Run("gcloud", "functions", "deploy", "PopulateForm", "--source", "dynamic", "--runtime", "go111", "--trigger-http")
 }
 
 func BuildStatic() error {

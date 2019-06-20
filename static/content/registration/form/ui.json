@@ -1,0 +1,38 @@
+{
+	"firstName": {
+		"classNames": "dss-firstName"
+	},
+	"lastName": {
+		"classNames": "dss-lastName"
+	},
+	"city": {
+		"classNames": "dss-city"
+	},
+	"state": {
+		"classNames": "dss-state"
+	},
+	"zip": {
+		"classNames": "dss-zip"
+	},
+	"email": {
+		"ui:options": {
+			"inputType": "email"
+		}
+	},
+	"homeScene": {
+		"ui:help": "(However you refer to the place you usually dance)"
+	},
+	"teamCompetition": {
+		"ui:help": "(Only one team registration required per team)"
+	},
+	"housingStatus": {
+		"ui:placeholder": "I neither require nor can provide housing"
+	},
+	"housingNumber": {
+		"ui:widget": "updown"
+	},
+	"myHousingDetails": {
+		"ui:widget": "textarea"
+	}
+}
+    
