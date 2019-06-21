@@ -70,7 +70,7 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 			level = add.Level2
 		case "Level 3":
 			level = add.Level3
-		case "None":
+		case "":
 			logger.Warnf("No level submitted for a weekend pass?")
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
@@ -113,7 +113,7 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 			tShirt = &add.TShirt{
 				Style: add.TShirtStyle(formData.TShirtSize),
 			}
-		case "None":
+		case "":
 			logger.Warn("No T-shirt size submitted?")
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		default:

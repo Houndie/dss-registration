@@ -28,55 +28,60 @@ function onLoad(dynamicBase) {
 
 function weekendPassShowHide() {
 	var levelDiv = document.getElementById('dss-workshopLevel')
+	var levelInput = document.getElementById('root_workshopLevel')
 	switch (document.getElementById('root_weekendPassType').value) {
 		case "Dance":
 		case "":
 			levelDiv.style.display = 'none';
-			levelDiv.required = false
+			levelInput.required = false
 			break;
 		default:
 			levelDiv.style.display = 'block';
-			levelDiv.required = true
+			levelInput.required = true
 			break;
 	}
 }
 
 function mixAndMatchShowHide() {
 	var mixAndMatchRole = document.getElementById('dss-mixAndMatchRole')
+	var mixAndMatchRoleInput = document.getElementById('root_mixAndMatchRole')
 	if (document.getElementById('root_mixAndMatch').checked) {
 		mixAndMatchRole.style.display = 'block';
-		mixAndMatchRole.required = true
+		mixAndMatchRoleInput.required = true
 	} else {
 		mixAndMatchRole.style.display = 'none';
-		mixAndMatchRole.required = false
+		mixAndMatchRoleInput.required = false
 	}
 }
 
 function teamShowHide() {
 	var teamName = document.getElementById('dss-teamName')
+	var teamNameInput = document.getElementById('root_teamName')
 	if (document.getElementById('root_teamCompetition').checked) {
 		teamName.style.display = 'block';
-		teamName.required = true
+		teamNameInput.required = true
 	} else {
 		teamName.style.display = 'none';
-		teamName.required = false
+		teamNameInput.required = false
 	}
 }
 
 function tShirtShowHide() {
 	var tShirtSize = document.getElementById('dss-tShirtSize')
+	var tShirtSizeInput = document.getElementById('root_tShirtSize')
 	if (document.getElementById('root_tShirt').checked) {
 		tShirtSize.style.display = 'block';
-		tShirtSize.required = true
+		tShirtSizeInput.required = true
 	} else {
 		tShirtSize.style.display = 'none';
-		tShirtSize.required = false
+		tShirtSizeInput.required = false
 	}
 }
 
 function housingShowHide() {
 	var myPets = document.getElementById('dss-myPets');
 	var housingNumber = document.getElementById('dss-housingNumber');
+	var housingNumberInput = document.getElementById('root_housingNumber');
 	var myHousingDetails = document.getElementById('dss-myHousingDetails');
 	var petAllergies = document.getElementById('dss-petAllergies')
 	var housingRequestDetails = document.getElementById('dss-housingRequestDetails')
@@ -84,7 +89,7 @@ function housingShowHide() {
 		case "None":
 			myPets.style.display = 'none';
 			housingNumber.style.display = 'none';
-			housingNumber.required = false
+			housingNumberInput.required = false
 			myHousingDetails.style.display = 'none';
 			petAllergies.style.display = 'none';
 			housingRequestDetails.style.display = 'none';
@@ -92,7 +97,7 @@ function housingShowHide() {
 		case "Require":
 			myPets.style.display = 'none';
 			housingNumber.style.display = 'none';
-			housingNumber.required = false
+			housingNumberInput.required = false
 			myHousingDetails.style.display = 'none';
 			petAllergies.style.display = 'block';
 			housingRequestDetails.style.display = 'block';
