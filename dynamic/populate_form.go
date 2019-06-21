@@ -3,8 +3,6 @@ package dynamic
 import (
 	"encoding/json"
 	"net/http"
-
-	"github.com/Houndie/dss-registration/dynamic/registration"
 )
 
 func PopulateForm(w http.ResponseWriter, r *http.Request) {
@@ -17,7 +15,7 @@ func PopulateForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	logger.Info("Populate Form")
-	res, err := registration.Populate(squareClient, logger)
+	res, err := populateService.Populate()
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

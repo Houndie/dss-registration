@@ -7,8 +7,12 @@ import (
 	"os"
 
 	"cloud.google.com/go/datastore"
+	"github.com/Houndie/dss-registration/dynamic/registration/add"
+	"github.com/Houndie/dss-registration/dynamic/registration/populate"
 	"github.com/Houndie/dss-registration/dynamic/square"
+	"github.com/Houndie/dss-registration/dynamic/storage"
 	stackdriver "github.com/TV4/logrus-stackdriver-formatter"
+	"github.com/gorilla/schema"
 	"github.com/sirupsen/logrus"
 	runtimeconfig "google.golang.org/api/runtimeconfig/v1beta1"
 )
@@ -26,8 +30,10 @@ const (
 )
 
 var (
-	logger       *logrus.Logger
-	squareClient *square.Client
+	logger          *logrus.Logger
+	decoder         *schema.Decoder
+	populateService *populate.Service
+	addService      *add.Service
 )
 
 func init() {
@@ -93,13 +99,17 @@ func init() {
 			wrap:   http.DefaultTransport,
 		},
 	}
-	squareClient = square.NewClient(squarekey.Text, httpClient)
+	squareClient := square.NewClient(squarekey.Text, httpClient)
 
 	datastore, err := datastore.NewClient(ctx, datastore.DetectProjectID)
 	if err != nil {
 		logger.WithError(err).Fatal("Could not get datastore connection")
 		os.Exit(1)
 	}
+
+	populateService = populate.NewService(logger, squareClient)
+	addService = add.NewService(logger, storage.NewDatastore(datastore))
+	decoder = schema.NewDecoder()
 }
 
 type logRequests struct {

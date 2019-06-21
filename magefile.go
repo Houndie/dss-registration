@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -61,6 +62,20 @@ func siteName() (string, error) {
 	return "", fmt.Errorf("Unknown project name found (%s)", project)
 }
 
+func dynamicSite() (string, error) {
+	project, err := gcpProject()
+	if err != nil {
+		return "", err
+	}
+	switch project {
+	case PROJECT_PROD:
+		return "https://us-central1-dayton-smackdown.cloudfunctions.net", nil
+	case PROJECT_TEST:
+		return "https://us-central1-dayton-smackdown-test.cloudfunctions.net", nil
+	}
+	return "", fmt.Errorf("Unknown project name found (%s)", project)
+}
+
 func bucketName() (string, error) {
 	project, err := gcpProject()
 	if err != nil {
@@ -82,7 +97,23 @@ func bucketName() (string, error) {
 func DeployDynamic() error {
 	mg.Deps(productionCheck)
 	fmt.Println("Deploying...")
-	return sh.Run("gcloud", "functions", "deploy", "PopulateForm", "--source", "dynamic", "--runtime", "go111", "--trigger-http")
+	var wg sync.WaitGroup
+	functions := []string{"PopulateForm", "AddRegistration"}
+	errChan := make(chan error, len(functions))
+	for _, function := range functions {
+		wg.Add(1)
+		go func(f string) {
+			defer wg.Done()
+			errChan <- sh.Run("gcloud", "functions", "deploy", f, "--source", "dynamic", "--runtime", "go111", "--trigger-http")
+		}(function)
+	}
+	wg.Wait()
+	for i := 0; i < len(functions); i++ {
+		if err := <-errChan; err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func BuildStatic() error {
@@ -91,9 +122,14 @@ func BuildStatic() error {
 	if err != nil {
 		return err
 	}
+	dynamicsite, err := dynamicSite()
+	if err != nil {
+		return err
+	}
 	cmd := exec.Command("hugo")
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, "HUGO_BASEURL="+sitename)
+	cmd.Env = append(cmd.Env, "HUGO_DYNAMIC="+dynamicsite)
 	cmd.Dir = "static"
 	if mg.Verbose() {
 		cmd.Stdout = os.Stdout
@@ -104,10 +140,15 @@ func BuildStatic() error {
 
 func DeployStatic() error {
 	mg.Deps(productionCheck, BuildStatic)
+	fmt.Println("Deploying static site")
 	bucketname, err := bucketName()
 	if err != nil {
 		return err
 	}
-	fmt.Println("Deploying static site")
-	return sh.Run("gsutil", "-m", "rsync", "-R", "static/public", bucketname)
+	return sh.Run("gsutil", "-m", "rsync", "-c", "-R", "static/public", bucketname)
+}
+
+func Deploy() {
+	mg.Deps(DeployStatic, DeployDynamic)
+	fmt.Println("All Sites Deployed")
 }

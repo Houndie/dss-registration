@@ -27,20 +27,16 @@ function onLoad(dynamicBase) {
 }
 
 function weekendPassShowHide() {
-	var studentDiv = document.getElementById('dss-student')
 	var levelDiv = document.getElementById('dss-workshopLevel')
 	switch (document.getElementById('root_weekendPassType').value) {
 		case "Dance":
-			studentDiv.style.display = 'block';
-			levelDiv.style.display = 'none';
-			break;
 		case "":
-			studentDiv.style.display = 'none';
 			levelDiv.style.display = 'none';
+			levelDiv.required = false
 			break;
 		default:
-			studentDiv.style.display = 'block';
 			levelDiv.style.display = 'block';
+			levelDiv.required = true
 			break;
 	}
 }
@@ -49,8 +45,10 @@ function mixAndMatchShowHide() {
 	var mixAndMatchRole = document.getElementById('dss-mixAndMatchRole')
 	if (document.getElementById('root_mixAndMatch').checked) {
 		mixAndMatchRole.style.display = 'block';
+		mixAndMatchRole.required = true
 	} else {
 		mixAndMatchRole.style.display = 'none';
+		mixAndMatchRole.required = false
 	}
 }
 
@@ -58,8 +56,10 @@ function teamShowHide() {
 	var teamName = document.getElementById('dss-teamName')
 	if (document.getElementById('root_teamCompetition').checked) {
 		teamName.style.display = 'block';
+		teamName.required = true
 	} else {
 		teamName.style.display = 'none';
+		teamName.required = false
 	}
 }
 
@@ -67,8 +67,10 @@ function tShirtShowHide() {
 	var tShirtSize = document.getElementById('dss-tShirtSize')
 	if (document.getElementById('root_tShirt').checked) {
 		tShirtSize.style.display = 'block';
+		tShirtSize.required = true
 	} else {
 		tShirtSize.style.display = 'none';
+		tShirtSize.required = false
 	}
 }
 
@@ -79,16 +81,18 @@ function housingShowHide() {
 	var petAllergies = document.getElementById('dss-petAllergies')
 	var housingRequestDetails = document.getElementById('dss-housingRequestDetails')
 	switch (document.getElementById('root_housingStatus').value) {
-		case "I neither require nor can provide housing":
+		case "None":
 			myPets.style.display = 'none';
 			housingNumber.style.display = 'none';
+			housingNumber.required = false
 			myHousingDetails.style.display = 'none';
 			petAllergies.style.display = 'none';
 			housingRequestDetails.style.display = 'none';
 			break;
-		case "I require housing":
+		case "Require":
 			myPets.style.display = 'none';
 			housingNumber.style.display = 'none';
+			housingNumber.required = false
 			myHousingDetails.style.display = 'none';
 			petAllergies.style.display = 'block';
 			housingRequestDetails.style.display = 'block';
@@ -96,6 +100,7 @@ function housingShowHide() {
 		default:
 			myPets.style.display = 'block';
 			housingNumber.style.display = 'block';
+			housingNumber.required = true
 			myHousingDetails.style.display = 'block';
 			petAllergies.style.display = 'none';
 			housingRequestDetails.style.display = 'none';
