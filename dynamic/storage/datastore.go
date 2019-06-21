@@ -6,64 +6,58 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"github.com/Houndie/dss-registration/dynamic/registration/add"
+	"github.com/pkg/errors"
 )
 
-const danceOnlyPassKind = "DanceOnlyPass"
-
-type danceOnlyPassEntity struct{}
-
-const fullWeekendPassKind = "FullWeekendPass"
-
-type fullWeekendPassEntity struct {
+type weekendPass struct {
 	Level int
 }
 
-const mixAndMatchKind = "MixAndMatch"
-
-type mixAndMatchEntity struct {
+type mixAndMatch struct {
 	Role string
 }
 
-const teamCompetitionKind = "TeamCompetition"
-
-type teamCompetitionEntity struct {
-	Name string
-}
-
-const tShirtKind = "TShirt"
-
-type tShirtEntity struct {
+type tShirt struct {
 	Style string
 }
 
-const provideHousingKind = "Provide Housing"
-
-type provideHousingEntity struct {
-	Pets     string
-	Quantity int
-	Details  string
-}
-
-const requireHousingKind = "Require Housing"
-
-type requireHousingEntity struct {
-	PetAllergies string
-	Details      string
+type teamCompetition struct {
+	Name string
 }
 
 const registrationKind = "Registration"
 
 type registrationEntity struct {
-	FirstName     string
-	LastName      string
-	StreetAddress string
-	City          string
-	State         string
-	ZipCode       string
-	Email         string
-	HomeScene     string
-	IsStudent     bool
-	SoloJazz      bool
+	FirstName       string
+	LastName        string
+	StreetAddress   string
+	City            string
+	State           string
+	ZipCode         string
+	Email           string
+	HomeScene       string
+	IsStudent       bool
+	SoloJazz        bool
+	RequiresHousing bool
+	RequireHousing  struct {
+		PetAllergies string
+		Details      string
+	}
+	ProvidesHousing bool
+	ProvideHousing  struct {
+		Pets     string
+		Quantity int
+		Details  string
+	}
+	WantsTShirt          bool
+	TShirtStyle          string
+	HasTeamCompetition   bool
+	TeamCompetitionName  string
+	HasMixAndMatch       bool
+	MixAndMatchRole      string
+	HasFullWeekendPass   bool
+	FullWeekendPassLevel int
+	HasDanceOnlyPass     bool
 }
 
 type Datastore struct {
@@ -78,9 +72,7 @@ func NewDatastore(client *datastore.Client) *Datastore {
 }
 
 func (s *Datastore) AddRegistration(ctx context.Context, r *add.Registration) error {
-	// Inserting the main registration table can't be in a transaction, as we need the key
-	registrationKey := datastore.IncompleteKey(registrationKind, nil)
-	registrationKey, err := s.client.Put(ctx, registrationKey, &registrationEntity{
+	registration := &registrationEntity{
 		FirstName:     r.FirstName,
 		LastName:      r.LastName,
 		StreetAddress: r.StreetAddress,
@@ -91,90 +83,49 @@ func (s *Datastore) AddRegistration(ctx context.Context, r *add.Registration) er
 		HomeScene:     r.HomeScene,
 		IsStudent:     r.IsStudent,
 		SoloJazz:      r.SoloJazz,
-	})
-	if err != nil {
-		return err
 	}
-	_, err = s.client.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
 
-		switch p := r.PassType.(type) {
-		case *add.WeekendPass:
-			weekendPassKey := datastore.IncompleteKey(fullWeekendPassKind, registrationKey)
-			_, err := tx.Put(weekendPassKey, &fullWeekendPassEntity{
-				Level: int(p.Level),
-			})
-			if err != nil {
-				return err
-			}
-		case *add.DanceOnlyPass:
-			danceOnlyPassKey := datastore.IncompleteKey(danceOnlyPassKind, registrationKey)
-			_, err := tx.Put(danceOnlyPassKey, &danceOnlyPassEntity{})
-			if err != nil {
-				return err
-			}
-		case *add.NoPass: //Do nothing
-		default:
-			return fmt.Errorf("Found unknown type of weekend pass")
-		}
-
-		if r.MixAndMatch != nil {
-			mixAndMatchKey := datastore.IncompleteKey(mixAndMatchKind, registrationKey)
-			_, err := tx.Put(mixAndMatchKey, &mixAndMatchEntity{
-				Role: r.MixAndMatch.Role,
-			})
-			if err != nil {
-				return err
-			}
-		}
-
-		if r.TeamCompetition != nil {
-			teamCompetitionKey := datastore.IncompleteKey(teamCompetitionKind, registrationKey)
-			_, err := tx.Put(teamCompetitionKey, &teamCompetitionEntity{
-				Name: r.TeamCompetition.Name,
-			})
-			if err != nil {
-				return err
-			}
-		}
-
-		if r.TShirt != nil {
-			tShirtKey := datastore.IncompleteKey(tShirtKind, registrationKey)
-			_, err := tx.Put(tShirtKey, &tShirtEntity{
-				Style: string(r.TShirt.Style),
-			})
-			if err != nil {
-				return err
-			}
-		}
-
-		switch h := r.Housing.(type) {
-		case *add.ProvideHousing:
-			provideHousingKey := datastore.IncompleteKey(provideHousingKind, registrationKey)
-			_, err := tx.Put(provideHousingKey, &provideHousingEntity{
-				Pets:     h.Pets,
-				Quantity: h.Quantity,
-				Details:  h.Details,
-			})
-			if err != nil {
-				return err
-			}
-		case *add.RequireHousing:
-			requireHousingKey := datastore.IncompleteKey(requireHousingKind, registrationKey)
-			_, err := tx.Put(requireHousingKey, &requireHousingEntity{
-				PetAllergies: h.PetAllergies,
-				Details:      h.Details,
-			})
-			if err != nil {
-				return err
-			}
-		case *add.NoHousing: //Nothing to do
-		default:
-			return fmt.Errorf("Found unknown type of housing")
-		}
-		return nil
-	})
-	if err != nil {
-		_ = s.client.Delete(ctx, registrationKey)
+	switch p := r.PassType.(type) {
+	case *add.WeekendPass:
+		registration.HasFullWeekendPass = true
+		registration.FullWeekendPassLevel = int(p.Level)
+	case *add.DanceOnlyPass:
+		registration.HasDanceOnlyPass = true
+	case *add.NoPass: //Do nothing
+	default:
+		return fmt.Errorf("Found unknown type of weekend pass")
 	}
-	return err
+
+	if r.MixAndMatch != nil {
+		registration.HasMixAndMatch = true
+		registration.MixAndMatchRole = r.MixAndMatch.Role
+	}
+
+	if r.TeamCompetition != nil {
+		registration.HasTeamCompetition = true
+		registration.TeamCompetitionName = r.TeamCompetition.Name
+	}
+
+	if r.TShirt != nil {
+		registration.WantsTShirt = true
+		registration.TShirtStyle = string(r.TShirt.Style)
+	}
+
+	switch h := r.Housing.(type) {
+	case *add.ProvideHousing:
+		registration.ProvidesHousing = true
+		registration.ProvideHousing.Pets = h.Pets
+		registration.ProvideHousing.Quantity = h.Quantity
+		registration.ProvideHousing.Details = h.Details
+	case *add.RequireHousing:
+		registration.RequiresHousing = true
+		registration.RequireHousing.PetAllergies = h.PetAllergies
+		registration.RequireHousing.Details = h.Details
+	case *add.NoHousing: //Nothing to do
+	default:
+		return fmt.Errorf("Found unknown type of housing")
+	}
+	registrationKey := datastore.IncompleteKey(registrationKind, nil)
+	_, err := s.client.Put(ctx, registrationKey, registration)
+	return errors.Wrap(err, "Error inserting registration into database")
 }
