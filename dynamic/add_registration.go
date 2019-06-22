@@ -49,6 +49,7 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 		MyHousingDetails      string `schema:"my_housing_details"`
 		PetAllergies          string `schema:"pet_allergies"`
 		HousingRequestDetails string `schema:"housing_request_details"`
+		WeekendPassTier       int    `schema:"weekend_pass_tier"`
 	}{}
 
 	err = decoder.Decode(&formData, r.PostForm)
@@ -79,8 +80,15 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
+
+		if formData.WeekendPassTier < 1 || formData.WeekendPassTier > 5 {
+			logger.Warnf("Found invalid Tier %v", formData.WeekendPassTier)
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
 		passType = &add.WeekendPass{
 			Level: level,
+			Tier:  add.WeekendPassTier(formData.WeekendPassTier),
 		}
 	case "Dance":
 		passType = &add.DanceOnlyPass{}

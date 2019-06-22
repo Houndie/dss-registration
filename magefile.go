@@ -76,20 +76,6 @@ func dynamicSite() (string, error) {
 	return "", fmt.Errorf("Unknown project name found (%s)", project)
 }
 
-func bucketName() (string, error) {
-	project, err := gcpProject()
-	if err != nil {
-		return "", err
-	}
-	switch project {
-	case PROJECT_PROD:
-		return "gs://daytonswingsmackdown.com", nil
-	case PROJECT_TEST:
-		return "gs://test.daytonswingsmackdown.com", nil
-	}
-	return "", fmt.Errorf("Unknown project name found (%s)", project)
-}
-
 // Default target to run when none is specified
 // If not set, running mage will list available targets
 // var Default = Build
@@ -141,11 +127,23 @@ func BuildStatic() error {
 func DeployStatic() error {
 	mg.Deps(productionCheck, BuildStatic)
 	fmt.Println("Deploying static site")
-	bucketname, err := bucketName()
+	project, err := gcpProject()
 	if err != nil {
 		return err
 	}
-	return sh.Run("gsutil", "-m", "rsync", "-c", "-R", "static/public", bucketname)
+	var bucketname string
+	var cachecontrol string
+	switch project {
+	case PROJECT_PROD:
+		bucketname = "gs://daytonswingsmackdown.com"
+		cachecontrol = "Cache-Control:public,max-age=3600"
+	case PROJECT_TEST:
+		bucketname = "gs://test.daytonswingsmackdown.com"
+		cachecontrol = "Cache-Control:private"
+	default:
+		return fmt.Errorf("Unknown project name found (%s)", project)
+	}
+	return sh.Run("gsutil", "-h", cachecontrol, "-m", "rsync", "-c", "-R", "static/public", bucketname)
 }
 
 func Deploy() {

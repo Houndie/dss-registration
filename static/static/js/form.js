@@ -11,6 +11,7 @@ function onLoad(dynamicBase) {
 	var teamComp = document.getElementById("team_competition_label")
 	var tShirt = document.getElementById("tshirt_label")
 	var req = new XMLHttpRequest();
+	var weekendPassTier = document.getElementById("weekend_pass_tier")
 	req.onreadystatechange = function() {
 		if (req.readyState == 4 && req.status == 200) {
 			var resp = JSON.parse(req.responseText)
@@ -20,6 +21,7 @@ function onLoad(dynamicBase) {
 			soloJazz.innerHTML = "Solo Jazz Competition (" + parseDollar(resp.solo_jazz_cost) + ")"
 			teamComp.innerHTML = "Team Competition (" + parseDollar(resp.team_comp_cost) + ")"
 			tShirt.innerHTML = "T-Shirt (" + parseDollar(resp.tshirt_cost) + ")"
+			weekendPassTier.value = resp.weekend_pass_tier
 		}
 	}
 	req.open("GET", dynamicBase + "/PopulateForm", true)

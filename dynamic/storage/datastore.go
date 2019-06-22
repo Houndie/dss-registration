@@ -9,55 +9,52 @@ import (
 	"github.com/pkg/errors"
 )
 
-type weekendPass struct {
-	Level int
-}
+const (
+	registrationKind = "Registration"
 
-type mixAndMatch struct {
-	Role string
-}
+	fullWeekendPass = "Full Weekend Pass"
+	danceOnlyPass   = "Dance Only Pass"
+	noPass          = "No Pass"
 
-type tShirt struct {
-	Style string
-}
-
-type teamCompetition struct {
-	Name string
-}
-
-const registrationKind = "Registration"
+	requiresHousing = "Requires Housing"
+	providesHousing = "Provides Housing"
+	noHousing       = "No Housing"
+)
 
 type registrationEntity struct {
-	FirstName       string
-	LastName        string
-	StreetAddress   string
-	City            string
-	State           string
-	ZipCode         string
-	Email           string
-	HomeScene       string
-	IsStudent       bool
-	SoloJazz        bool
-	RequiresHousing bool
-	RequireHousing  struct {
+	FirstName      string
+	LastName       string
+	StreetAddress  string
+	City           string
+	State          string
+	ZipCode        string
+	Email          string
+	HomeScene      string
+	IsStudent      bool
+	SoloJazz       bool
+	HousingRequest string
+	RequireHousing struct {
 		PetAllergies string
 		Details      string
 	}
-	ProvidesHousing bool
-	ProvideHousing  struct {
+	ProvideHousing struct {
 		Pets     string
 		Quantity int
 		Details  string
 	}
-	WantsTShirt          bool
-	TShirtStyle          string
-	HasTeamCompetition   bool
-	TeamCompetitionName  string
-	HasMixAndMatch       bool
-	MixAndMatchRole      string
-	HasFullWeekendPass   bool
-	FullWeekendPassLevel int
-	HasDanceOnlyPass     bool
+	WantsTShirt         bool
+	TShirtStyle         string
+	HasTeamCompetition  bool
+	TeamCompetitionName string
+	HasMixAndMatch      bool
+	MixAndMatchRole     string
+	WeekendPass         string
+	FullWeekendPassInfo struct {
+		Level int
+		Tier  int
+	}
+	TransactionID string
+	Paid          bool
 }
 
 type Datastore struct {
@@ -71,7 +68,7 @@ func NewDatastore(client *datastore.Client) *Datastore {
 
 }
 
-func (s *Datastore) AddRegistration(ctx context.Context, r *add.Registration) error {
+func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistration) error {
 	registration := &registrationEntity{
 		FirstName:     r.FirstName,
 		LastName:      r.LastName,
@@ -83,15 +80,19 @@ func (s *Datastore) AddRegistration(ctx context.Context, r *add.Registration) er
 		HomeScene:     r.HomeScene,
 		IsStudent:     r.IsStudent,
 		SoloJazz:      r.SoloJazz,
+		TransactionID: r.TransactionID.String(),
+		Paid:          false,
 	}
 
 	switch p := r.PassType.(type) {
 	case *add.WeekendPass:
-		registration.HasFullWeekendPass = true
-		registration.FullWeekendPassLevel = int(p.Level)
+		registration.WeekendPass = fullWeekendPass
+		registration.FullWeekendPassInfo.Level = int(p.Level)
+		registration.FullWeekendPassInfo.Tier = int(p.Tier)
 	case *add.DanceOnlyPass:
-		registration.HasDanceOnlyPass = true
-	case *add.NoPass: //Do nothing
+		registration.WeekendPass = danceOnlyPass
+	case *add.NoPass:
+		registration.WeekendPass = noPass
 	default:
 		return fmt.Errorf("Found unknown type of weekend pass")
 	}
@@ -113,15 +114,16 @@ func (s *Datastore) AddRegistration(ctx context.Context, r *add.Registration) er
 
 	switch h := r.Housing.(type) {
 	case *add.ProvideHousing:
-		registration.ProvidesHousing = true
+		registration.HousingRequest = providesHousing
 		registration.ProvideHousing.Pets = h.Pets
 		registration.ProvideHousing.Quantity = h.Quantity
 		registration.ProvideHousing.Details = h.Details
 	case *add.RequireHousing:
-		registration.RequiresHousing = true
+		registration.HousingRequest = requiresHousing
 		registration.RequireHousing.PetAllergies = h.PetAllergies
 		registration.RequireHousing.Details = h.Details
-	case *add.NoHousing: //Nothing to do
+	case *add.NoHousing:
+		registration.HousingRequest = noHousing
 	default:
 		return fmt.Errorf("Found unknown type of housing")
 	}
