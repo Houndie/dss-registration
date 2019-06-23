@@ -7,20 +7,22 @@ import (
 	"github.com/pkg/errors"
 )
 
+type CatalogObjectType string
+
 const (
-	CatalogObjectItemType            = "ITEM"
-	CatalogObjectItemVariationType   = "ITEM_VARIATION"
-	CatalogObjectModifierType        = "MODIFIER"
-	CatalogObjectModifierListType    = "MODIFIER_LIST"
-	CatalogObjectCategoryType        = "CATEGORY"
-	CatalogObjectDiscountType        = "DISCOUNT"
-	CatalogObjectTaxType             = "TAX"
-	CatalogObjectImageType           = "IMAGE"
-	CatalogObjectMeasurementUnitType = "MEASUREMENT_UNIT"
+	CatalogObjectTypeItem            CatalogObjectType = "ITEM"
+	CatalogObjectTypeItemVariation   CatalogObjectType = "ITEM_VARIATION"
+	CatalogObjectTypeModifier        CatalogObjectType = "MODIFIER"
+	CatalogObjectTypeModifierList    CatalogObjectType = "MODIFIER_LIST"
+	CatalogObjectTypeCategory        CatalogObjectType = "CATEGORY"
+	CatalogObjectTypeDiscount        CatalogObjectType = "DISCOUNT"
+	CatalogObjectTypeTax             CatalogObjectType = "TAX"
+	CatalogObjectTypeImage           CatalogObjectType = "IMAGE"
+	CatalogObjectTypeMeasurementUnit CatalogObjectType = "MEASUREMENT_UNIT"
 )
 
 type catalogObject struct {
-	Type                  string                  `json:"type"`
+	Type                  CatalogObjectType       `json:"type"`
 	Id                    string                  `json:"id"`
 	UpdatedAt             string                  `json:"updated_at"`
 	Version               int                     `json:"version"`
@@ -41,7 +43,7 @@ type catalogObject struct {
 	MeasurementUnitData   *CatalogMeasurementUnit `json:"catalog_measurement_unit"`
 }
 
-type CatalogObjectType interface {
+type catalogObjectType interface {
 	isCatalogObjectType()
 }
 
@@ -55,7 +57,7 @@ type CatalogObject struct {
 	PresentAtLocationIds  []string
 	AbsentAtLocationIds   []string
 	ImageId               string
-	CatalogObjectType     CatalogObjectType
+	CatalogObjectType     catalogObjectType
 }
 
 func (c *CatalogObject) MarshalJSON() ([]byte, error) {
@@ -73,31 +75,31 @@ func (c *CatalogObject) MarshalJSON() ([]byte, error) {
 	switch t := c.CatalogObjectType.(type) {
 	case *CatalogItem:
 		cJson.ItemData = t
-		cJson.Type = CatalogObjectItemType
+		cJson.Type = CatalogObjectTypeItem
 	case *CatalogCategory:
 		cJson.CategoryData = t
-		cJson.Type = CatalogObjectCategoryType
+		cJson.Type = CatalogObjectTypeCategory
 	case *CatalogItemVariation:
 		cJson.ItemVariationData = t
-		cJson.Type = CatalogObjectItemVariationType
+		cJson.Type = CatalogObjectTypeItemVariation
 	case *CatalogTax:
 		cJson.TaxData = t
-		cJson.Type = CatalogObjectTaxType
+		cJson.Type = CatalogObjectTypeTax
 	case *CatalogDiscount:
 		cJson.DiscountData = t
-		cJson.Type = CatalogObjectDiscountType
+		cJson.Type = CatalogObjectTypeDiscount
 	case *CatalogModifierList:
 		cJson.ModifierListData = t
-		cJson.Type = CatalogObjectModifierListType
+		cJson.Type = CatalogObjectTypeModifierList
 	case *CatalogModifier:
 		cJson.ModifierData = t
-		cJson.Type = CatalogObjectModifierType
+		cJson.Type = CatalogObjectTypeModifier
 	case *CatalogImage:
 		cJson.ImageData = t
-		cJson.Type = CatalogObjectImageType
+		cJson.Type = CatalogObjectTypeImage
 	case *CatalogMeasurementUnit:
 		cJson.MeasurementUnitData = t
-		cJson.Type = CatalogObjectMeasurementUnitType
+		cJson.Type = CatalogObjectTypeMeasurementUnit
 	default:
 		return nil, errors.New("Found unknown catalog object data type")
 	}
@@ -122,23 +124,23 @@ func (c *CatalogObject) UnmarshalJSON(data []byte) error {
 	c.ImageId = cJson.ImageId
 
 	switch cJson.Type {
-	case CatalogObjectItemType:
+	case CatalogObjectTypeItem:
 		c.CatalogObjectType = cJson.ItemData
-	case CatalogObjectCategoryType:
+	case CatalogObjectTypeCategory:
 		c.CatalogObjectType = cJson.CategoryData
-	case CatalogObjectItemVariationType:
+	case CatalogObjectTypeItemVariation:
 		c.CatalogObjectType = cJson.ItemVariationData
-	case CatalogObjectTaxType:
+	case CatalogObjectTypeTax:
 		c.CatalogObjectType = cJson.TaxData
-	case CatalogObjectDiscountType:
+	case CatalogObjectTypeDiscount:
 		c.CatalogObjectType = cJson.DiscountData
-	case CatalogObjectModifierListType:
+	case CatalogObjectTypeModifierList:
 		c.CatalogObjectType = cJson.ModifierListData
-	case CatalogObjectModifierType:
+	case CatalogObjectTypeModifier:
 		c.CatalogObjectType = cJson.ModifierData
-	case CatalogObjectImageType:
+	case CatalogObjectTypeImage:
 		c.CatalogObjectType = cJson.ImageData
-	case CatalogObjectMeasurementUnitType:
+	case CatalogObjectTypeMeasurementUnit:
 		c.CatalogObjectType = cJson.MeasurementUnitData
 	default:
 		return fmt.Errorf("Found unknown catalog object type %s", cJson.Type)

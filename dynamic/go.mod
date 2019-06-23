@@ -9,6 +9,7 @@ require (
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/gorilla/schema v1.1.0
 	github.com/joonix/log v0.0.0-20190524090622-13fe31bbdd7a
+	github.com/peterhellberg/duration v0.0.0-20190124114432-484232d632c1
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.4.2
 	google.golang.org/api v0.6.0

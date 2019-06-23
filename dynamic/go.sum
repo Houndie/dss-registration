@@ -34,6 +34,8 @@ github.com/joonix/log v0.0.0-20190524090622-13fe31bbdd7a h1:LL1gwNo4Z1LG68SaaNb8
 github.com/joonix/log v0.0.0-20190524090622-13fe31bbdd7a/go.mod h1:fS54ONkjDV71zS9CDx3V9K21gJg7byKSvI4ajuWFNJw=
 github.com/jstemmer/go-junit-report v0.0.0-20190106144839-af01ea7f8024/go.mod h1:6v2b51hI/fHJwM22ozAgKL4VKDeJcHhJFhtBdhmNjmU=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
+github.com/peterhellberg/duration v0.0.0-20190124114432-484232d632c1 h1:Z11SFzGH4gLm9PGtXTgnP3EvJWpu24mHOCQaeAJDx90=
+github.com/peterhellberg/duration v0.0.0-20190124114432-484232d632c1/go.mod h1:x5xjkH61fUOJVgCCDgqNzlJvdLXiYpmMzSuum2FBOaw=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
