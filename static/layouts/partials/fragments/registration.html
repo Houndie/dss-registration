@@ -5,7 +5,7 @@
 <div class="overlay container-fluid {{- printf " bg-%s" $bg -}}">
 	<div data-portal="">
 		<div class="container editor-container">
-			<form class="rjsf" action="{{ getenv "HUGO_DYNAMIC" }}/AddRegistration" method="POST">
+			<form class="rjsf" action="javascript:void(0)" onsubmit="submitRegistration()">
 				<div class="form-group field field-object">
 					<fieldset>
 						<h2>Personal Information</h2>
@@ -247,13 +247,10 @@
 							<input class="form-control" id="root_coupon" label="Coupon code" placeholder="" type="text" value="">
 							<div></div><div></div>
 						</div>
-						<div>
-							<input type="hidden" id="weekend_pass_tier" name="weekend_pass_tier" value=-1>
-						</div>
 					</fieldset>
 					<div></div><div></div>
 				</div>
-				<p><input type="submit" class="btn btn-info" value="Submit" /></p>
+				<p><input type="submit" value="Submit" class="btn btn-info" /></p>
 			</form>
 		</div>
 	</div>

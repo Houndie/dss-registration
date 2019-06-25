@@ -3,7 +3,11 @@ function parseDollar(intCost) {
 	return "$" + dollar.slice(0, -2) + "." + dollar.slice(-2)
 }
 
-function onLoad(dynamicBase) {
+var dynamicBase
+var current_tier
+
+function onLoad(d) {
+	dynamicBase = d
 	var danceOption = document.getElementById("dance_only_pass_option")
 	var fullWeekendOption = document.getElementById("full_weekend_pass_option")
 	var mixAndMatch = document.getElementById("mix_and_match_label")
@@ -11,7 +15,6 @@ function onLoad(dynamicBase) {
 	var teamComp = document.getElementById("team_competition_label")
 	var tShirt = document.getElementById("tshirt_label")
 	var req = new XMLHttpRequest();
-	var weekendPassTier = document.getElementById("weekend_pass_tier")
 	req.onreadystatechange = function() {
 		if (req.readyState == 4 && req.status == 200) {
 			var resp = JSON.parse(req.responseText)
@@ -21,7 +24,7 @@ function onLoad(dynamicBase) {
 			soloJazz.innerHTML = "Solo Jazz Competition (" + parseDollar(resp.solo_jazz_cost) + ")"
 			teamComp.innerHTML = "Team Competition (" + parseDollar(resp.team_comp_cost) + ")"
 			tShirt.innerHTML = "T-Shirt (" + parseDollar(resp.tshirt_cost) + ")"
-			weekendPassTier.value = resp.weekend_pass_tier
+			current_tier = resp.weekend_pass_tier
 		}
 	}
 	req.open("GET", dynamicBase + "/PopulateForm", true)
@@ -113,4 +116,75 @@ function housingShowHide() {
 			housingRequestDetails.style.display = 'none';
 			break;
 	}
+}
+
+function submitRegistration() {
+	var j = new Object();
+	j.first_name = document.getElementById('root_firstName').value;
+	j.last_name = document.getElementById('root_lastName').value;
+	j.address = document.getElementById('root_address').value;
+	j.city = document.getElementById('root_city').value;
+	j.state = document.getElementById('root_state').value;
+	j.zip = document.getElementById('root_zip').value;
+	j.email = document.getElementById('root_email').value;
+	j.home_scene = document.getElementById('root_homeScene').value;
+	j.student = document.getElementById('root_homeScene').checked;
+
+	j.weekend_pass_type = document.getElementById('root_weekendPassType').value;
+	if (j.weekend_pass_type == 'Full') {
+		j.full_weekend = new Object();
+		j.full_weekend.level = document.getElementById('root_workshopLevel').value;
+		j.full_weekend.tier = current_tier;
+	}
+
+	j.mix_and_match = document.getElementById('root_mixAndMatch').checked;
+	if (j.mix_and_match) {
+		j.mix_and_match_role = document.getElementById('root_mixAndMatchRole').value;
+	}
+
+	j.solo_jazz = document.getElementById('root_soloJazz').checked;
+
+	j.team_competition = document.getElementById('root_teamCompetition').checked;
+	if (j.team_competition) {
+		j.team_name = document.getElementById('root_teamName').value;
+	}
+
+	j.tshirt = document.getElementById('root_tShirt').checked;
+	if (j.tshirt) {
+		j.tshirt_size = document.getElementById('root_tShirtSize').value;
+	}
+
+	j.housing_status = document.getElementById('root_housingStatus').value;
+	if (j.housing_status == "Require") {
+		j.require_housing = new Object();
+		j.require_housing.pet_allergies = document.getElementById('root_petAllergies').value;
+		j.require_housing.housing_request_details = document.getElementById('root_housingRequestDetails').value;
+	} else if (j.housing_status == "Provide") {
+		j.provide_housing = new Object();
+		j.provide_housing.my_pets = document.getElementById('root_myPets').value;
+		j.provide_housing.housing_number = document.getElementById('root_housingNumber').value;
+		j.provide_housing.my_housing_details = document.getElementById('root_myHousingDetails').value;
+	}
+
+	var jsonString = JSON.stringify(j);
+	alert(jsonString)
+
+	var req = new XMLHttpRequest();
+	req.onreadystatechange = function() {
+		if (req.readyState != 4 || req.status != 200) {
+			return;
+		}
+		var resp = JSON.parse(req.responseText);
+		if (typeof resp.errors !== "undefined" && resp.errors.length != 0) {
+			alert("SOMETHING BAD HAS HAPPENED");
+			return;
+		}
+
+		window.location.href = resp.checkout_url;
+	}
+
+	req.open("POST", dynamicBase + "/AddRegistration", true)
+	req.setRequestHeader("Content-Type", "application/json")
+	req.setRequestHeader("Accept", "application/json")
+	req.send(jsonString)
 }
