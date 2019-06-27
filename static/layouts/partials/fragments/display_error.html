@@ -1,0 +1,24 @@
+{{- $fragment := .self.Params -}}
+{{- $name := strings.TrimSuffix ".md" (replace .self.Name "/index.md" "") -}}
+{{- $bg := $fragment.background | default "secondary" }}
+
+<section class="fragment content-fragment">
+	<div class="overlay container-fluid {{- printf " bg-%s" $bg -}}">
+		<div class="container py-5">
+			<div class="row">
+				<article class="col-md-12">
+					<div class="col-12 content px-0 text-body">
+						<h2>Error</h2>
+						<h3>Source Page:</h3>
+						<pre id="error_source_page"></pre>
+						<h3>Message:</h3>
+						<pre id="error_message"></pre>
+					</div>
+				</article>
+			</div>
+		</div>
+	</div>
+	<script>
+		error_onload();
+	</script>
+</section>
