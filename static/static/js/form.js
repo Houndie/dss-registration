@@ -4,10 +4,12 @@ function parseDollar(intCost) {
 }
 
 var dynamicBase
+var siteBase
 var current_tier
 
-function onLoad(d) {
+function onLoad(d, s) {
 	dynamicBase = d
+	siteBase = s
 	var danceOption = document.getElementById("dance_only_pass_option")
 	var fullWeekendOption = document.getElementById("full_weekend_pass_option")
 	var mixAndMatch = document.getElementById("mix_and_match_label")
@@ -167,20 +169,28 @@ function submitRegistration() {
 	}
 
 	var jsonString = JSON.stringify(j);
-	alert(jsonString)
 
 	var req = new XMLHttpRequest();
 	req.onreadystatechange = function() {
-		if (req.readyState != 4 || req.status != 200) {
-			return;
-		}
-		var resp = JSON.parse(req.responseText);
-		if (typeof resp.errors !== "undefined" && resp.errors.length != 0) {
-			alert("SOMETHING BAD HAS HAPPENED");
+		if (req.readyState != 4) {
 			return;
 		}
 
-		window.location.href = resp.checkout_url;
+		try {
+			var resp = JSON.parse(req.responseText);
+			if (typeof resp.errors !== "undefined" && resp.errors.length != 0) {
+				window.location.href = siteBase + "error/?source_page=/registration&error="+encodeURI(req.responseText)
+				return;
+			}
+
+			if (req.status != 200) {
+				window.location.href = siteBase + "error/?source_page=/registration&error=status"+req.status
+			}
+
+			window.location.href = resp.checkout_url;
+		} catch(e) {
+			window.location.href = siteBase + "error/?source_page=/registration&error="+e.name+"%3A%20"+e.message
+		}
 	}
 
 	req.open("POST", dynamicBase + "/AddRegistration", true)

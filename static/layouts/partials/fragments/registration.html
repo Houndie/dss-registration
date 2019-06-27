@@ -256,5 +256,5 @@
 	</div>
 </div>
 <script>
-	onLoad({{ getenv "HUGO_DYNAMIC" }})
+	onLoad({{ getenv "HUGO_DYNAMIC" }}, {{.Site.BaseURL}})
 </script>
