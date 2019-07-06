@@ -7,7 +7,7 @@ type BusinessHours struct {
 }
 
 type BusinessHoursPeriod struct {
-	DayOfWeek      string    `json:"day_of_week"`
-	StartLocalTime time.Time `json:"start_local_time"`
-	EndLocalTime   time.Time `json:"end_local_time"`
+	DayOfWeek      string     `json:"day_of_week,omitempty"`
+	StartLocalTime *time.Time `json:"start_local_time,omitempty"`
+	EndLocalTime   *time.Time `json:"end_local_time,omitempty"`
 }

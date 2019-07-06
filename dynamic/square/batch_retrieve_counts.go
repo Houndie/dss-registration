@@ -16,16 +16,14 @@ func (c *Client) BatchRetrieveInventoryCounts(catalogObjectIds, locationIds []st
 		return nil, errors.Wrap(err, "Error parsing url")
 	}
 	body := struct {
-		CatalogObjectIds []string `json:"catalog_object_ids"`
-		LocationIds      []string `json:"location_ids"`
-		UpdatedAfter     string   `json:"updated_after"`
-		Cursor           string   `json:"cursor"`
+		CatalogObjectIds []string   `json:"catalog_object_ids,omitempty"`
+		LocationIds      []string   `json:"location_ids,omitempty"`
+		UpdatedAfter     *time.Time `json:"updated_after,omitempty"`
+		Cursor           string     `json:"cursor,omitempty"`
 	}{
 		CatalogObjectIds: catalogObjectIds,
 		LocationIds:      locationIds,
-	}
-	if updatedAfter != nil {
-		body.UpdatedAfter = updatedAfter.String()
+		UpdatedAfter:     updatedAfter,
 	}
 
 	counts := []*InventoryCount{}

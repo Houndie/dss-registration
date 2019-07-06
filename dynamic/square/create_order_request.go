@@ -1,6 +1,6 @@
 package square
 
 type CreateOrderRequest struct {
-	Order          *Order `json:"order"`
-	IdempotencyKey string `json:"idempotency_key"`
+	Order          *Order `json:"order,omitempty"`
+	IdempotencyKey string `json:"idempotency_key,omitempty"`
 }

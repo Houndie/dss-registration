@@ -1,7 +1,7 @@
 package square
 
 type OrderRoundingAdjustment struct {
-	Uid         string `json:"uid"`
-	Name        string `json:"name"`
-	AmountMoney *Money `json:"amount_money"`
+	Uid         string `json:"uid,omitempty"`
+	Name        string `json:"name,omitempty"`
+	AmountMoney *Money `json:"amount_money,omitempty"`
 }

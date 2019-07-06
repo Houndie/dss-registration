@@ -1,9 +1,9 @@
 package dynamic
 
 type jsonError struct {
-	Type                    jsonErrorType            `json:"type"`
-	MissingParameterDetails *missingParameterDetails `json:"missing_parameter_details"`
-	BadParameterDetails     *badParameterDetails     `json:"bad_parameter_details"`
+	Type                    jsonErrorType            `json:"type,omitempty"`
+	MissingParameterDetails *missingParameterDetails `json:"missing_parameter_details,omitempty"`
+	BadParameterDetails     *badParameterDetails     `json:"bad_parameter_details,omitempty"`
 }
 
 type jsonErrorType string

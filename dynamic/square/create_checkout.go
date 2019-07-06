@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -12,15 +13,15 @@ import (
 
 func (c *Client) CreateCheckout(ctx context.Context, locationId, idempotencyKey string, order *CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail string, prePopulateBuyerEmail string, prePopulateShippingAddress *Address, redirectUrl string, additionalRecipients []*ChargeRequestAdditionalRecipient, note string) (*Checkout, error) {
 	body := struct {
-		IdempotencyKey             string                              `json:"idempotency_key"`
-		Order                      *CreateOrderRequest                 `json:"order"`
-		AskForShippingAddress      bool                                `json:"ask_for_shipping_address"`
-		MerchantSupportEmail       string                              `json:"merchant_support_email"`
-		PrePopulateBuyerEmail      string                              `json:"pre_populate_buyer_email"`
-		PrePopulateShippingAddress *Address                            `json:"pre_populate_shipping_address"`
-		RedirectUrl                string                              `json:"redirect_url"`
-		AdditionalRecipients       []*ChargeRequestAdditionalRecipient `json:"additional_recipients"`
-		Note                       string                              `json:"note"`
+		IdempotencyKey             string                              `json:"idempotency_key,omitempty"`
+		Order                      *CreateOrderRequest                 `json:"order,omitempty"`
+		AskForShippingAddress      bool                                `json:"ask_for_shipping_address,omitempty"`
+		MerchantSupportEmail       string                              `json:"merchant_support_email,omitempty"`
+		PrePopulateBuyerEmail      string                              `json:"pre_populate_buyer_email,omitempty"`
+		PrePopulateShippingAddress *Address                            `json:"pre_populate_shipping_address,omitempty"`
+		RedirectUrl                string                              `json:"redirect_url,omitempty"`
+		AdditionalRecipients       []*ChargeRequestAdditionalRecipient `json:"additional_recipients,omitempty"`
+		Note                       string                              `json:"note,omitempty"`
 	}{
 		IdempotencyKey: idempotencyKey,
 		Order:          order,
@@ -36,6 +37,7 @@ func (c *Client) CreateCheckout(ctx context.Context, locationId, idempotencyKey 
 	if err != nil {
 		return nil, errors.Wrap(err, "Error mashaling request body")
 	}
+	fmt.Println(string(jsonBody))
 
 	bodyBuf := bytes.NewBuffer(jsonBody)
 

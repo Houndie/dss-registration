@@ -1,7 +1,7 @@
 package square
 
 type ChargeRequestAdditionalRecipient struct {
-	LocationId  string `json:"location_id"`
-	Description string `json:"description"`
-	AmountMoney *Money `json:"amount_money"`
+	LocationId  string `json:"location_id,omitempty"`
+	Description string `json:"description,omitempty"`
+	AmountMoney *Money `json:"amount_money,omitempty"`
 }

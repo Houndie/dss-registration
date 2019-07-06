@@ -9,12 +9,12 @@ import (
 )
 
 type inventoryCount struct {
-	CatalogObjectId   string `json:"catalog_object_id"`
-	CatalogObjectType string `json:"catalog_object_type"`
-	State             string `json:"state"`
-	LocationId        string `json:"location_id"`
-	Quantity          string `json:"quantity"`
-	CalculatedAt      string `json:"calculated_at"`
+	CatalogObjectId   string `json:"catalog_object_id,omitempty"`
+	CatalogObjectType string `json:"catalog_object_type,omitempty"`
+	State             string `json:"state,omitempty"`
+	LocationId        string `json:"location_id,omitempty"`
+	Quantity          string `json:"quantity,omitempty"`
+	CalculatedAt      string `json:"calculated_at,omitempty"`
 }
 
 type InventoryCount struct {

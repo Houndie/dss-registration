@@ -10,21 +10,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	mixAndMatchItem = "Mix And Match"
-	teamCompItem    = "Team Competition"
-	soloJazzItem    = "Solo"
-	dancePassItem   = "Dance Only"
-	weekendPassItem = "Full Weekend Pass"
-	tShirtItem      = "2020 T-Shirt"
-
-	weekendPassTier1Name = "Tier 1"
-	weekendPassTier2Name = "Tier 2"
-	weekendPassTier3Name = "Tier 3"
-	weekendPassTier4Name = "Tier 4"
-	weekendPassTier5Name = "Tier 5"
-)
-
 type tierData struct {
 	tier int
 	cost int
@@ -65,12 +50,9 @@ func (s *Service) Populate() (*FormData, error) {
 			s.logger.Trace("Square object was not of type catalog item")
 			continue
 		}
-		if item == nil {
-			s.logger.Tracef("here")
-		}
 		s.logger.Tracef("Comparing item name %s to legend", item.Name)
 		switch item.Name {
-		case mixAndMatchItem, teamCompItem, soloJazzItem, tShirtItem:
+		case utility.MixAndMatchItem, utility.TeamCompItem, utility.SoloJazzItem, utility.TShirtItem:
 			s.logger.Trace("Found competition item")
 			if len(item.Variations) != 1 {
 				err := fmt.Errorf("Found unexpected number of variations: %v", len(item.Variations))
@@ -84,20 +66,20 @@ func (s *Service) Populate() (*FormData, error) {
 				return nil, errors.New(err)
 			}
 			switch item.Name {
-			case mixAndMatchItem:
+			case utility.MixAndMatchItem:
 				res.MixAndMatchCost = variation.PriceMoney.Amount
-			case teamCompItem:
+			case utility.TeamCompItem:
 				res.TeamCompCost = variation.PriceMoney.Amount
-			case soloJazzItem:
+			case utility.SoloJazzItem:
 				res.SoloJazzCost = variation.PriceMoney.Amount
-			case tShirtItem:
+			case utility.TShirtItem:
 				res.TShirtCost = variation.PriceMoney.Amount
 			default:
 				err := errors.New("Impossible code path...how did I get here")
 				s.logger.Error(err)
 				return nil, err
 			}
-		case dancePassItem:
+		case utility.DancePassItem:
 			s.logger.Trace("Found dance pass item")
 			for _, v := range item.Variations {
 				variation, ok := v.CatalogObjectType.(*square.CatalogItemVariation)
@@ -113,7 +95,7 @@ func (s *Service) Populate() (*FormData, error) {
 				}
 				s.logger.Tracef("Did not find dance pass variant Presale (found %s), moving on", variation.Name)
 			}
-		case weekendPassItem:
+		case utility.WeekendPassItem:
 			s.logger.Trace("Found weekend pass object")
 			for _, v := range item.Variations {
 				variation, ok := v.CatalogObjectType.(*square.CatalogItemVariation)
@@ -125,19 +107,19 @@ func (s *Service) Populate() (*FormData, error) {
 
 				s.logger.Tracef("Found variation with name %s and id %s", variation.Name, v.Id)
 				switch variation.Name {
-				case weekendPassTier1Name:
+				case utility.WeekendPassTier1Name:
 					s.logger.Trace("Variation matched tier 1")
 					tiers[v.Id] = tierData{1, variation.PriceMoney.Amount}
-				case weekendPassTier2Name:
+				case utility.WeekendPassTier2Name:
 					s.logger.Trace("Variation matched tier 2")
 					tiers[v.Id] = tierData{2, variation.PriceMoney.Amount}
-				case weekendPassTier3Name:
+				case utility.WeekendPassTier3Name:
 					s.logger.Trace("Variation matched tier 3")
 					tiers[v.Id] = tierData{3, variation.PriceMoney.Amount}
-				case weekendPassTier4Name:
+				case utility.WeekendPassTier4Name:
 					s.logger.Trace("Variation matched tier 4")
 					tiers[v.Id] = tierData{4, variation.PriceMoney.Amount}
-				case weekendPassTier5Name:
+				case utility.WeekendPassTier5Name:
 					s.logger.Trace("Variation matched tier 5")
 					tiers[v.Id] = tierData{5, variation.PriceMoney.Amount}
 				default: // Do nothing, we have other names that are allowable

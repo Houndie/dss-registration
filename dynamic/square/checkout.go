@@ -3,14 +3,14 @@ package square
 import "time"
 
 type Checkout struct {
-	Id                         string                 `json:"id"`
-	CheckoutPageUrl            string                 `json:"checkout_page_url"`
-	AskForShippingAddress      bool                   `json:"ask_for_shipping_address"`
-	MerchantSupportEmail       string                 `json:"merchant_support_email"`
-	PrePopulateBuyerEmail      string                 `json:"pre_populate_buyer_email"`
-	PrePopulateShippingAddress *Address               `json:"pre_populate_shipping_address"`
-	RedirectUrl                string                 `json:"redirect_url"`
-	Order                      *Order                 `json:"order"`
-	CreatedAt                  time.Time              `json:"created_at"`
-	AdditionalRecipients       []*AdditionalRecipient `json:"additional_recipients"`
+	Id                         string                 `json:"id,omitempty"`
+	CheckoutPageUrl            string                 `json:"checkout_page_url,omitempty"`
+	AskForShippingAddress      bool                   `json:"ask_for_shipping_address,omitempty"`
+	MerchantSupportEmail       string                 `json:"merchant_support_email,omitempty"`
+	PrePopulateBuyerEmail      string                 `json:"pre_populate_buyer_email,omitempty"`
+	PrePopulateShippingAddress *Address               `json:"pre_populate_shipping_address,omitempty"`
+	RedirectUrl                string                 `json:"redirect_url,omitempty"`
+	Order                      *Order                 `json:"order,omitempty"`
+	CreatedAt                  *time.Time             `json:"created_at,omitempty"`
+	AdditionalRecipients       []*AdditionalRecipient `json:"additional_recipients,omitempty"`
 }

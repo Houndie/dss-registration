@@ -76,6 +76,7 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 			PetAllergies          string `json:"pet_allergies"`
 			HousingRequestDetails string `json:"housing_request_details"`
 		} `json:"require_housing"`
+		RedirectUrl string `json:"redirect_url"`
 	}{}
 
 	body, err := ioutil.ReadAll(r.Body)
@@ -234,7 +235,7 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = addService.Add(r.Context(), &add.Registration{
+	url, err := addService.Add(r.Context(), &add.Registration{
 		FirstName:       inputs.FirstName,
 		LastName:        inputs.LastName,
 		StreetAddress:   inputs.Address,
@@ -250,11 +251,11 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 		TeamCompetition: teamCompetition,
 		TShirt:          tShirt,
 		Housing:         housing,
-	})
+	}, inputs.RedirectUrl)
 	if err != nil {
 		logger.WithError(err).Error("Error adding regitration to backend")
 		writeAddRegistrationResp(w, logger, "", []*jsonError{internalServerError()})
 		return
 	}
-	writeAddRegistrationResp(w, logger, "http://test.daytonswingsmackdown.com", nil)
+	writeAddRegistrationResp(w, logger, url, nil)
 }

@@ -1,16 +1,16 @@
 package square
 
 type OrderReturnServiceCharge struct {
-	Uid                    string                             `json:"uid"`
-	SourceServiceChargeUid string                             `json:"source_service_charge_uid"`
-	Name                   string                             `json:"name"`
-	CatalogObjectId        string                             `json:"catalog_object_id"`
-	Percentage             string                             `json:"percentage"`
-	AmountMoney            *Money                             `json:"amount_money"`
-	AppliedMoney           *Money                             `json:"applied_money"`
-	TotalMoney             *Money                             `json:"total_money"`
-	TotalTaxMoney          *Money                             `json:"total_tax_money"`
-	CalculationPhase       OrderServiceChargeCalculationPhase `json:"calculation_phase"`
-	Taxable                bool                               `json:"taxable"`
-	ReturnTaxes            []*OrderReturnTax                  `json:"return_taxes"`
+	Uid                    string                             `json:"uid,omitempty"`
+	SourceServiceChargeUid string                             `json:"source_service_charge_uid,omitempty"`
+	Name                   string                             `json:"name,omitempty"`
+	CatalogObjectId        string                             `json:"catalog_object_id,omitempty"`
+	Percentage             string                             `json:"percentage,omitempty"`
+	AmountMoney            *Money                             `json:"amount_money,omitempty"`
+	AppliedMoney           *Money                             `json:"applied_money,omitempty"`
+	TotalMoney             *Money                             `json:"total_money,omitempty"`
+	TotalTaxMoney          *Money                             `json:"total_tax_money,omitempty"`
+	CalculationPhase       OrderServiceChargeCalculationPhase `json:"calculation_phase,omitempty"`
+	Taxable                bool                               `json:"taxable,omitempty"`
+	ReturnTaxes            []*OrderReturnTax                  `json:"return_taxes,omitempty"`
 }

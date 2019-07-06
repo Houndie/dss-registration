@@ -40,9 +40,9 @@ func (c *Client) ListCatalog(types []string) ([]*CatalogObject, error) {
 			return objects, errors.Wrap(err, "Error reading response body")
 		}
 		respJson := struct {
-			Errors  []*Error         `json:"errors"`
-			Cursor  string           `json:"cursor"`
-			Objects []*CatalogObject `json:"objects"`
+			Errors  []*Error         `json:"errors,omitempty"`
+			Cursor  string           `json:"cursor,omitempty"`
+			Objects []*CatalogObject `json:"objects,omitempty"`
 		}{}
 		err = json.Unmarshal(bytes, &respJson)
 		if err != nil {

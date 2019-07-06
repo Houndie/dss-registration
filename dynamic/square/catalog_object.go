@@ -22,25 +22,25 @@ const (
 )
 
 type catalogObject struct {
-	Type                  CatalogObjectType       `json:"type"`
-	Id                    string                  `json:"id"`
-	UpdatedAt             string                  `json:"updated_at"`
-	Version               int                     `json:"version"`
-	IsDeleted             bool                    `json:"is_deleted"`
-	CatalogV1Ids          []*CatalogV1Id          `json:"catalog_v1_ids"`
-	PresentAtAllLocations bool                    `json:"present_at_all_locations"`
-	PresentAtLocationIds  []string                `json:"present_at_location_ids"`
-	AbsentAtLocationIds   []string                `json:"absent_at_location_ids"`
-	ImageId               string                  `json:"image_id"`
-	ItemData              *CatalogItem            `json:"item_data"`
-	CategoryData          *CatalogCategory        `json:"category_data"`
-	ItemVariationData     *CatalogItemVariation   `json:"item_variation_data"`
-	TaxData               *CatalogTax             `json:"tax_data"`
-	DiscountData          *CatalogDiscount        `json:"discount_data"`
-	ModifierListData      *CatalogModifierList    `json:"modifier_list_data"`
-	ModifierData          *CatalogModifier        `json:"modifier_data"`
-	ImageData             *CatalogImage           `json:"image_data"`
-	MeasurementUnitData   *CatalogMeasurementUnit `json:"catalog_measurement_unit"`
+	Type                  CatalogObjectType       `json:"type,omitempty"`
+	Id                    string                  `json:"id,omitempty"`
+	UpdatedAt             string                  `json:"updated_at,omitempty"`
+	Version               int                     `json:"version,omitempty"`
+	IsDeleted             bool                    `json:"is_deleted,omitempty"`
+	CatalogV1Ids          []*CatalogV1Id          `json:"catalog_v1_ids,omitempty"`
+	PresentAtAllLocations bool                    `json:"present_at_all_locations,omitempty"`
+	PresentAtLocationIds  []string                `json:"present_at_location_ids,omitempty"`
+	AbsentAtLocationIds   []string                `json:"absent_at_location_ids,omitempty"`
+	ImageId               string                  `json:"image_id,omitempty"`
+	ItemData              *CatalogItem            `json:"item_data,omitempty"`
+	CategoryData          *CatalogCategory        `json:"category_data,omitempty"`
+	ItemVariationData     *CatalogItemVariation   `json:"item_variation_data,omitempty"`
+	TaxData               *CatalogTax             `json:"tax_data,omitempty"`
+	DiscountData          *CatalogDiscount        `json:"discount_data,omitempty"`
+	ModifierListData      *CatalogModifierList    `json:"modifier_list_data,omitempty"`
+	ModifierData          *CatalogModifier        `json:"modifier_data,omitempty"`
+	ImageData             *CatalogImage           `json:"image_data,omitempty"`
+	MeasurementUnitData   *CatalogMeasurementUnit `json:"catalog_measurement_unit,omitempty"`
 }
 
 type catalogObjectType interface {

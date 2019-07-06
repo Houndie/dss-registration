@@ -1,6 +1,6 @@
 package square
 
 type OrderQuantityUnit struct {
-	MeasurementUnit *MeasurementUnit `json:"measurement_unit"`
-	Precision       int              `json:"precision"`
+	MeasurementUnit *MeasurementUnit `json:"measurement_unit,omitempty"`
+	Precision       int              `json:"precision,omitempty"`
 }

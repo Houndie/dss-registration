@@ -15,12 +15,12 @@ const (
 )
 
 type Card struct {
-	Id             string    `json:"string"`
-	CardBrand      CardBrand `json:"card_brand"`
-	Last4          string    `json:"last_4"`
-	ExpMonth       int       `json:"exp_month"`
-	ExpYear        int       `json:"exp_year"`
-	CardholderName string    `json:"cardholder_name"`
-	BillingAddress Address   `json:"address"`
-	Fingerprint    string    `json:"fingerprint"`
+	Id             string    `json:"string,omitempty"`
+	CardBrand      CardBrand `json:"card_brand,omitempty"`
+	Last4          string    `json:"last_4,omitempty"`
+	ExpMonth       int       `json:"exp_month,omitempty"`
+	ExpYear        int       `json:"exp_year,omitempty"`
+	CardholderName string    `json:"cardholder_name,omitempty"`
+	BillingAddress Address   `json:"address,omitempty"`
+	Fingerprint    string    `json:"fingerprint,omitempty"`
 }

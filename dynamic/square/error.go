@@ -111,10 +111,10 @@ const (
 )
 
 type Error struct {
-	Category ErrorCategory `json:"category"`
-	Code     ErrorCode     `json:"code"`
-	Detail   string        `json:"detail"`
-	Field    string        `json:"field"`
+	Category ErrorCategory `json:"category,omitempty"`
+	Code     ErrorCode     `json:"code,omitempty"`
+	Detail   string        `json:"detail,omitempty"`
+	Field    string        `json:"field,omitempty"`
 }
 
 func (e *Error) Error() string {

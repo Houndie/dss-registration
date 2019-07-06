@@ -16,7 +16,7 @@ const (
 )
 
 type OrderFulfillment struct {
-	Type          OrderFulfillmentType           `json:"type"`
-	State         OrderFulfillmentState          `json:"state"`
-	PickupDetails *OrderFulfillmentPickupDetails `json:"pickup_details"`
+	Type          OrderFulfillmentType           `json:"type,omitempty"`
+	State         OrderFulfillmentState          `json:"state,omitempty"`
+	PickupDetails *OrderFulfillmentPickupDetails `json:"pickup_details,omitempty"`
 }

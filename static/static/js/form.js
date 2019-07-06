@@ -167,8 +167,10 @@ function submitRegistration() {
 		j.provide_housing.housing_number = document.getElementById('root_housingNumber').value;
 		j.provide_housing.my_housing_details = document.getElementById('root_myHousingDetails').value;
 	}
+	j.redirect_url = siteBase
 
 	var jsonString = JSON.stringify(j);
+	alert(jsonString)
 
 	var req = new XMLHttpRequest();
 	req.onreadystatechange = function() {
@@ -179,17 +181,17 @@ function submitRegistration() {
 		try {
 			var resp = JSON.parse(req.responseText);
 			if (typeof resp.errors !== "undefined" && resp.errors.length != 0) {
-				window.location.href = siteBase + "error/?source_page=/registration&error="+encodeURI(req.responseText)
+				window.location.href = siteBase + "/error/?source_page=/registration&message="+encodeURI(req.responseText)
 				return;
 			}
 
 			if (req.status != 200) {
-				window.location.href = siteBase + "error/?source_page=/registration&error=status"+req.status
+				window.location.href = siteBase + "/error/?source_page=/registration&message=status"+req.status
 			}
 
 			window.location.href = resp.checkout_url;
 		} catch(e) {
-			window.location.href = siteBase + "error/?source_page=/registration&error="+e.name+"%3A%20"+e.message
+			window.location.href = siteBase + "/error/?source_page=/registration&message="+e.name+"%3A%20"+e.message
 		}
 	}
 

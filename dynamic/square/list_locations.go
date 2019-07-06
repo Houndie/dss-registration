@@ -19,8 +19,8 @@ func (c *Client) ListLocations() ([]*Location, error) {
 	}
 
 	respJson := struct {
-		Errors    []*Error    `json:"errors"`
-		Locations []*Location `json:"locations"`
+		Errors    []*Error    `json:"errors,omitempty"`
+		Locations []*Location `json:"locations,omitempty"`
 	}{}
 
 	err = json.Unmarshal(bytes, &respJson)

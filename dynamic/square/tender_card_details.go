@@ -20,9 +20,9 @@ const (
 )
 
 type TenderCardDetails struct {
-	Status      TenderCardDetailsStatus      `json:"status"`
-	Card        *Card                        `json:"card"`
-	EntryMethod TenderCardDetailsEntryMethod `json:"entry_method"`
+	Status      TenderCardDetailsStatus      `json:"status,omitempty"`
+	Card        *Card                        `json:"card,omitempty"`
+	EntryMethod TenderCardDetailsEntryMethod `json:"entry_method,omitempty"`
 }
 
 func (*TenderCardDetails) isTenderType() {}

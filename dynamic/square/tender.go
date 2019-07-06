@@ -8,19 +8,19 @@ import (
 )
 
 type tender struct {
-	Id                   string                 `json:"id"`
-	LocationId           string                 `json:"location_id"`
-	TransactionId        string                 `json:"transaction_id"`
-	CreatedAt            time.Time              `json:"created_at"`
-	Note                 string                 `json:"note"`
-	AmountMoney          *Money                 `json:"amount_money"`
-	TipMoney             *Money                 `json:"tip_money"`
-	ProcessingFeeMoney   *Money                 `json:"processing_fee_money"`
-	CustomerId           string                 `json:"customer_id"`
-	Type                 TenderType             `json:"type"`
-	CardDetails          *TenderCardDetails     `json:"card_details"`
-	CashDetails          *TenderCashDetails     `json:"cash_details"`
-	AdditionalRecipients []*AdditionalRecipient `json:"additional_recipients"`
+	Id                   string                 `json:"id,omitempty"`
+	LocationId           string                 `json:"location_id,omitempty"`
+	TransactionId        string                 `json:"transaction_id,omitempty"`
+	CreatedAt            *time.Time             `json:"created_at,omitempty"`
+	Note                 string                 `json:"note,omitempty"`
+	AmountMoney          *Money                 `json:"amount_money,omitempty"`
+	TipMoney             *Money                 `json:"tip_money,omitempty"`
+	ProcessingFeeMoney   *Money                 `json:"processing_fee_money,omitempty"`
+	CustomerId           string                 `json:"customer_id,omitempty"`
+	Type                 TenderType             `json:"type,omitempty"`
+	CardDetails          *TenderCardDetails     `json:"card_details,omitempty"`
+	CashDetails          *TenderCashDetails     `json:"cash_details,omitempty"`
+	AdditionalRecipients []*AdditionalRecipient `json:"additional_recipients,omitempty"`
 }
 
 type tenderType interface {
@@ -41,7 +41,7 @@ type Tender struct {
 	Id                   string
 	LocationId           string
 	TransactionId        string
-	CreatedAt            time.Time
+	CreatedAt            *time.Time
 	Note                 string
 	AmountMoney          *Money
 	TipMoney             *Money
