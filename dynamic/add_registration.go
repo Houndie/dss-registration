@@ -160,7 +160,7 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 			writeAddRegistrationResp(w, logger, "", []*jsonError{missingParameterError("mix_and_match_role")})
 			return
 		default:
-			logger.Warnf("Bad mix and match role", inputs.MixAndMatchRole)
+			logger.Warnf("Bad mix and match role %v", inputs.MixAndMatchRole)
 			writeAddRegistrationResp(w, logger, "", []*jsonError{badParameterError("mix_and_match_role", inputs.MixAndMatchRole, `must be "Lead" or "Follow"`)})
 			return
 		}
