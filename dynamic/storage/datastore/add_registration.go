@@ -1,4 +1,4 @@
-package storage
+package datastore
 
 import (
 	"context"
@@ -9,66 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const (
-	registrationKind = "Registration"
-
-	fullWeekendPass = "Full Weekend Pass"
-	danceOnlyPass   = "Dance Only Pass"
-	noPass          = "No Pass"
-
-	requiresHousing = "Requires Housing"
-	providesHousing = "Provides Housing"
-	noHousing       = "No Housing"
-)
-
-type registrationEntity struct {
-	FirstName      string
-	LastName       string
-	StreetAddress  string
-	City           string
-	State          string
-	ZipCode        string
-	Email          string
-	HomeScene      string
-	IsStudent      bool
-	SoloJazz       bool
-	HousingRequest string
-	RequireHousing struct {
-		PetAllergies string
-		Details      string
-	}
-	ProvideHousing struct {
-		Pets     string
-		Quantity int
-		Details  string
-	}
-	WantsTShirt         bool
-	TShirtStyle         string
-	HasTeamCompetition  bool
-	TeamCompetitionName string
-	HasMixAndMatch      bool
-	MixAndMatchRole     string
-	WeekendPass         string
-	FullWeekendPassInfo struct {
-		Level int
-		Tier  int
-	}
-	TransactionID string
-	Paid          bool
-}
-
-type Datastore struct {
-	client *datastore.Client
-}
-
-func NewDatastore(client *datastore.Client) *Datastore {
-	return &Datastore{
-		client: client,
-	}
-
-}
-
-func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistration) error {
+func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistration) (string, error) {
 	registration := &registrationEntity{
 		FirstName:     r.FirstName,
 		LastName:      r.LastName,
@@ -80,8 +21,8 @@ func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistratio
 		HomeScene:     r.HomeScene,
 		IsStudent:     r.IsStudent,
 		SoloJazz:      r.SoloJazz,
-		TransactionID: r.TransactionID.String(),
-		Paid:          false,
+		ReferenceId:   r.ReferenceId.String(),
+		Paid:          r.Paid,
 	}
 
 	switch p := r.PassType.(type) {
@@ -94,12 +35,12 @@ func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistratio
 	case *add.NoPass:
 		registration.WeekendPass = noPass
 	default:
-		return fmt.Errorf("Found unknown type of weekend pass")
+		return "", fmt.Errorf("Found unknown type of weekend pass")
 	}
 
 	if r.MixAndMatch != nil {
 		registration.HasMixAndMatch = true
-		registration.MixAndMatchRole = r.MixAndMatch.Role
+		registration.MixAndMatchRole = string(r.MixAndMatch.Role)
 	}
 
 	if r.TeamCompetition != nil {
@@ -125,9 +66,12 @@ func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistratio
 	case *add.NoHousing:
 		registration.HousingRequest = noHousing
 	default:
-		return fmt.Errorf("Found unknown type of housing")
+		return "", fmt.Errorf("Found unknown type of housing")
 	}
 	registrationKey := datastore.IncompleteKey(registrationKind, nil)
-	_, err := s.client.Put(ctx, registrationKey, registration)
-	return errors.Wrap(err, "Error inserting registration into database")
+	completeKey, err := s.client.Put(ctx, registrationKey, registration)
+	if err != nil {
+		return "", errors.Wrap(err, "Error inserting registration into database")
+	}
+	return completeKey.Encode(), nil
 }

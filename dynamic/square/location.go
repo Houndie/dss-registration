@@ -16,8 +16,8 @@ const (
 type LocationType string
 
 const (
-	LocationTypePhysical LocationStatus = "PHYSICAL"
-	LocationTypeMobile   LocationStatus = "MOBILE"
+	LocationTypePhysical LocationType = "PHYSICAL"
+	LocationTypeMobile   LocationType = "MOBILE"
 )
 
 type Location struct {

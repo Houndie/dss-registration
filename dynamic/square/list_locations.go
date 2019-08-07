@@ -1,14 +1,21 @@
 package square
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
+	"net/http"
 
 	"github.com/pkg/errors"
 )
 
-func (c *Client) ListLocations() ([]*Location, error) {
-	resp, err := c.httpClient.Get("https://connect.squareup.com/v2/locations")
+func (c *Client) ListLocations(ctx context.Context) ([]*Location, error) {
+	req, err := http.NewRequest("GET", "https://connect.squareup.com/v2/locations", nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating new request")
+	}
+	req = req.WithContext(ctx)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error listing locations")
 	}

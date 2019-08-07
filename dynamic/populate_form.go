@@ -15,7 +15,7 @@ func PopulateForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	logger.Info("Populate Form")
-	res, err := populateService.Populate()
+	res, err := populateService.Populate(r.Context())
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

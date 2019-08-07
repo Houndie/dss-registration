@@ -6,15 +6,15 @@ type WeekendPassLevel int
 type WeekendPassTier int
 
 const (
-	Level1 WeekendPassLevel = 1
-	Level2 WeekendPassLevel = 2
-	Level3 WeekendPassLevel = 3
+	WeekendPassLevel1 WeekendPassLevel = 1
+	WeekendPassLevel2 WeekendPassLevel = 2
+	WeekendPassLevel3 WeekendPassLevel = 3
 
-	Tier1 WeekendPassTier = 1
-	Tier2 WeekendPassTier = 2
-	Tier3 WeekendPassTier = 3
-	Tier4 WeekendPassTier = 4
-	Tier5 WeekendPassTier = 5
+	WeekendPassTier1 WeekendPassTier = 1
+	WeekendPassTier2 WeekendPassTier = 2
+	WeekendPassTier3 WeekendPassTier = 3
+	WeekendPassTier4 WeekendPassTier = 4
+	WeekendPassTier5 WeekendPassTier = 5
 )
 
 type PassType interface {
@@ -31,8 +31,15 @@ func (*WeekendPass) isPassType()   {}
 func (*DanceOnlyPass) isPassType() {}
 func (*NoPass) isPassType()        {}
 
+type MixAndMatchRole string
+
+const (
+	MixAndMatchRoleLeader   MixAndMatchRole = "Leader"
+	MixAndMatchRoleFollower MixAndMatchRole = "Follower"
+)
+
 type MixAndMatch struct {
-	Role string
+	Role MixAndMatchRole
 }
 
 type TeamCompetition struct {
@@ -42,17 +49,17 @@ type TeamCompetition struct {
 type TShirtStyle string
 
 const (
-	UnisexS   TShirtStyle = "Unisex S"
-	UnisexM   TShirtStyle = "Unisex M"
-	UnisexL   TShirtStyle = "Unisex L"
-	UnisexXL  TShirtStyle = "Unisex XL"
-	Unisex2XL TShirtStyle = "Unisex 2XL"
-	Unisex3XL TShirtStyle = "Unisex 3XL"
-	BellaS    TShirtStyle = "Bella S"
-	BellaM    TShirtStyle = "Bella M"
-	BellaL    TShirtStyle = "Bella L"
-	BellaXL   TShirtStyle = "Bella XL"
-	Bella2XL  TShirtStyle = "Bella 2XL"
+	TShirtStyleUnisexS   TShirtStyle = "Unisex S"
+	TShirtStyleUnisexM   TShirtStyle = "Unisex M"
+	TShirtStyleUnisexL   TShirtStyle = "Unisex L"
+	TShirtStyleUnisexXL  TShirtStyle = "Unisex XL"
+	TShirtStyleUnisex2XL TShirtStyle = "Unisex 2XL"
+	TShirtStyleUnisex3XL TShirtStyle = "Unisex 3XL"
+	TShirtStyleBellaS    TShirtStyle = "Bella S"
+	TShirtStyleBellaM    TShirtStyle = "Bella M"
+	TShirtStyleBellaL    TShirtStyle = "Bella L"
+	TShirtStyleBellaXL   TShirtStyle = "Bella XL"
+	TShirtStyleBella2XL  TShirtStyle = "Bella 2XL"
 )
 
 type TShirt struct {
@@ -112,5 +119,6 @@ type StoreRegistration struct {
 	TeamCompetition *TeamCompetition
 	TShirt          *TShirt
 	Housing         Housing
-	TransactionID   uuid.UUID
+	ReferenceId     uuid.UUID
+	Paid            bool
 }

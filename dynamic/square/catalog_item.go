@@ -1,5 +1,15 @@
 package square
 
+type CatalogItemProductType string
+
+const (
+	CatalogItemProductTypeRegular             CatalogItemProductType = "REGULAR"
+	CatalogItemProductTypeGiftCard            CatalogItemProductType = "GIFT_CARD"
+	CatalogItemProductTypeAppointmentsService CatalogItemProductType = "APPOINTMENTS_SERVICE"
+	CatalogItemProductTypeRetailItem          CatalogItemProductType = "RETAIL_ITEM"
+	CatalogItemProductTypeRestaurantItem      CatalogItemProductType = "RESTAURANT_ITEM"
+)
+
 type CatalogItem struct {
 	Name                    string                         `json:"name,omitempty"`
 	Description             string                         `json:"description,omitempty"`
@@ -12,7 +22,7 @@ type CatalogItem struct {
 	TaxIds                  []string                       `json:"tax_ids,omitempty"`
 	ModifierListInfo        []*CatalogItemModifierListInfo `json:"modifier_list_info,omitempty"`
 	Variations              []*CatalogObject               `json:"variations,omitempty"`
-	ProductType             string                         `json:"product_type,omitempty"`
+	ProductType             CatalogItemProductType         `json:"product_type,omitempty"`
 	SkipModifierScreen      bool                           `json:"skip_modifier_screen,omitempty"`
 }
 

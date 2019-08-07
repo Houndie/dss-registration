@@ -1,12 +1,19 @@
 package square
 
+type CatalogPricingType string
+
+const (
+	CatalogPricingTypeFixed    CatalogPricingType = "FIXED_PRICING"
+	CatalogPricingTypeVariable CatalogPricingType = "VARIABLE_PRICING"
+)
+
 type CatalogItemVariation struct {
 	ItemId                   string                            `json:"item_id,omitempty"`
 	Name                     string                            `json:"name,omitempty"`
 	Sku                      string                            `json:"sku,omitempty"`
 	Upc                      string                            `json:"string,omitempty"`
 	Ordinal                  int                               `json:"ordinal,omitempty"`
-	PricingType              string                            `json:"pricing_type,omitempty"`
+	PricingType              CatalogPricingType                `json:"pricing_type,omitempty"`
 	PriceMoney               *Money                            `json:"price_money,omitempty"`
 	LocationOverrides        []*ItemVariationLocationOverrides `json:"location_overrides,omitempty"`
 	TrackInventory           bool                              `json:"track_inventory,omitempty"`

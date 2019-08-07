@@ -3,6 +3,7 @@ package square
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -24,7 +25,7 @@ const (
 type catalogObject struct {
 	Type                  CatalogObjectType       `json:"type,omitempty"`
 	Id                    string                  `json:"id,omitempty"`
-	UpdatedAt             string                  `json:"updated_at,omitempty"`
+	UpdatedAt             *time.Time              `json:"updated_at,omitempty"`
 	Version               int                     `json:"version,omitempty"`
 	IsDeleted             bool                    `json:"is_deleted,omitempty"`
 	CatalogV1Ids          []*CatalogV1Id          `json:"catalog_v1_ids,omitempty"`
@@ -49,7 +50,7 @@ type catalogObjectType interface {
 
 type CatalogObject struct {
 	Id                    string
-	UpdatedAt             string
+	UpdatedAt             *time.Time
 	Version               int
 	IsDeleted             bool
 	CatalogV1Ids          []*CatalogV1Id

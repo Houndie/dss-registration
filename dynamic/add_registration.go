@@ -106,11 +106,11 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 		var level add.WeekendPassLevel
 		switch inputs.FullWeekend.Level {
 		case "Level 1":
-			level = add.Level1
+			level = add.WeekendPassLevel1
 		case "Level 2":
-			level = add.Level2
+			level = add.WeekendPassLevel2
 		case "Level 3":
-			level = add.Level3
+			level = add.WeekendPassLevel3
 		case "":
 			logger.Warnf("No level submitted for a full weekend pass")
 			writeAddRegistrationResp(w, logger, "", []*jsonError{missingParameterError("full_weekend.level")})
@@ -147,9 +147,13 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 	var mixAndMatch *add.MixAndMatch
 	if inputs.MixAndMatch {
 		switch inputs.MixAndMatchRole {
-		case "Leader", "Follower":
+		case "Leader":
 			mixAndMatch = &add.MixAndMatch{
-				Role: inputs.MixAndMatchRole,
+				Role: add.MixAndMatchRoleLeader,
+			}
+		case "Follower":
+			mixAndMatch = &add.MixAndMatch{
+				Role: add.MixAndMatchRoleFollower,
 			}
 		case "":
 			logger.Warnf("Mix and match role not provided")
@@ -177,7 +181,7 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 	var tShirt *add.TShirt
 	if inputs.TShirt {
 		switch add.TShirtStyle(inputs.TShirtSize) {
-		case add.UnisexS, add.UnisexM, add.UnisexL, add.UnisexXL, add.Unisex2XL, add.Unisex3XL, add.BellaS, add.BellaM, add.BellaL, add.BellaXL, add.Bella2XL:
+		case add.TShirtStyleUnisexS, add.TShirtStyleUnisexM, add.TShirtStyleUnisexL, add.TShirtStyleUnisexXL, add.TShirtStyleUnisex2XL, add.TShirtStyleUnisex3XL, add.TShirtStyleBellaS, add.TShirtStyleBellaM, add.TShirtStyleBellaL, add.TShirtStyleBellaXL, add.TShirtStyleBella2XL:
 			tShirt = &add.TShirt{
 				Style: add.TShirtStyle(inputs.TShirtSize),
 			}

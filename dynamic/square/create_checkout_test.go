@@ -1,0 +1,485 @@
+package square
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"reflect"
+	"testing"
+	"time"
+
+	"github.com/pkg/errors"
+)
+
+func TestCreateCheckout(t *testing.T) {
+	locationId := "some location id"
+	idempotencyKey := "some unique key"
+	order := &CreateOrderRequest{
+		IdempotencyKey: "some other unique key",
+		Order: &Order{
+			Id:          "some id",
+			LocationId:  "some other location id",
+			ReferenceId: "some reference id",
+			Source: &OrderSource{
+				Name: "some source",
+			},
+			CustomerId: "some customer",
+			LineItems: []*OrderLineItem{
+				&OrderLineItem{
+					Uid:      "some unique id",
+					Name:     "im a line item",
+					Quantity: "70",
+					QuantityUnit: &OrderQuantityUnit{
+						MeasurementUnit: &MeasurementUnit{
+							Type: MeasurementUnitLength("3"),
+						},
+						Precision: 7,
+					},
+				},
+			},
+		},
+	}
+	askForShippingAddress := true
+	merchantSupportEmail := "someemail@whatever.com"
+	prePopulateBuyerEmail := "someotheremail@aol.com"
+	prePopulateShippingAddress := &Address{
+		AddressLine1:                 "1234 Any St.",
+		Locality:                     "New York",
+		AdministrativeDistrictLevel1: "New York",
+		PostalCode:                   "12345",
+		Country:                      CountryTheUnitedStatesOfAmerica,
+		FirstName:                    "John",
+		LastName:                     "Doe",
+		Organization:                 "Ninjas",
+	}
+	redirectUrl := "www.mywebsite.com"
+	additionalRecipients := []*ChargeRequestAdditionalRecipient{
+		&ChargeRequestAdditionalRecipient{
+			LocationId:  "more locations",
+			Description: "blah blah",
+			AmountMoney: &Money{
+				Amount:   1234,
+				Currency: "Rupies",
+			},
+		},
+	}
+	note := "you're breathtaking!"
+
+	apiKey := "some key"
+
+	createdAt := time.Unix(1234567, 0)
+
+	expectedCheckout := &Checkout{
+		Id:                         "some checkout id",
+		CheckoutPageUrl:            "www.sqaureup.com/gohere",
+		AskForShippingAddress:      askForShippingAddress,
+		MerchantSupportEmail:       merchantSupportEmail,
+		PrePopulateBuyerEmail:      prePopulateBuyerEmail,
+		PrePopulateShippingAddress: prePopulateShippingAddress,
+		RedirectUrl:                redirectUrl,
+		Order:                      order.Order,
+		CreatedAt:                  &createdAt,
+		AdditionalRecipients: []*AdditionalRecipient{
+			&AdditionalRecipient{
+				LocationId:   additionalRecipients[0].LocationId,
+				Description:  additionalRecipients[0].Description,
+				AmountMoney:  additionalRecipients[0].AmountMoney,
+				ReceivableId: "some receivable id",
+			},
+		},
+	}
+	client := &http.Client{
+		Transport: &testRoundTripper{
+			roundTripFunc: func(r *http.Request) (*http.Response, error) {
+				if r.Method != "POST" {
+					t.Fatalf("found non post method %s", r.Method)
+				}
+
+				if r.Header.Get("Content-Type") != "application/json" {
+					t.Fatalf("found wrong content type header %s", r.Header.Get("Content-Type"))
+				}
+				if r.Header.Get("Accept") != "application/json" {
+					t.Fatalf("found wrong accept header %s", r.Header.Get("Accept"))
+				}
+				if r.Header.Get("Authorization") != "Bearer "+apiKey {
+					t.Fatalf("found wrong authorization header %s", r.Header.Get("Authorization"))
+				}
+
+				reqJson := struct {
+					IdempotencyKey             string                              `json:"idempotency_key,omitempty"`
+					Order                      *CreateOrderRequest                 `json:"order,omitempty"`
+					AskForShippingAddress      bool                                `json:"ask_for_shipping_address,omitempty"`
+					MerchantSupportEmail       string                              `json:"merchant_support_email,omitempty"`
+					PrePopulateBuyerEmail      string                              `json:"pre_populate_buyer_email,omitempty"`
+					PrePopulateShippingAddress *Address                            `json:"pre_populate_shipping_address,omitempty"`
+					RedirectUrl                string                              `json:"redirect_url,omitempty"`
+					AdditionalRecipients       []*ChargeRequestAdditionalRecipient `json:"additional_recipients,omitempty"`
+					Note                       string                              `json:"note,omitempty"`
+				}{
+					IdempotencyKey: idempotencyKey,
+					Order:          order,
+					AskForShippingAddress:      askForShippingAddress,
+					MerchantSupportEmail:       merchantSupportEmail,
+					PrePopulateBuyerEmail:      prePopulateBuyerEmail,
+					PrePopulateShippingAddress: prePopulateShippingAddress,
+					RedirectUrl:                redirectUrl,
+					AdditionalRecipients:       additionalRecipients,
+					Note:                       note,
+				}
+
+				reqBody, err := ioutil.ReadAll(r.Body)
+				if err != nil {
+					t.Fatalf("error reading request body: %v", err)
+				}
+
+				err = json.Unmarshal(reqBody, &reqJson)
+				if err != nil {
+					t.Fatalf("error unmarshaling request body: %v", err)
+				}
+
+				if reqJson.IdempotencyKey != idempotencyKey {
+					t.Fatalf("found idepotency key %s, expected %s", reqJson.IdempotencyKey, idempotencyKey)
+				}
+
+				if !reflect.DeepEqual(reqJson.Order, order) {
+					t.Fatalf("found order %#v not equal to existing order %#v", reqJson.Order, order)
+				}
+
+				if reqJson.AskForShippingAddress != askForShippingAddress {
+					t.Fatalf("found ask for shipping param %v, expected %v", reqJson.AskForShippingAddress, askForShippingAddress)
+				}
+
+				if reqJson.MerchantSupportEmail != merchantSupportEmail {
+					t.Fatalf("found merchant support email %s, expected %s", reqJson.MerchantSupportEmail, merchantSupportEmail)
+				}
+
+				if reqJson.PrePopulateBuyerEmail != prePopulateBuyerEmail {
+					t.Fatalf("found pre populate buyer email %s, expected %s", reqJson.PrePopulateBuyerEmail, prePopulateBuyerEmail)
+				}
+
+				if !reflect.DeepEqual(reqJson.PrePopulateShippingAddress, prePopulateShippingAddress) {
+					t.Fatalf("found wrong pre populate shipping address %#v, expected %#v", reqJson.PrePopulateShippingAddress, prePopulateShippingAddress)
+				}
+
+				if reqJson.RedirectUrl != redirectUrl {
+					t.Fatalf("found redirect url %s, expected %s", reqJson.RedirectUrl, redirectUrl)
+				}
+
+				if !reflect.DeepEqual(reqJson.AdditionalRecipients, additionalRecipients) {
+					t.Fatalf("found additional recipients %#v, expected %#v", reqJson.AdditionalRecipients, additionalRecipients)
+				}
+
+				if reqJson.Note != note {
+					t.Fatalf("found note %s, expected %s", reqJson.Note, note)
+				}
+
+				resJson := struct {
+					Checkout *Checkout `json:"checkout"`
+				}{
+					Checkout: expectedCheckout,
+				}
+
+				resBody, err := json.Marshal(&resJson)
+				if err != nil {
+					t.Fatalf("error marshaling response body: %v", err)
+				}
+
+				header := http.Header{}
+				header.Set("Content-Type", "application/json")
+
+				return &http.Response{
+					Status:        http.StatusText(http.StatusOK),
+					StatusCode:    http.StatusOK,
+					Proto:         "HTTP/1.0",
+					ProtoMajor:    1,
+					ProtoMinor:    0,
+					Header:        header,
+					Body:          ioutil.NopCloser(bytes.NewReader(resBody)),
+					ContentLength: -1,
+					Request:       r,
+				}, nil
+			},
+		},
+	}
+	checkout, err := NewClient(apiKey, client).CreateCheckout(context.Background(), locationId, idempotencyKey, order, askForShippingAddress, merchantSupportEmail, prePopulateBuyerEmail, prePopulateShippingAddress, redirectUrl, additionalRecipients, note)
+
+	if err != nil {
+		t.Fatalf("found unxpected error from CreateCheckout: %v", err)
+	}
+
+	if !reflect.DeepEqual(checkout, expectedCheckout) {
+		t.Fatalf("found checkout %#v, expected %#v", checkout, expectedCheckout)
+	}
+}
+
+func TestCreateCheckoutClientError(t *testing.T) {
+	locationId := "some location id"
+	idempotencyKey := "some unique key"
+	order := &CreateOrderRequest{
+		IdempotencyKey: "some other unique key",
+		Order: &Order{
+			Id:          "some id",
+			LocationId:  "some other location id",
+			ReferenceId: "some reference id",
+			Source: &OrderSource{
+				Name: "some source",
+			},
+			CustomerId: "some customer",
+			LineItems: []*OrderLineItem{
+				&OrderLineItem{
+					Uid:      "some unique id",
+					Name:     "im a line item",
+					Quantity: "70",
+					QuantityUnit: &OrderQuantityUnit{
+						MeasurementUnit: &MeasurementUnit{
+							Type: MeasurementUnitLength("3"),
+						},
+						Precision: 7,
+					},
+				},
+			},
+		},
+	}
+	askForShippingAddress := true
+	merchantSupportEmail := "someemail@whatever.com"
+	prePopulateBuyerEmail := "someotheremail@aol.com"
+	prePopulateShippingAddress := &Address{
+		AddressLine1:                 "1234 Any St.",
+		Locality:                     "New York",
+		AdministrativeDistrictLevel1: "New York",
+		PostalCode:                   "12345",
+		Country:                      CountryTheUnitedStatesOfAmerica,
+		FirstName:                    "John",
+		LastName:                     "Doe",
+		Organization:                 "Ninjas",
+	}
+	redirectUrl := "www.mywebsite.com"
+	additionalRecipients := []*ChargeRequestAdditionalRecipient{
+		&ChargeRequestAdditionalRecipient{
+			LocationId:  "more locations",
+			Description: "blah blah",
+			AmountMoney: &Money{
+				Amount:   1234,
+				Currency: "Rupies",
+			},
+		},
+	}
+	note := "you're breathtaking!"
+
+	apiKey := "some key"
+
+	client := &http.Client{
+		Transport: &testRoundTripper{
+			roundTripFunc: func(r *http.Request) (*http.Response, error) {
+				return nil, errors.New("some error")
+			},
+		},
+	}
+
+	_, err := NewClient(apiKey, client).CreateCheckout(context.Background(), locationId, idempotencyKey, order, askForShippingAddress, merchantSupportEmail, prePopulateBuyerEmail, prePopulateShippingAddress, redirectUrl, additionalRecipients, note)
+
+	if err == nil {
+		t.Fatal("found no error when client returned one?")
+	}
+}
+
+func TestCreateCheckoutErrorCode(t *testing.T) {
+	locationId := "some location id"
+	idempotencyKey := "some unique key"
+	order := &CreateOrderRequest{
+		IdempotencyKey: "some other unique key",
+		Order: &Order{
+			Id:          "some id",
+			LocationId:  "some other location id",
+			ReferenceId: "some reference id",
+			Source: &OrderSource{
+				Name: "some source",
+			},
+			CustomerId: "some customer",
+			LineItems: []*OrderLineItem{
+				&OrderLineItem{
+					Uid:      "some unique id",
+					Name:     "im a line item",
+					Quantity: "70",
+					QuantityUnit: &OrderQuantityUnit{
+						MeasurementUnit: &MeasurementUnit{
+							Type: MeasurementUnitLength("3"),
+						},
+						Precision: 7,
+					},
+				},
+			},
+		},
+	}
+	askForShippingAddress := true
+	merchantSupportEmail := "someemail@whatever.com"
+	prePopulateBuyerEmail := "someotheremail@aol.com"
+	prePopulateShippingAddress := &Address{
+		AddressLine1:                 "1234 Any St.",
+		Locality:                     "New York",
+		AdministrativeDistrictLevel1: "New York",
+		PostalCode:                   "12345",
+		Country:                      CountryTheUnitedStatesOfAmerica,
+		FirstName:                    "John",
+		LastName:                     "Doe",
+		Organization:                 "Ninjas",
+	}
+	redirectUrl := "www.mywebsite.com"
+	additionalRecipients := []*ChargeRequestAdditionalRecipient{
+		&ChargeRequestAdditionalRecipient{
+			LocationId:  "more locations",
+			Description: "blah blah",
+			AmountMoney: &Money{
+				Amount:   1234,
+				Currency: "Rupies",
+			},
+		},
+	}
+	note := "you're breathtaking!"
+
+	apiKey := "some key"
+
+	client := &http.Client{
+		Transport: &testRoundTripper{
+			roundTripFunc: func(r *http.Request) (*http.Response, error) {
+				return &http.Response{
+					Status:        http.StatusText(http.StatusInternalServerError),
+					StatusCode:    http.StatusInternalServerError,
+					Proto:         "HTTP/1.0",
+					ProtoMajor:    1,
+					ProtoMinor:    0,
+					ContentLength: 0,
+					Body:          ioutil.NopCloser(bytes.NewReader([]byte{})),
+					Request:       r,
+				}, nil
+			},
+		},
+	}
+
+	_, err := NewClient(apiKey, client).CreateCheckout(context.Background(), locationId, idempotencyKey, order, askForShippingAddress, merchantSupportEmail, prePopulateBuyerEmail, prePopulateShippingAddress, redirectUrl, additionalRecipients, note)
+
+	if err == nil {
+		t.Fatal("found no error when client returned one?")
+	}
+
+	uerr, ok := err.(unexpectedCodeError)
+	if !ok {
+		t.Fatalf("error was not of type unexpectedCodeError")
+	}
+
+	if int(uerr) != http.StatusInternalServerError {
+		t.Fatalf("error code was not internal server error, found %v", int(uerr))
+	}
+}
+
+func TestCreateCheckoutErrorMessage(t *testing.T) {
+	locationId := "some location id"
+	idempotencyKey := "some unique key"
+	order := &CreateOrderRequest{
+		IdempotencyKey: "some other unique key",
+		Order: &Order{
+			Id:          "some id",
+			LocationId:  "some other location id",
+			ReferenceId: "some reference id",
+			Source: &OrderSource{
+				Name: "some source",
+			},
+			CustomerId: "some customer",
+			LineItems: []*OrderLineItem{
+				&OrderLineItem{
+					Uid:      "some unique id",
+					Name:     "im a line item",
+					Quantity: "70",
+					QuantityUnit: &OrderQuantityUnit{
+						MeasurementUnit: &MeasurementUnit{
+							Type: MeasurementUnitLength("3"),
+						},
+						Precision: 7,
+					},
+				},
+			},
+		},
+	}
+	askForShippingAddress := true
+	merchantSupportEmail := "someemail@whatever.com"
+	prePopulateBuyerEmail := "someotheremail@aol.com"
+	prePopulateShippingAddress := &Address{
+		AddressLine1:                 "1234 Any St.",
+		Locality:                     "New York",
+		AdministrativeDistrictLevel1: "New York",
+		PostalCode:                   "12345",
+		Country:                      CountryTheUnitedStatesOfAmerica,
+		FirstName:                    "John",
+		LastName:                     "Doe",
+		Organization:                 "Ninjas",
+	}
+	redirectUrl := "www.mywebsite.com"
+	additionalRecipients := []*ChargeRequestAdditionalRecipient{
+		&ChargeRequestAdditionalRecipient{
+			LocationId:  "more locations",
+			Description: "blah blah",
+			AmountMoney: &Money{
+				Amount:   1234,
+				Currency: "Rupies",
+			},
+		},
+	}
+	note := "you're breathtaking!"
+
+	apiKey := "some key"
+
+	testError := &Error{
+		Category: ErrorCategoryApiError,
+		Code:     ErrorCodeInternalServerError,
+		Detail:   "some detail",
+		Field:    "some field",
+	}
+
+	client := &http.Client{
+		Transport: &testRoundTripper{
+			roundTripFunc: func(r *http.Request) (*http.Response, error) {
+				resp := struct {
+					Errors []*Error
+				}{
+					Errors: []*Error{testError},
+				}
+
+				respJson, err := json.Marshal(&resp)
+				if err != nil {
+					t.Fatalf("error marshaling response body: %v", err)
+				}
+				return &http.Response{
+					Status:        http.StatusText(http.StatusInternalServerError),
+					StatusCode:    http.StatusInternalServerError,
+					Proto:         "HTTP/1.0",
+					ProtoMajor:    1,
+					ProtoMinor:    0,
+					ContentLength: 0,
+					Body:          ioutil.NopCloser(bytes.NewReader(respJson)),
+					Request:       r,
+				}, nil
+			},
+		},
+	}
+
+	_, err := NewClient(apiKey, client).CreateCheckout(context.Background(), locationId, idempotencyKey, order, askForShippingAddress, merchantSupportEmail, prePopulateBuyerEmail, prePopulateShippingAddress, redirectUrl, additionalRecipients, note)
+
+	if err == nil {
+		t.Fatal("found no error when client returned one?")
+	}
+
+	serr, ok := err.(*ErrorList)
+	if !ok {
+		t.Fatalf("error was not of type square.ErrorList")
+	}
+
+	if len(serr.Errors) != 1 {
+		t.Fatalf("found %v errors, expected %v", len(serr.Errors), 1)
+	}
+
+	if !reflect.DeepEqual(serr.Errors[0], testError) {
+		t.Fatalf("errors were not equal, found %#v, expected %#v", serr.Errors[0], testError)
+	}
+}

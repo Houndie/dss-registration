@@ -1,6 +1,8 @@
 package square
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type ErrorCategory string
 
@@ -135,4 +137,10 @@ func (e *ErrorList) Error() string {
 		retVal = fmt.Sprintf(retVal+" %s", err.Error())
 	}
 	return retVal
+}
+
+type unexpectedCodeError int
+
+func (u unexpectedCodeError) Error() string {
+	return fmt.Sprintf("found unxpected http error code %v", int(u))
 }

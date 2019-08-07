@@ -12,10 +12,10 @@ const (
 
 type Order struct {
 	Id                      string                   `json:"id,omitempty"`
-	LocationID              string                   `json:"location_id,omitempty"`
-	ReferenceID             string                   `json:"reference_id,omitempty"`
+	LocationId              string                   `json:"location_id,omitempty"`
+	ReferenceId             string                   `json:"reference_id,omitempty"`
 	Source                  *OrderSource             `json:"source,omitempty"`
-	CustomerID              string                   `json:"customer_id,omitempty"`
+	CustomerId              string                   `json:"customer_id,omitempty"`
 	LineItems               []*OrderLineItem         `json:"line_items,omitempty"`
 	Taxes                   []*OrderLineItemTax      `json:"taxes,omitempty"`
 	Discounts               []*OrderLineItemDiscount `json:"discounts,omitempty"`

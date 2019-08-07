@@ -13,4 +13,5 @@ const (
 	WeekendPassTier3Name = "Tier 3"
 	WeekendPassTier4Name = "Tier 4"
 	WeekendPassTier5Name = "Tier 5"
+	DancePassPresaleName = "Presale"
 )

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -37,7 +36,6 @@ func (c *Client) CreateCheckout(ctx context.Context, locationId, idempotencyKey 
 	if err != nil {
 		return nil, errors.Wrap(err, "Error mashaling request body")
 	}
-	fmt.Println(string(jsonBody))
 
 	bodyBuf := bytes.NewBuffer(jsonBody)
 
@@ -53,8 +51,16 @@ func (c *Client) CreateCheckout(ctx context.Context, locationId, idempotencyKey 
 		return nil, errors.Wrap(err, "Error with http request")
 	}
 	defer resp.Body.Close()
+
+	var codeErr error
+	if resp.StatusCode != http.StatusOK {
+		codeErr = unexpectedCodeError(resp.StatusCode)
+	}
 	bytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		if codeErr != nil {
+			return nil, codeErr
+		}
 		return nil, errors.Wrap(err, "Error reading response body")
 	}
 
@@ -64,10 +70,16 @@ func (c *Client) CreateCheckout(ctx context.Context, locationId, idempotencyKey 
 	}{}
 	err = json.Unmarshal(bytes, &respJson)
 	if err != nil {
+		if codeErr != nil {
+			return nil, codeErr
+		}
 		return nil, errors.Wrap(err, "Error unmarshalling json response")
 	}
 	if len(respJson.Errors) != 0 {
 		return nil, &ErrorList{respJson.Errors}
+	}
+	if codeErr != nil {
+		return nil, codeErr
 	}
 	return respJson.Checkout, nil
 }

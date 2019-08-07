@@ -8,9 +8,10 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"github.com/Houndie/dss-registration/dynamic/registration/add"
+	"github.com/Houndie/dss-registration/dynamic/registration/finalize"
 	"github.com/Houndie/dss-registration/dynamic/registration/populate"
 	"github.com/Houndie/dss-registration/dynamic/square"
-	"github.com/Houndie/dss-registration/dynamic/storage"
+	storage "github.com/Houndie/dss-registration/dynamic/storage/datastore"
 	stackdriver "github.com/TV4/logrus-stackdriver-formatter"
 	"github.com/gorilla/schema"
 	"github.com/sirupsen/logrus"
@@ -34,6 +35,7 @@ var (
 	decoder         *schema.Decoder
 	populateService *populate.Service
 	addService      *add.Service
+	finalizeService *finalize.Service
 )
 
 func init() {
@@ -107,8 +109,11 @@ func init() {
 		os.Exit(1)
 	}
 
+	store := storage.NewDatastore(datastore)
+
 	populateService = populate.NewService(logger, squareClient)
-	addService = add.NewService(logger, storage.NewDatastore(datastore), squareClient)
+	addService = add.NewService(logger, store, squareClient)
+	finalizeService = finalize.NewService(logger, store, squareClient)
 	decoder = schema.NewDecoder()
 }
 

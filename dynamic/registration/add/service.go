@@ -11,13 +11,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const smackdownEmail = "info@daytonswingsmackdown.com"
+
 type Store interface {
-	AddRegistration(context.Context, *StoreRegistration) error
+	AddRegistration(context.Context, *StoreRegistration) (string, error)
+	DeleteRegistration(context.Context, string) error
 }
 
 type SquareClient interface {
-	ListCatalog([]string) ([]*square.CatalogObject, error)
-	ListLocations() ([]*square.Location, error)
+	ListCatalog(ctx context.Context, types []square.CatalogObjectType) square.ListCatalogIterator
+	ListLocations(ctx context.Context) ([]*square.Location, error)
 	CreateCheckout(ctx context.Context, locationId, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error)
 }
 
@@ -35,35 +38,13 @@ func NewService(logger *logrus.Logger, store Store, client SquareClient) *Servic
 	}
 }
 
+func containsNoPaidItems(r *Registration) bool {
+	_, noPassOk := r.PassType.(*NoPass)
+	return noPassOk && r.MixAndMatch == nil && r.TeamCompetition == nil && r.TShirt == nil && !r.SoloJazz
+}
+
 func (s *Service) Add(ctx context.Context, registration *Registration, redirectUrl string) (string, error) {
-	s.logger.Trace("Fetching all locations from square")
-	locations, err := s.client.ListLocations()
-	if err != nil {
-		wrap := "error listing locations from square"
-		utility.LogSquareError(s.logger, err, wrap)
-		return "", errors.Wrap(err, wrap)
-	}
-	if len(locations) != 1 {
-		err := fmt.Errorf("found wrong number of locations %v", len(locations))
-		s.logger.Error(err)
-		return "", err
-	}
-
-	s.logger.Trace("Fetching all items from square")
-	objects, err := s.client.ListCatalog(nil)
-	if err != nil {
-		wrap := "error fetching all items from square"
-		utility.LogSquareError(s.logger, err, wrap)
-		return "", errors.Wrap(err, wrap)
-	}
-
-	idempotencyKey, err := uuid.NewV4()
-	if err != nil {
-		wrap := "error generating idempotency key"
-		s.logger.WithError(err).Error(wrap)
-		return "", errors.Wrap(err, wrap)
-	}
-
+	s.logger.Trace("generating reference id")
 	referenceId, err := uuid.NewV4()
 	if err != nil {
 		wrap := "error generating reference id"
@@ -71,8 +52,7 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 		return "", errors.Wrap(err, wrap)
 	}
 
-	s.logger.Trace("Adding registration to database")
-	err = s.store.AddRegistration(ctx, &StoreRegistration{
+	storeRegistration := &StoreRegistration{
 		FirstName:       registration.FirstName,
 		LastName:        registration.LastName,
 		StreetAddress:   registration.StreetAddress,
@@ -88,10 +68,42 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 		TeamCompetition: registration.TeamCompetition,
 		TShirt:          registration.TShirt,
 		Housing:         registration.Housing,
-		TransactionID:   idempotencyKey,
-	})
+		ReferenceId:     referenceId,
+		Paid:            false,
+	}
+	if containsNoPaidItems(registration) {
+		storeRegistration.Paid = true
+		s.logger.Trace("no square items found, simply adding registration to database")
+		_, err := s.store.AddRegistration(ctx, storeRegistration)
+		if err != nil {
+			wrap := "error adding registration to database"
+			s.logger.WithError(err).Error(wrap)
+			return "", errors.Wrap(err, wrap)
+		}
+		return redirectUrl, nil
+	}
+
+	s.logger.Trace("registration contians items that must be paid, making square calls")
+
+	s.logger.Trace("Fetching all locations from square")
+	locations, err := s.client.ListLocations(ctx)
 	if err != nil {
-		wrap := "error adding registration to database"
+		wrap := "error listing locations from square"
+		utility.LogSquareError(s.logger, err, wrap)
+		return "", errors.Wrap(err, wrap)
+	}
+	if len(locations) != 1 {
+		err := fmt.Errorf("found wrong number of locations %v", len(locations))
+		s.logger.Error(err)
+		return "", err
+	}
+
+	s.logger.Trace("Fetching all items from square")
+	objects := s.client.ListCatalog(ctx, nil)
+
+	idempotencyKey, err := uuid.NewV4()
+	if err != nil {
+		wrap := "error generating idempotency key"
 		s.logger.WithError(err).Error(wrap)
 		return "", errors.Wrap(err, wrap)
 	}
@@ -99,14 +111,14 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 	order := &square.CreateOrderRequest{
 		IdempotencyKey: idempotencyKey.String(),
 		Order: &square.Order{
-			ReferenceID: referenceId.String(),
-			LocationID:  locations[0].Id,
+			ReferenceId: referenceId.String(),
+			LocationId:  locations[0].Id,
 			LineItems:   []*square.OrderLineItem{},
 		},
 	}
 
-	for _, object := range objects {
-		item, ok := object.CatalogObjectType.(*square.CatalogItem)
+	for objects.Next() {
+		item, ok := objects.Value().CatalogObjectType.(*square.CatalogItem)
 		if !ok {
 			s.logger.Trace("Square object was not of type catalog item")
 			continue
@@ -195,15 +207,15 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 
 			var tierString string
 			switch weekendPass.Tier {
-			case Tier1:
+			case WeekendPassTier1:
 				tierString = utility.WeekendPassTier1Name
-			case Tier2:
+			case WeekendPassTier2:
 				tierString = utility.WeekendPassTier2Name
-			case Tier3:
+			case WeekendPassTier3:
 				tierString = utility.WeekendPassTier3Name
-			case Tier4:
+			case WeekendPassTier4:
 				tierString = utility.WeekendPassTier4Name
-			case Tier5:
+			case WeekendPassTier5:
 				tierString = utility.WeekendPassTier5Name
 			}
 			for _, v := range item.Variations {
@@ -224,12 +236,32 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 			}
 		}
 	}
+	if objects.Error() != nil {
+		wrap := "error fetching all items from square"
+		utility.LogSquareError(s.logger, objects.Error(), wrap)
+		return "", errors.Wrap(objects.Error(), wrap)
+	}
+
+	s.logger.Trace("Adding registration to database")
+	dbId, err := s.store.AddRegistration(ctx, storeRegistration)
+	if err != nil {
+		wrap := "error adding registration to database"
+		s.logger.WithError(err).Error(wrap)
+		return "", errors.Wrap(err, wrap)
+	}
 
 	s.logger.Trace("creating checkout with square")
-	checkout, err := s.client.CreateCheckout(ctx, locations[0].Id, idempotencyKey.String(), order, false, "info@daytonswingsmackdown.com", registration.Email, nil, redirectUrl, nil, "")
+	checkout, err := s.client.CreateCheckout(ctx, locations[0].Id, idempotencyKey.String(), order, false, smackdownEmail, registration.Email, nil, redirectUrl, nil, "")
 	if err != nil {
 		wrap := "error creating square checkout"
 		utility.LogSquareError(s.logger, err, wrap)
+
+		newerr := s.store.DeleteRegistration(ctx, dbId)
+		if newerr != nil {
+			wrap := "error cleaning up registration from database on error"
+			s.logger.WithError(newerr).Error(wrap)
+			return "", errors.Wrap(err, wrap)
+		}
 		return "", errors.Wrap(err, wrap)
 	}
 	return checkout.CheckoutPageUrl, nil
