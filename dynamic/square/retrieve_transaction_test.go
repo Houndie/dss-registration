@@ -6,10 +6,12 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"reflect"
 	"testing"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/pkg/errors"
 )
 
@@ -81,8 +83,8 @@ func TestRetrieveTransaction(t *testing.T) {
 		t.Fatalf("unexpected error returned when retrieving transaction: %v", err)
 	}
 
-	if !reflect.DeepEqual(transaction, expectedTransaction) {
-		t.Fatalf("found transaction %#v, expected transaction %#v", transaction, expectedTransaction)
+	if !cmp.Equal(transaction, expectedTransaction, cmpopts.IgnoreUnexported()) {
+		t.Fatalf("found transaction %s, expected transaction %s", spew.Sdump(transaction), spew.Sdump(expectedTransaction))
 	}
 }
 
@@ -192,7 +194,7 @@ func TestRetrieveTransactionErrorMessage(t *testing.T) {
 		t.Fatalf("found incorrect number of errors %d, expected 1", len(serr.Errors))
 	}
 
-	if !reflect.DeepEqual(serr.Errors[0], testError) {
-		t.Fatalf("found error %#v was different from expected %#v", serr.Errors[0], testError)
+	if !cmp.Equal(serr.Errors[0], testError, cmpopts.IgnoreUnexported()) {
+		t.Fatalf("found error %s was different from expected %s", spew.Sdump(serr.Errors[0]), spew.Sdump(testError))
 	}
 }

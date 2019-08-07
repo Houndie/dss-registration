@@ -6,11 +6,13 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"reflect"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/pkg/errors"
 )
 
@@ -133,8 +135,8 @@ func TestListCatalog(t *testing.T) {
 
 	idx := 0
 	for catalogObjects.Next() {
-		if !reflect.DeepEqual(catalogObjects.Value(), expectedObjects[idx]) {
-			t.Fatalf("found unexpected catalog item %#v, expected %#v", catalogObjects.Value(), expectedObjects[idx])
+		if !cmp.Equal(catalogObjects.Value(), expectedObjects[idx], cmpopts.IgnoreUnexported()) {
+			t.Fatalf("found unexpected catalog item %s, expected %s", spew.Sdump(catalogObjects.Value()), spew.Sdump(expectedObjects[idx]))
 		}
 		idx = idx + 1
 	}
@@ -286,8 +288,8 @@ func TestListCatalogErrorMessage(t *testing.T) {
 		t.Fatalf("error not of type square.ErrorList")
 	}
 
-	if !reflect.DeepEqual(serr.Errors[0], testError) {
-		t.Fatalf("expected error %#v, found %#v", serr.Errors[0], testError)
+	if !cmp.Equal(serr.Errors[0], testError, cmpopts.IgnoreUnexported()) {
+		t.Fatalf("expected error %s, found %s", spew.Sdump(serr.Errors[0]), spew.Sdump(testError))
 	}
 
 	if idx != 0 {

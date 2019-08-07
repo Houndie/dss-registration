@@ -2,12 +2,14 @@ package add
 
 import (
 	"context"
-	"reflect"
 	"testing"
 	"time"
 
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
+	"github.com/davecgh/go-spew/spew"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -270,8 +272,8 @@ func TestAddPassTypes(t *testing.T) {
 
 			store := &mockStore{
 				AddRegistrationFunc: func(ctx context.Context, r *StoreRegistration) (string, error) {
-					if !reflect.DeepEqual(r.PassType, testCase.passType) {
-						t.Fatalf("found incorrect pass type data %#v, expected %#v", r.PassType, testCase.passType)
+					if !cmp.Equal(r.PassType, testCase.passType, cmpopts.IgnoreUnexported()) {
+						t.Fatalf("found incorrect pass type data %s, expected %s", spew.Sdump(r.PassType), spew.Sdump(testCase.passType))
 					}
 					return "store key", nil
 				},
@@ -377,8 +379,8 @@ func TestAddHousing(t *testing.T) {
 
 			store := &mockStore{
 				AddRegistrationFunc: func(ctx context.Context, r *StoreRegistration) (string, error) {
-					if !reflect.DeepEqual(r.Housing, testCase.housing) {
-						t.Fatalf("found incorrect housing data %#v, expected %#v", r.Housing, testCase.housing)
+					if !cmp.Equal(r.Housing, testCase.housing, cmpopts.IgnoreUnexported()) {
+						t.Fatalf("found incorrect housing data %s, expected %s", spew.Sdump(r.Housing), spew.Sdump(testCase.housing))
 					}
 					return "store key", nil
 				},
@@ -472,8 +474,8 @@ func TestAddMixAndMatch(t *testing.T) {
 
 	store := &mockStore{
 		AddRegistrationFunc: func(ctx context.Context, r *StoreRegistration) (string, error) {
-			if !reflect.DeepEqual(r.MixAndMatch, registration.MixAndMatch) {
-				t.Fatalf("found incorrect mix and match data %#v, expected %#v", r.MixAndMatch, registration.MixAndMatch)
+			if !cmp.Equal(r.MixAndMatch, registration.MixAndMatch, cmpopts.IgnoreUnexported()) {
+				t.Fatalf("found incorrect mix and match data %s, expected %s", spew.Sdump(r.MixAndMatch), spew.Sdump(registration.MixAndMatch))
 			}
 			return "store key", nil
 		},
@@ -565,8 +567,8 @@ func TestAddTeamCompetition(t *testing.T) {
 
 	store := &mockStore{
 		AddRegistrationFunc: func(ctx context.Context, r *StoreRegistration) (string, error) {
-			if !reflect.DeepEqual(r.TeamCompetition, registration.TeamCompetition) {
-				t.Fatalf("found incorrect mix and match data %#v, expected %#v", r.TeamCompetition, registration.TeamCompetition)
+			if !cmp.Equal(r.TeamCompetition, registration.TeamCompetition, cmpopts.IgnoreUnexported()) {
+				t.Fatalf("found incorrect mix and match data %s, expected %s", spew.Sdump(r.TeamCompetition), spew.Sdump(registration.TeamCompetition))
 			}
 			return "store key", nil
 		},
@@ -658,8 +660,8 @@ func TestAddTShirt(t *testing.T) {
 
 	store := &mockStore{
 		AddRegistrationFunc: func(ctx context.Context, r *StoreRegistration) (string, error) {
-			if !reflect.DeepEqual(r.TShirt, registration.TShirt) {
-				t.Fatalf("found incorrect mix and match data %#v, expected %#v", r.TShirt, registration.TShirt)
+			if !cmp.Equal(r.TShirt, registration.TShirt, cmpopts.IgnoreUnexported()) {
+				t.Fatalf("found incorrect mix and match data %s, expected %s", spew.Sdump(r.TShirt), spew.Sdump(registration.TShirt))
 			}
 			return "store key", nil
 		},

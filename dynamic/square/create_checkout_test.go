@@ -6,10 +6,12 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"reflect"
 	"testing"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/pkg/errors"
 )
 
@@ -143,8 +145,8 @@ func TestCreateCheckout(t *testing.T) {
 					t.Fatalf("found idepotency key %s, expected %s", reqJson.IdempotencyKey, idempotencyKey)
 				}
 
-				if !reflect.DeepEqual(reqJson.Order, order) {
-					t.Fatalf("found order %#v not equal to existing order %#v", reqJson.Order, order)
+				if !cmp.Equal(reqJson.Order, order, cmpopts.IgnoreUnexported()) {
+					t.Fatalf("found order %s not equal to existing order %s", spew.Sdump(reqJson.Order), spew.Sdump(order))
 				}
 
 				if reqJson.AskForShippingAddress != askForShippingAddress {
@@ -159,16 +161,16 @@ func TestCreateCheckout(t *testing.T) {
 					t.Fatalf("found pre populate buyer email %s, expected %s", reqJson.PrePopulateBuyerEmail, prePopulateBuyerEmail)
 				}
 
-				if !reflect.DeepEqual(reqJson.PrePopulateShippingAddress, prePopulateShippingAddress) {
-					t.Fatalf("found wrong pre populate shipping address %#v, expected %#v", reqJson.PrePopulateShippingAddress, prePopulateShippingAddress)
+				if !cmp.Equal(reqJson.PrePopulateShippingAddress, prePopulateShippingAddress, cmpopts.IgnoreUnexported()) {
+					t.Fatalf("found wrong pre populate shipping address %s, expected %s", spew.Sdump(reqJson.PrePopulateShippingAddress), spew.Sdump(prePopulateShippingAddress))
 				}
 
 				if reqJson.RedirectUrl != redirectUrl {
 					t.Fatalf("found redirect url %s, expected %s", reqJson.RedirectUrl, redirectUrl)
 				}
 
-				if !reflect.DeepEqual(reqJson.AdditionalRecipients, additionalRecipients) {
-					t.Fatalf("found additional recipients %#v, expected %#v", reqJson.AdditionalRecipients, additionalRecipients)
+				if !cmp.Equal(reqJson.AdditionalRecipients, additionalRecipients, cmpopts.IgnoreUnexported()) {
+					t.Fatalf("found additional recipients %s, expected %s", spew.Sdump(reqJson.AdditionalRecipients), spew.Sdump(additionalRecipients))
 				}
 
 				if reqJson.Note != note {
@@ -209,8 +211,8 @@ func TestCreateCheckout(t *testing.T) {
 		t.Fatalf("found unxpected error from CreateCheckout: %v", err)
 	}
 
-	if !reflect.DeepEqual(checkout, expectedCheckout) {
-		t.Fatalf("found checkout %#v, expected %#v", checkout, expectedCheckout)
+	if !cmp.Equal(checkout, expectedCheckout, cmpopts.IgnoreUnexported()) {
+		t.Fatalf("found checkout %s, expected %s", spew.Sdump(checkout), spew.Sdump(expectedCheckout))
 	}
 }
 
@@ -479,7 +481,7 @@ func TestCreateCheckoutErrorMessage(t *testing.T) {
 		t.Fatalf("found %v errors, expected %v", len(serr.Errors), 1)
 	}
 
-	if !reflect.DeepEqual(serr.Errors[0], testError) {
-		t.Fatalf("errors were not equal, found %#v, expected %#v", serr.Errors[0], testError)
+	if !cmp.Equal(serr.Errors[0], testError, cmpopts.IgnoreUnexported()) {
+		t.Fatalf("errors were not equal, found %s, expected %s", spew.Sdump(serr.Errors[0]), spew.Sdump(testError))
 	}
 }
