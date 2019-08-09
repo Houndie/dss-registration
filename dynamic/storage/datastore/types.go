@@ -46,4 +46,5 @@ type registrationEntity struct {
 	}
 	ReferenceId string
 	Paid        bool
+	UserId      string
 }

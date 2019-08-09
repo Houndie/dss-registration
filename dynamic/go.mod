@@ -5,6 +5,7 @@ go 1.12
 require (
 	cloud.google.com/go v0.38.0
 	github.com/TV4/logrus-stackdriver-formatter v0.1.0
+	github.com/bluele/gcache v0.0.0-20190518031135-bc40bd653833
 	github.com/davecgh/go-spew v1.1.1
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible

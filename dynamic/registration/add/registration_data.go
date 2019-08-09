@@ -121,4 +121,5 @@ type StoreRegistration struct {
 	Housing         Housing
 	ReferenceId     uuid.UUID
 	Paid            bool
+	UserId          string
 }

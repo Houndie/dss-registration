@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
 	"github.com/davecgh/go-spew/spew"
@@ -37,6 +38,9 @@ func TestAdd(t *testing.T) {
 	expectedCheckoutUrl := "https://squareup.com/98734987349873498345"
 
 	catalogObjectsIdx := -1
+
+	testAccessToken := "some.access.token"
+	testUserId := "12356"
 
 	squareClient := &mockSquareClient{
 		ListCatalogFunc: func(ctx context.Context, types []square.CatalogObjectType) square.ListCatalogIterator {
@@ -156,6 +160,9 @@ func TestAdd(t *testing.T) {
 			if r.TShirt != nil {
 				t.Fatalf("found unexpected tshirt registration")
 			}
+			if r.UserId != testUserId {
+				t.Fatalf("found incorrect userid %s, expected %s", r.UserId, testUserId)
+			}
 			return "store key", nil
 		},
 		DeleteRegistrationFunc: func(ctx context.Context, id string) error {
@@ -169,7 +176,18 @@ func TestAdd(t *testing.T) {
 	logger.AddHook(&test_utility.ErrorHook{t})
 	logger.SetLevel(logrus.TraceLevel)
 
-	url, err := (&Service{squareClient, store, logger}).Add(context.Background(), registration, testRedirectUrl)
+	authorizer := &MockAuthorizer{
+		UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
+			if accessToken != testAccessToken {
+				t.Fatalf("found incorrect access token %s, expected %s", accessToken, testAccessToken)
+			}
+			return &authorizer.Userinfo{
+				UserId: testUserId,
+			}, nil
+		},
+	}
+
+	url, err := NewService(logger, store, squareClient, authorizer).Add(context.Background(), registration, testRedirectUrl, testAccessToken)
 	if err != nil {
 		t.Fatalf("error adding new registration: %v", err)
 	}
@@ -203,6 +221,9 @@ func TestAddPassTypes(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
+
+			testAccessToken := "some.access.token"
+			testUserId := "12356"
 
 			registration := &Registration{
 				FirstName:       "John",
@@ -288,7 +309,15 @@ func TestAddPassTypes(t *testing.T) {
 			logger.AddHook(&test_utility.ErrorHook{t})
 			logger.SetLevel(logrus.TraceLevel)
 
-			_, err := (&Service{squareClient, store, logger}).Add(context.Background(), registration, testRedirectUrl)
+			authorizer := &MockAuthorizer{
+				UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
+					return &authorizer.Userinfo{
+						UserId: testUserId,
+					}, nil
+				},
+			}
+
+			_, err := NewService(logger, store, squareClient, authorizer).Add(context.Background(), registration, testRedirectUrl, testAccessToken)
 			if err != nil {
 				t.Fatalf("error adding new registration: %v", err)
 			}
@@ -319,6 +348,9 @@ func TestAddHousing(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
+
+			testAccessToken := "some.access.token"
+			testUserId := "12356"
 
 			registration := &Registration{
 				FirstName:       "John",
@@ -395,7 +427,15 @@ func TestAddHousing(t *testing.T) {
 			logger.AddHook(&test_utility.ErrorHook{t})
 			logger.SetLevel(logrus.TraceLevel)
 
-			_, err := (&Service{squareClient, store, logger}).Add(context.Background(), registration, testRedirectUrl)
+			authorizer := &MockAuthorizer{
+				UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
+					return &authorizer.Userinfo{
+						UserId: testUserId,
+					}, nil
+				},
+			}
+
+			_, err := NewService(logger, store, squareClient, authorizer).Add(context.Background(), registration, testRedirectUrl, testAccessToken)
 			if err != nil {
 				t.Fatalf("error adding new registration: %v", err)
 			}
@@ -404,6 +444,9 @@ func TestAddHousing(t *testing.T) {
 }
 
 func TestAddMixAndMatch(t *testing.T) {
+	testAccessToken := "some.access.token"
+	testUserId := "12356"
+
 	registration := &Registration{
 		FirstName:     "John",
 		LastName:      "Doe",
@@ -490,13 +533,24 @@ func TestAddMixAndMatch(t *testing.T) {
 	logger.AddHook(&test_utility.ErrorHook{t})
 	logger.SetLevel(logrus.TraceLevel)
 
-	_, err := (&Service{squareClient, store, logger}).Add(context.Background(), registration, testRedirectUrl)
+	authorizer := &MockAuthorizer{
+		UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
+			return &authorizer.Userinfo{
+				UserId: testUserId,
+			}, nil
+		},
+	}
+
+	_, err := NewService(logger, store, squareClient, authorizer).Add(context.Background(), registration, testRedirectUrl, testAccessToken)
 	if err != nil {
 		t.Fatalf("error adding new registration: %v", err)
 	}
 }
 
 func TestAddTeamCompetition(t *testing.T) {
+	testAccessToken := "some.access.token"
+	testUserId := "12356"
+
 	registration := &Registration{
 		FirstName:     "John",
 		LastName:      "Doe",
@@ -583,13 +637,24 @@ func TestAddTeamCompetition(t *testing.T) {
 	logger.AddHook(&test_utility.ErrorHook{t})
 	logger.SetLevel(logrus.TraceLevel)
 
-	_, err := (&Service{squareClient, store, logger}).Add(context.Background(), registration, testRedirectUrl)
+	authorizer := &MockAuthorizer{
+		UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
+			return &authorizer.Userinfo{
+				UserId: testUserId,
+			}, nil
+		},
+	}
+
+	_, err := NewService(logger, store, squareClient, authorizer).Add(context.Background(), registration, testRedirectUrl, testAccessToken)
 	if err != nil {
 		t.Fatalf("error adding new registration: %v", err)
 	}
 }
 
 func TestAddTShirt(t *testing.T) {
+	testAccessToken := "some.access.token"
+	testUserId := "12356"
+
 	registration := &Registration{
 		FirstName:       "John",
 		LastName:        "Doe",
@@ -676,13 +741,24 @@ func TestAddTShirt(t *testing.T) {
 	logger.AddHook(&test_utility.ErrorHook{t})
 	logger.SetLevel(logrus.TraceLevel)
 
-	_, err := (&Service{squareClient, store, logger}).Add(context.Background(), registration, testRedirectUrl)
+	authorizer := &MockAuthorizer{
+		UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
+			return &authorizer.Userinfo{
+				UserId: testUserId,
+			}, nil
+		},
+	}
+
+	_, err := NewService(logger, store, squareClient, authorizer).Add(context.Background(), registration, testRedirectUrl, testAccessToken)
 	if err != nil {
 		t.Fatalf("error adding new registration: %v", err)
 	}
 }
 
 func TestAddCatalogError(t *testing.T) {
+	testAccessToken := "some.access.token"
+	testUserId := "12356"
+
 	registration := &Registration{
 		FirstName:       "John",
 		LastName:        "Doe",
@@ -746,7 +822,15 @@ func TestAddCatalogError(t *testing.T) {
 	logger.SetOutput(&test_utility.ErrorWriter{t})
 	logger.SetLevel(logrus.TraceLevel)
 
-	_, err := (&Service{squareClient, store, logger}).Add(context.Background(), registration, testRedirectUrl)
+	authorizer := &MockAuthorizer{
+		UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
+			return &authorizer.Userinfo{
+				UserId: testUserId,
+			}, nil
+		},
+	}
+
+	_, err := NewService(logger, store, squareClient, authorizer).Add(context.Background(), registration, testRedirectUrl, testAccessToken)
 	if err == nil {
 		t.Fatalf("No error returned when square could not list catalog items")
 	}
@@ -756,6 +840,9 @@ func TestAddCatalogError(t *testing.T) {
 }
 
 func TestAddLocationsError(t *testing.T) {
+	testAccessToken := "some.access.token"
+	testUserId := "12356"
+
 	registration := &Registration{
 		FirstName:       "John",
 		LastName:        "Doe",
@@ -821,7 +908,15 @@ func TestAddLocationsError(t *testing.T) {
 	logger.SetOutput(&test_utility.ErrorWriter{t})
 	logger.SetLevel(logrus.TraceLevel)
 
-	_, err := (&Service{squareClient, store, logger}).Add(context.Background(), registration, testRedirectUrl)
+	authorizer := &MockAuthorizer{
+		UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
+			return &authorizer.Userinfo{
+				UserId: testUserId,
+			}, nil
+		},
+	}
+
+	_, err := NewService(logger, store, squareClient, authorizer).Add(context.Background(), registration, testRedirectUrl, testAccessToken)
 	if err == nil {
 		t.Fatalf("No error returned when square could not list catalog items")
 	}
@@ -831,6 +926,9 @@ func TestAddLocationsError(t *testing.T) {
 }
 
 func TestAddCheckoutError(t *testing.T) {
+	testAccessToken := "some.access.token"
+	testUserId := "12356"
+
 	registration := &Registration{
 		FirstName:       "John",
 		LastName:        "Doe",
@@ -895,7 +993,15 @@ func TestAddCheckoutError(t *testing.T) {
 	logger.SetOutput(&test_utility.ErrorWriter{t})
 	logger.SetLevel(logrus.TraceLevel)
 
-	_, err := (&Service{squareClient, store, logger}).Add(context.Background(), registration, testRedirectUrl)
+	authorizer := &MockAuthorizer{
+		UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
+			return &authorizer.Userinfo{
+				UserId: testUserId,
+			}, nil
+		},
+	}
+
+	_, err := NewService(logger, store, squareClient, authorizer).Add(context.Background(), registration, testRedirectUrl, testAccessToken)
 	if err == nil {
 		t.Fatalf("No error returned when square could not create checkout")
 	}
@@ -905,6 +1011,9 @@ func TestAddCheckoutError(t *testing.T) {
 }
 
 func TestAddAddRegistrationError(t *testing.T) {
+	testAccessToken := "some.access.token"
+	testUserId := "12356"
+
 	registration := &Registration{
 		FirstName:       "John",
 		LastName:        "Doe",
@@ -963,13 +1072,24 @@ func TestAddAddRegistrationError(t *testing.T) {
 	logger.SetOutput(&test_utility.ErrorWriter{t})
 	logger.SetLevel(logrus.TraceLevel)
 
-	_, err := (&Service{squareClient, store, logger}).Add(context.Background(), registration, testRedirectUrl)
+	authorizer := &MockAuthorizer{
+		UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
+			return &authorizer.Userinfo{
+				UserId: testUserId,
+			}, nil
+		},
+	}
+
+	_, err := NewService(logger, store, squareClient, authorizer).Add(context.Background(), registration, testRedirectUrl, testAccessToken)
 	if err == nil {
 		t.Fatalf("No error returned when square could not create checkout")
 	}
 }
 
 func TestAddRegistrationNoPayments(t *testing.T) {
+	testAccessToken := "some.access.token"
+	testUserId := "12356"
+
 	registration := &Registration{
 		FirstName:       "John",
 		LastName:        "Doe",
@@ -1029,11 +1149,181 @@ func TestAddRegistrationNoPayments(t *testing.T) {
 	logger.SetLevel(logrus.TraceLevel)
 	logger.AddHook(&test_utility.ErrorHook{t})
 
-	url, err := (&Service{squareClient, store, logger}).Add(context.Background(), registration, testRedirectUrl)
+	authorizer := &MockAuthorizer{
+		UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
+			return &authorizer.Userinfo{
+				UserId: testUserId,
+			}, nil
+		},
+	}
+
+	url, err := NewService(logger, store, squareClient, authorizer).Add(context.Background(), registration, testRedirectUrl, testAccessToken)
 	if err != nil {
 		t.Fatalf("error returned when creating registration: %v", err)
 	}
 	if url != testRedirectUrl {
 		t.Fatalf("found redirect url %s, expected %s", url, testRedirectUrl)
+	}
+}
+
+func TestAddRegistrationNoUserId(t *testing.T) {
+	registration := &Registration{
+		FirstName:       "John",
+		LastName:        "Doe",
+		StreetAddress:   "123 Any St.",
+		City:            "New York",
+		State:           "NY",
+		ZipCode:         "12345",
+		Email:           "John.Doe@example.com",
+		HomeScene:       "Frim Fram",
+		IsStudent:       true,
+		PassType:        &NoPass{},
+		MixAndMatch:     nil,
+		SoloJazz:        true,
+		TeamCompetition: nil,
+		TShirt:          nil,
+		Housing:         &NoHousing{},
+	}
+	testRedirectUrl := "https://daytonswingsmackdown.com/registration-complete"
+
+	catalogObjectsIdx := -1
+
+	squareClient := &mockSquareClient{
+		ListCatalogFunc: func(ctx context.Context, types []square.CatalogObjectType) square.ListCatalogIterator {
+			return &mockListCatalogIterator{
+				ValueFunc: func() *square.CatalogObject {
+					return catalogObjects[catalogObjectsIdx]
+				},
+				ErrorFunc: func() error {
+					return nil
+				},
+				NextFunc: func() bool {
+					catalogObjectsIdx++
+					return catalogObjectsIdx < len(catalogObjects)
+				},
+			}
+		},
+		ListLocationsFunc: func(ctx context.Context) ([]*square.Location, error) {
+			return locations, nil
+		},
+		CreateCheckoutFunc: func(ctx context.Context, locationId, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error) {
+			createdAt := time.Now()
+			return &square.Checkout{
+				Id:                         "checkout id",
+				CheckoutPageUrl:            "some url",
+				AskForShippingAddress:      askForShippingAddress,
+				MerchantSupportEmail:       merchantSupportEmail,
+				PrePopulateBuyerEmail:      prePopulateBuyerEmail,
+				PrePopulateShippingAddress: prePopulateShippingAddress,
+				RedirectUrl:                redirectUrl,
+				Order:                      order.Order,
+				CreatedAt:                  &createdAt,
+				AdditionalRecipients:       nil,
+			}, nil
+		},
+	}
+
+	store := &mockStore{
+		AddRegistrationFunc: func(ctx context.Context, r *StoreRegistration) (string, error) {
+			if r.UserId != "" {
+				t.Fatalf("expected no user id when no access token given, found %s", r.UserId)
+			}
+			return "key", nil
+		},
+		DeleteRegistrationFunc: func(ctx context.Context, id string) error {
+			t.Fatalf("deleting registration?")
+			return nil
+		},
+	}
+
+	logger := logrus.New()
+	logger.SetOutput(&test_utility.ErrorWriter{t})
+	logger.SetLevel(logrus.TraceLevel)
+	logger.AddHook(&test_utility.ErrorHook{t})
+
+	authorizer := &MockAuthorizer{
+		UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
+			t.Fatalf("found call to userinfo endpoint when no access token given")
+			return nil, nil
+		},
+	}
+
+	_, err := NewService(logger, store, squareClient, authorizer).Add(context.Background(), registration, testRedirectUrl, "")
+	if err != nil {
+		t.Fatalf("error returned when creating registration: %v", err)
+	}
+}
+
+func TestAddRegistrationUserInfoError(t *testing.T) {
+	registration := &Registration{
+		FirstName:       "John",
+		LastName:        "Doe",
+		StreetAddress:   "123 Any St.",
+		City:            "New York",
+		State:           "NY",
+		ZipCode:         "12345",
+		Email:           "John.Doe@example.com",
+		HomeScene:       "Frim Fram",
+		IsStudent:       true,
+		PassType:        &NoPass{},
+		MixAndMatch:     nil,
+		SoloJazz:        true,
+		TeamCompetition: nil,
+		TShirt:          nil,
+		Housing:         &NoHousing{},
+	}
+	testRedirectUrl := "https://daytonswingsmackdown.com/registration-complete"
+
+	catalogObjectsIdx := -1
+
+	squareClient := &mockSquareClient{
+		ListCatalogFunc: func(ctx context.Context, types []square.CatalogObjectType) square.ListCatalogIterator {
+			return &mockListCatalogIterator{
+				ValueFunc: func() *square.CatalogObject {
+					return catalogObjects[catalogObjectsIdx]
+				},
+				ErrorFunc: func() error {
+					return nil
+				},
+				NextFunc: func() bool {
+					catalogObjectsIdx++
+					return catalogObjectsIdx < len(catalogObjects)
+				},
+			}
+		},
+		ListLocationsFunc: func(ctx context.Context) ([]*square.Location, error) {
+			return locations, nil
+		},
+		CreateCheckoutFunc: func(ctx context.Context, locationId, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error) {
+			t.Fatalf("expected no checkout created when userinfo could not be attained")
+			return nil, nil
+		},
+	}
+
+	store := &mockStore{
+		AddRegistrationFunc: func(ctx context.Context, r *StoreRegistration) (string, error) {
+			t.Fatalf("expected no registraiton data created when userinfo could not be attained")
+			return "", nil
+		},
+		DeleteRegistrationFunc: func(ctx context.Context, id string) error {
+			t.Fatalf("deleting registration?")
+			return nil
+		},
+	}
+
+	logger := logrus.New()
+	logger.SetOutput(&test_utility.ErrorWriter{t})
+	logger.SetLevel(logrus.TraceLevel)
+	logger.AddHook(&test_utility.ErrorHook{t})
+
+	authorizer := &MockAuthorizer{
+		UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
+			return nil, errors.New("some error")
+		},
+	}
+
+	_, err := NewService(logger, store, squareClient, authorizer).Add(context.Background(), registration, testRedirectUrl, "some.access.token")
+	if err == nil {
+		t.Fatalf("expected error to be returned when userinfo endpoint fails")
 	}
 }

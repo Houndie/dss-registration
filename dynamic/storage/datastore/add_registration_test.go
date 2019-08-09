@@ -43,6 +43,7 @@ func TestAddRegistration1(t *testing.T) {
 		Housing:         &add.NoHousing{},
 		ReferenceId:     referenceId,
 		Paid:            false,
+		UserId:          "12385",
 	}
 
 	key, err := NewDatastore(store).AddRegistration(context.Background(), registration)
@@ -134,6 +135,10 @@ func TestAddRegistration1(t *testing.T) {
 
 	if entity.Paid != registration.Paid {
 		t.Fatalf("found paid status %v, expected %v", entity.Paid, registration.Paid)
+	}
+
+	if entity.UserId != registration.UserId {
+		t.Fatalf("found user id %v, expected %v", entity.UserId, registration.UserId)
 	}
 }
 

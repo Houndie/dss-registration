@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/Houndie/dss-registration/dynamic/registration/add"
 	"github.com/sirupsen/logrus"
@@ -43,6 +44,17 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	logger.Info("Add Registration")
+
+	auth := r.Header.Get("Authorization")
+	authToken := ""
+	if auth != "" {
+		if !strings.HasPrefix(auth, "Bearer ") {
+			logger.Debug("malformed auth header")
+			writeAddRegistrationResp(w, logger, "", []*jsonError{internalServerError()})
+			return
+		}
+		authToken = strings.TrimPrefix(auth, "Bearer ")
+	}
 
 	inputs := struct {
 		FirstName       string `json:"first_name"`
@@ -255,7 +267,7 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 		TeamCompetition: teamCompetition,
 		TShirt:          tShirt,
 		Housing:         housing,
-	}, inputs.RedirectUrl)
+	}, inputs.RedirectUrl, authToken)
 	if err != nil {
 		logger.WithError(err).Error("Error adding regitration to backend")
 		writeAddRegistrationResp(w, logger, "", []*jsonError{internalServerError()})

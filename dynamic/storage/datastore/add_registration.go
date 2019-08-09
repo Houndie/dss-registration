@@ -23,6 +23,7 @@ func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistratio
 		SoloJazz:      r.SoloJazz,
 		ReferenceId:   r.ReferenceId.String(),
 		Paid:          r.Paid,
+		UserId:        r.UserId,
 	}
 
 	switch p := r.PassType.(type) {

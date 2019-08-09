@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"cloud.google.com/go/datastore"
+	"github.com/Houndie/dss-registration/dynamic/authorizer/google"
 	"github.com/Houndie/dss-registration/dynamic/registration/add"
 	"github.com/Houndie/dss-registration/dynamic/registration/finalize"
 	"github.com/Houndie/dss-registration/dynamic/registration/populate"
@@ -111,8 +112,10 @@ func init() {
 
 	store := storage.NewDatastore(datastore)
 
+	authorizer := google.NewAuthorizer(httpClient)
+
 	populateService = populate.NewService(logger, squareClient)
-	addService = add.NewService(logger, store, squareClient)
+	addService = add.NewService(logger, store, squareClient, authorizer)
 	finalizeService = finalize.NewService(logger, store, squareClient)
 	decoder = schema.NewDecoder()
 }

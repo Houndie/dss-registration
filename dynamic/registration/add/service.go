@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/utility"
 	"github.com/gofrs/uuid"
@@ -24,17 +25,23 @@ type SquareClient interface {
 	CreateCheckout(ctx context.Context, locationId, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error)
 }
 
-type Service struct {
-	client SquareClient
-	store  Store
-	logger *logrus.Logger
+type Authorizer interface {
+	Userinfo(ctx context.Context, accessToken string) (*authorizer.Userinfo, error)
 }
 
-func NewService(logger *logrus.Logger, store Store, client SquareClient) *Service {
+type Service struct {
+	client     SquareClient
+	store      Store
+	authorizer Authorizer
+	logger     *logrus.Logger
+}
+
+func NewService(logger *logrus.Logger, store Store, client SquareClient, authorizer Authorizer) *Service {
 	return &Service{
-		store:  store,
-		logger: logger,
-		client: client,
+		store:      store,
+		logger:     logger,
+		client:     client,
+		authorizer: authorizer,
 	}
 }
 
@@ -43,7 +50,19 @@ func containsNoPaidItems(r *Registration) bool {
 	return noPassOk && r.MixAndMatch == nil && r.TeamCompetition == nil && r.TShirt == nil && !r.SoloJazz
 }
 
-func (s *Service) Add(ctx context.Context, registration *Registration, redirectUrl string) (string, error) {
+func (s *Service) Add(ctx context.Context, registration *Registration, redirectUrl, accessToken string) (string, error) {
+	s.logger.Trace("in add registration service")
+	userid := ""
+	if accessToken != "" {
+		s.logger.Trace("found access token, calling userinfo endpoint")
+		userinfo, err := s.authorizer.Userinfo(ctx, accessToken)
+		if err != nil {
+			msg := "error fetching userinfo"
+			s.logger.WithError(err).Debug(msg)
+			return "", errors.Wrap(err, msg)
+		}
+		userid = userinfo.UserId
+	}
 	s.logger.Trace("generating reference id")
 	referenceId, err := uuid.NewV4()
 	if err != nil {
@@ -70,6 +89,7 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 		Housing:         registration.Housing,
 		ReferenceId:     referenceId,
 		Paid:            false,
+		UserId:          userid,
 	}
 	if containsNoPaidItems(registration) {
 		storeRegistration.Paid = true

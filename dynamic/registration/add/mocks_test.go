@@ -3,6 +3,7 @@ package add
 import (
 	"context"
 
+	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/square"
 )
 
@@ -53,4 +54,12 @@ func (m *mockStore) AddRegistration(ctx context.Context, r *StoreRegistration) (
 
 func (m *mockStore) DeleteRegistration(ctx context.Context, s string) error {
 	return m.DeleteRegistrationFunc(ctx, s)
+}
+
+type MockAuthorizer struct {
+	UserinfoFunc func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error)
+}
+
+func (m *MockAuthorizer) Userinfo(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
+	return m.UserinfoFunc(ctx, accessToken)
 }
