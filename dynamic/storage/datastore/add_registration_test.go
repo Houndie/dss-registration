@@ -20,9 +20,9 @@ func TestAddRegistration1(t *testing.T) {
 		t.Fatalf("could not connect to datastore emulator: %v", err)
 	}
 
-	referenceId, err := uuid.NewV4()
+	userId, err := uuid.NewV4()
 	if err != nil {
-		t.Fatalf("error generating reference id for test: %v", err)
+		t.Fatalf("error generating user id for test: %v", err)
 	}
 
 	registration := &add.StoreRegistration{
@@ -41,33 +41,37 @@ func TestAddRegistration1(t *testing.T) {
 		TeamCompetition: nil,
 		TShirt:          nil,
 		Housing:         &add.NoHousing{},
-		ReferenceId:     referenceId,
-		Paid:            false,
-		UserId:          "12385",
+		UserId:          userId.String(),
 	}
 
-	key, err := NewDatastore(store).AddRegistration(context.Background(), registration)
+	err = NewDatastore(store).AddRegistration(context.Background(), registration)
 	if err != nil {
 		t.Fatalf("error inserting new registration into store: %v", err)
 	}
-	decodedKey, err := datastore.DecodeKey(key)
+
+	q := datastore.NewQuery(registrationKind).Filter("UserId =", userId.String())
+	entities := []registrationEntity{}
+	keys, err := store.GetAll(context.Background(), q, &entities)
 	if err != nil {
 		t.Log("WARNING:  Information leaked into database during test (test not cleaned up)")
-		t.Fatalf("could not decode key %s: %v", key, err)
+		t.Fatalf("could find database item with id %v: %v", userId, err)
 	}
 	defer func() {
-		err := store.Delete(context.Background(), decodedKey)
-		if err != nil {
-			t.Log("WARNING:  Information leaked into database during test (test not cleaned up)")
-			t.Fatalf("error cleaning up test item from store: %v", err)
+		for _, key := range keys {
+			err := store.Delete(context.Background(), key)
+			if err != nil {
+				t.Log("WARNING:  Information leaked into database during test (test not cleaned up)")
+				t.Fatalf("error cleaning up test item from store: %v", err)
+			}
 		}
 	}()
-
-	entity := &registrationEntity{}
-	err = store.Get(context.Background(), decodedKey, entity)
-	if err != nil {
-		t.Fatalf("error finding newly added registration in store: %v", err)
+	if len(keys) != 1 {
+		t.Fatalf("found incorrect number of test item keys %d", len(keys))
 	}
+	if len(entities) != 1 {
+		t.Fatalf("found incorrect number of test items %d", len(keys))
+	}
+	entity := entities[0]
 
 	if registration.FirstName != entity.FirstName {
 		t.Fatalf("found first name %s, expected %s", entity.FirstName, registration.FirstName)
@@ -129,14 +133,6 @@ func TestAddRegistration1(t *testing.T) {
 		t.Fatalf("found weekend pass status %s, expected %s", entity.WeekendPass, noPass)
 	}
 
-	if entity.ReferenceId != referenceId.String() {
-		t.Fatalf("found reference id %s, expected %s", entity.ReferenceId, registration.ReferenceId)
-	}
-
-	if entity.Paid != registration.Paid {
-		t.Fatalf("found paid status %v, expected %v", entity.Paid, registration.Paid)
-	}
-
 	if entity.UserId != registration.UserId {
 		t.Fatalf("found user id %v, expected %v", entity.UserId, registration.UserId)
 	}
@@ -152,9 +148,9 @@ func TestAddRegistration2(t *testing.T) {
 		t.Fatalf("could not connect to datastore emulator: %v", err)
 	}
 
-	referenceId, err := uuid.NewV4()
+	userId, err := uuid.NewV4()
 	if err != nil {
-		t.Fatalf("error generating reference id for test: %v", err)
+		t.Fatalf("error generating user id for test: %v", err)
 	}
 
 	role := add.MixAndMatchRoleLeader
@@ -187,32 +183,37 @@ func TestAddRegistration2(t *testing.T) {
 			PetAllergies: petAllergies,
 			Details:      details,
 		},
-		ReferenceId: referenceId,
-		Paid:        true,
+		UserId: userId.String(),
 	}
 
-	key, err := NewDatastore(store).AddRegistration(context.Background(), registration)
+	err = NewDatastore(store).AddRegistration(context.Background(), registration)
 	if err != nil {
 		t.Fatalf("error inserting new registration into store: %v", err)
 	}
-	decodedKey, err := datastore.DecodeKey(key)
+
+	q := datastore.NewQuery(registrationKind).Filter("UserId =", userId.String())
+	entities := []registrationEntity{}
+	keys, err := store.GetAll(context.Background(), q, &entities)
 	if err != nil {
 		t.Log("WARNING:  Information leaked into database during test (test not cleaned up)")
-		t.Fatalf("could not decode key %s: %v", key, err)
+		t.Fatalf("could find database item with id %v: %v", userId, err)
 	}
 	defer func() {
-		err := store.Delete(context.Background(), decodedKey)
-		if err != nil {
-			t.Log("WARNING:  Information leaked into database during test (test not cleaned up)")
-			t.Fatalf("error cleaning up test item from store: %v", err)
+		for _, key := range keys {
+			err := store.Delete(context.Background(), key)
+			if err != nil {
+				t.Log("WARNING:  Information leaked into database during test (test not cleaned up)")
+				t.Fatalf("error cleaning up test item from store: %v", err)
+			}
 		}
 	}()
-
-	entity := &registrationEntity{}
-	err = store.Get(context.Background(), decodedKey, entity)
-	if err != nil {
-		t.Fatalf("error finding newly added registration in store: %v", err)
+	if len(keys) != 1 {
+		t.Fatalf("found incorrect number of test item keys %d", len(keys))
 	}
+	if len(entities) != 1 {
+		t.Fatalf("found incorrect number of test items %d", len(keys))
+	}
+	entity := entities[0]
 
 	if registration.IsStudent != entity.IsStudent {
 		t.Fatalf("found student status %v, expected %v", entity.IsStudent, registration.IsStudent)
@@ -261,10 +262,6 @@ func TestAddRegistration2(t *testing.T) {
 	if entity.WeekendPass != danceOnlyPass {
 		t.Fatalf("found weekend pass status %s, expected %s", entity.WeekendPass, danceOnlyPass)
 	}
-
-	if entity.Paid != registration.Paid {
-		t.Fatalf("found paid status %v, expected %v", entity.Paid, registration.Paid)
-	}
 }
 
 func TestAddRegistration3(t *testing.T) {
@@ -277,9 +274,9 @@ func TestAddRegistration3(t *testing.T) {
 		t.Fatalf("could not connect to datastore emulator: %v", err)
 	}
 
-	referenceId, err := uuid.NewV4()
+	userId, err := uuid.NewV4()
 	if err != nil {
-		t.Fatalf("error generating reference id for test: %v", err)
+		t.Fatalf("error generating user id for test: %v", err)
 	}
 
 	pets := "some pets"
@@ -308,32 +305,37 @@ func TestAddRegistration3(t *testing.T) {
 			Quantity: quantity,
 			Details:  details,
 		},
-		ReferenceId: referenceId,
-		Paid:        true,
+		UserId: userId.String(),
 	}
 
-	key, err := NewDatastore(store).AddRegistration(context.Background(), registration)
+	err = NewDatastore(store).AddRegistration(context.Background(), registration)
 	if err != nil {
 		t.Fatalf("error inserting new registration into store: %v", err)
 	}
-	decodedKey, err := datastore.DecodeKey(key)
+
+	q := datastore.NewQuery(registrationKind).Filter("UserId =", userId.String())
+	entities := []registrationEntity{}
+	keys, err := store.GetAll(context.Background(), q, &entities)
 	if err != nil {
 		t.Log("WARNING:  Information leaked into database during test (test not cleaned up)")
-		t.Fatalf("could not decode key %s: %v", key, err)
+		t.Fatalf("could find database item with id %v: %v", userId, err)
 	}
 	defer func() {
-		err := store.Delete(context.Background(), decodedKey)
-		if err != nil {
-			t.Log("WARNING:  Information leaked into database during test (test not cleaned up)")
-			t.Fatalf("error cleaning up test item from store: %v", err)
+		for _, key := range keys {
+			err := store.Delete(context.Background(), key)
+			if err != nil {
+				t.Log("WARNING:  Information leaked into database during test (test not cleaned up)")
+				t.Fatalf("error cleaning up test item from store: %v", err)
+			}
 		}
 	}()
-
-	entity := &registrationEntity{}
-	err = store.Get(context.Background(), decodedKey, entity)
-	if err != nil {
-		t.Fatalf("error finding newly added registration in store: %v", err)
+	if len(keys) != 1 {
+		t.Fatalf("found incorrect number of test item keys %d", len(keys))
 	}
+	if len(entities) != 1 {
+		t.Fatalf("found incorrect number of test items %d", len(keys))
+	}
+	entity := entities[0]
 
 	if entity.HousingRequest != providesHousing {
 		t.Fatalf("found housing request %s, expected %s", entity.HousingRequest, providesHousing)

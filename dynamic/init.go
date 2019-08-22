@@ -116,7 +116,6 @@ func init() {
 
 	populateService = populate.NewService(logger, squareClient)
 	addService = add.NewService(logger, store, squareClient, authorizer)
-	finalizeService = finalize.NewService(logger, store, squareClient)
 	decoder = schema.NewDecoder()
 }
 

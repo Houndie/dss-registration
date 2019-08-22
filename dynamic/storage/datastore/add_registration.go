@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistration) (string, error) {
+func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistration) error {
 	registration := &registrationEntity{
 		FirstName:     r.FirstName,
 		LastName:      r.LastName,
@@ -21,9 +21,8 @@ func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistratio
 		HomeScene:     r.HomeScene,
 		IsStudent:     r.IsStudent,
 		SoloJazz:      r.SoloJazz,
-		ReferenceId:   r.ReferenceId.String(),
-		Paid:          r.Paid,
 		UserId:        r.UserId,
+		OrderIds:      r.OrderIds,
 	}
 
 	switch p := r.PassType.(type) {
@@ -36,7 +35,7 @@ func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistratio
 	case *add.NoPass:
 		registration.WeekendPass = noPass
 	default:
-		return "", fmt.Errorf("Found unknown type of weekend pass")
+		return fmt.Errorf("Found unknown type of weekend pass")
 	}
 
 	if r.MixAndMatch != nil {
@@ -67,12 +66,9 @@ func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistratio
 	case *add.NoHousing:
 		registration.HousingRequest = noHousing
 	default:
-		return "", fmt.Errorf("Found unknown type of housing")
+		return fmt.Errorf("Found unknown type of housing")
 	}
 	registrationKey := datastore.IncompleteKey(registrationKind, nil)
-	completeKey, err := s.client.Put(ctx, registrationKey, registration)
-	if err != nil {
-		return "", errors.Wrap(err, "Error inserting registration into database")
-	}
-	return completeKey.Encode(), nil
+	_, err := s.client.Put(ctx, registrationKey, registration)
+	return errors.Wrap(err, "Error inserting registration into database")
 }

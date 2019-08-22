@@ -1,7 +1,5 @@
 package add
 
-import "github.com/gofrs/uuid"
-
 type WeekendPassLevel int
 type WeekendPassTier int
 
@@ -119,7 +117,6 @@ type StoreRegistration struct {
 	TeamCompetition *TeamCompetition
 	TShirt          *TShirt
 	Housing         Housing
-	ReferenceId     uuid.UUID
-	Paid            bool
 	UserId          string
+	OrderIds        []string
 }

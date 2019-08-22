@@ -34,8 +34,6 @@ func TestDeleteRegistration(t *testing.T) {
 		HasTeamCompetition: false,
 		HasMixAndMatch:     false,
 		WeekendPass:        danceOnlyPass,
-		ReferenceId:        "12345",
-		Paid:               false,
 	}
 
 	registrationKey := datastore.IncompleteKey(registrationKind, nil)

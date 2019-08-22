@@ -15,7 +15,7 @@ import (
 const smackdownEmail = "info@daytonswingsmackdown.com"
 
 type Store interface {
-	AddRegistration(context.Context, *StoreRegistration) (string, error)
+	AddRegistration(context.Context, *StoreRegistration) error
 	DeleteRegistration(context.Context, string) error
 }
 
@@ -23,6 +23,7 @@ type SquareClient interface {
 	ListCatalog(ctx context.Context, types []square.CatalogObjectType) square.ListCatalogIterator
 	ListLocations(ctx context.Context) ([]*square.Location, error)
 	CreateCheckout(ctx context.Context, locationId, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error)
+	UpdateOrder(ctx context.Context, locationId, orderId string, order *square.Order, fieldsToClear []string, idempotencyKey string) (*square.Order, error)
 }
 
 type Authorizer interface {
@@ -87,14 +88,11 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 		TeamCompetition: registration.TeamCompetition,
 		TShirt:          registration.TShirt,
 		Housing:         registration.Housing,
-		ReferenceId:     referenceId,
-		Paid:            false,
 		UserId:          userid,
 	}
 	if containsNoPaidItems(registration) {
-		storeRegistration.Paid = true
 		s.logger.Trace("no square items found, simply adding registration to database")
-		_, err := s.store.AddRegistration(ctx, storeRegistration)
+		err = s.store.AddRegistration(ctx, storeRegistration)
 		if err != nil {
 			wrap := "error adding registration to database"
 			s.logger.WithError(err).Error(wrap)
@@ -262,23 +260,31 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 		return "", errors.Wrap(objects.Error(), wrap)
 	}
 
-	s.logger.Trace("Adding registration to database")
-	dbId, err := s.store.AddRegistration(ctx, storeRegistration)
-	if err != nil {
-		wrap := "error adding registration to database"
-		s.logger.WithError(err).Error(wrap)
-		return "", errors.Wrap(err, wrap)
-	}
-
 	s.logger.Trace("creating checkout with square")
 	checkout, err := s.client.CreateCheckout(ctx, locations[0].Id, idempotencyKey.String(), order, false, smackdownEmail, registration.Email, nil, redirectUrl, nil, "")
 	if err != nil {
 		wrap := "error creating square checkout"
 		utility.LogSquareError(s.logger, err, wrap)
+		return "", errors.Wrap(err, wrap)
+	}
 
-		newerr := s.store.DeleteRegistration(ctx, dbId)
+	storeRegistration.OrderIds = []string{checkout.Order.Id}
+
+	s.logger.Trace("Adding registration to database")
+	err = s.store.AddRegistration(ctx, storeRegistration)
+	if err != nil {
+		wrap := "error adding registration to database"
+		s.logger.WithError(err).Error(wrap)
+
+		sparseOrder := &square.Order{
+			Id:      checkout.Order.Id,
+			Version: checkout.Order.Version,
+			State:   square.OrderStateCanceled,
+		}
+
+		_, newerr := s.client.UpdateOrder(ctx, locations[0].Id, checkout.Order.Id, sparseOrder, nil, idempotencyKey.String())
 		if newerr != nil {
-			wrap := "error cleaning up registration from database on error"
+			wrap := "error cleaning up order from square"
 			s.logger.WithError(newerr).Error(wrap)
 			return "", errors.Wrap(err, wrap)
 		}
