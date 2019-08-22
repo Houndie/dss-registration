@@ -44,7 +44,21 @@ type registrationEntity struct {
 		Level int
 		Tier  int
 	}
-	ReferenceId string
-	Paid        bool
-	UserId      string
+	UserId string
+}
+
+const (
+	orderKind = "Order"
+
+	nonePayment                 = "none"
+	manualPayment               = "manual"
+	automaticPayment            = "automatic"
+	completedButNoRecordPayment = "completed but no record"
+)
+
+type orderEntity struct {
+	ReferenceId      string
+	OrderId          string
+	PaymentType      string
+	AutomaticPayment string
 }

@@ -48,7 +48,7 @@ type middleware struct {
 func (m middleware) RoundTrip(r *http.Request) (*http.Response, error) {
 	r.Header.Add("Authorization", "Bearer "+m.apiKey)
 	r.Header.Add("Accept", "application/json")
-	if r.Method == "POST" {
+	if r.Method == "POST" || r.Method == "PUT" {
 		r.Header.Add("Content-Type", "application/json")
 	}
 	return m.wrap.RoundTrip(r)

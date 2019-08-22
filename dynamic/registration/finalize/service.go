@@ -35,7 +35,7 @@ func NewService(logger *logrus.Logger, store Store, client SquareClient) *Servic
 }
 
 type Store interface {
-	MarkRegistrationPaid(ctx context.Context, referenceId uuid.UUID) error
+	MarkRegistrationPaid(ctx context.Context, referenceId uuid.UUID, paymentId string) error
 }
 
 type SquareClient interface {

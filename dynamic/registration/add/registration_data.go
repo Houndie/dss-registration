@@ -123,3 +123,8 @@ type StoreRegistration struct {
 	Paid            bool
 	UserId          string
 }
+
+type StoreOrder struct {
+	ReferenceId uuid.UUID
+	OrderId     string
+}
