@@ -57,7 +57,7 @@ func siteName() (string, error) {
 	case PROJECT_PROD:
 		return "https://daytonswingsmackdown.com", nil
 	case PROJECT_TEST:
-		return "http://test.daytonswingsmackdown.com", nil
+		return "https://test.daytonswingsmackdown.com", nil
 	}
 	return "", fmt.Errorf("Unknown project name found (%s)", project)
 }

@@ -167,10 +167,9 @@ function submitRegistration() {
 		j.provide_housing.housing_number = document.getElementById('root_housingNumber').value;
 		j.provide_housing.my_housing_details = document.getElementById('root_myHousingDetails').value;
 	}
-	j.redirect_url = siteBase
+	j.redirect_url = siteBase+"/registration-complete"
 
 	var jsonString = JSON.stringify(j);
-	alert(jsonString)
 
 	var req = new XMLHttpRequest();
 	req.onreadystatechange = function() {
@@ -191,11 +190,22 @@ function submitRegistration() {
 
 			window.location.href = resp.checkout_url;
 		} catch(e) {
-			window.location.href = siteBase + "/error/?source_page=/registration&message="+e.name+"%3A%20"+e.message
+			if (req.status != 200) {
+				window.location.href = siteBase + "/error/?source_page=/registration&message=status"+req.status
+			}
+			if req.responseText == "" {
+				window.location.href = siteBase + "/error/?source_page=/registration&message=empty_response_body"
+			}
+
+			window.location.href = siteBase + "/error/?source_page=/registration&message="+req.responseText
 		}
 	}
 
 	req.open("POST", dynamicBase + "/AddRegistration", true)
+	var access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token
+	if (typeof access_token !== "undefined") {
+		req.setRequestHeader("Authorization", "Bearer "+access_token)
+	}
 	req.setRequestHeader("Content-Type", "application/json")
 	req.setRequestHeader("Accept", "application/json")
 	req.send(jsonString)
