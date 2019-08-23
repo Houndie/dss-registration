@@ -12,6 +12,7 @@ const (
 	jsonErrorTypeInternalServerError jsonErrorType = "INTERNAL_SERVER_ERROR"
 	jsonErrorTypeMissingParameter    jsonErrorType = "MISSING_PARAMETER"
 	jsonErrorTypeBadParameter        jsonErrorType = "BAD_PARAMETER"
+	jsonErrorTypeUnauthorized        jsonErrorType = "UNAUTHORIZED"
 )
 
 type missingParameterDetails struct {
@@ -47,5 +48,11 @@ func badParameterError(parameterName, suppliedValue, reason string) *jsonError {
 			SuppliedValue: suppliedValue,
 			Reason:        reason,
 		},
+	}
+}
+
+func unauthorizedError() *jsonError {
+	return &jsonError{
+		Type: jsonErrorTypeUnauthorized,
 	}
 }

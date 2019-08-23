@@ -44,6 +44,7 @@ type registrationEntity struct {
 		Level int
 		Tier  int
 	}
-	UserId   string
-	OrderIds []string
+	UserId    string
+	OrderIds  []string
+	CreatedAt string
 }

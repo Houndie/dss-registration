@@ -132,6 +132,7 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 			ReferenceId: referenceId.String(),
 			LocationId:  locations[0].Id,
 			LineItems:   []*square.OrderLineItem{},
+			Version:     1,
 		},
 	}
 

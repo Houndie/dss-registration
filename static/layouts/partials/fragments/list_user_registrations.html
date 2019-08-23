@@ -1,0 +1,27 @@
+{{- $fragment := .self.Params -}}
+{{- $name := strings.TrimSuffix ".md" (replace .self.Name "/index.md" "") -}}
+{{- $bg := $fragment.background | default "secondary" }}
+
+<div class="overlay container-fluid {{- printf " bg-%s" $bg -}}">
+	<div data-portal="">
+		<div class="container editor-container">
+			<table>
+				<thead id="registrations-header">
+					<tr>
+						<th>Created At</th>
+						<th>First Name</th>
+						<th>Last Name</th>
+						<th>Email</th>
+						<th>Paid</th>
+					</tr>
+				</thead>
+				<tbody id="registrations-body">
+				</tbody>
+			</table>
+      </div>
+   </div>
+</div>
+<script>
+	var siteBase = {{ .Site.BaseURL }}
+	var dynamicBase = {{ getenv "HUGO_DYNAMIC" }}
+</script>

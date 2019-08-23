@@ -10,6 +10,7 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/authorizer/google"
 	"github.com/Houndie/dss-registration/dynamic/registration/add"
 	"github.com/Houndie/dss-registration/dynamic/registration/finalize"
+	"github.com/Houndie/dss-registration/dynamic/registration/listbyuser"
 	"github.com/Houndie/dss-registration/dynamic/registration/populate"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	storage "github.com/Houndie/dss-registration/dynamic/storage/datastore"
@@ -32,11 +33,12 @@ const (
 )
 
 var (
-	logger          *logrus.Logger
-	decoder         *schema.Decoder
-	populateService *populate.Service
-	addService      *add.Service
-	finalizeService *finalize.Service
+	logger            *logrus.Logger
+	decoder           *schema.Decoder
+	populateService   *populate.Service
+	addService        *add.Service
+	finalizeService   *finalize.Service
+	listByUserService *listbyuser.Service
 )
 
 func init() {
@@ -116,6 +118,7 @@ func init() {
 
 	populateService = populate.NewService(logger, squareClient)
 	addService = add.NewService(logger, store, squareClient, authorizer)
+	listByUserService = listbyuser.NewService(authorizer, logger, store, squareClient)
 	decoder = schema.NewDecoder()
 }
 

@@ -3,13 +3,9 @@ function parseDollar(intCost) {
 	return "$" + dollar.slice(0, -2) + "." + dollar.slice(-2)
 }
 
-var dynamicBase
-var siteBase
 var current_tier
 
-function onLoad(d, s) {
-	dynamicBase = d
-	siteBase = s
+function onLoad() {
 	var danceOption = document.getElementById("dance_only_pass_option")
 	var fullWeekendOption = document.getElementById("full_weekend_pass_option")
 	var mixAndMatch = document.getElementById("mix_and_match_label")
@@ -38,7 +34,7 @@ function weekendPassShowHide() {
 	var levelInput = document.getElementById('root_workshopLevel')
 	switch (document.getElementById('root_weekendPassType').value) {
 		case "Dance":
-		case "":
+		case "None":
 			levelDiv.style.display = 'none';
 			levelInput.required = false
 			break;
@@ -180,24 +176,27 @@ function submitRegistration() {
 		try {
 			var resp = JSON.parse(req.responseText);
 			if (typeof resp.errors !== "undefined" && resp.errors.length != 0) {
-				window.location.href = siteBase + "/error/?source_page=/registration&message="+encodeURI(req.responseText)
+				window.location.href = siteBase + "/error/?source_page=/registration&message="+encodeURI(req.responseText);
 				return;
 			}
 
 			if (req.status != 200) {
-				window.location.href = siteBase + "/error/?source_page=/registration&message=status"+req.status
+				window.location.href = siteBase + "/error/?source_page=/registration&message=status"+req.status;
+				return;
 			}
 
 			window.location.href = resp.checkout_url;
 		} catch(e) {
 			if (req.status != 200) {
-				window.location.href = siteBase + "/error/?source_page=/registration&message=status"+req.status
+				window.location.href = siteBase + "/error/?source_page=/registration&message=status"+req.status;
+				return;
 			}
-			if req.responseText == "" {
-				window.location.href = siteBase + "/error/?source_page=/registration&message=empty_response_body"
+			if (req.responseText == "") {
+				window.location.href = siteBase + "/error/?source_page=/registration&message=empty_response_body";
+				return;
 			}
 
-			window.location.href = siteBase + "/error/?source_page=/registration&message="+req.responseText
+			window.location.href = siteBase + "/error/?source_page=/registration&message="+req.responseText;
 		}
 	}
 

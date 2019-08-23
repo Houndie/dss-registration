@@ -12,6 +12,7 @@ var SCOPES = "https://www.googleapis.com/auth/userinfo.email";
 
 var authorizeButton = document.getElementById('authorize_button');
 var signoutButton = document.getElementById('signout_button');
+var myRegistrationsButton = document.getElementById('my_registrations_button');
 
 /**
 *  On load, called to load the auth2 library and API client library.
@@ -31,6 +32,10 @@ function handleClientLoad() {
 			updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
 			authorizeButton.onclick = handleSigninClick;
 			signoutButton.onclick = handleSignoutClick;
+
+			if (typeof onLoad === 'function') {
+				onLoad();
+			}
 		}, function(error) {
 			alert(JSON.stringify(error,null,2));
 		});
@@ -52,9 +57,11 @@ function updateSigninStatus(isSignedIn) {
 	if (isSignedIn) {
 		authorizeButton.style.display = 'none';
 		signoutButton.style.display = 'block';
+		myRegistrationsButton.style.display = 'block';
 	} else {
 		authorizeButton.style.display = 'block';
 		signoutButton.style.display = 'none';
+		myRegistrationsButton.style.display = 'none';
 	}
 }
 

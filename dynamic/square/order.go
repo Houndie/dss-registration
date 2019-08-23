@@ -25,8 +25,8 @@ type Order struct {
 	ReturnAmounts           *OrderMoneyAmounts       `json:"return_amounts,omitempty"`
 	NetAmounts              *OrderMoneyAmounts       `json:"net_amounts,omitempty"`
 	RoundingAdjustment      *OrderRoundingAdjustment `json:"rounding_adjustment,omitempty"`
-	Tenders                 *Tender                  `json:"tenders,omitempty"`
-	Refunds                 *Refund                  `json:"refunds,omitempty"`
+	Tenders                 []*Tender                `json:"tenders,omitempty"`
+	Refunds                 []*Refund                `json:"refunds,omitempty"`
 	CreatedAt               *time.Time               `json:"created_at,omitempty"`
 	UpdatedAt               *time.Time               `json:"updated_at,omitempty"`
 	ClosedAt                *time.Time               `json:"closed_at,omitempty"`
@@ -35,5 +35,5 @@ type Order struct {
 	TotalTaxMoney           *Money                   `json:"total_tax_money,omitempty"`
 	TotalDiscountMoney      *Money                   `json:"total_discount_money,omitempty"`
 	TotalServiceChargeMoney *Money                   `json:"total_service_charge_money,omitempty"`
-	Version                 string                   `json:"version"`
+	Version                 int                      `json:"version"`
 }

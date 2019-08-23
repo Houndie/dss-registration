@@ -3,6 +3,7 @@ package datastore
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"cloud.google.com/go/datastore"
 	"github.com/Houndie/dss-registration/dynamic/registration/add"
@@ -23,6 +24,7 @@ func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistratio
 		SoloJazz:      r.SoloJazz,
 		UserId:        r.UserId,
 		OrderIds:      r.OrderIds,
+		CreatedAt:     time.Now().Format(time.RFC3339),
 	}
 
 	switch p := r.PassType.(type) {
