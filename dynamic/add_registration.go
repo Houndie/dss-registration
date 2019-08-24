@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Houndie/dss-registration/dynamic/registration/add"
+	"github.com/Houndie/dss-registration/dynamic/registration/common"
 	"github.com/sirupsen/logrus"
 )
 
@@ -106,7 +107,7 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var passType add.PassType
+	var passType common.PassType
 	switch inputs.WeekendPassType {
 	case "Full":
 		if inputs.FullWeekend == nil {
@@ -116,14 +117,14 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		var level add.WeekendPassLevel
+		var level common.WeekendPassLevel
 		switch inputs.FullWeekend.Level {
 		case "Level 1":
-			level = add.WeekendPassLevel1
+			level = common.WeekendPassLevel1
 		case "Level 2":
-			level = add.WeekendPassLevel2
+			level = common.WeekendPassLevel2
 		case "Level 3":
-			level = add.WeekendPassLevel3
+			level = common.WeekendPassLevel3
 		case "":
 			logger.Warnf("No level submitted for a full weekend pass")
 			writeAddRegistrationResp(w, logger, "", []*jsonError{missingParameterError("full_weekend.level")})
@@ -139,14 +140,14 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 			writeAddRegistrationResp(w, logger, "", []*jsonError{badParameterError("full_weekend.tier", string(inputs.FullWeekend.Tier), "must be between 1 and 5 (inclusive)")})
 			return
 		}
-		passType = &add.WeekendPass{
+		passType = &common.WeekendPass{
 			Level: level,
-			Tier:  add.WeekendPassTier(inputs.FullWeekend.Tier),
+			Tier:  common.WeekendPassTier(inputs.FullWeekend.Tier),
 		}
 	case "Dance":
-		passType = &add.DanceOnlyPass{}
+		passType = &common.DanceOnlyPass{}
 	case "None":
-		passType = &add.NoPass{}
+		passType = &common.NoPass{}
 	case "":
 		logger.Warnf("No pass type submitted")
 		writeAddRegistrationResp(w, logger, "", []*jsonError{missingParameterError("weekend_pass_type")})
@@ -157,16 +158,16 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var mixAndMatch *add.MixAndMatch
+	var mixAndMatch *common.MixAndMatch
 	if inputs.MixAndMatch {
 		switch inputs.MixAndMatchRole {
 		case "Leader":
-			mixAndMatch = &add.MixAndMatch{
-				Role: add.MixAndMatchRoleLeader,
+			mixAndMatch = &common.MixAndMatch{
+				Role: common.MixAndMatchRoleLeader,
 			}
 		case "Follower":
-			mixAndMatch = &add.MixAndMatch{
-				Role: add.MixAndMatchRoleFollower,
+			mixAndMatch = &common.MixAndMatch{
+				Role: common.MixAndMatchRoleFollower,
 			}
 		case "":
 			logger.Warnf("Mix and match role not provided")
@@ -179,24 +180,24 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var teamCompetition *add.TeamCompetition
+	var teamCompetition *common.TeamCompetition
 	if inputs.TeamCompetition {
 		if inputs.TeamName == "" {
 			logger.Warnf("Team name not provided")
 			writeAddRegistrationResp(w, logger, "", []*jsonError{missingParameterError("team_name")})
 			return
 		}
-		teamCompetition = &add.TeamCompetition{
+		teamCompetition = &common.TeamCompetition{
 			Name: inputs.TeamName,
 		}
 	}
 
-	var tShirt *add.TShirt
+	var tShirt *common.TShirt
 	if inputs.TShirt {
-		switch add.TShirtStyle(inputs.TShirtSize) {
-		case add.TShirtStyleUnisexS, add.TShirtStyleUnisexM, add.TShirtStyleUnisexL, add.TShirtStyleUnisexXL, add.TShirtStyleUnisex2XL, add.TShirtStyleUnisex3XL, add.TShirtStyleBellaS, add.TShirtStyleBellaM, add.TShirtStyleBellaL, add.TShirtStyleBellaXL, add.TShirtStyleBella2XL:
-			tShirt = &add.TShirt{
-				Style: add.TShirtStyle(inputs.TShirtSize),
+		switch common.TShirtStyle(inputs.TShirtSize) {
+		case common.TShirtStyleUnisexS, common.TShirtStyleUnisexM, common.TShirtStyleUnisexL, common.TShirtStyleUnisexXL, common.TShirtStyleUnisex2XL, common.TShirtStyleUnisex3XL, common.TShirtStyleBellaS, common.TShirtStyleBellaM, common.TShirtStyleBellaL, common.TShirtStyleBellaXL, common.TShirtStyleBella2XL:
+			tShirt = &common.TShirt{
+				Style: common.TShirtStyle(inputs.TShirtSize),
 			}
 		case "":
 			logger.Warn("No T-shirt size submitted?")
@@ -209,17 +210,17 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var housing add.Housing
+	var housing common.Housing
 	switch inputs.HousingStatus {
 	case "None":
-		housing = &add.NoHousing{}
+		housing = &common.NoHousing{}
 	case "Require":
-		housing = &add.RequireHousing{
+		housing = &common.RequireHousing{
 			PetAllergies: inputs.RequireHousing.PetAllergies,
 			Details:      inputs.RequireHousing.HousingRequestDetails,
 		}
 	case "Provide":
-		housing = &add.ProvideHousing{
+		housing = &common.ProvideHousing{
 			Pets:     inputs.ProvideHousing.MyPets,
 			Quantity: inputs.ProvideHousing.HousingNumber,
 			Details:  inputs.ProvideHousing.MyHousingDetails,

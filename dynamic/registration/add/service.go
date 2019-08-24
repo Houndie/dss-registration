@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
+	"github.com/Houndie/dss-registration/dynamic/registration/common"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/utility"
 	"github.com/gofrs/uuid"
@@ -47,7 +48,7 @@ func NewService(logger *logrus.Logger, store Store, client SquareClient, authori
 }
 
 func containsNoPaidItems(r *Registration) bool {
-	_, noPassOk := r.PassType.(*NoPass)
+	_, noPassOk := r.PassType.(*common.NoPass)
 	return noPassOk && r.MixAndMatch == nil && r.TeamCompetition == nil && r.TShirt == nil && !r.SoloJazz
 }
 
@@ -197,7 +198,7 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 			}
 		case utility.DancePassItem:
 			s.logger.Trace("Found dance pass item")
-			if _, ok := registration.PassType.(*DanceOnlyPass); !ok {
+			if _, ok := registration.PassType.(*common.DanceOnlyPass); !ok {
 				continue
 			}
 			for _, v := range item.Variations {
@@ -219,22 +220,22 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 			}
 		case utility.WeekendPassItem:
 			s.logger.Trace("Found full weekend pass item")
-			weekendPass, ok := registration.PassType.(*WeekendPass)
+			weekendPass, ok := registration.PassType.(*common.WeekendPass)
 			if !ok {
 				continue
 			}
 
 			var tierString string
 			switch weekendPass.Tier {
-			case WeekendPassTier1:
+			case common.WeekendPassTier1:
 				tierString = utility.WeekendPassTier1Name
-			case WeekendPassTier2:
+			case common.WeekendPassTier2:
 				tierString = utility.WeekendPassTier2Name
-			case WeekendPassTier3:
+			case common.WeekendPassTier3:
 				tierString = utility.WeekendPassTier3Name
-			case WeekendPassTier4:
+			case common.WeekendPassTier4:
 				tierString = utility.WeekendPassTier4Name
-			case WeekendPassTier5:
+			case common.WeekendPassTier5:
 				tierString = utility.WeekendPassTier5Name
 			}
 			for _, v := range item.Variations {

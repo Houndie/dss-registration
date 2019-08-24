@@ -1,0 +1,93 @@
+#dss-firstName {
+	float: left;
+	width: 50%;
+	padding-right: 1em;
+}
+
+#dss-lastName {
+	float: left;
+	width: 50%;
+	padding-left: 1em;
+}
+
+#dss-city {
+	float: left;
+	width: 50%;
+	padding-right: 1em;
+}
+
+#dss-state {
+	float: left;
+	width: 20%;
+	padding-left: 1em;
+	padding-right: 1em;
+}
+
+#dss-zip {
+	float: left;
+	width: 30%;
+	padding-left: 1em;
+}
+
+#dss-workshopLevel {
+	float: left;
+	width: 100%;
+	padding-left: 2em;
+	display: none;
+}
+
+#dss-mixAndMatchRole {
+	float: left;
+	width: 100%;
+	padding-left: 2em;
+	display: none;
+}
+
+#dss-teamName {
+	float: left;
+	width: 100%;
+	padding-left: 2em;
+	display: none;
+}
+
+#dss-tShirtSize {
+	float: left;
+	width: 100%;
+	padding-left: 2em;
+	display: none;
+}
+
+#dss-myPets {
+	float: left;
+	width: 100%;
+	padding-left: 2em;
+	display: none;
+}
+
+#dss-housingNumber {
+	float: left;
+	width: 100%;
+	padding-left: 2em;
+	display: none;
+}
+
+#dss-myHousingDetails {
+	float: left;
+	width: 100%;
+	padding-left: 2em;
+	display: none;
+}
+
+#dss-petAllergies {
+	float: left;
+	width: 100%;
+	padding-left: 2em;
+	display: none;
+}
+
+#dss-housingRequestDetails {
+	float: left;
+	width: 100%;
+	padding-left: 2em;
+	display: none;
+}

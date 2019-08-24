@@ -84,7 +84,7 @@ func DeployDynamic() error {
 	mg.Deps(productionCheck)
 	fmt.Println("Deploying...")
 	var wg sync.WaitGroup
-	functions := []string{"PopulateForm", "AddRegistration", "ListUserRegistrations"}
+	functions := []string{"PopulateForm", "AddRegistration", "ListUserRegistrations", "GetUserRegistration"}
 	errChan := make(chan error, len(functions))
 	for _, function := range functions {
 		wg.Add(1)

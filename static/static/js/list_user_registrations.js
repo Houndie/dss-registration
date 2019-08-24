@@ -10,40 +10,38 @@ function onLoad() {
 		}
 		var resp 
 		try {
-			alert(req.responseText)
 			resp = JSON.parse(req.responseText);
 			if (typeof resp.errors !== "undefined" && resp.errors.length != 0) {
-				alert("a1")
 				window.location.href = siteBase + "/error/?source_page=/my_registrations&message="+encodeURI(req.responseText)
 				return;
 			}
 
 			if (req.status != 200) {
-				alert("a2")
 				window.location.href = siteBase + "/error/?source_page=/my_registrations&message=status"+req.status
 				return
 			}
 
 		} catch(e) {
 			if (req.status != 200) {
-				alert("a3")
 				window.location.href = siteBase + "/error/?source_page=/my_registrations&message=status"+req.status
 				return
 			}
 			if (req.responseText == "") {
-				alert("a4")
 				window.location.href = siteBase + "/error/?source_page=/my_registrations&message=empty_response_body"
 				return
 			}
 
-			alert("a5")
 			window.location.href = siteBase + "/error/?source_page=/my_registrations&message="+req.responseText
 			return
 		}
 		var body = document.getElementById("registrations-body")
 		for (var i = 0; i < resp.registrations.length; i++) {
 			var row = body.insertRow(i)
-			row.insertCell(0).textContent = resp.registrations[i].created_at;
+			var a = document.createElement('a');
+			var linkText = document.createTextNode(resp.registrations[i].created_at);
+			a.appendChild(linkText);
+			a.href = siteBase+"/my_registration?registration_id="+resp.registrations[i].registration_id;
+			row.insertCell(0).appendChild(a);
 			row.insertCell(1).textContent = resp.registrations[i].first_name;
 			row.insertCell(2).textContent = resp.registrations[i].last_name;
 			row.insertCell(3).textContent = resp.registrations[i].email;

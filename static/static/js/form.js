@@ -126,7 +126,7 @@ function submitRegistration() {
 	j.zip = document.getElementById('root_zip').value;
 	j.email = document.getElementById('root_email').value;
 	j.home_scene = document.getElementById('root_homeScene').value;
-	j.student = document.getElementById('root_homeScene').checked;
+	j.student = document.getElementById('root_student').checked;
 
 	j.weekend_pass_type = document.getElementById('root_weekendPassType').value;
 	if (j.weekend_pass_type == 'Full') {

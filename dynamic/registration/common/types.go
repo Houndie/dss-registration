@@ -1,4 +1,4 @@
-package add
+package common
 
 type WeekendPassLevel int
 type WeekendPassTier int
@@ -82,41 +82,3 @@ type RequireHousing struct {
 func (*NoHousing) isHousing()      {}
 func (*ProvideHousing) isHousing() {}
 func (*RequireHousing) isHousing() {}
-
-type Registration struct {
-	FirstName       string
-	LastName        string
-	StreetAddress   string
-	City            string
-	State           string
-	ZipCode         string
-	Email           string
-	HomeScene       string
-	IsStudent       bool
-	PassType        PassType
-	MixAndMatch     *MixAndMatch
-	SoloJazz        bool
-	TeamCompetition *TeamCompetition
-	TShirt          *TShirt
-	Housing         Housing
-}
-
-type StoreRegistration struct {
-	FirstName       string
-	LastName        string
-	StreetAddress   string
-	City            string
-	State           string
-	ZipCode         string
-	Email           string
-	HomeScene       string
-	IsStudent       bool
-	PassType        PassType
-	MixAndMatch     *MixAndMatch
-	SoloJazz        bool
-	TeamCompetition *TeamCompetition
-	TShirt          *TShirt
-	Housing         Housing
-	UserId          string
-	OrderIds        []string
-}

@@ -7,6 +7,7 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"github.com/Houndie/dss-registration/dynamic/registration/add"
+	"github.com/Houndie/dss-registration/dynamic/registration/common"
 	"github.com/pkg/errors"
 )
 
@@ -28,13 +29,13 @@ func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistratio
 	}
 
 	switch p := r.PassType.(type) {
-	case *add.WeekendPass:
+	case *common.WeekendPass:
 		registration.WeekendPass = fullWeekendPass
 		registration.FullWeekendPassInfo.Level = int(p.Level)
 		registration.FullWeekendPassInfo.Tier = int(p.Tier)
-	case *add.DanceOnlyPass:
+	case *common.DanceOnlyPass:
 		registration.WeekendPass = danceOnlyPass
-	case *add.NoPass:
+	case *common.NoPass:
 		registration.WeekendPass = noPass
 	default:
 		return fmt.Errorf("Found unknown type of weekend pass")
@@ -56,16 +57,16 @@ func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistratio
 	}
 
 	switch h := r.Housing.(type) {
-	case *add.ProvideHousing:
+	case *common.ProvideHousing:
 		registration.HousingRequest = providesHousing
 		registration.ProvideHousing.Pets = h.Pets
 		registration.ProvideHousing.Quantity = h.Quantity
 		registration.ProvideHousing.Details = h.Details
-	case *add.RequireHousing:
+	case *common.RequireHousing:
 		registration.HousingRequest = requiresHousing
 		registration.RequireHousing.PetAllergies = h.PetAllergies
 		registration.RequireHousing.Details = h.Details
-	case *add.NoHousing:
+	case *common.NoHousing:
 		registration.HousingRequest = noHousing
 	default:
 		return fmt.Errorf("Found unknown type of housing")
