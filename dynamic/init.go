@@ -12,6 +12,7 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/registration/getbyid"
 	"github.com/Houndie/dss-registration/dynamic/registration/listbyuser"
 	"github.com/Houndie/dss-registration/dynamic/registration/populate"
+	"github.com/Houndie/dss-registration/dynamic/registration/update"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	storage "github.com/Houndie/dss-registration/dynamic/storage/datastore"
 	stackdriver "github.com/TV4/logrus-stackdriver-formatter"
@@ -39,6 +40,7 @@ var (
 	addService        *add.Service
 	listByUserService *listbyuser.Service
 	getByIdService    *getbyid.Service
+	updateService     *update.Service
 )
 
 func init() {
@@ -120,6 +122,7 @@ func init() {
 	addService = add.NewService(logger, store, squareClient, authorizer)
 	listByUserService = listbyuser.NewService(authorizer, logger, store, squareClient)
 	getByIdService = getbyid.NewService(logger, authorizer, store, squareClient)
+	updateService = update.NewService(logger, authorizer, store, squareClient)
 	decoder = schema.NewDecoder()
 }
 

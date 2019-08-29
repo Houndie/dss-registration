@@ -15,3 +15,5 @@ const (
 	WeekendPassTier5Name = "Tier 5"
 	DancePassPresaleName = "Presale"
 )
+
+const SmackdownEmail = "info@daytonswingsmackdown.com"

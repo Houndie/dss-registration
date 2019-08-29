@@ -1,4 +1,4 @@
-package add
+package update
 
 import (
 	"context"
@@ -7,17 +7,21 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/registration/common"
 	"github.com/Houndie/dss-registration/dynamic/square"
+	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/utility"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
-type Store interface {
-	AddRegistration(context.Context, *StoreRegistration) error
-	DeleteRegistration(context.Context, string) error
+type Authorizer interface {
+	Userinfo(ctx context.Context, accessToken string) (*authorizer.Userinfo, error)
 }
 
+type Store interface {
+	GetUpdateRegistration(context.Context, string) (*StoreOldRegistration, error)
+	UpdateRegistration(context.Context, *StoreUpdateRegistration, string) error
+}
 type SquareClient interface {
 	ListCatalog(ctx context.Context, types []square.CatalogObjectType) square.ListCatalogIterator
 	ListLocations(ctx context.Context) ([]*square.Location, error)
@@ -25,58 +29,144 @@ type SquareClient interface {
 	UpdateOrder(ctx context.Context, locationId, orderId string, order *square.Order, fieldsToClear []string, idempotencyKey string) (*square.Order, error)
 }
 
-type Authorizer interface {
-	Userinfo(ctx context.Context, accessToken string) (*authorizer.Userinfo, error)
-}
-
 type Service struct {
-	client     SquareClient
+	logger     *logrus.Logger
 	store      Store
 	authorizer Authorizer
-	logger     *logrus.Logger
+	client     SquareClient
 }
 
-func NewService(logger *logrus.Logger, store Store, client SquareClient, authorizer Authorizer) *Service {
+func NewService(logger *logrus.Logger, authorizer Authorizer, store Store, client SquareClient) *Service {
 	return &Service{
-		store:      store,
 		logger:     logger,
-		client:     client,
+		store:      store,
 		authorizer: authorizer,
+		client:     client,
 	}
 }
 
-func containsNoPaidItems(r *Registration) bool {
-	_, noPassOk := r.PassType.(*common.NoPass)
-	return noPassOk && r.MixAndMatch == nil && r.TeamCompetition == nil && r.TShirt == nil && !r.SoloJazz
+func hasPurchase(newRegistration *Registration, oldRegistration *StoreOldRegistration) bool {
+	switch newRegistration.PassType.(type) {
+	case *common.WeekendPass:
+		if _, ok := oldRegistration.PassType.(*common.WeekendPass); !ok {
+			return true
+		}
+	case *common.DanceOnlyPass:
+		if _, ok := oldRegistration.PassType.(*common.DanceOnlyPass); !ok {
+			return true
+		}
+	}
+
+	if newRegistration.MixAndMatch != nil && oldRegistration.MixAndMatch == nil {
+		return true
+	}
+
+	if newRegistration.TShirt != nil && oldRegistration.TShirt == nil {
+		return true
+	}
+
+	if newRegistration.TeamCompetition != nil && oldRegistration.TeamCompetition == nil {
+		return true
+	}
+
+	if newRegistration.SoloJazz && !oldRegistration.SoloJazz {
+		return true
+	}
+	return false
 }
 
-func (s *Service) Add(ctx context.Context, registration *Registration, redirectUrl, accessToken string) (string, error) {
-	s.logger.Trace("in add registration service")
-	userid := ""
-	if accessToken != "" {
-		s.logger.Trace("found access token, calling userinfo endpoint")
-		userinfo, err := s.authorizer.Userinfo(ctx, accessToken)
-		if err != nil {
-			msg := "error fetching userinfo"
-			s.logger.WithError(err).Debug(msg)
+func (s *Service) Update(ctx context.Context, token string, registration *Registration, redirectUrl string) (string, error) {
+	s.logger.Tracef("fetching old registration id %s", registration.Id)
+	oldRegistration, err := s.store.GetUpdateRegistration(ctx, registration.Id)
+	if err != nil {
+		switch errors.Cause(err).(type) {
+		case storage.ErrNotFound:
+			newErr := ErrBadRegistrationId{registration.Id}
+			s.logger.WithError(err).Debug(newErr)
+			return "", newErr
+		default:
+			msg := "error fetching registrations from store"
+			s.logger.WithError(err).Error(msg)
 			return "", errors.Wrap(err, msg)
 		}
-		userid = userinfo.UserId
-	}
-	s.logger.Trace("generating reference id")
-	referenceId, err := uuid.NewV4()
-	if err != nil {
-		wrap := "error generating reference id"
-		s.logger.WithError(err).Error(wrap)
-		return "", errors.Wrap(err, wrap)
 	}
 
-	storeRegistration := &StoreRegistration{
+	s.logger.Tracef("fetching user-info for token %s", token)
+	userinfo, err := s.authorizer.Userinfo(ctx, token)
+	if err != nil {
+		msg := "could not authorize user"
+		s.logger.WithError(err).Debug(msg)
+		return "", errors.Wrap(err, msg)
+	}
+	s.logger.Tracef("found user %s", userinfo.UserId)
+
+	if oldRegistration.UserId != userinfo.UserId {
+		s.logger.Debugf("registration found does not belong to user")
+		return "", ErrBadRegistrationId{registration.Id}
+	}
+
+	switch oldRegistration.PassType.(type) {
+	case *common.WeekendPass:
+		if _, ok := registration.PassType.(*common.WeekendPass); !ok {
+			err := ErrAlreadyPurchased{
+				Field:         "Pass Type",
+				ExistingValue: "Full Weekend",
+			}
+			s.logger.Debug(err)
+			return "", err
+		}
+	case *common.DanceOnlyPass:
+		if _, ok := registration.PassType.(*common.DanceOnlyPass); !ok {
+			err := ErrAlreadyPurchased{
+				Field:         "Pass Type",
+				ExistingValue: "DanceOnly",
+			}
+			s.logger.Debug(err)
+			return "", err
+		}
+	}
+
+	if oldRegistration.MixAndMatch != nil && registration.MixAndMatch == nil {
+		err := ErrAlreadyPurchased{
+			Field:         "Mix and Match",
+			ExistingValue: "Yes",
+		}
+		s.logger.Debug(err)
+		return "", err
+	}
+
+	if oldRegistration.SoloJazz && !registration.SoloJazz {
+		err := ErrAlreadyPurchased{
+			Field:         "Solo Jazz",
+			ExistingValue: "Yes",
+		}
+		s.logger.Debug(err)
+		return "", err
+	}
+
+	if oldRegistration.TeamCompetition != nil && registration.TeamCompetition == nil {
+		err := ErrAlreadyPurchased{
+			Field:         "Team Competition",
+			ExistingValue: "Yes",
+		}
+		s.logger.Debug(err)
+		return "", err
+	}
+
+	if oldRegistration.TShirt != nil && registration.TShirt == nil {
+		err := ErrAlreadyPurchased{
+			Field:         "TShirt",
+			ExistingValue: "Yes",
+		}
+		s.logger.Debug(err)
+		return "", err
+	}
+
+	updateRegistration := &StoreUpdateRegistration{
 		FirstName:       registration.FirstName,
 		LastName:        registration.LastName,
 		StreetAddress:   registration.StreetAddress,
 		City:            registration.City,
-		State:           registration.State,
 		ZipCode:         registration.ZipCode,
 		Email:           registration.Email,
 		HomeScene:       registration.HomeScene,
@@ -87,17 +177,22 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 		TeamCompetition: registration.TeamCompetition,
 		TShirt:          registration.TShirt,
 		Housing:         registration.Housing,
-		UserId:          userid,
 	}
-	if containsNoPaidItems(registration) {
-		s.logger.Trace("no square items found, simply adding registration to database")
-		err = s.store.AddRegistration(ctx, storeRegistration)
+	if !hasPurchase(registration, oldRegistration) {
+		err = s.store.UpdateRegistration(ctx, updateRegistration, registration.Id)
 		if err != nil {
-			wrap := "error adding registration to database"
-			s.logger.WithError(err).Error(wrap)
-			return "", errors.Wrap(err, wrap)
+			msg := "error updating registration in database"
+			s.logger.WithError(err).Error(msg)
+			return "", errors.Wrap(err, msg)
 		}
 		return redirectUrl, nil
+	}
+	s.logger.Trace("generating reference id")
+	referenceId, err := uuid.NewV4()
+	if err != nil {
+		wrap := "error generating reference id"
+		s.logger.WithError(err).Error(wrap)
+		return "", errors.Wrap(err, wrap)
 	}
 
 	s.logger.Trace("registration contians items that must be paid, making square calls")
@@ -268,10 +363,10 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 		return "", errors.Wrap(err, wrap)
 	}
 
-	storeRegistration.OrderIds = []string{checkout.Order.Id}
+	updateRegistration.NewOrderId = checkout.Order.Id
 
 	s.logger.Trace("Adding registration to database")
-	err = s.store.AddRegistration(ctx, storeRegistration)
+	err = s.store.UpdateRegistration(ctx, updateRegistration, registration.Id)
 	if err != nil {
 		wrap := "error adding registration to database"
 		s.logger.WithError(err).Error(wrap)

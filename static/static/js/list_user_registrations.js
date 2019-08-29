@@ -35,17 +35,24 @@ function onLoad() {
 			return
 		}
 		var body = document.getElementById("registrations-body")
-		for (var i = 0; i < resp.registrations.length; i++) {
+		var sorted_registrations = resp.registrations
+		sorted_registrations.sort(function(a,b){
+			var date1 = new Date(a.created_at)
+			var date2 = new Date(b.created_at)
+			return date1 > date2;
+		});
+		for (var i = 0; i < sorted_registrations.length; i++) {
 			var row = body.insertRow(i)
 			var a = document.createElement('a');
-			var linkText = document.createTextNode(resp.registrations[i].created_at);
+			var date = new Date(sorted_registrations[i].created_at)
+			var linkText = document.createTextNode(date.toString());
 			a.appendChild(linkText);
-			a.href = siteBase+"/my_registration?registration_id="+resp.registrations[i].registration_id;
+			a.href = siteBase+"/my_registration?registration_id="+sorted_registrations[i].registration_id;
 			row.insertCell(0).appendChild(a);
-			row.insertCell(1).textContent = resp.registrations[i].first_name;
-			row.insertCell(2).textContent = resp.registrations[i].last_name;
-			row.insertCell(3).textContent = resp.registrations[i].email;
-			row.insertCell(4).textContent = resp.registrations[i].paid;
+			row.insertCell(1).textContent = sorted_registrations[i].first_name;
+			row.insertCell(2).textContent = sorted_registrations[i].last_name;
+			row.insertCell(3).textContent = sorted_registrations[i].email;
+			row.insertCell(4).textContent = sorted_registrations[i].paid;
 		}
 	}
 	req.open("GET", dynamicBase +"/ListUserRegistrations", true);

@@ -5,7 +5,6 @@ function parseDollar(intCost) {
 
 function parseResponse(req) {
 	try {
-		alert(req.responseText);
 		var resp = JSON.parse(req.responseText);
 		if (typeof resp.errors !== "undefined" && resp.errors.length != 0) {
 			window.location.href = siteBase + "/error/?source_page=/my_registration&message="+encodeURI(responseText);
@@ -269,6 +268,7 @@ function housingShowHide() {
 
 function submitRegistration() {
 	var j = new Object();
+	j.id = urlparams.get('registration_id')
 	j.first_name = firstNameBox.value;
 	j.last_name = lastNameBox.value;
 	j.address = addressBox.value;
@@ -317,4 +317,22 @@ function submitRegistration() {
 	j.redirect_url = siteBase+"/registration-complete"
 
 	var jsonString = JSON.stringify(j);
+	var req = new XMLHttpRequest();
+	req.onreadystatechange = function() {
+		if (req.readyState != 4) {
+			return
+		}
+		res = parseResponse(req);
+		if (!res) {
+			return
+		}
+		window.location.href = res.checkout_url;
+	}
+	req.open("POST", dynamicBase + "/UpdateRegistration", true)
+	req.setRequestHeader("Content-Type", "application/json")
+	req.setRequestHeader("Accept", "application/json")
+	var access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token
+	req.setRequestHeader("Authorization", "Bearer "+access_token)
+	alert(jsonString)
+	req.send(jsonString)
 }
