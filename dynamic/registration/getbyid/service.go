@@ -41,7 +41,7 @@ func NewService(logger *logrus.Logger, authorizer Authorizer, store Store, clien
 }
 
 func (s *Service) GetById(ctx context.Context, token, registrationId string) (*Registration, error) {
-	s.logger.Trace("In list by user service")
+	s.logger.Trace("In get by id service")
 	s.logger.Tracef("fetching user-info for token %s", token)
 	userinfo, err := s.authorizer.Userinfo(ctx, token)
 	if err != nil {
@@ -101,16 +101,18 @@ func (s *Service) GetById(ctx context.Context, token, registrationId string) (*R
 		}
 		orders = make([]*Order, len(squareOrders))
 		for i, squareOrder := range squareOrders {
-			items := make([]*OrderItem, len(squareOrder.LineItems))
+			cost := 0
+			items := make([]string, len(squareOrder.LineItems))
 			for j, squareOrderItem := range squareOrder.LineItems {
-				items[j] = &OrderItem{
-					Name: squareOrderItem.Name,
-					Cost: squareOrderItem.TotalMoney.Amount,
-				}
+				items[j] = squareOrderItem.Name
+				cost += squareOrderItem.TotalMoney.Amount
 			}
 			orders[i] = &Order{
-				Items: items,
-				Paid:  squareOrder.State == square.OrderStateCompleted,
+				Id:        squareOrder.Id,
+				Items:     items,
+				Cost:      cost,
+				Paid:      squareOrder.State == square.OrderStateCompleted,
+				CreatedAt: *squareOrder.CreatedAt,
 			}
 		}
 	}

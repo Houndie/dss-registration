@@ -143,7 +143,7 @@ func DeployStatic() error {
 	default:
 		return fmt.Errorf("Unknown project name found (%s)", project)
 	}
-	return sh.Run("gsutil", "-h", cachecontrol, "-m", "rsync", "-c", "-R", "static/public", bucketname)
+	return sh.Run("gsutil", "-h", cachecontrol, "-m", "rsync", "-d", "-c", "-R", "static/public", bucketname)
 }
 
 func Deploy() {

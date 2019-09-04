@@ -3,6 +3,20 @@ function parseDollar(intCost) {
 	return "$" + dollar.slice(0, -2) + "." + dollar.slice(-2)
 }
 
+function isAlphaNumeric(str) {
+  var code, i, len;
+
+  for (i = 0, len = str.length; i < len; i++) {
+    code = str.charCodeAt(i);
+    if (!(code > 47 && code < 58) && // numeric (0-9)
+        !(code > 64 && code < 91) && // upper alpha (A-Z)
+        !(code > 96 && code < 123)) { // lower alpha (a-z)
+      return false;
+    }
+  }
+  return true;
+};
+
 function parseResponse(req) {
 	try {
 		var resp = JSON.parse(req.responseText);
@@ -72,6 +86,8 @@ var housingNumberBox = document.getElementById('root_housingNumber');
 var housingNumberDiv = document.getElementById('dss-housingNumber');
 var myHousingDetailsBox = document.getElementById('root_myHousingDetails');
 var myHousingDetailsDiv = document.getElementById('dss-myHousingDetails');
+var ordersDiv = document.getElementById('orders-table');
+var ordersBody = document.getElementById('orders-body');
 
 function onLoad() {
 	urlparams = new URLSearchParams(window.location.search);
@@ -124,61 +140,71 @@ function populateForm(populateRes, myRegistrationRes) {
 		workshopLevelBox.disabled = true;
 	case "Dance":
 		weekendPassSelector.value = myRegistrationRes.registration.weekend_pass_type;
-		selector.disabled = true;
-		studentBox.disabled = true;
 		weekendPassShowHide();
 		break;
 	default:
 		danceOption.innerHTML = "Dance Only Pass (" + parseDollar(populateRes.dance_pass_cost) + ")";
 		fullWeekendOption.innerHTML = "Full Weekend Pass (Tier " + populateRes.weekend_pass_tier + " - " + parseDollar(populateRes.weekend_pass_cost) + ")";
 		current_tier = populateRes.weekend_pass_tier;
+		weekendPassSelector.disabled = false;
+		studentBox.disabled = false;
 	}
 
 	if (myRegistrationRes.registration.mix_and_match) {
 		mixAndMatchBox.checked = true;
-		mixAndMatchBox.disabled = true;
 		mixAndMatchRoleDiv.value = myRegistrationRes.registration.mix_and_match_role;
-		mixAndMatchRoleDiv.disabled = true;
 		mixAndMatchShowHide();
 	} else {
+		mixAndMatchBox.disabled = false;
+		mixAndMatchRoleDiv.disabled = false;
 		mixAndMatchLabel.innerHTML = "Mix And Match Competition (" + parseDollar(populateRes.mix_and_match_cost) + ")";
 	}
 	if (myRegistrationRes.registration.solo_jazz) {
 		soloJazzBox.checked = true;
-		soloJazzBox.disabled = true;
 	} else {
+		soloJazzBox.disabled = false;
 		soloJazzLabel.innerHTML = "Solo Jazz Competition (" + parseDollar(populateRes.solo_jazz_cost) + ")";
 	}
 	if (myRegistrationRes.registration.team_competition) {
 		teamCompBox.checked = true;
-		teamCompBox.disabled = true;
 		teamNameInput.value = myRegistrationRes.registration.team_name;
-		teamNameInput.disabled = true;
 		teamShowHide();
 	} else {
+		teamCompBox.disabled = false;
+		teamNameInput.disabled = false;
 		teamCompLabel.innerHTML = "Team Competition (" + parseDollar(populateRes.team_comp_cost) + ")";
 	}
 	if (myRegistrationRes.registration.tshirt) {
 		tShirtBox.checked = true;
-		tShirtBox.disabled = true;
 		tShirtSizeInput.value = myRegistrationRes.registration.tshirt_size;
-		tShirtSizeInput.disabled = true;
 		tShirtShowHide();
 	} else {
+		tShirtBox.disabled = false;
+		tShirtSizeInput.disabled = false;
 		tShirtLabel.innerHTML = "T-Shirt (" + parseDollar(populateRes.tshirt_cost) + ")";
 	}
 
 	firstNameBox.value = myRegistrationRes.registration.first_name;
+	firstNameBox.disabled = false;
 	lastNameBox.value = myRegistrationRes.registration.last_name;
+	lastNameBox.disabled = false;
 	addressBox.value = myRegistrationRes.registration.address;
+	addressBox.disabled = false;
 	cityBox.value = myRegistrationRes.registration.city;
+	cityBox.disabled = false;
 	stateBox.value = myRegistrationRes.registration.state;
+	stateBox.disabled = false;
 	zipBox.value = myRegistrationRes.registration.zip;
+	zipBox.disabled = false;
 	emailBox.value = myRegistrationRes.registration.email;
+	emailBox.disabled = false;
 	homeSceneBox.value = myRegistrationRes.registration.home_scene;
+	homeSceneBox.disabled = false;
 	studentBox.checked = myRegistrationRes.registration.student;
+	studentBox.disabled = false;
 
 	housingBox.value = myRegistrationRes.registration.housing_status;
+	housingBox.disabled = false;
 	switch (myRegistrationRes.registration.housing_status) {
 		case "Require":
 			petAllergiesBox.value = myRegistrationRes.registration.require_housing.pet_allergies;
@@ -191,6 +217,37 @@ function populateForm(populateRes, myRegistrationRes) {
 			break;
 	}
 	housingShowHide();
+
+	if (typeof myRegistrationRes.registration.orders !== 'undefined') {
+		var sorted_orders = myRegistrationRes.registration.orders;
+		sorted_orders.sort(function(a,b){
+			var date1 = a.created_at;
+			var date2 = b.created_at;
+			return date1 > date2;
+		});
+		for (var i = 0; i < sorted_orders.length; i++) {
+			var row = ordersBody.insertRow(i);
+			row.insertCell(0).textContent = sorted_orders[i].items.join();
+			row.insertCell(1).textContent = parseDollar(sorted_orders[i].cost);
+			if (sorted_orders[i].paid) {
+				row.insertCell(2).textContent = '\u2705';
+			} else {
+				// Be double extra sure of no html injection.  Should be fine because https, but hey let's not mess around here.
+				if (!isAlphaNumeric(sorted_orders[i].id)) {
+					window.location.href = siteBase + "/error/?source_page=/my_registration&message=id_not_alphanumeric"
+					return
+				}
+				row.insertCell(2).innerHTML = '<button class="btn btn-info" onclick="payOrder(\''+sorted_orders[i].id+'\')">Pay Now</button>';
+			}
+		}
+		ordersDiv.style.display = 'block';
+	}
+
+	document.getElementById('populate-loading').style.display = 'none';
+}
+
+function payOrder(orderId) {
+	alert(orderId);
 }
 
 function weekendPassShowHide() {
@@ -267,6 +324,8 @@ function housingShowHide() {
 }
 
 function submitRegistration() {
+	document.getElementById('submit-button').disabled = true;
+	document.getElementById('submit-loading').style.display = 'block';
 	var j = new Object();
 	j.id = urlparams.get('registration_id')
 	j.first_name = firstNameBox.value;
@@ -333,6 +392,5 @@ function submitRegistration() {
 	req.setRequestHeader("Accept", "application/json")
 	var access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token
 	req.setRequestHeader("Authorization", "Bearer "+access_token)
-	alert(jsonString)
 	req.send(jsonString)
 }

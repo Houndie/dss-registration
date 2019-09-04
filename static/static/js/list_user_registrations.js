@@ -34,25 +34,32 @@ function onLoad() {
 			window.location.href = siteBase + "/error/?source_page=/my_registrations&message="+req.responseText
 			return
 		}
-		var body = document.getElementById("registrations-body")
-		var sorted_registrations = resp.registrations
-		sorted_registrations.sort(function(a,b){
-			var date1 = new Date(a.created_at)
-			var date2 = new Date(b.created_at)
-			return date1 > date2;
-		});
-		for (var i = 0; i < sorted_registrations.length; i++) {
-			var row = body.insertRow(i)
-			var a = document.createElement('a');
-			var date = new Date(sorted_registrations[i].created_at)
-			var linkText = document.createTextNode(date.toString());
-			a.appendChild(linkText);
-			a.href = siteBase+"/my_registration?registration_id="+sorted_registrations[i].registration_id;
-			row.insertCell(0).appendChild(a);
-			row.insertCell(1).textContent = sorted_registrations[i].first_name;
-			row.insertCell(2).textContent = sorted_registrations[i].last_name;
-			row.insertCell(3).textContent = sorted_registrations[i].email;
-			row.insertCell(4).textContent = sorted_registrations[i].paid;
+		if (resp.registrations.length > 0) {
+			var body = document.getElementById("registrations-body")
+			var sorted_registrations = resp.registrations
+			sorted_registrations.sort(function(a,b){
+				var date1 = new Date(a.created_at)
+				var date2 = new Date(b.created_at)
+				return date1 > date2;
+			});
+			for (var i = 0; i < sorted_registrations.length; i++) {
+				var row = body.insertRow(i)
+				var a = document.createElement('a');
+				var date = new Date(sorted_registrations[i].created_at)
+				var linkText = document.createTextNode(date.toString());
+				a.appendChild(linkText);
+				a.href = siteBase+"/my_registration?registration_id="+sorted_registrations[i].registration_id;
+				row.insertCell(0).appendChild(a);
+				row.insertCell(1).textContent = sorted_registrations[i].first_name;
+				row.insertCell(2).textContent = sorted_registrations[i].last_name;
+				row.insertCell(3).textContent = sorted_registrations[i].email;
+				row.insertCell(4).textContent = sorted_registrations[i].paid;
+			}
+			document.getElementById('populate-loading').style.display = 'none';
+			document.getElementById('registration-table').style.display = 'block';
+		} else {
+			document.getElementById('populate-loading').style.display = 'none';
+			document.getElementById('no-registrations').style.display = 'block';
 		}
 	}
 	req.open("GET", dynamicBase +"/ListUserRegistrations", true);

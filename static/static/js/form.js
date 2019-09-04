@@ -23,6 +23,7 @@ function onLoad() {
 			teamComp.innerHTML = "Team Competition (" + parseDollar(resp.team_comp_cost) + ")"
 			tShirt.innerHTML = "T-Shirt (" + parseDollar(resp.tshirt_cost) + ")"
 			current_tier = resp.weekend_pass_tier
+			document.getElementById("populate-loading").style.display='none';
 		}
 	}
 	req.open("GET", dynamicBase + "/PopulateForm", true)
@@ -117,6 +118,8 @@ function housingShowHide() {
 }
 
 function submitRegistration() {
+	document.getElementById('submit-button').disabled = true;
+	document.getElementById('submit-loading').style.display = 'block';
 	var j = new Object();
 	j.first_name = document.getElementById('root_firstName').value;
 	j.last_name = document.getElementById('root_lastName').value;

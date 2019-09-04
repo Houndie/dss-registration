@@ -28,14 +28,12 @@ type getUserRegistrationRequireHousingData struct {
 	HousingRequestDetails string `json:"housing_request_details"`
 }
 
-type getUserRegistrationOrderItem struct {
-	Name string `json:"name"`
-	Cost int    `json:"cost"`
-}
-
 type getUserRegistrationOrderData struct {
-	Items []*getUserRegistrationOrderItem `json:"items,omitempty"`
-	Paid  bool                            `json:"paid"`
+	Id        string    `json:"id"`
+	Items     []string  `json:"items,omitempty"`
+	Cost      int       `json:"cost"`
+	Paid      bool      `json:"paid"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type getUserRegistrationsData struct {
@@ -250,19 +248,12 @@ func GetUserRegistration(w http.ResponseWriter, r *http.Request) {
 	if len(registration.Orders) > 0 {
 		resp.Orders = make([]*getUserRegistrationOrderData, len(registration.Orders))
 		for i, order := range registration.Orders {
-			var items []*getUserRegistrationOrderItem
-			if len(order.Items) > 0 {
-				items = make([]*getUserRegistrationOrderItem, len(order.Items))
-				for j, item := range order.Items {
-					items[j] = &getUserRegistrationOrderItem{
-						Name: item.Name,
-						Cost: item.Cost,
-					}
-				}
-			}
 			resp.Orders[i] = &getUserRegistrationOrderData{
-				Items: items,
-				Paid:  order.Paid,
+				Id:        order.Id,
+				Items:     order.Items,
+				Cost:      order.Cost,
+				Paid:      order.Paid,
+				CreatedAt: order.CreatedAt,
 			}
 		}
 	}

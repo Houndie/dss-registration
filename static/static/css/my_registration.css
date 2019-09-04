@@ -91,3 +91,11 @@
 	padding-left: 2em;
 	display: none;
 }
+
+#submit-loading {
+	display: none;
+}
+
+#orders-table {
+	display: none;
+}

@@ -5,6 +5,12 @@
 <div class="overlay container-fluid {{- printf " bg-%s" $bg -}}">
 	<div data-portal="">
 		<div class="container editor-container">
+			<div id="populate-loading">
+				<div class="spinner-border" role="status">
+					<span class="sr-only">Loading...</span>
+				</div>
+				Populating pricing information...
+			</div>
 			<form class="rjsf" action="javascript:void(0)" onsubmit="submitRegistration()">
 				<div class="form-group field field-object">
 					<fieldset>
@@ -250,8 +256,28 @@
 					</fieldset>
 					<div></div><div></div>
 				</div>
-				<p><input type="submit" value="Submit" class="btn btn-info" /></p>
+				<p><input type="submit" value="Submit" class="btn btn-info" id="submit-button"/></p>
+				<div id="submit-loading">
+					<div class="spinner-border" role="status">
+						<span class="sr-only">Loading...</span>
+					</div>
+					Submitting registration, please wait...
+				</div>
 			</form>
+			<div id="orders-table">
+				<table class="table">
+					<caption>A list of orders</caption>
+					<thead id="orders-header" class="thead-light">
+						<tr>
+							<th>Contains</th>
+							<th>Total</th>
+							<th>Paid</th>
+						</tr>
+					</thead>
+					<tbody id="orders-body">
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
 </div>
