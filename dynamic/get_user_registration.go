@@ -28,12 +28,10 @@ type getUserRegistrationRequireHousingData struct {
 	HousingRequestDetails string `json:"housing_request_details"`
 }
 
-type getUserRegistrationOrderData struct {
-	Id        string    `json:"id"`
-	Items     []string  `json:"items,omitempty"`
-	Cost      int       `json:"cost"`
-	Paid      bool      `json:"paid"`
-	CreatedAt time.Time `json:"created_at"`
+type getUserRegistrationUnpaidItems struct {
+	Ids   []string `json:"ids"`
+	Items []string `json:"items,omitempty"`
+	Cost  int      `json:"cost"`
 }
 
 type getUserRegistrationsData struct {
@@ -60,7 +58,7 @@ type getUserRegistrationsData struct {
 	ProvideHousing  *getUserRegistrationProvideHousingData `json:"provide_housing,omitempty"`
 	RequireHousing  *getUserRegistrationRequireHousingData `json:"require_housing,omitempty"`
 	CreatedAt       time.Time                              `json:"created_at"`
-	Orders          []*getUserRegistrationOrderData        `json:"orders,omitempty"`
+	UnpaidItems     *getUserRegistrationUnpaidItems        `json:"unpaid_items,omitempty"`
 }
 
 type getUserRegistrationResponse struct {
@@ -245,16 +243,11 @@ func GetUserRegistration(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(registration.Orders) > 0 {
-		resp.Orders = make([]*getUserRegistrationOrderData, len(registration.Orders))
-		for i, order := range registration.Orders {
-			resp.Orders[i] = &getUserRegistrationOrderData{
-				Id:        order.Id,
-				Items:     order.Items,
-				Cost:      order.Cost,
-				Paid:      order.Paid,
-				CreatedAt: order.CreatedAt,
-			}
+	if registration.UnpaidItems != nil {
+		resp.UnpaidItems = &getUserRegistrationUnpaidItems{
+			Ids:   registration.UnpaidItems.OrderIds,
+			Items: registration.UnpaidItems.Items,
+			Cost:  registration.UnpaidItems.Cost,
 		}
 	}
 

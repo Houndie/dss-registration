@@ -7,12 +7,10 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/registration/common"
 )
 
-type Order struct {
-	Id        string
-	Items     []string
-	Cost      int
-	Paid      bool
-	CreatedAt time.Time
+type UnpaidItems struct {
+	OrderIds []string
+	Items    []string
+	Cost     int
 }
 
 type Registration struct {
@@ -31,7 +29,7 @@ type Registration struct {
 	TeamCompetition *common.TeamCompetition
 	TShirt          *common.TShirt
 	Housing         common.Housing
-	Orders          []*Order
+	UnpaidItems     *UnpaidItems
 	CreatedAt       time.Time
 }
 

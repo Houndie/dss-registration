@@ -90,7 +90,7 @@ func (s *Service) GetById(ctx context.Context, token, registrationId string) (*R
 	}
 	s.logger.Tracef("found location %s", locations[0].Id)
 
-	var orders []*Order
+	var unpaidItems *UnpaidItems
 	if len(r.OrderIds) > 0 {
 		s.logger.Trace("retrieving orders from square")
 		squareOrders, err := s.client.BatchRetrieveOrders(ctx, locations[0].Id, r.OrderIds)
@@ -99,21 +99,23 @@ func (s *Service) GetById(ctx context.Context, token, registrationId string) (*R
 			s.logger.WithError(err).Error(msg)
 			return nil, errors.Wrap(err, msg)
 		}
-		orders = make([]*Order, len(squareOrders))
-		for i, squareOrder := range squareOrders {
-			cost := 0
-			items := make([]string, len(squareOrder.LineItems))
-			for j, squareOrderItem := range squareOrder.LineItems {
-				items[j] = squareOrderItem.Name
-				cost += squareOrderItem.TotalMoney.Amount
+		unpaidItems = &UnpaidItems{
+			OrderIds: []string{},
+			Items:    []string{},
+			Cost:     0,
+		}
+		for _, squareOrder := range squareOrders {
+			if squareOrder.State != square.OrderStateOpen {
+				continue
 			}
-			orders[i] = &Order{
-				Id:        squareOrder.Id,
-				Items:     items,
-				Cost:      cost,
-				Paid:      squareOrder.State == square.OrderStateCompleted,
-				CreatedAt: *squareOrder.CreatedAt,
+			for _, squareOrderItem := range squareOrder.LineItems {
+				unpaidItems.Items = append(unpaidItems.Items, squareOrderItem.Name)
+				unpaidItems.Cost += squareOrderItem.TotalMoney.Amount
 			}
+			unpaidItems.OrderIds = append(unpaidItems.OrderIds, squareOrder.Id)
+		}
+		if len(unpaidItems.OrderIds) == 0 {
+			unpaidItems = nil
 		}
 	}
 
@@ -133,6 +135,6 @@ func (s *Service) GetById(ctx context.Context, token, registrationId string) (*R
 		TeamCompetition: r.TeamCompetition,
 		TShirt:          r.TShirt,
 		Housing:         r.Housing,
-		Orders:          orders,
+		UnpaidItems:     unpaidItems,
 	}, nil
 }

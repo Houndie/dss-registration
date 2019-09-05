@@ -256,6 +256,12 @@
 					</fieldset>
 					<div></div><div></div>
 				</div>
+				<div id="orders-div">
+					<h2>Unpaid Items</h2>
+					<ul id="orders-list">
+					</ul>
+					<p id="orders-cost"></p>
+				</div>
 				<p><input type="submit" value="Update" class="btn btn-info" id="submit-button"/></p>
 				<div id="submit-loading">
 					<div class="spinner-border" role="status">
@@ -264,21 +270,6 @@
 					Submitting registration updates, please wait...
 				</div>
 			</form>
-			<h2>Existing Orders</h2>
-			<div id="orders-table">
-				<table class="table">
-					<caption>A list of orders</caption>
-					<thead id="orders-header" class="thead-light">
-						<tr>
-							<th>Items</th>
-							<th>Cost</th>
-							<th>Paid</th>
-						</tr>
-					</thead>
-					<tbody id="orders-body">
-					</tbody>
-				</table>
-			</div>
 		</div>
 	</div>
 </div>

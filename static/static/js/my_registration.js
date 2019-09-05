@@ -86,8 +86,10 @@ var housingNumberBox = document.getElementById('root_housingNumber');
 var housingNumberDiv = document.getElementById('dss-housingNumber');
 var myHousingDetailsBox = document.getElementById('root_myHousingDetails');
 var myHousingDetailsDiv = document.getElementById('dss-myHousingDetails');
-var ordersDiv = document.getElementById('orders-table');
-var ordersBody = document.getElementById('orders-body');
+var ordersDiv = document.getElementById('orders-div');
+var ordersList = document.getElementById('orders-list');
+var ordersCost = document.getElementById('orders-cost');
+var submitButton = document.getElementById('submit-button');
 
 function onLoad() {
 	urlparams = new URLSearchParams(window.location.search);
@@ -218,28 +220,16 @@ function populateForm(populateRes, myRegistrationRes) {
 	}
 	housingShowHide();
 
-	if (typeof myRegistrationRes.registration.orders !== 'undefined') {
-		var sorted_orders = myRegistrationRes.registration.orders;
-		sorted_orders.sort(function(a,b){
-			var date1 = a.created_at;
-			var date2 = b.created_at;
-			return date1 > date2;
-		});
-		for (var i = 0; i < sorted_orders.length; i++) {
-			var row = ordersBody.insertRow(i);
-			row.insertCell(0).textContent = sorted_orders[i].items.join();
-			row.insertCell(1).textContent = parseDollar(sorted_orders[i].cost);
-			if (sorted_orders[i].paid) {
-				row.insertCell(2).textContent = '\u2705';
-			} else {
-				// Be double extra sure of no html injection.  Should be fine because https, but hey let's not mess around here.
-				if (!isAlphaNumeric(sorted_orders[i].id)) {
-					window.location.href = siteBase + "/error/?source_page=/my_registration&message=id_not_alphanumeric"
-					return
-				}
-				row.insertCell(2).innerHTML = '<button class="btn btn-info" onclick="payOrder(\''+sorted_orders[i].id+'\')">Pay Now</button>';
-			}
+	if (typeof myRegistrationRes.registration.unpaid_items !== 'undefined') {
+		for (var i = 0; i < myRegistrationRes.registration.unpaid_items.items.length; i++) {
+			var text = document.createTextNode(myRegistrationRes.registration.unpaid_items.items[i]);
+			var li = document.createElement("LI");
+			li.appendChild(text);
+			ordersList.appendChild(li);
 		}
+		var text = document.createTextNode(parseDollar(myRegistrationRes.registration.unpaid_items.cost));
+		ordersCost.appendChild(text);
+		submitButton.value = "Update & Pay";
 		ordersDiv.style.display = 'block';
 	}
 
@@ -324,7 +314,7 @@ function housingShowHide() {
 }
 
 function submitRegistration() {
-	document.getElementById('submit-button').disabled = true;
+	submitButton.disabled = true;
 	document.getElementById('submit-loading').style.display = 'block';
 	var j = new Object();
 	j.id = urlparams.get('registration_id')

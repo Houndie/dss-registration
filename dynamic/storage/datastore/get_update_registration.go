@@ -62,5 +62,6 @@ func (d *Datastore) GetUpdateRegistration(ctx context.Context, id string) (*upda
 		TeamCompetition: teamCompetition,
 		TShirt:          tShirt,
 		UserId:          registration.UserId,
+		OrderIds:        registration.OrderIds,
 	}, nil
 }

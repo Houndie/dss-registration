@@ -33,6 +33,12 @@ type StoreOldRegistration struct {
 	TeamCompetition *common.TeamCompetition
 	TShirt          *common.TShirt
 	UserId          string
+	OrderIds        []string
+}
+
+type StoreOrderUpdate struct {
+	NewId       string
+	ObsoleteIds []string
 }
 
 type StoreUpdateRegistration struct {
@@ -51,7 +57,7 @@ type StoreUpdateRegistration struct {
 	TeamCompetition *common.TeamCompetition
 	TShirt          *common.TShirt
 	Housing         common.Housing
-	NewOrderId      string
+	OrderUpdate     *StoreOrderUpdate
 }
 
 type ErrBadRegistrationId struct {

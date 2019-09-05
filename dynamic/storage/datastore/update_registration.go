@@ -30,8 +30,28 @@ func (s *Datastore) UpdateRegistration(ctx context.Context, r *update.StoreUpdat
 	registration.HomeScene = r.HomeScene
 	registration.IsStudent = r.IsStudent
 	registration.SoloJazz = r.SoloJazz
-	if r.NewOrderId != "" {
-		registration.OrderIds = append(registration.OrderIds, r.NewOrderId)
+	if r.OrderUpdate != nil {
+		var newOrderIds []string
+		if len(r.OrderUpdate.ObsoleteIds) > 0 {
+			newOrderIds = []string{}
+			for _, oldOrderId := range registration.OrderIds {
+				found := false
+				for _, removeOrderId := range r.OrderUpdate.ObsoleteIds {
+					if removeOrderId == oldOrderId {
+						found = true
+						break
+					}
+				}
+				if found {
+					continue
+				}
+				newOrderIds = append(newOrderIds, oldOrderId)
+			}
+		} else {
+			newOrderIds = registration.OrderIds
+		}
+		newOrderIds = append(newOrderIds, r.OrderUpdate.NewId)
+		registration.OrderIds = newOrderIds
 	}
 
 	switch p := r.PassType.(type) {

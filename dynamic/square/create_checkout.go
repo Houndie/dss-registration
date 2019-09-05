@@ -22,8 +22,8 @@ func (c *Client) CreateCheckout(ctx context.Context, locationId, idempotencyKey 
 		AdditionalRecipients       []*ChargeRequestAdditionalRecipient `json:"additional_recipients,omitempty"`
 		Note                       string                              `json:"note,omitempty"`
 	}{
-		IdempotencyKey: idempotencyKey,
-		Order:          order,
+		IdempotencyKey:             idempotencyKey,
+		Order:                      order,
 		AskForShippingAddress:      askForShippingAddress,
 		MerchantSupportEmail:       merchantSupportEmail,
 		PrePopulateBuyerEmail:      prePopulateBuyerEmail,
