@@ -163,12 +163,13 @@ function submitRegistration() {
 	} else if (j.housing_status == "Provide") {
 		j.provide_housing = new Object();
 		j.provide_housing.my_pets = document.getElementById('root_myPets').value;
-		j.provide_housing.housing_number = document.getElementById('root_housingNumber').value;
+		j.provide_housing.housing_number = parseInt(document.getElementById('root_housingNumber').value, 10);
 		j.provide_housing.my_housing_details = document.getElementById('root_myHousingDetails').value;
 	}
 	j.redirect_url = siteBase+"/registration-complete"
 
 	var jsonString = JSON.stringify(j);
+	alert(jsonString)
 
 	var req = new XMLHttpRequest();
 	req.onreadystatechange = function() {

@@ -7,6 +7,7 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"github.com/Houndie/dss-registration/dynamic/registration/add"
+	"github.com/Houndie/dss-registration/dynamic/registration/common"
 	"github.com/gofrs/uuid"
 )
 
@@ -35,16 +36,16 @@ func TestAddRegistration1(t *testing.T) {
 		Email:           "John.Doe@example.com",
 		HomeScene:       "Swing City",
 		IsStudent:       false,
-		PassType:        &add.NoPass{},
+		PassType:        &common.NoPass{},
 		MixAndMatch:     nil,
 		SoloJazz:        false,
 		TeamCompetition: nil,
 		TShirt:          nil,
-		Housing:         &add.NoHousing{},
+		Housing:         &common.NoHousing{},
 		UserId:          userId.String(),
 	}
 
-	err = NewDatastore(store).AddRegistration(context.Background(), registration)
+	_, err = NewDatastore(store).AddRegistration(context.Background(), registration)
 	if err != nil {
 		t.Fatalf("error inserting new registration into store: %v", err)
 	}
@@ -153,9 +154,9 @@ func TestAddRegistration2(t *testing.T) {
 		t.Fatalf("error generating user id for test: %v", err)
 	}
 
-	role := add.MixAndMatchRoleLeader
+	role := common.MixAndMatchRoleLeader
 	name := "Awesome team"
-	style := add.TShirtStyleBellaM
+	style := common.TShirtStyleBellaM
 	petAllergies := "some pet allergies"
 	details := "plz help"
 	registration := &add.StoreRegistration{
@@ -168,25 +169,25 @@ func TestAddRegistration2(t *testing.T) {
 		Email:         "John.Doe@example.com",
 		HomeScene:     "Swing City",
 		IsStudent:     true,
-		PassType:      &add.DanceOnlyPass{},
-		MixAndMatch: &add.MixAndMatch{
+		PassType:      &common.DanceOnlyPass{},
+		MixAndMatch: &common.MixAndMatch{
 			Role: role,
 		},
 		SoloJazz: true,
-		TeamCompetition: &add.TeamCompetition{
+		TeamCompetition: &common.TeamCompetition{
 			Name: name,
 		},
-		TShirt: &add.TShirt{
+		TShirt: &common.TShirt{
 			Style: style,
 		},
-		Housing: &add.RequireHousing{
+		Housing: &common.RequireHousing{
 			PetAllergies: petAllergies,
 			Details:      details,
 		},
 		UserId: userId.String(),
 	}
 
-	err = NewDatastore(store).AddRegistration(context.Background(), registration)
+	_, err = NewDatastore(store).AddRegistration(context.Background(), registration)
 	if err != nil {
 		t.Fatalf("error inserting new registration into store: %v", err)
 	}
@@ -292,15 +293,15 @@ func TestAddRegistration3(t *testing.T) {
 		Email:         "John.Doe@example.com",
 		HomeScene:     "Swing City",
 		IsStudent:     true,
-		PassType: &add.WeekendPass{
-			Level: add.WeekendPassLevel2,
-			Tier:  add.WeekendPassTier3,
+		PassType: &common.WeekendPass{
+			Level: common.WeekendPassLevel2,
+			Tier:  common.WeekendPassTier3,
 		},
 		MixAndMatch:     nil,
 		SoloJazz:        true,
 		TeamCompetition: nil,
 		TShirt:          nil,
-		Housing: &add.ProvideHousing{
+		Housing: &common.ProvideHousing{
 			Pets:     pets,
 			Quantity: quantity,
 			Details:  details,
@@ -308,7 +309,7 @@ func TestAddRegistration3(t *testing.T) {
 		UserId: userId.String(),
 	}
 
-	err = NewDatastore(store).AddRegistration(context.Background(), registration)
+	_, err = NewDatastore(store).AddRegistration(context.Background(), registration)
 	if err != nil {
 		t.Fatalf("error inserting new registration into store: %v", err)
 	}
@@ -357,11 +358,11 @@ func TestAddRegistration3(t *testing.T) {
 		t.Fatalf("found weekend pass status %s, expected %s", entity.WeekendPass, fullWeekendPass)
 	}
 
-	if entity.FullWeekendPassInfo.Level != int(add.WeekendPassLevel2) {
-		t.Fatalf("found weekend pass level %d, expected %d", entity.FullWeekendPassInfo.Level, int(add.WeekendPassLevel2))
+	if entity.FullWeekendPassInfo.Level != int(common.WeekendPassLevel2) {
+		t.Fatalf("found weekend pass level %d, expected %d", entity.FullWeekendPassInfo.Level, int(common.WeekendPassLevel2))
 	}
 
-	if entity.FullWeekendPassInfo.Tier != int(add.WeekendPassTier3) {
-		t.Fatalf("found weekend pass tier %d, expected %d", entity.FullWeekendPassInfo.Tier, int(add.WeekendPassTier3))
+	if entity.FullWeekendPassInfo.Tier != int(common.WeekendPassTier3) {
+		t.Fatalf("found weekend pass tier %d, expected %d", entity.FullWeekendPassInfo.Tier, int(common.WeekendPassTier3))
 	}
 }

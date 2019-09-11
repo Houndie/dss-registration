@@ -17,12 +17,14 @@ import (
 	storage "github.com/Houndie/dss-registration/dynamic/storage/datastore"
 	stackdriver "github.com/TV4/logrus-stackdriver-formatter"
 	"github.com/gorilla/schema"
+	"github.com/sendgrid/sendgrid-go"
 	"github.com/sirupsen/logrus"
 	runtimeconfig "google.golang.org/api/runtimeconfig/v1beta1"
 )
 
 const (
 	SQUARE_API_KEY_CONFIG_KEY = "projects/dayton-smackdown-test/configs/registration/variables/square_key"
+	MAIL_API_KEY_CONFIG_KEY   = "projects/dayton-smackdown-test/configs/registration/variables/mail_key"
 	LOG_LEVEL                 = "projects/dayton-smackdown-test/configs/registration/variables/log_level"
 	LOG_TRACE                 = "TRACE"
 	LOG_DEBUG                 = "DEBUG"
@@ -100,6 +102,20 @@ func init() {
 		os.Exit(1)
 	}
 
+	mailkey, err := service.Projects.Configs.Variables.Get(MAIL_API_KEY_CONFIG_KEY).Do()
+	if err != nil {
+		logger.WithError(err).Fatal("Could not fetch sendgrid api key")
+		os.Exit(1)
+	}
+	if mailkey.Value != "" {
+		logger.WithError(err).Fatal("Sendgrid API key set as value")
+		os.Exit(1)
+	}
+	if mailkey.Text == "" {
+		logger.WithError(err).Fatal("Sendgrid API key text not found")
+		os.Exit(1)
+	}
+
 	httpClient := &http.Client{
 		Transport: &logRequests{
 			logger: logger,
@@ -118,8 +134,10 @@ func init() {
 
 	authorizer := google.NewAuthorizer(httpClient)
 
+	mail := sendgrid.NewSendClient(mailkey.Text)
+
 	populateService = populate.NewService(logger, squareClient)
-	addService = add.NewService(logger, store, squareClient, authorizer)
+	addService = add.NewService(logger, store, squareClient, authorizer, mail)
 	listByUserService = listbyuser.NewService(authorizer, logger, store, squareClient)
 	getByIdService = getbyid.NewService(logger, authorizer, store, squareClient)
 	updateService = update.NewService(logger, authorizer, store, squareClient)
