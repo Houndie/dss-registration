@@ -48,3 +48,30 @@ type registrationEntity struct {
 	OrderIds  []string
 	CreatedAt string
 }
+
+const (
+	discountKind = "Discount"
+
+	fullWeekendDiscount     = "full weekend"
+	danceOnlyDiscount       = "dance only"
+	mixAndMatchDiscount     = "mix and match"
+	soloJazzDiscount        = "solo jazz"
+	teamCompetitionDiscount = "team competition"
+	tshirtDiscount          = "tshirt"
+)
+
+type singleDiscount struct {
+	Name      string
+	AppliedTo string
+}
+
+type discountEntity struct {
+	Code      string
+	Discounts []singleDiscount `datastore:",noindex"`
+}
+
+const adminKind = "Admin"
+
+type adminEntity struct {
+	UserId string
+}

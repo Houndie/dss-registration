@@ -9,6 +9,7 @@ import (
 	"cloud.google.com/go/datastore"
 	"github.com/Houndie/dss-registration/dynamic/authorizer/google"
 	"github.com/Houndie/dss-registration/dynamic/registration/add"
+	"github.com/Houndie/dss-registration/dynamic/registration/adddiscount"
 	"github.com/Houndie/dss-registration/dynamic/registration/getbyid"
 	"github.com/Houndie/dss-registration/dynamic/registration/listbyuser"
 	"github.com/Houndie/dss-registration/dynamic/registration/populate"
@@ -36,13 +37,14 @@ const (
 )
 
 var (
-	logger            *logrus.Logger
-	decoder           *schema.Decoder
-	populateService   *populate.Service
-	addService        *add.Service
-	listByUserService *listbyuser.Service
-	getByIdService    *getbyid.Service
-	updateService     *update.Service
+	logger             *logrus.Logger
+	decoder            *schema.Decoder
+	populateService    *populate.Service
+	addService         *add.Service
+	listByUserService  *listbyuser.Service
+	getByIdService     *getbyid.Service
+	updateService      *update.Service
+	addDiscountService *adddiscount.Service
 )
 
 func init() {
@@ -141,6 +143,7 @@ func init() {
 	listByUserService = listbyuser.NewService(authorizer, logger, store, squareClient)
 	getByIdService = getbyid.NewService(logger, authorizer, store, squareClient)
 	updateService = update.NewService(logger, authorizer, store, squareClient)
+	addDiscountService = adddiscount.NewService(logger, store, authorizer)
 	decoder = schema.NewDecoder()
 }
 
