@@ -11,6 +11,7 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/registration/add"
 	"github.com/Houndie/dss-registration/dynamic/registration/adddiscount"
 	"github.com/Houndie/dss-registration/dynamic/registration/getbyid"
+	"github.com/Houndie/dss-registration/dynamic/registration/getdiscount"
 	"github.com/Houndie/dss-registration/dynamic/registration/listbyuser"
 	"github.com/Houndie/dss-registration/dynamic/registration/populate"
 	"github.com/Houndie/dss-registration/dynamic/registration/update"
@@ -45,6 +46,7 @@ var (
 	getByIdService     *getbyid.Service
 	updateService      *update.Service
 	addDiscountService *adddiscount.Service
+	getDiscountService *getdiscount.Service
 )
 
 func init() {
@@ -144,6 +146,7 @@ func init() {
 	getByIdService = getbyid.NewService(logger, authorizer, store, squareClient)
 	updateService = update.NewService(logger, authorizer, store, squareClient)
 	addDiscountService = adddiscount.NewService(logger, store, authorizer)
+	getDiscountService = getdiscount.NewService(logger, store, squareClient)
 	decoder = schema.NewDecoder()
 }
 

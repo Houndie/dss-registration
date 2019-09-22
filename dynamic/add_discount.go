@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Houndie/dss-registration/dynamic/registration/adddiscount"
+	"github.com/Houndie/dss-registration/dynamic/registration/common"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -21,13 +22,13 @@ func writeAddDiscountResp(w http.ResponseWriter, logger *logrus.Logger, errors [
 	}
 	bytes, err := json.Marshal(&resp)
 	if err != nil {
-		logger.WithError(err).Error("Error marshalling add registration response")
+		logger.WithError(err).Error("Error marshalling add discount response")
 		return
 	}
 
 	_, err = w.Write(bytes)
 	if err != nil {
-		logger.WithError(err).Error("Error writing add registration response")
+		logger.WithError(err).Error("Error writing add discount response")
 		return
 	}
 }
@@ -84,20 +85,20 @@ func AddDiscount(w http.ResponseWriter, r *http.Request) {
 		Discounts: make([]*adddiscount.SingleDiscount, len(inputs.Discounts)),
 	}
 	for i, inputDiscount := range inputs.Discounts {
-		var appliedTo adddiscount.DiscountTarget
+		var appliedTo common.DiscountTarget
 		switch inputDiscount.AppliedTo {
 		case "Full Weekend":
-			appliedTo = adddiscount.FullWeekendDiscountTarget
+			appliedTo = common.FullWeekendDiscountTarget
 		case "Dance Only":
-			appliedTo = adddiscount.DanceOnlyDiscountTarget
+			appliedTo = common.DanceOnlyDiscountTarget
 		case "Mix And Match":
-			appliedTo = adddiscount.MixAndMatchDiscountTarget
+			appliedTo = common.MixAndMatchDiscountTarget
 		case "Solo Jazz":
-			appliedTo = adddiscount.SoloJazzDiscountTarget
+			appliedTo = common.SoloJazzDiscountTarget
 		case "Team Competition":
-			appliedTo = adddiscount.TeamCompetitionDiscountTarget
+			appliedTo = common.TeamCompetitionDiscountTarget
 		case "TShirt":
-			appliedTo = adddiscount.TShirtDiscountTarget
+			appliedTo = common.TShirtDiscountTarget
 		default:
 			logger.Debugf("Found unknown applied to: %s", inputDiscount.AppliedTo)
 			writeAddDiscountResp(w, logger, []*jsonError{badParameterError("discounts.applied_to", inputDiscount.AppliedTo, "must be one of the following: Full Weekend, Dance Only, Mix And Match, Solo Jazz, Team Competition, TShirt")})

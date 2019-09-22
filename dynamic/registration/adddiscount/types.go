@@ -1,19 +1,10 @@
 package adddiscount
 
-type DiscountTarget string
-
-const (
-	FullWeekendDiscountTarget     DiscountTarget = "Full Weekend"
-	DanceOnlyDiscountTarget       DiscountTarget = "Dance Only"
-	MixAndMatchDiscountTarget     DiscountTarget = "Mix And Match"
-	SoloJazzDiscountTarget        DiscountTarget = "Solo Jazz"
-	TeamCompetitionDiscountTarget DiscountTarget = "Team Competition"
-	TShirtDiscountTarget          DiscountTarget = "TShirt"
-)
+import "github.com/Houndie/dss-registration/dynamic/registration/common"
 
 type SingleDiscount struct {
 	Name      string
-	AppliedTo DiscountTarget
+	AppliedTo common.DiscountTarget
 }
 
 type Discount struct {

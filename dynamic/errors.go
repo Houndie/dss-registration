@@ -16,13 +16,13 @@ const (
 )
 
 type missingParameterDetails struct {
-	ParameterName string
+	ParameterName string `json:"parameter_name"`
 }
 
 type badParameterDetails struct {
-	ParameterName string
-	SuppliedValue string
-	Reason        string
+	ParameterName string `json:"parameter_name"`
+	SuppliedValue string `json:"supplied_value"`
+	Reason        string `json:"reason"`
 }
 
 func internalServerError() *jsonError {

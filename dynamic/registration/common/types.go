@@ -82,3 +82,14 @@ type RequireHousing struct {
 func (*NoHousing) isHousing()      {}
 func (*ProvideHousing) isHousing() {}
 func (*RequireHousing) isHousing() {}
+
+type DiscountTarget string
+
+const (
+	FullWeekendDiscountTarget     DiscountTarget = "Full Weekend"
+	DanceOnlyDiscountTarget       DiscountTarget = "Dance Only"
+	MixAndMatchDiscountTarget     DiscountTarget = "Mix And Match"
+	SoloJazzDiscountTarget        DiscountTarget = "Solo Jazz"
+	TeamCompetitionDiscountTarget DiscountTarget = "Team Competition"
+	TShirtDiscountTarget          DiscountTarget = "TShirt"
+)

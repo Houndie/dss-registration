@@ -3,25 +3,94 @@ function parseDollar(intCost) {
 	return "$" + dollar.slice(0, -2) + "." + dollar.slice(-2)
 }
 
-var current_tier
+function parseResponse(req) {
+	try {
+		var resp = JSON.parse(req.responseText);
+		if (typeof resp.errors !== "undefined" && resp.errors.length != 0) {
+			window.location.href = siteBase + "/error/?source_page=/my_registration&message="+encodeURI(responseText);
+			return null;
+		}
 
+		if (req.status != 200) {
+			window.location.href = siteBase + "/error/?source_page=/my_registration&message=status"+req.status;
+			return null;
+		}
+
+		return resp;
+	} catch(e) {
+		if (req.status != 200) {
+			window.location.href = siteBase + "/error/?source_page=/my_registration&message=status"+req.status;
+			return null;
+		}
+		if (req.responseText == "") {
+			window.location.href = siteBase + "/error/?source_page=/my_registration&message=empty_response_body";
+			return null;
+		}
+
+		window.location.href = siteBase + "/error/?source_page=/my_registration&message="+req.responseText;
+		return null;
+	}
+}
+
+var current_tier
+var weekendPassSelector = document.getElementById("root_weekendPassType");
+var workshopLevelBox = document.getElementById('root_workshopLevel');
+var workshopLevelDiv = document.getElementById('dss-workshopLevel')
+var danceOption = document.getElementById("dance_only_pass_option");
+var fullWeekendOption = document.getElementById("full_weekend_pass_option");
+var mixAndMatchBox = document.getElementById("root_mixAndMatch");
+var mixAndMatchLabel = document.getElementById("mix_and_match_label");
+var mixAndMatchRoleDiv = document.getElementById('dss-mixAndMatchRole')
+var mixAndMatchRoleInput = document.getElementById('root_mixAndMatchRole')
+var soloJazzBox = document.getElementById("root_soloJazz");
+var soloJazzLabel = document.getElementById("solo_jazz_label");
+var teamCompBox = document.getElementById("root_teamCompetition");
+var teamCompLabel = document.getElementById("team_competition_label");
+var teamNameDiv = document.getElementById('dss-teamName')
+var teamNameInput = document.getElementById('root_teamName')
+var tShirtBox = document.getElementById("root_tShirt");
+var tShirtLabel = document.getElementById("tshirt_label");
+var tShirtSizeDiv = document.getElementById('dss-tShirtSize')
+var tShirtSizeInput = document.getElementById('root_tShirtSize')
+var firstNameBox = document.getElementById('root_firstName');
+var lastNameBox = document.getElementById('root_lastName');
+var addressBox = document.getElementById('root_address');
+var cityBox = document.getElementById('root_city');
+var stateBox = document.getElementById('root_state');
+var zipBox = document.getElementById('root_zip');
+var emailBox = document.getElementById('root_email');
+var homeSceneBox = document.getElementById('root_homeScene');
+var studentBox = document.getElementById('root_homeScene');
+var housingBox = document.getElementById('root_housingStatus');
+var petAllergiesBox = document.getElementById('root_petAllergies');
+var petAllergiesDiv = document.getElementById('dss-petAllergies');
+var housingRequestDetailsBox = document.getElementById('root_housingRequestDetails');
+var housingRequestDetailsDiv = document.getElementById('dss-housingRequestDetails');
+var myPetsBox = document.getElementById('root_myPets');
+var myPetsDiv = document.getElementById('dss-myPets');
+var housingNumberBox = document.getElementById('root_housingNumber');
+var housingNumberDiv = document.getElementById('dss-housingNumber');
+var myHousingDetailsBox = document.getElementById('root_myHousingDetails');
+var myHousingDetailsDiv = document.getElementById('dss-myHousingDetails');
+var ordersDiv = document.getElementById('orders-div');
+var ordersList = document.getElementById('orders-list');
+var ordersCost = document.getElementById('orders-cost');
+var submitButton = document.getElementById('submit-button');
+var submitLoading = document.getElementById('submit-loading');
+var couponList = document.getElementById('coupon-list');
+var couponBox = document.getElementById('root_coupon');
+var couponAlert = document.getElementById('coupon-alert');
 function onLoad() {
-	var danceOption = document.getElementById("dance_only_pass_option")
-	var fullWeekendOption = document.getElementById("full_weekend_pass_option")
-	var mixAndMatch = document.getElementById("mix_and_match_label")
-	var soloJazz = document.getElementById("solo_jazz_label")
-	var teamComp = document.getElementById("team_competition_label")
-	var tShirt = document.getElementById("tshirt_label")
 	var req = new XMLHttpRequest();
 	req.onreadystatechange = function() {
 		if (req.readyState == 4 && req.status == 200) {
 			var resp = JSON.parse(req.responseText)
 			danceOption.innerHTML = "Dance Only Pass (" + parseDollar(resp.dance_pass_cost) + ")"
 			fullWeekendOption.innerHTML = "Full Weekend Pass (Tier " + resp.weekend_pass_tier + " - " + parseDollar(resp.weekend_pass_cost) + ")"
-			mixAndMatch.innerHTML = "Mix And Match Competition (" + parseDollar(resp.mix_and_match_cost) + ")"
-			soloJazz.innerHTML = "Solo Jazz Competition (" + parseDollar(resp.solo_jazz_cost) + ")"
-			teamComp.innerHTML = "Team Competition (" + parseDollar(resp.team_comp_cost) + ")"
-			tShirt.innerHTML = "T-Shirt (" + parseDollar(resp.tshirt_cost) + ")"
+			mixAndMatchLabel.innerHTML = "Mix And Match Competition (" + parseDollar(resp.mix_and_match_cost) + ")"
+			soloJazzLabel.innerHTML = "Solo Jazz Competition (" + parseDollar(resp.solo_jazz_cost) + ")"
+			teamCompLabel.innerHTML = "Team Competition (" + parseDollar(resp.team_comp_cost) + ")"
+			tShirtLabel.innerHTML = "T-Shirt (" + parseDollar(resp.tshirt_cost) + ")"
 			current_tier = resp.weekend_pass_tier
 			document.getElementById("populate-loading").style.display='none';
 		}
@@ -31,145 +100,130 @@ function onLoad() {
 }
 
 function weekendPassShowHide() {
-	var levelDiv = document.getElementById('dss-workshopLevel')
-	var levelInput = document.getElementById('root_workshopLevel')
-	switch (document.getElementById('root_weekendPassType').value) {
+	switch (weekendPassSelector.value) {
 		case "Dance":
 		case "None":
-			levelDiv.style.display = 'none';
-			levelInput.required = false
+			workshopLevelDiv.style.display = 'none';
+			workshopLevelBox.required = false
 			break;
 		default:
-			levelDiv.style.display = 'block';
-			levelInput.required = true
+			workshopLevelDiv.style.display = 'block';
+			workshopLevelBox.required = true
 			break;
 	}
 }
 
 function mixAndMatchShowHide() {
-	var mixAndMatchRole = document.getElementById('dss-mixAndMatchRole')
-	var mixAndMatchRoleInput = document.getElementById('root_mixAndMatchRole')
-	if (document.getElementById('root_mixAndMatch').checked) {
-		mixAndMatchRole.style.display = 'block';
+	if (mixAndMatchBox.checked) {
+		mixAndMatchRoleDiv.style.display = 'block';
 		mixAndMatchRoleInput.required = true
 	} else {
-		mixAndMatchRole.style.display = 'none';
+		mixAndMatchRoleDiv.style.display = 'none';
 		mixAndMatchRoleInput.required = false
 	}
 }
 
 function teamShowHide() {
-	var teamName = document.getElementById('dss-teamName')
-	var teamNameInput = document.getElementById('root_teamName')
-	if (document.getElementById('root_teamCompetition').checked) {
-		teamName.style.display = 'block';
+	if (teamCompBox.checked) {
+		teamNameDiv.style.display = 'block';
 		teamNameInput.required = true
 	} else {
-		teamName.style.display = 'none';
+		teamNameDiv.style.display = 'none';
 		teamNameInput.required = false
 	}
 }
 
 function tShirtShowHide() {
-	var tShirtSize = document.getElementById('dss-tShirtSize')
-	var tShirtSizeInput = document.getElementById('root_tShirtSize')
-	if (document.getElementById('root_tShirt').checked) {
-		tShirtSize.style.display = 'block';
+	if (tShirtBox.checked) {
+		tShirtSizeDiv.style.display = 'block';
 		tShirtSizeInput.required = true
 	} else {
-		tShirtSize.style.display = 'none';
+		tShirtSizeDiv.style.display = 'none';
 		tShirtSizeInput.required = false
 	}
 }
 
 function housingShowHide() {
-	var myPets = document.getElementById('dss-myPets');
-	var housingNumber = document.getElementById('dss-housingNumber');
-	var housingNumberInput = document.getElementById('root_housingNumber');
-	var myHousingDetails = document.getElementById('dss-myHousingDetails');
-	var petAllergies = document.getElementById('dss-petAllergies')
-	var housingRequestDetails = document.getElementById('dss-housingRequestDetails')
-	switch (document.getElementById('root_housingStatus').value) {
+	switch (housingBox.value) {
 		case "None":
-			myPets.style.display = 'none';
-			housingNumber.style.display = 'none';
-			housingNumberInput.required = false
-			myHousingDetails.style.display = 'none';
-			petAllergies.style.display = 'none';
-			housingRequestDetails.style.display = 'none';
+			myPetsDiv.style.display = 'none';
+			housingNumberDiv.style.display = 'none';
+			housingNumberBox.required = false
+			myHousingDetailsDiv.style.display = 'none';
+			petAllergiesDiv.style.display = 'none';
+			housingRequestDetailsDiv.style.display = 'none';
 			break;
 		case "Require":
-			myPets.style.display = 'none';
-			housingNumber.style.display = 'none';
-			housingNumberInput.required = false
-			myHousingDetails.style.display = 'none';
-			petAllergies.style.display = 'block';
-			housingRequestDetails.style.display = 'block';
+			myPetsDiv.style.display = 'none';
+			housingNumberDiv.style.display = 'none';
+			housingNumberBox.required = false
+			myHousingDetailsDiv.style.display = 'none';
+			petAllergiesDiv.style.display = 'block';
+			housingRequestDetailsDiv.style.display = 'block';
 			break;
 		default:
-			myPets.style.display = 'block';
-			housingNumber.style.display = 'block';
-			housingNumber.required = true
-			myHousingDetails.style.display = 'block';
-			petAllergies.style.display = 'none';
-			housingRequestDetails.style.display = 'none';
+			myPetsDiv.style.display = 'block';
+			housingNumberDiv.style.display = 'block';
+			housingNumberBox.required = true
+			myHousingDetailsDiv.style.display = 'block';
+			petAllergiesDiv.style.display = 'none';
+			housingRequestDetailsDiv.style.display = 'none';
 			break;
 	}
 }
 
 function submitRegistration() {
-	document.getElementById('submit-button').disabled = true;
-	document.getElementById('submit-loading').style.display = 'block';
+	submitButton.disabled = true;
+	submitLoading.style.display = 'block';
 	var j = new Object();
-	j.first_name = document.getElementById('root_firstName').value;
-	j.last_name = document.getElementById('root_lastName').value;
-	j.address = document.getElementById('root_address').value;
-	j.city = document.getElementById('root_city').value;
-	j.state = document.getElementById('root_state').value;
-	j.zip = document.getElementById('root_zip').value;
-	j.email = document.getElementById('root_email').value;
-	j.home_scene = document.getElementById('root_homeScene').value;
-	j.student = document.getElementById('root_student').checked;
+	j.first_name = firstNameBox.value;
+	j.last_name = lastNameBox.value;
+	j.address = addressBox.value;
+	j.city = cityBox.value;
+	j.state = stateBox.value;
+	j.zip = zipBox.value;
+	j.email = emailBox.value;
+	j.home_scene = homeSceneBox.value;
+	j.student = studentBox.checked;
 
-	j.weekend_pass_type = document.getElementById('root_weekendPassType').value;
+	j.weekend_pass_type = weekendPassSelector.value;
 	if (j.weekend_pass_type == 'Full') {
 		j.full_weekend = new Object();
-		j.full_weekend.level = document.getElementById('root_workshopLevel').value;
+		j.full_weekend.level = workshopLevelBox.value;
 		j.full_weekend.tier = current_tier;
 	}
 
-	j.mix_and_match = document.getElementById('root_mixAndMatch').checked;
+	j.mix_and_match = mixAndMatchBox.checked;
 	if (j.mix_and_match) {
-		j.mix_and_match_role = document.getElementById('root_mixAndMatchRole').value;
+		j.mix_and_match_role = mixAndMatchRoleInput.value;
 	}
 
-	j.solo_jazz = document.getElementById('root_soloJazz').checked;
+	j.solo_jazz = soloJazzBox.checked;
 
-	j.team_competition = document.getElementById('root_teamCompetition').checked;
+	j.team_competition = teamCompBox.checked;
 	if (j.team_competition) {
-		j.team_name = document.getElementById('root_teamName').value;
+		j.team_name = teamNameInput.value;
 	}
 
-	j.tshirt = document.getElementById('root_tShirt').checked;
+	j.tshirt = tShirtBox.checked;
 	if (j.tshirt) {
-		j.tshirt_size = document.getElementById('root_tShirtSize').value;
+		j.tshirt_size = tShirtSizeInput.value;
 	}
 
-	j.housing_status = document.getElementById('root_housingStatus').value;
+	j.housing_status = housingBox.value;
 	if (j.housing_status == "Require") {
 		j.require_housing = new Object();
-		j.require_housing.pet_allergies = document.getElementById('root_petAllergies').value;
-		j.require_housing.housing_request_details = document.getElementById('root_housingRequestDetails').value;
+		j.require_housing.pet_allergies = petAllergiesBox.value;
+		j.require_housing.housing_request_details = housingRequestDetailsBox.value;
 	} else if (j.housing_status == "Provide") {
 		j.provide_housing = new Object();
-		j.provide_housing.my_pets = document.getElementById('root_myPets').value;
-		j.provide_housing.housing_number = parseInt(document.getElementById('root_housingNumber').value, 10);
-		j.provide_housing.my_housing_details = document.getElementById('root_myHousingDetails').value;
+		j.provide_housing.my_pets = myPetsBox.value;
+		j.provide_housing.housing_number = parseInt(housingNumberBox.value, 10);
+		j.provide_housing.my_housing_details = myHousingDetailsBox.value;
 	}
 	j.redirect_url = siteBase+"/registration-complete"
 
 	var jsonString = JSON.stringify(j);
-	alert(jsonString)
 
 	var req = new XMLHttpRequest();
 	req.onreadystatechange = function() {
@@ -177,9 +231,56 @@ function submitRegistration() {
 			return;
 		}
 
+		var registrationRes = parseResponse(req)
+		if (!registrationRes) {
+			return
+		}
+		window.location.href = registrationRes.checkout_url;
+	}
+
+	req.open("POST", dynamicBase + "/AddRegistration", true)
+	var access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token
+	if (typeof access_token !== "undefined") {
+		req.setRequestHeader("Authorization", "Bearer "+access_token)
+	}
+	req.setRequestHeader("Content-Type", "application/json")
+	req.setRequestHeader("Accept", "application/json")
+	req.send(jsonString)
+}
+
+function submitDiscount() {
+	var code = couponBox.value;
+
+	// Sanatize "code"
+	tmp = document.createElement('DIV');
+	tmp.textContent = code;
+	sanCode = tmp.innerHTML;
+
+	var listId = 'discounts-list-'+sanCode
+	if (document.getElementById(listId)) {
+		couponAlert.style.display = 'block';
+		couponAlert.textContent = 'coupon already applied';
+		return;
+	}
+
+	var req = new XMLHttpRequest();
+	req.onreadystatechange = function() {
+		if (req.readyState != 4) {
+			return;
+		}
+
+		var discountRes
 		try {
-			var resp = JSON.parse(req.responseText);
-			if (typeof resp.errors !== "undefined" && resp.errors.length != 0) {
+			discountRes = JSON.parse(req.responseText);
+			if (typeof discountRes.errors !== "undefined" && discountRes.errors.length != 0) {
+				if (discountRes.errors.length == 1 && 
+					discountRes.errors[0].type == "BAD_PARAMETER" && 
+					discountRes.errors[0].bad_parameter_details.parameter_name == "code" &&
+					discountRes.errors[0].bad_parameter_details.reason == "discount with this name does not exist") {
+					couponAlert.style.display = 'block';
+					couponAlert.textContent = 'coupon code "' + code + '" is invalid';
+					return;
+				}
 				window.location.href = siteBase + "/error/?source_page=/registration&message="+encodeURI(req.responseText);
 				return;
 			}
@@ -188,9 +289,8 @@ function submitRegistration() {
 				window.location.href = siteBase + "/error/?source_page=/registration&message=status"+req.status;
 				return;
 			}
-
-			window.location.href = resp.checkout_url;
 		} catch(e) {
+			alert(e);
 			if (req.status != 200) {
 				window.location.href = siteBase + "/error/?source_page=/registration&message=status"+req.status;
 				return;
@@ -202,14 +302,54 @@ function submitRegistration() {
 
 			window.location.href = siteBase + "/error/?source_page=/registration&message="+req.responseText;
 		}
-	}
 
-	req.open("POST", dynamicBase + "/AddRegistration", true)
-	var access_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token
-	if (typeof access_token !== "undefined") {
-		req.setRequestHeader("Authorization", "Bearer "+access_token)
+		if (typeof discountRes.discount === "undefined" || discountRes.discount.length == 0) {
+			couponAlert.style.display = 'block';
+			couponAlert.textContent = 'coupon code "' + code + '" is invalid';
+			return;
+		}
+		couponAlert.style.display = 'none';
+		var newListItem = document.createElement('LI');
+		newListItem.classList.add('list-group-item');
+		newListItem.classList.add('d-flex');
+		newListItem.classList.add('justify-content-between');
+		newListItem.id = listId;
+
+		var items = ""
+		for (var i = 0; i < discountRes.discount.length; i++) {
+			var thisDiscount = discountRes.discount[i];
+			items += '<p class="mb-1">'+thisDiscount.applied_to + ': '
+			switch(thisDiscount.type) {
+				case 'percent':
+					items += thisDiscount.percent + '%'
+					break;
+				case 'dollar':
+					items += parseDollar(thisDiscount.dollar)
+					break;
+			}
+			items += ' off</p>'
+		}
+		newListItem.innerHTML = '<div class="d-flex flex-column"><h5 class="mb-1">Code: "'+sanCode+'"</h5>' + items + '</div>';
+
+		var closeButton = document.createElement('BUTTON');
+		closeButton.innerHTML = '<span aria-hidden="true">&times;</span>'
+		closeButton.classList.add('close');
+		closeButton.setAttribute('aria-label', 'close');
+		closeButton.type = 'button';
+		closeButton.onclick = function() {
+			closeDiscount(listId);
+		}
+
+		newListItem.appendChild(closeButton);
+
+		couponList.appendChild(newListItem);
 	}
-	req.setRequestHeader("Content-Type", "application/json")
-	req.setRequestHeader("Accept", "application/json")
-	req.send(jsonString)
+	req.open("GET", dynamicBase+"/GetDiscount?code="+code, true)
+	req.setRequestHeader("Accept", "appliction/json")
+	req.send(null)
+}
+
+function closeDiscount(id) {
+	var listItem = document.getElementById(id);
+	listItem.parentNode.removeChild(listItem);
 }

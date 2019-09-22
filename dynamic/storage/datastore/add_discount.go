@@ -5,6 +5,7 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"github.com/Houndie/dss-registration/dynamic/registration/adddiscount"
+	"github.com/Houndie/dss-registration/dynamic/registration/common"
 	"github.com/pkg/errors"
 )
 
@@ -16,17 +17,17 @@ func (d *Datastore) AddDiscount(ctx context.Context, discount *adddiscount.Disco
 	for i, sd := range discount.Discounts {
 		var appliedTo string
 		switch sd.AppliedTo {
-		case adddiscount.FullWeekendDiscountTarget:
+		case common.FullWeekendDiscountTarget:
 			appliedTo = fullWeekendDiscount
-		case adddiscount.DanceOnlyDiscountTarget:
+		case common.DanceOnlyDiscountTarget:
 			appliedTo = danceOnlyDiscount
-		case adddiscount.MixAndMatchDiscountTarget:
+		case common.MixAndMatchDiscountTarget:
 			appliedTo = mixAndMatchDiscount
-		case adddiscount.SoloJazzDiscountTarget:
+		case common.SoloJazzDiscountTarget:
 			appliedTo = soloJazzDiscount
-		case adddiscount.TeamCompetitionDiscountTarget:
+		case common.TeamCompetitionDiscountTarget:
 			appliedTo = teamCompetitionDiscount
-		case adddiscount.TShirtDiscountTarget:
+		case common.TShirtDiscountTarget:
 			appliedTo = tshirtDiscount
 		default:
 			return errors.New("Unknown discount target found")
