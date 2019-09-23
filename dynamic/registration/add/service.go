@@ -23,6 +23,7 @@ type MailClient interface {
 type Store interface {
 	AddRegistration(context.Context, *StoreRegistration) (string, error)
 	DeleteRegistration(context.Context, string) error
+	GetDiscounts(context.Context, []string) ([]string, []*common.StoreDiscount, error)
 }
 
 type SquareClient interface {
@@ -80,6 +81,18 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 		return "", errors.Wrap(err, wrap)
 	}
 
+	s.logger.Trace("looking up discount codes from database")
+	discountKeys, discounts, err := s.store.GetDiscounts(ctx, registration.DiscountCodes)
+	if err != nil {
+		wrap := "error fetching discount codes from datastore"
+		if _, ok := errors.Cause(err).(ErrDiscountDoesNotExist); ok {
+			s.logger.WithError(err).Debug(wrap)
+		} else {
+			s.logger.WithError(err).Error(wrap)
+		}
+		return "", errors.Wrap(err, wrap)
+	}
+
 	storeRegistration := &StoreRegistration{
 		FirstName:       registration.FirstName,
 		LastName:        registration.LastName,
@@ -97,9 +110,41 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 		TShirt:          registration.TShirt,
 		Housing:         registration.Housing,
 		UserId:          userid,
+		Discounts:       discountKeys,
 	}
 	returnerURL := redirectUrl
 	if containsPaidItems(registration) {
+		discountsMap := map[string]common.PurchaseItem{}
+		for _, discount := range discounts {
+			discountsMap[discount.Name] = discount.AppliedTo
+		}
+
+		purchaseItems := map[common.PurchaseItem]*square.OrderLineItem{}
+		switch registration.PassType.(type) {
+		case *common.WeekendPass:
+			purchaseItems[common.FullWeekendPurchaseItem] = &square.OrderLineItem{Quantity: "1"}
+		case *common.DanceOnlyPass:
+			purchaseItems[common.DanceOnlyPurchaseItem] = &square.OrderLineItem{Quantity: "1"}
+		default:
+			//Do nothing
+		}
+
+		if registration.MixAndMatch != nil {
+			purchaseItems[common.MixAndMatchPurchaseItem] = &square.OrderLineItem{Quantity: "1"}
+		}
+
+		if registration.SoloJazz {
+			purchaseItems[common.SoloJazzPurchaseItem] = &square.OrderLineItem{Quantity: "1"}
+		}
+
+		if registration.TeamCompetition != nil {
+			purchaseItems[common.TeamCompetitionPurchaseItem] = &square.OrderLineItem{Quantity: "1"}
+		}
+
+		if registration.TShirt != nil {
+			purchaseItems[common.TShirtPurchaseItem] = &square.OrderLineItem{Quantity: "1"}
+		}
+
 		s.logger.Trace("Fetching all locations from square")
 		locations, err := s.client.ListLocations(ctx)
 		if err != nil {
@@ -114,7 +159,7 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 		}
 
 		s.logger.Trace("Fetching all items from square")
-		objects := s.client.ListCatalog(ctx, nil)
+		objects := s.client.ListCatalog(ctx, []square.CatalogObjectType{square.CatalogObjectTypeItem, square.CatalogObjectTypeDiscount})
 
 		idempotencyKey, err := uuid.NewV4()
 		if err != nil {
@@ -123,133 +168,130 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 			return "", errors.Wrap(err, wrap)
 		}
 
-		order := &square.CreateOrderRequest{
-			IdempotencyKey: idempotencyKey.String(),
-			Order: &square.Order{
-				ReferenceId: referenceId.String(),
-				LocationId:  locations[0].Id,
-				LineItems:   []*square.OrderLineItem{},
-				Version:     1,
-			},
-		}
-
 		for objects.Next() {
-			item, ok := objects.Value().CatalogObjectType.(*square.CatalogItem)
-			if !ok {
-				s.logger.Trace("Square object was not of type catalog item")
-				continue
-			}
-			s.logger.Tracef("Comparing item name %s to legend", item.Name)
-			switch item.Name {
-			case utility.MixAndMatchItem, utility.TeamCompItem, utility.SoloJazzItem, utility.TShirtItem:
-				if len(item.Variations) != 1 {
-					err := fmt.Errorf("Found unexpected number of variations: %v", len(item.Variations))
-					s.logger.Error(err)
-					return "", err
-				}
-				v := item.Variations[0]
-				_, ok := v.CatalogObjectType.(*square.CatalogItemVariation)
-				if !ok {
-					err := "Invalid response from square...item variation isn't a variation?"
-					s.logger.Error(err)
-					return "", errors.New(err)
-				}
-				switch item.Name {
-				case utility.MixAndMatchItem:
-					if registration.MixAndMatch == nil {
-						continue
+			switch o := objects.Value().CatalogObjectType.(type) {
+			case *square.CatalogItem:
+				s.logger.Tracef("Comparing item name %s to legend", o.Name)
+				switch o.Name {
+				case utility.MixAndMatchItem, utility.TeamCompItem, utility.SoloJazzItem, utility.TShirtItem:
+					if len(o.Variations) != 1 {
+						err := fmt.Errorf("Found unexpected number of variations: %v", len(o.Variations))
+						s.logger.Error(err)
+						return "", err
 					}
-					order.Order.LineItems = append(order.Order.LineItems, &square.OrderLineItem{
-						Quantity:        "1",
-						CatalogObjectId: v.Id,
-					})
-				case utility.TeamCompItem:
-					if registration.TeamCompetition == nil {
-						continue
-					}
-					order.Order.LineItems = append(order.Order.LineItems, &square.OrderLineItem{
-						Quantity:        "1",
-						CatalogObjectId: v.Id,
-					})
-				case utility.SoloJazzItem:
-					if !registration.SoloJazz {
-						continue
-					}
-					order.Order.LineItems = append(order.Order.LineItems, &square.OrderLineItem{
-						Quantity:        "1",
-						CatalogObjectId: v.Id,
-					})
-				case utility.TShirtItem:
-					if registration.TShirt == nil {
-						continue
-					}
-					order.Order.LineItems = append(order.Order.LineItems, &square.OrderLineItem{
-						Quantity:        "1",
-						CatalogObjectId: v.Id,
-					})
-				default:
-					err := errors.New("Impossible code path...how did I get here")
-					s.logger.Error(err)
-					return "", err
-				}
-			case utility.DancePassItem:
-				s.logger.Trace("Found dance pass item")
-				if _, ok := registration.PassType.(*common.DanceOnlyPass); !ok {
-					continue
-				}
-				for _, v := range item.Variations {
-					variation, ok := v.CatalogObjectType.(*square.CatalogItemVariation)
+					v := o.Variations[0]
+					_, ok := v.CatalogObjectType.(*square.CatalogItemVariation)
 					if !ok {
 						err := "Invalid response from square...item variation isn't a variation?"
 						s.logger.Error(err)
 						return "", errors.New(err)
 					}
-					if variation.Name == "Presale" {
+					var pi *square.OrderLineItem
+					switch o.Name {
+					case utility.MixAndMatchItem:
+						pi, ok = purchaseItems[common.MixAndMatchPurchaseItem]
+						if !ok {
+							continue
+						}
+					case utility.TeamCompItem:
+						pi, ok = purchaseItems[common.TeamCompetitionPurchaseItem]
+						if !ok {
+							continue
+						}
+					case utility.SoloJazzItem:
+						pi, ok = purchaseItems[common.SoloJazzPurchaseItem]
+						if !ok {
+							continue
+						}
+					case utility.TShirtItem:
+						pi, ok = purchaseItems[common.TShirtPurchaseItem]
+						if !ok {
+							continue
+						}
+					default:
+						err := errors.New("Impossible code path...how did I get here")
+						s.logger.Error(err)
+						return "", err
+					}
+					pi.CatalogObjectId = v.Id
+				case utility.DancePassItem:
+					s.logger.Trace("Found dance pass item")
+					pi, ok := purchaseItems[common.DanceOnlyPurchaseItem]
+					if !ok {
+						continue
+					}
+					for _, v := range o.Variations {
+						variation, ok := v.CatalogObjectType.(*square.CatalogItemVariation)
+						if !ok {
+							err := "Invalid response from square...item variation isn't a variation?"
+							s.logger.Error(err)
+							return "", errors.New(err)
+						}
+						if variation.Name != "Presale" {
+							s.logger.Tracef("Did not find dance pass variant Presale (found %s), moving on", variation.Name)
+							continue
+						}
 						s.logger.Trace("Found dance pass variant Presale")
-						order.Order.LineItems = append(order.Order.LineItems, &square.OrderLineItem{
-							Quantity:        "1",
-							CatalogObjectId: v.Id,
-						})
-						break
+						pi.CatalogObjectId = v.Id
 					}
-					s.logger.Tracef("Did not find dance pass variant Presale (found %s), moving on", variation.Name)
+				case utility.WeekendPassItem:
+					s.logger.Trace("Found full weekend pass item")
+					weekendPass, ok := registration.PassType.(*common.WeekendPass)
+					if !ok {
+						continue
+					}
+					pi, ok := purchaseItems[common.FullWeekendPurchaseItem]
+					if !ok {
+						continue
+					}
+
+					var tierString string
+					switch weekendPass.Tier {
+					case common.WeekendPassTier1:
+						tierString = utility.WeekendPassTier1Name
+					case common.WeekendPassTier2:
+						tierString = utility.WeekendPassTier2Name
+					case common.WeekendPassTier3:
+						tierString = utility.WeekendPassTier3Name
+					case common.WeekendPassTier4:
+						tierString = utility.WeekendPassTier4Name
+					case common.WeekendPassTier5:
+						tierString = utility.WeekendPassTier5Name
+					}
+					for _, v := range o.Variations {
+						variation, ok := v.CatalogObjectType.(*square.CatalogItemVariation)
+						if !ok {
+							err := "Invalid response from square...item variation isn't a variation?"
+							s.logger.Error(err)
+							return "", errors.New(err)
+						}
+						if variation.Name == tierString {
+							s.logger.Trace("Found weekend pass")
+							pi.CatalogObjectId = v.Id
+							break
+						}
+					}
 				}
-			case utility.WeekendPassItem:
-				s.logger.Trace("Found full weekend pass item")
-				weekendPass, ok := registration.PassType.(*common.WeekendPass)
+			case *square.CatalogDiscount:
+				appliedTo, ok := discountsMap[o.Name]
 				if !ok {
 					continue
 				}
-
-				var tierString string
-				switch weekendPass.Tier {
-				case common.WeekendPassTier1:
-					tierString = utility.WeekendPassTier1Name
-				case common.WeekendPassTier2:
-					tierString = utility.WeekendPassTier2Name
-				case common.WeekendPassTier3:
-					tierString = utility.WeekendPassTier3Name
-				case common.WeekendPassTier4:
-					tierString = utility.WeekendPassTier4Name
-				case common.WeekendPassTier5:
-					tierString = utility.WeekendPassTier5Name
+				delete(discountsMap, o.Name)
+				pi, ok := purchaseItems[appliedTo]
+				if !ok {
+					continue
 				}
-				for _, v := range item.Variations {
-					variation, ok := v.CatalogObjectType.(*square.CatalogItemVariation)
-					if !ok {
-						err := "Invalid response from square...item variation isn't a variation?"
-						s.logger.Error(err)
-						return "", errors.New(err)
-					}
-					if variation.Name == tierString {
-						s.logger.Trace("Found weekend pass")
-						order.Order.LineItems = append(order.Order.LineItems, &square.OrderLineItem{
-							Quantity:        "1",
-							CatalogObjectId: v.Id,
-						})
-						break
-					}
+				if pi.Discounts == nil {
+					pi.Discounts = []*square.OrderLineItemDiscount{}
 				}
+				pi.Discounts = append(pi.Discounts, &square.OrderLineItemDiscount{
+					CatalogObjectId: objects.Value().Id,
+				})
+			default:
+				err := errors.New("found unknown catalog object type (should be impossible)")
+				s.logger.Error(err)
+				return "", err
 			}
 		}
 		if objects.Error() != nil {
@@ -258,16 +300,55 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 			return "", errors.Wrap(objects.Error(), wrap)
 		}
 
+		if len(discountsMap) != 0 {
+			keys := make([]string, len(discountsMap))
+			i := 0
+			for key, _ := range discountsMap {
+				keys[i] = key
+				i++
+			}
+			err := fmt.Errorf("disount names %v not found in square database", keys)
+			s.logger.Error(err)
+			return "", err
+		}
+
+		order := &square.CreateOrderRequest{
+			IdempotencyKey: idempotencyKey.String(),
+			Order: &square.Order{
+				ReferenceId: referenceId.String(),
+				LocationId:  locations[0].Id,
+				LineItems:   make([]*square.OrderLineItem, len(purchaseItems)),
+				Version:     1,
+			},
+		}
+		i := 0
+		for itemName, purchaseItem := range purchaseItems {
+			if purchaseItem.CatalogObjectId == "" {
+				err := fmt.Errorf("could not find square item to purchase a %s", itemName)
+				s.logger.Error(err)
+				return "", err
+			}
+
+			order.Order.LineItems[i] = purchaseItem
+			i++
+		}
+
 		s.logger.Trace("creating checkout with square")
 		checkout, err := s.client.CreateCheckout(ctx, locations[0].Id, idempotencyKey.String(), order, false, utility.SmackdownEmail, registration.Email, nil, redirectUrl, nil, "")
 		if err != nil {
-			wrap := "error creating square checkout"
-			utility.LogSquareError(s.logger, err, wrap)
-			return "", errors.Wrap(err, wrap)
-		}
+			errorList, ok := err.(*square.ErrorList)
 
-		storeRegistration.OrderIds = []string{checkout.Order.Id}
-		returnerURL = checkout.CheckoutPageUrl
+			// If this error is anything other than "can't create checkouts worth less than a dollar"
+			if !ok || len(errorList.Errors) > 1 || errorList.Errors[0].Category != square.ErrorCategoryInvalidRequestError || errorList.Errors[0].Code != square.ErrorCodeValueTooLow || errorList.Errors[0].Field != "order.total_money.amount" {
+				wrap := "error creating square checkout"
+				utility.LogSquareError(s.logger, err, wrap)
+				return "", errors.Wrap(err, wrap)
+			}
+			s.logger.Trace("registration with checkout amount less than a dollar found, not creating order or checkout")
+		} else {
+			storeRegistration.OrderIds = []string{checkout.Order.Id}
+			returnerURL = checkout.CheckoutPageUrl
+		}
 	}
 
 	s.logger.Trace("Adding registration to database")

@@ -17,17 +17,17 @@ func (d *Datastore) AddDiscount(ctx context.Context, discount *adddiscount.Disco
 	for i, sd := range discount.Discounts {
 		var appliedTo string
 		switch sd.AppliedTo {
-		case common.FullWeekendDiscountTarget:
+		case common.FullWeekendPurchaseItem:
 			appliedTo = fullWeekendDiscount
-		case common.DanceOnlyDiscountTarget:
+		case common.DanceOnlyPurchaseItem:
 			appliedTo = danceOnlyDiscount
-		case common.MixAndMatchDiscountTarget:
+		case common.MixAndMatchPurchaseItem:
 			appliedTo = mixAndMatchDiscount
-		case common.SoloJazzDiscountTarget:
+		case common.SoloJazzPurchaseItem:
 			appliedTo = soloJazzDiscount
-		case common.TeamCompetitionDiscountTarget:
+		case common.TeamCompetitionPurchaseItem:
 			appliedTo = teamCompetitionDiscount
-		case common.TShirtDiscountTarget:
+		case common.TShirtPurchaseItem:
 			appliedTo = tshirtDiscount
 		default:
 			return errors.New("Unknown discount target found")

@@ -1,5 +1,7 @@
 package datastore
 
+import "cloud.google.com/go/datastore"
+
 const (
 	registrationKind = "Registration"
 
@@ -47,6 +49,7 @@ type registrationEntity struct {
 	UserId    string
 	OrderIds  []string
 	CreatedAt string
+	Discounts []*datastore.Key
 }
 
 const (

@@ -107,17 +107,17 @@ func GetDiscount(w http.ResponseWriter, r *http.Request) {
 	for i, discount := range discounts {
 		respDiscount := &getDiscountResponseDiscount{}
 		switch discount.AppliedTo {
-		case common.FullWeekendDiscountTarget:
+		case common.FullWeekendPurchaseItem:
 			respDiscount.AppliedTo = "Full Weekend"
-		case common.DanceOnlyDiscountTarget:
+		case common.DanceOnlyPurchaseItem:
 			respDiscount.AppliedTo = "Dance Only"
-		case common.MixAndMatchDiscountTarget:
+		case common.MixAndMatchPurchaseItem:
 			respDiscount.AppliedTo = "Mix And Match"
-		case common.SoloJazzDiscountTarget:
+		case common.SoloJazzPurchaseItem:
 			respDiscount.AppliedTo = "Solo Jazz"
-		case common.TeamCompetitionDiscountTarget:
+		case common.TeamCompetitionPurchaseItem:
 			respDiscount.AppliedTo = "Team Competition"
-		case common.TShirtDiscountTarget:
+		case common.TShirtPurchaseItem:
 			respDiscount.AppliedTo = "TShirt"
 		default:
 			logger.Errorf("Unknown discount applied to %v", discount.AppliedTo)
@@ -125,10 +125,10 @@ func GetDiscount(w http.ResponseWriter, r *http.Request) {
 		}
 
 		switch t := discount.ItemDiscount.(type) {
-		case *getdiscount.PercentDiscount:
+		case *common.PercentDiscount:
 			respDiscount.Type = "percent"
 			respDiscount.Percent = t.Amount
-		case *getdiscount.DollarDiscount:
+		case *common.DollarDiscount:
 			respDiscount.Type = "dollar"
 			respDiscount.Dollar = t.Amount
 		default:

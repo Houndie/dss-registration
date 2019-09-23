@@ -85,23 +85,24 @@ func AddDiscount(w http.ResponseWriter, r *http.Request) {
 		Discounts: make([]*adddiscount.SingleDiscount, len(inputs.Discounts)),
 	}
 	for i, inputDiscount := range inputs.Discounts {
-		var appliedTo common.DiscountTarget
+		var appliedTo common.PurchaseItem
 		switch inputDiscount.AppliedTo {
 		case "Full Weekend":
-			appliedTo = common.FullWeekendDiscountTarget
+			appliedTo = common.FullWeekendPurchaseItem
 		case "Dance Only":
-			appliedTo = common.DanceOnlyDiscountTarget
+			appliedTo = common.DanceOnlyPurchaseItem
 		case "Mix And Match":
-			appliedTo = common.MixAndMatchDiscountTarget
+			appliedTo = common.MixAndMatchPurchaseItem
 		case "Solo Jazz":
-			appliedTo = common.SoloJazzDiscountTarget
+			appliedTo = common.SoloJazzPurchaseItem
 		case "Team Competition":
-			appliedTo = common.TeamCompetitionDiscountTarget
+			appliedTo = common.TeamCompetitionPurchaseItem
 		case "TShirt":
-			appliedTo = common.TShirtDiscountTarget
+			appliedTo = common.TShirtPurchaseItem
 		default:
 			logger.Debugf("Found unknown applied to: %s", inputDiscount.AppliedTo)
 			writeAddDiscountResp(w, logger, []*jsonError{badParameterError("discounts.applied_to", inputDiscount.AppliedTo, "must be one of the following: Full Weekend, Dance Only, Mix And Match, Solo Jazz, Team Competition, TShirt")})
+			return
 		}
 		discount.Discounts[i] = &adddiscount.SingleDiscount{
 			Name:      inputDiscount.Name,
@@ -118,6 +119,7 @@ func AddDiscount(w http.ResponseWriter, r *http.Request) {
 		default:
 			writeAddDiscountResp(w, logger, []*jsonError{internalServerError()})
 		}
+		return
 	}
 	writeAddDiscountResp(w, logger, nil)
 }

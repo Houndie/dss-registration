@@ -96,6 +96,8 @@ func (o *OrderLineItemDiscount) MarshalJSON() ([]byte, error) {
 	case *OrderLineItemDiscountVariablePercentage:
 		jsonData.Type = orderLineItemDiscountTypeVariablePercentage
 		jsonData.Percentage = t.Percentage
+	case nil:
+		// Do Nothing
 	default:
 		return nil, errors.New("unknown discount type found")
 	}
@@ -134,6 +136,8 @@ func (o *OrderLineItemDiscount) UnmarshalJSON(input []byte) error {
 		o.Type = &OrderLineItemDiscountFixedPercentage{
 			Percentage: jsonData.Percentage,
 		}
+	case "":
+		// Do Nothing
 	default:
 		return errors.New("unknown discount type found")
 	}

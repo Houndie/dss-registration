@@ -3,13 +3,14 @@ package getdiscount
 import (
 	"context"
 
+	"github.com/Houndie/dss-registration/dynamic/registration/common"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
 type Store interface {
-	GetDiscount(context.Context, string) ([]*StoreDiscount, error)
+	GetDiscount(context.Context, string) ([]*common.StoreDiscount, error)
 }
 
 type SquareClient interface {
@@ -59,22 +60,22 @@ func (s *Service) GetDiscount(ctx context.Context, code string) ([]*Discount, er
 			if storeDiscount.Name != squareDiscount.Name {
 				continue
 			}
-			var itemDiscount ItemDiscount
+			var itemDiscount common.ItemDiscount
 			switch t := squareDiscount.DiscountType.(type) {
 			case *square.CatalogDiscountFixedAmount:
-				itemDiscount = &DollarDiscount{
+				itemDiscount = &common.DollarDiscount{
 					Amount: t.AmountMoney.Amount,
 				}
 			case *square.CatalogDiscountVariableAmount:
-				itemDiscount = &DollarDiscount{
+				itemDiscount = &common.DollarDiscount{
 					Amount: t.AmountMoney.Amount,
 				}
 			case *square.CatalogDiscountFixedPercentage:
-				itemDiscount = &PercentDiscount{
+				itemDiscount = &common.PercentDiscount{
 					Amount: t.Percentage,
 				}
 			case *square.CatalogDiscountVariablePercentage:
-				itemDiscount = &PercentDiscount{
+				itemDiscount = &common.PercentDiscount{
 					Amount: t.Percentage,
 				}
 			default:

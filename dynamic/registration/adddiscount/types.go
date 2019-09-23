@@ -4,7 +4,7 @@ import "github.com/Houndie/dss-registration/dynamic/registration/common"
 
 type SingleDiscount struct {
 	Name      string
-	AppliedTo common.DiscountTarget
+	AppliedTo common.PurchaseItem
 }
 
 type Discount struct {

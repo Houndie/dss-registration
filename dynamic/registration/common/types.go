@@ -83,13 +83,33 @@ func (*NoHousing) isHousing()      {}
 func (*ProvideHousing) isHousing() {}
 func (*RequireHousing) isHousing() {}
 
-type DiscountTarget string
+type PurchaseItem string
 
 const (
-	FullWeekendDiscountTarget     DiscountTarget = "Full Weekend"
-	DanceOnlyDiscountTarget       DiscountTarget = "Dance Only"
-	MixAndMatchDiscountTarget     DiscountTarget = "Mix And Match"
-	SoloJazzDiscountTarget        DiscountTarget = "Solo Jazz"
-	TeamCompetitionDiscountTarget DiscountTarget = "Team Competition"
-	TShirtDiscountTarget          DiscountTarget = "TShirt"
+	FullWeekendPurchaseItem     PurchaseItem = "Full Weekend"
+	DanceOnlyPurchaseItem       PurchaseItem = "Dance Only"
+	MixAndMatchPurchaseItem     PurchaseItem = "Mix And Match"
+	SoloJazzPurchaseItem        PurchaseItem = "Solo Jazz"
+	TeamCompetitionPurchaseItem PurchaseItem = "Team Competition"
+	TShirtPurchaseItem          PurchaseItem = "TShirt"
 )
+
+type ItemDiscount interface {
+	isItemDiscount()
+}
+
+type PercentDiscount struct {
+	Amount string
+}
+
+type DollarDiscount struct {
+	Amount int
+}
+
+func (*DollarDiscount) isItemDiscount()  {}
+func (*PercentDiscount) isItemDiscount() {}
+
+type StoreDiscount struct {
+	Name      string
+	AppliedTo PurchaseItem
+}

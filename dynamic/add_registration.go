@@ -90,7 +90,8 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 			PetAllergies          string `json:"pet_allergies"`
 			HousingRequestDetails string `json:"housing_request_details"`
 		} `json:"require_housing"`
-		RedirectUrl string `json:"redirect_url"`
+		RedirectUrl   string   `json:"redirect_url"`
+		DiscountCodes []string `json:"discount_codes"`
 	}{}
 
 	body, err := ioutil.ReadAll(r.Body)
@@ -269,6 +270,7 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 		TeamCompetition: teamCompetition,
 		TShirt:          tShirt,
 		Housing:         housing,
+		DiscountCodes:   inputs.DiscountCodes,
 	}, inputs.RedirectUrl, authToken)
 	if err != nil {
 		logger.WithError(err).Error("Error adding regitration to backend")

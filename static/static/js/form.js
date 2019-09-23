@@ -1,5 +1,8 @@
 function parseDollar(intCost) {
 	dollar = intCost.toString()
+	while(dollar.length < 3) {
+		dollar = "0" + dollar;
+	}
 	return "$" + dollar.slice(0, -2) + "." + dollar.slice(-2)
 }
 
@@ -33,6 +36,28 @@ function parseResponse(req) {
 }
 
 var current_tier
+var discountCodes = [];
+
+var fullWeekendCost = 0;
+var dancePassCost = 0;
+var soloJazzCost = 0;
+var mixAndMatchCost = 0;
+var teamCompCost = 0;
+var tshirtCost = 0;
+
+var fullWeekendPercentDiscounts = [];
+var fullWeekendDollarDiscounts = [];
+var dancePassPercentDiscounts = [];
+var dancePassDollarDiscounts = [];
+var soloJazzPercentDiscounts = [];
+var soloJazzDollarDiscounts = [];
+var mixAndMatchPercentDiscounts = [];
+var mixAndMatchDollarDiscounts = [];
+var teamCompPercentDiscounts = [];
+var teamCompDollarDiscounts = [];
+var tshirtPercentDiscounts = [];
+var tshirtDollarDiscounts = [];
+
 var weekendPassSelector = document.getElementById("root_weekendPassType");
 var workshopLevelBox = document.getElementById('root_workshopLevel');
 var workshopLevelDiv = document.getElementById('dss-workshopLevel')
@@ -80,18 +105,27 @@ var submitLoading = document.getElementById('submit-loading');
 var couponList = document.getElementById('coupon-list');
 var couponBox = document.getElementById('root_coupon');
 var couponAlert = document.getElementById('coupon-alert');
+var totalCount = document.getElementById('totalCount');
+
 function onLoad() {
 	var req = new XMLHttpRequest();
 	req.onreadystatechange = function() {
 		if (req.readyState == 4 && req.status == 200) {
 			var resp = JSON.parse(req.responseText)
 			danceOption.innerHTML = "Dance Only Pass (" + parseDollar(resp.dance_pass_cost) + ")"
+			dancePassCost = resp.dance_pass_cost;
 			fullWeekendOption.innerHTML = "Full Weekend Pass (Tier " + resp.weekend_pass_tier + " - " + parseDollar(resp.weekend_pass_cost) + ")"
+			fullWeekendCost = resp.weekend_pass_cost
+			current_tier = resp.weekend_pass_tier;
 			mixAndMatchLabel.innerHTML = "Mix And Match Competition (" + parseDollar(resp.mix_and_match_cost) + ")"
+			mixAndMatchCost = resp.mix_and_match_cost;
 			soloJazzLabel.innerHTML = "Solo Jazz Competition (" + parseDollar(resp.solo_jazz_cost) + ")"
+			soloJazzCost = resp.solo_jazz_cost;
 			teamCompLabel.innerHTML = "Team Competition (" + parseDollar(resp.team_comp_cost) + ")"
+			teamCompCost = resp.team_comp_cost;
 			tShirtLabel.innerHTML = "T-Shirt (" + parseDollar(resp.tshirt_cost) + ")"
-			current_tier = resp.weekend_pass_tier
+			resp.tshirtCost = resp.tshirt_cost;
+			recalculateTotal();
 			document.getElementById("populate-loading").style.display='none';
 		}
 	}
@@ -111,6 +145,7 @@ function weekendPassShowHide() {
 			workshopLevelBox.required = true
 			break;
 	}
+	recalculateTotal();
 }
 
 function mixAndMatchShowHide() {
@@ -121,6 +156,7 @@ function mixAndMatchShowHide() {
 		mixAndMatchRoleDiv.style.display = 'none';
 		mixAndMatchRoleInput.required = false
 	}
+	recalculateTotal();
 }
 
 function teamShowHide() {
@@ -131,6 +167,7 @@ function teamShowHide() {
 		teamNameDiv.style.display = 'none';
 		teamNameInput.required = false
 	}
+	recalculateTotal();
 }
 
 function tShirtShowHide() {
@@ -141,6 +178,11 @@ function tShirtShowHide() {
 		tShirtSizeDiv.style.display = 'none';
 		tShirtSizeInput.required = false
 	}
+	recalculateTotal();
+}
+
+function soloJazzShowHide() {
+	recalculateTotal();
 }
 
 function housingShowHide() {
@@ -222,6 +264,9 @@ function submitRegistration() {
 		j.provide_housing.my_housing_details = myHousingDetailsBox.value;
 	}
 	j.redirect_url = siteBase+"/registration-complete"
+	if (discountCodes.length > 0) {
+		j.discount_codes = discountCodes;
+	}
 
 	var jsonString = JSON.stringify(j);
 
@@ -260,8 +305,7 @@ function submitDiscount() {
 	if (document.getElementById(listId)) {
 		couponAlert.style.display = 'block';
 		couponAlert.textContent = 'coupon already applied';
-		return;
-	}
+		return; }
 
 	var req = new XMLHttpRequest();
 	req.onreadystatechange = function() {
@@ -308,6 +352,7 @@ function submitDiscount() {
 			couponAlert.textContent = 'coupon code "' + code + '" is invalid';
 			return;
 		}
+		discountCodes.push(code)
 		couponAlert.style.display = 'none';
 		var newListItem = document.createElement('LI');
 		newListItem.classList.add('list-group-item');
@@ -318,13 +363,62 @@ function submitDiscount() {
 		var items = ""
 		for (var i = 0; i < discountRes.discount.length; i++) {
 			var thisDiscount = discountRes.discount[i];
+
+			var itemDiscount = new Object();
+			itemDiscount.code = code;
+			
 			items += '<p class="mb-1">'+thisDiscount.applied_to + ': '
 			switch(thisDiscount.type) {
 				case 'percent':
 					items += thisDiscount.percent + '%'
+					var p = parseFloat(thisDiscount.percent);
+					p = 1 - (p/100.0);
+					itemDiscount.percent = p;
+
+					switch (thisDiscount.applied_to) {
+						case "Full Weekend":
+							fullWeekendPercentDiscounts.push(itemDiscount);
+							break;
+						case "Dance Only":
+							dancePassPercentDiscounts.push(itemDiscount);
+							break;
+						case "Mix And Match":
+							mixAndMatchPercentDiscounts.push(itemDiscount);
+							break;
+						case "Solo Jazz":
+							soloJazzPercentDiscounts.push(itemDiscount);
+							break;
+						case "Team Competition":
+							teamCompPercentDiscounts.push(itemDiscount);
+							break;
+						case "TShirt":
+							tshirtPercentDiscounts.push(itemDiscount);
+							break;
+					}
 					break;
 				case 'dollar':
 					items += parseDollar(thisDiscount.dollar)
+					itemDiscount.dollar = thisDiscount.dollar
+					switch (thisDiscount.applied_to) {
+						case "Full Weekend":
+							fullWeekendDollarDiscounts.push(itemDiscount);
+							break;
+						case "Dance Only":
+							dancePassDollarDiscounts.push(itemDiscount);
+							break;
+						case "Mix And Match":
+							mixAndMatchDollarDiscounts.push(itemDiscount);
+							break;
+						case "Solo Jazz":
+							soloJazzDollarDiscounts.push(itemDiscount);
+							break;
+						case "Team Competition":
+							teamCompDollarDiscounts.push(itemDiscount);
+							break;
+						case "TShirt":
+							tshirtDollarDiscounts.push(itemDiscount);
+							break;
+					}
 					break;
 			}
 			items += ' off</p>'
@@ -337,19 +431,104 @@ function submitDiscount() {
 		closeButton.setAttribute('aria-label', 'close');
 		closeButton.type = 'button';
 		closeButton.onclick = function() {
-			closeDiscount(listId);
+			closeDiscount(code);
 		}
 
 		newListItem.appendChild(closeButton);
 
 		couponList.appendChild(newListItem);
+		couponBox.value = "";
+		recalculateTotal();
 	}
 	req.open("GET", dynamicBase+"/GetDiscount?code="+code, true)
 	req.setRequestHeader("Accept", "appliction/json")
 	req.send(null)
 }
 
-function closeDiscount(id) {
-	var listItem = document.getElementById(id);
+function removeDiscountFromList(code, discountList) {
+	for (var i = 0; i < discountList.length; i++) {
+		if (discountList[i].code == code) {
+			discountList.splice(i, 1);
+		}
+	}
+}
+
+function closeDiscount(code) {
+	// Sanatize "code"
+	tmp = document.createElement('DIV');
+	tmp.textContent = code;
+	sanCode = tmp.innerHTML;
+
+	var listId = 'discounts-list-'+sanCode
+	var listItem = document.getElementById(listId);
 	listItem.parentNode.removeChild(listItem);
+
+	for (var i = 0; i < discountCodes.length; i++) {
+		if (discountCodes[0] == code) {
+			discountCodes.splice(i, 1)
+		}
+	}
+
+	removeDiscountFromList(code, fullWeekendDollarDiscounts);
+	removeDiscountFromList(code, fullWeekendPercentDiscounts);
+	removeDiscountFromList(code, dancePassDollarDiscounts);
+	removeDiscountFromList(code, dancePassPercentDiscounts);
+	removeDiscountFromList(code, soloJazzDollarDiscounts);
+	removeDiscountFromList(code, soloJazzPercentDiscounts);
+	removeDiscountFromList(code, teamCompDollarDiscounts);
+	removeDiscountFromList(code, teamCompPercentDiscounts);
+	removeDiscountFromList(code, tshirtDollarDiscounts);
+	removeDiscountFromList(code, tshirtPercentDiscounts);
+
+	recalculateTotal();
+}
+
+function calculateCost(base, percentDiscounts, dollarDiscounts) {
+	var result = base;
+
+	for (var i = 0; i < percentDiscounts.length; i++) {
+		result *= percentDiscounts[i].percent;
+	}
+	for (var i = 0; i < dollarDiscounts.length; i++) {
+		result -= dollarDiscounts[i].dollar;
+	}
+	if (result < 0) {
+		result = 0;
+	}
+
+	return result;
+}
+
+function recalculateTotal() {
+	var total = 0;
+	switch (weekendPassSelector.value) {
+		case "Dance":
+			total += calculateCost(dancePassCost, dancePassPercentDiscounts, dancePassDollarDiscounts)
+			break;
+		case "Full":
+			total += calculateCost(fullWeekendCost, fullWeekendPercentDiscounts, fullWeekendDollarDiscounts)
+			break;
+	}
+	if (mixAndMatchBox.checked) {
+		total += calculateCost(mixAndMatchCost, mixAndMatchPercentDiscounts, mixAndMatchDollarDiscounts)
+	}
+	if (teamCompBox.checked) {
+		total += calculateCost(teamCompCost, teamCompPercentDiscounts, teamCompDollarDiscounts)
+	}
+	if (tShirtBox.checked) {
+		total += calculateCost(tshirtCost, tshirtPercentDiscounts, tshirtDollarDiscounts)
+	}
+	if (soloJazzBox.checked) {
+		total += calculateCost(soloJazzCost, soloJazzPercentDiscounts, soloJazzDollarDiscounts)
+	}
+
+	totalCount.textContent = parseDollar(total);
+}
+
+function couponEnter(e) {
+	if (e.which != 13) {
+		return;
+	}
+	e.preventDefault();	
+	submitDiscount();
 }

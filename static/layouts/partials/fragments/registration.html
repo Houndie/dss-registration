@@ -163,7 +163,7 @@
 						</div>
 						<div class="form-group field field-boolean">
 							<div class="checkbox ">
-								<label><input type="checkbox" id="root_soloJazz" name="solo_jazz"><span id="solo_jazz_label">Solo Jazz Competition</span></label>
+								<label><input type="checkbox" id="root_soloJazz" onchange="soloJazzShowHide()" name="solo_jazz"><span id="solo_jazz_label">Solo Jazz Competition</span></label>
 							</div>
 							<div></div><div></div>
 						</div>
@@ -252,10 +252,13 @@
 							</ul>
 							<label class="control-label" for="root_coupon">Coupon code</label>
 							<div></div>
-							<input class="form-control" id="root_coupon" label="Coupon code" placeholder="" type="text" value="">
+							<input class="form-control" id="root_coupon" label="Coupon code" placeholder="" type="text" value="" onKeyDown="couponEnter(event)">
 							<button type="button" class="btn btn-primary" onclick="submitDiscount()">Add Coupon</button>
 							<div class="alert alert-danger" role="alert" id="coupon-alert"></div>
 							<div></div><div></div>
+						</div>
+						<div>
+							<p>Total: <span id="totalCount"><span></p>
 						</div>
 					</fieldset>
 					<div></div><div></div>

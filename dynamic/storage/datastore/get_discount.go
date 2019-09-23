@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (d *Datastore) GetDiscount(ctx context.Context, code string) ([]*getdiscount.StoreDiscount, error) {
+func (d *Datastore) GetDiscount(ctx context.Context, code string) ([]*common.StoreDiscount, error) {
 	q := datastore.NewQuery(discountKind).Filter("Code =", code).Limit(1)
 	discounts := []discountEntity{}
 	_, err := d.client.GetAll(ctx, q, &discounts)
@@ -28,27 +28,27 @@ func (d *Datastore) GetDiscount(ctx context.Context, code string) ([]*getdiscoun
 		return nil, fmt.Errorf("somehow discovered %d discounts with code %s when only one was expected", len(discounts), code)
 	}
 
-	result := make([]*getdiscount.StoreDiscount, len(discounts[0].Discounts))
+	result := make([]*common.StoreDiscount, len(discounts[0].Discounts))
 
 	for i, sd := range discounts[0].Discounts {
-		var appliedTo common.DiscountTarget
+		var appliedTo common.PurchaseItem
 		switch sd.AppliedTo {
 		case fullWeekendDiscount:
-			appliedTo = common.FullWeekendDiscountTarget
+			appliedTo = common.FullWeekendPurchaseItem
 		case danceOnlyDiscount:
-			appliedTo = common.DanceOnlyDiscountTarget
+			appliedTo = common.DanceOnlyPurchaseItem
 		case mixAndMatchDiscount:
-			appliedTo = common.MixAndMatchDiscountTarget
+			appliedTo = common.MixAndMatchPurchaseItem
 		case soloJazzDiscount:
-			appliedTo = common.SoloJazzDiscountTarget
+			appliedTo = common.SoloJazzPurchaseItem
 		case teamCompetitionDiscount:
-			appliedTo = common.TeamCompetitionDiscountTarget
+			appliedTo = common.TeamCompetitionPurchaseItem
 		case tshirtDiscount:
-			appliedTo = common.TShirtDiscountTarget
+			appliedTo = common.TShirtPurchaseItem
 		default:
 			return nil, fmt.Errorf("found unknown discount applied to %s", sd.AppliedTo)
 		}
-		result[i] = &getdiscount.StoreDiscount{
+		result[i] = &common.StoreDiscount{
 			Name:      sd.Name,
 			AppliedTo: appliedTo,
 		}

@@ -12,6 +12,15 @@ import (
 )
 
 func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistration) (string, error) {
+	keys := make([]*datastore.Key, len(r.Discounts))
+
+	for i, discount := range r.Discounts {
+		d, err := datastore.DecodeKey(discount)
+		if err != nil {
+			return "", fmt.Errorf("Key not of datastore type")
+		}
+		keys[i] = d
+	}
 	registration := &registrationEntity{
 		FirstName:     r.FirstName,
 		LastName:      r.LastName,
@@ -26,6 +35,7 @@ func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistratio
 		UserId:        r.UserId,
 		OrderIds:      r.OrderIds,
 		CreatedAt:     time.Now().Format(time.RFC3339),
+		Discounts:     keys,
 	}
 
 	switch p := r.PassType.(type) {
