@@ -1,8 +1,3 @@
-function parseDollar(intCost) {
-	dollar = intCost.toString()
-	return "$" + dollar.slice(0, -2) + "." + dollar.slice(-2)
-}
-
 function isAlphaNumeric(str) {
   var code, i, len;
 
@@ -46,26 +41,14 @@ function parseResponse(req) {
 	}
 }
 
+var existingCodes = [];
 var current_tier;
-var weekendPassSelector = document.getElementById("root_weekendPassType");
-var workshopLevelBox = document.getElementById('root_workshopLevel');
-var workshopLevelDiv = document.getElementById('dss-workshopLevel')
 var danceOption = document.getElementById("dance_only_pass_option");
 var fullWeekendOption = document.getElementById("full_weekend_pass_option");
-var mixAndMatchBox = document.getElementById("root_mixAndMatch");
 var mixAndMatchLabel = document.getElementById("mix_and_match_label");
-var mixAndMatchRoleDiv = document.getElementById('dss-mixAndMatchRole')
-var mixAndMatchRoleInput = document.getElementById('root_mixAndMatchRole')
-var soloJazzBox = document.getElementById("root_soloJazz");
 var soloJazzLabel = document.getElementById("solo_jazz_label");
-var teamCompBox = document.getElementById("root_teamCompetition");
 var teamCompLabel = document.getElementById("team_competition_label");
-var teamNameDiv = document.getElementById('dss-teamName')
-var teamNameInput = document.getElementById('root_teamName')
-var tShirtBox = document.getElementById("root_tShirt");
 var tShirtLabel = document.getElementById("tshirt_label");
-var tShirtSizeDiv = document.getElementById('dss-tShirtSize')
-var tShirtSizeInput = document.getElementById('root_tShirtSize')
 var firstNameBox = document.getElementById('root_firstName');
 var lastNameBox = document.getElementById('root_lastName');
 var addressBox = document.getElementById('root_address');
@@ -75,17 +58,10 @@ var zipBox = document.getElementById('root_zip');
 var emailBox = document.getElementById('root_email');
 var homeSceneBox = document.getElementById('root_homeScene');
 var studentBox = document.getElementById('root_homeScene');
-var housingBox = document.getElementById('root_housingStatus');
 var petAllergiesBox = document.getElementById('root_petAllergies');
-var petAllergiesDiv = document.getElementById('dss-petAllergies');
 var housingRequestDetailsBox = document.getElementById('root_housingRequestDetails');
-var housingRequestDetailsDiv = document.getElementById('dss-housingRequestDetails');
 var myPetsBox = document.getElementById('root_myPets');
-var myPetsDiv = document.getElementById('dss-myPets');
-var housingNumberBox = document.getElementById('root_housingNumber');
-var housingNumberDiv = document.getElementById('dss-housingNumber');
 var myHousingDetailsBox = document.getElementById('root_myHousingDetails');
-var myHousingDetailsDiv = document.getElementById('dss-myHousingDetails');
 var ordersDiv = document.getElementById('orders-div');
 var ordersList = document.getElementById('orders-list');
 var ordersCost = document.getElementById('orders-cost');
@@ -139,6 +115,7 @@ function populateForm(populateRes, myRegistrationRes) {
 	case "Full":
 		fullWeekendOption.innerHTML = "Full Weekend Pass (Tier " + myRegistrationRes.registration.full_weekend.tier + ")";
 		workshopLevelBox.value = myRegistrationRes.registration.full_weekend.level;
+		current_tier = myRegistrationRes.registration.full_weekend.tier;
 		workshopLevelBox.disabled = true;
 	case "Dance":
 		weekendPassSelector.value = myRegistrationRes.registration.weekend_pass_type;
@@ -233,84 +210,14 @@ function populateForm(populateRes, myRegistrationRes) {
 		ordersDiv.style.display = 'block';
 	}
 
+	if (typeof myRegistrationRes.registration.discounts !== "undefined") {
+		for (var i = 0; i < myRegistrationRes.registration.discounts.length; i++) {
+			addDiscount(myRegistrationRes.registration.discounts[i].code, myRegistrationRes.registration.discounts[i].discounts)
+			existingCodes.push(myRegistrationRes.registration.discounts[i].code);
+		}
+	}
+
 	document.getElementById('populate-loading').style.display = 'none';
-}
-
-function payOrder(orderId) {
-	alert(orderId);
-}
-
-function weekendPassShowHide() {
-	switch (weekendPassSelector.value) {
-		case "Dance":
-		case "None":
-			workshopLevelDiv.style.display = 'none';
-			workshopLevelBox.required = false;
-			break;
-		default:
-			workshopLevelDiv.style.display = 'block';
-			workshopLevelBox.required = true;
-			break;
-	}
-}
-
-function mixAndMatchShowHide() {
-	if (mixAndMatchBox.checked) {
-		mixAndMatchRoleDiv.style.display = 'block';
-		mixAndMatchRoleInput.required = true;
-	} else {
-		mixAndMatchRoleDiv.style.display = 'none';
-		mixAndMatchRoleInput.required = false;
-	}
-}
-
-function teamShowHide() {
-	if (teamCompBox.checked) {
-		teamNameDiv.style.display = 'block';
-		teamNameInput.required = true;
-	} else {
-		teamNameDiv.style.display = 'none';
-		teamNameInput.required = false;
-	}
-}
-
-function tShirtShowHide() {
-	if (tShirtBox.checked) {
-		tShirtSizeDiv.style.display = 'block';
-		tShirtSizeInput.required = true
-	} else {
-		tShirtSizeDiv.style.display = 'none';
-		tShirtSizeInput.required = false
-	}
-}
-
-function housingShowHide() {
-	switch (housingBox.value) {
-		case "None":
-			myPetsDiv.style.display = 'none';
-			housingNumberDiv.style.display = 'none';
-			housingNumberBox.required = false
-			myHousingDetailsDiv.style.display = 'none';
-			petAllergiesDiv.style.display = 'none';
-			housingRequestDetailsDiv.style.display = 'none';
-			break;
-		case "Require":
-			myPetsDiv.style.display = 'none';
-			housingNumberDiv.style.display = 'none';
-			housingNumberBox.required = false
-			myHousingDetailsDiv.style.display = 'none';
-			petAllergiesDiv.style.display = 'block';
-			housingRequestDetailsDiv.style.display = 'block';
-			break;
-		default:
-			myPetsDiv.style.display = 'block';
-			housingNumberDiv.style.display = 'block';
-			housingNumberBox.required = true
-			myHousingDetailsDiv.style.display = 'block';
-			petAllergiesDiv.style.display = 'none';
-			housingRequestDetailsDiv.style.display = 'none';
-			break;
-	}
 }
 
 function submitRegistration() {
@@ -364,6 +271,16 @@ function submitRegistration() {
 		j.provide_housing.my_housing_details = myHousingDetailsBox.value;
 	}
 	j.redirect_url = siteBase+"/registration-complete"
+
+	newCodes = [];
+	for (var i = 0; i < discountCodes.length; i++) {
+		if (!existingCodes.includes(discountCodes[i])) {
+			newCodes.push(discountCodes[i])
+		}
+	}
+	if (discountCodes.length > 0) {
+		j.discount_codes = newCodes;
+	}
 
 	var jsonString = JSON.stringify(j);
 	var req = new XMLHttpRequest();

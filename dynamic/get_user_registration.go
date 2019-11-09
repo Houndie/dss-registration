@@ -34,6 +34,18 @@ type getUserRegistrationUnpaidItems struct {
 	Cost  int      `json:"cost"`
 }
 
+type getUserRegistrationSingleDiscount struct {
+	AppliedTo string `json:"applied_to"`
+	Type      string `json:"type"`
+	Percent   string `json:"percent,omitempty"`
+	Dollar    int    `json:"dollar,omitempty"`
+}
+
+type getUserRegistrationDiscount struct {
+	Code      string                               `json:"code"`
+	Discounts []*getUserRegistrationSingleDiscount `json:"discounts"`
+}
+
 type getUserRegistrationsData struct {
 	Id              string                                 `json:"registration_id"`
 	FirstName       string                                 `json:"first_name"`
@@ -59,6 +71,7 @@ type getUserRegistrationsData struct {
 	RequireHousing  *getUserRegistrationRequireHousingData `json:"require_housing,omitempty"`
 	CreatedAt       time.Time                              `json:"created_at"`
 	UnpaidItems     *getUserRegistrationUnpaidItems        `json:"unpaid_items,omitempty"`
+	Discounts       []*getUserRegistrationDiscount         `json:"discounts,omitempty"`
 }
 
 type getUserRegistrationResponse struct {
@@ -249,6 +262,52 @@ func GetUserRegistration(w http.ResponseWriter, r *http.Request) {
 			Items: registration.UnpaidItems.Items,
 			Cost:  registration.UnpaidItems.Cost,
 		}
+	}
+
+	if len(registration.Discounts) > 0 {
+		discounts := make([]*getUserRegistrationDiscount, len(registration.Discounts))
+		for i, discount := range registration.Discounts {
+			singleDiscounts := make([]*getUserRegistrationSingleDiscount, len(discount.Discounts))
+			for j, sd := range discount.Discounts {
+				respDiscount := &getUserRegistrationSingleDiscount{}
+				switch sd.AppliedTo {
+				case common.FullWeekendPurchaseItem:
+					respDiscount.AppliedTo = "Full Weekend"
+				case common.DanceOnlyPurchaseItem:
+					respDiscount.AppliedTo = "Dance Only"
+				case common.MixAndMatchPurchaseItem:
+					respDiscount.AppliedTo = "Mix And Match"
+				case common.SoloJazzPurchaseItem:
+					respDiscount.AppliedTo = "Solo Jazz"
+				case common.TeamCompetitionPurchaseItem:
+					respDiscount.AppliedTo = "Team Competition"
+				case common.TShirtPurchaseItem:
+					respDiscount.AppliedTo = "TShirt"
+				default:
+					logger.Errorf("Unknown discount applied to %v", sd.AppliedTo)
+					writeGetDiscountResp(w, logger, nil, []*jsonError{internalServerError()})
+				}
+
+				switch t := sd.ItemDiscount.(type) {
+				case *common.PercentDiscount:
+					respDiscount.Type = "percent"
+					respDiscount.Percent = t.Amount
+				case *common.DollarDiscount:
+					respDiscount.Type = "dollar"
+					respDiscount.Dollar = t.Amount
+				default:
+					logger.Error("Unknown discount type")
+					writeGetDiscountResp(w, logger, nil, []*jsonError{internalServerError()})
+				}
+
+				singleDiscounts[j] = respDiscount
+			}
+			discounts[i] = &getUserRegistrationDiscount{
+				Code:      discount.Code,
+				Discounts: singleDiscounts,
+			}
+		}
+		resp.Discounts = discounts
 	}
 
 	writeGetUserRegistrationResp(w, logger, resp, nil)

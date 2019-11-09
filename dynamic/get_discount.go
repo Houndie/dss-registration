@@ -19,14 +19,14 @@ type getDiscountResponseDiscount struct {
 }
 
 type getDiscountResponse struct {
-	Discount []*getDiscountResponseDiscount `json:"discount,omitempty"`
-	Errors   []*jsonError                   `json:"errors,omitempty"`
+	Discounts []*getDiscountResponseDiscount `json:"discounts,omitempty"`
+	Errors    []*jsonError                   `json:"errors,omitempty"`
 }
 
 func writeGetDiscountResp(w http.ResponseWriter, logger *logrus.Logger, discount []*getDiscountResponseDiscount, errors []*jsonError) {
 	resp := &getDiscountResponse{
-		Discount: discount,
-		Errors:   errors,
+		Discounts: discount,
+		Errors:    errors,
 	}
 	bytes, err := json.Marshal(&resp)
 	if err != nil {

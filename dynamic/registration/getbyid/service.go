@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
+	"github.com/Houndie/dss-registration/dynamic/registration/common"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/pkg/errors"
@@ -22,6 +23,7 @@ type Store interface {
 type SquareClient interface {
 	ListLocations(ctx context.Context) ([]*square.Location, error)
 	BatchRetrieveOrders(ctx context.Context, locationId string, orderIds []string) ([]*square.Order, error)
+	ListCatalog(ctx context.Context, types []square.CatalogObjectType) square.ListCatalogIterator
 }
 
 type Service struct {
@@ -119,6 +121,87 @@ func (s *Service) GetById(ctx context.Context, token, registrationId string) (*R
 		}
 	}
 
+	squareDiscounts := map[string]common.ItemDiscount{}
+	for _, d := range r.Discounts {
+		for _, sd := range d.Discounts {
+			squareDiscounts[sd.Name] = nil
+		}
+	}
+	objects := s.client.ListCatalog(ctx, []square.CatalogObjectType{square.CatalogObjectTypeDiscount})
+	for objects.Next() {
+		discountObject, ok := objects.Value().CatalogObjectType.(*square.CatalogDiscount)
+		if !ok {
+			s.logger.Error("found non discount object when discount was requested")
+			continue
+		}
+		_, ok = squareDiscounts[discountObject.Name]
+		if !ok {
+			continue
+		}
+
+		var itemDiscount common.ItemDiscount
+		switch t := discountObject.DiscountType.(type) {
+		case *square.CatalogDiscountFixedAmount:
+			itemDiscount = &common.DollarDiscount{
+				Amount: t.AmountMoney.Amount,
+			}
+		case *square.CatalogDiscountVariableAmount:
+			itemDiscount = &common.DollarDiscount{
+				Amount: t.AmountMoney.Amount,
+			}
+		case *square.CatalogDiscountFixedPercentage:
+			itemDiscount = &common.PercentDiscount{
+				Amount: t.Percentage,
+			}
+		case *square.CatalogDiscountVariablePercentage:
+			itemDiscount = &common.PercentDiscount{
+				Amount: t.Percentage,
+			}
+		default:
+			err := errors.New("unknown item discount type found from square")
+			s.logger.Error(err)
+			return nil, err
+		}
+
+		squareDiscounts[discountObject.Name] = itemDiscount
+	}
+	if objects.Error() != nil {
+		wrap := "error fetching catalog objects from square"
+		s.logger.WithError(err).Error(wrap)
+		return nil, errors.Wrap(err, wrap)
+	}
+	discounts := []*Discount{}
+	s.logger.Tracef("parsing %d discounts", len(r.Discounts))
+	for _, discount := range r.Discounts {
+		singleDiscounts := make([]*SingleDiscount, len(discount.Discounts))
+		allDiscountsFound := true
+		for i, sd := range discount.Discounts {
+			itemDiscount, ok := squareDiscounts[sd.Name]
+			if !ok {
+				err := errors.New("impossible code path, somehow a square discount was not added or removed from square discount map")
+				s.logger.Error(err)
+				return nil, err
+			}
+			if itemDiscount == nil {
+				s.logger.Errorf("Discount %s was applied but is no longer found in square store.  Omitting this code in result")
+				allDiscountsFound = false
+				break
+			}
+			singleDiscounts[i] = &SingleDiscount{
+				ItemDiscount: itemDiscount,
+				AppliedTo:    sd.AppliedTo,
+			}
+		}
+		if !allDiscountsFound {
+			continue
+		}
+		discounts = append(discounts, &Discount{
+			Code:      discount.Code,
+			Discounts: singleDiscounts,
+		})
+	}
+	s.logger.Tracef("%d discounts parsed and applied to registration", len(discounts))
+
 	return &Registration{
 		FirstName:       r.FirstName,
 		LastName:        r.LastName,
@@ -136,5 +219,6 @@ func (s *Service) GetById(ctx context.Context, token, registrationId string) (*R
 		TShirt:          r.TShirt,
 		Housing:         r.Housing,
 		UnpaidItems:     unpaidItems,
+		Discounts:       discounts,
 	}, nil
 }

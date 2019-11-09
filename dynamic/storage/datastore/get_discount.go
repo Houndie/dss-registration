@@ -31,22 +31,9 @@ func (d *Datastore) GetDiscount(ctx context.Context, code string) ([]*common.Sto
 	result := make([]*common.StoreDiscount, len(discounts[0].Discounts))
 
 	for i, sd := range discounts[0].Discounts {
-		var appliedTo common.PurchaseItem
-		switch sd.AppliedTo {
-		case fullWeekendDiscount:
-			appliedTo = common.FullWeekendPurchaseItem
-		case danceOnlyDiscount:
-			appliedTo = common.DanceOnlyPurchaseItem
-		case mixAndMatchDiscount:
-			appliedTo = common.MixAndMatchPurchaseItem
-		case soloJazzDiscount:
-			appliedTo = common.SoloJazzPurchaseItem
-		case teamCompetitionDiscount:
-			appliedTo = common.TeamCompetitionPurchaseItem
-		case tshirtDiscount:
-			appliedTo = common.TShirtPurchaseItem
-		default:
-			return nil, fmt.Errorf("found unknown discount applied to %s", sd.AppliedTo)
+		appliedTo, err := parseAppliedTo(sd.AppliedTo)
+		if err != nil {
+			return nil, errors.Wrap(nil, "found unknown error appliedto from store")
 		}
 		result[i] = &common.StoreDiscount{
 			Name:      sd.Name,
@@ -55,4 +42,25 @@ func (d *Datastore) GetDiscount(ctx context.Context, code string) ([]*common.Sto
 	}
 
 	return result, nil
+}
+
+func parseAppliedTo(datastoreVal string) (common.PurchaseItem, error) {
+	var appliedTo common.PurchaseItem
+	switch datastoreVal {
+	case fullWeekendDiscount:
+		appliedTo = common.FullWeekendPurchaseItem
+	case danceOnlyDiscount:
+		appliedTo = common.DanceOnlyPurchaseItem
+	case mixAndMatchDiscount:
+		appliedTo = common.MixAndMatchPurchaseItem
+	case soloJazzDiscount:
+		appliedTo = common.SoloJazzPurchaseItem
+	case teamCompetitionDiscount:
+		appliedTo = common.TeamCompetitionPurchaseItem
+	case tshirtDiscount:
+		appliedTo = common.TShirtPurchaseItem
+	default:
+		return "", fmt.Errorf("found unknown discount applied to %s", datastoreVal)
+	}
+	return appliedTo, nil
 }

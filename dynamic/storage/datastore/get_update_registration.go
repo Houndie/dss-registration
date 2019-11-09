@@ -54,6 +54,30 @@ func (d *Datastore) GetUpdateRegistration(ctx context.Context, id string) (*upda
 		}
 	}
 
+	discounts := make([]*update.ExistingDiscount, len(registration.Discounts))
+	for i, discountKey := range registration.Discounts {
+		de := discountEntity{}
+		err := d.client.Get(ctx, discountKey, &de)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error getting discount with key %v", discountKey)
+		}
+		singleDiscounts := make([]*common.StoreDiscount, len(de.Discounts))
+		for j, sd := range de.Discounts {
+			appliedTo, err := parseAppliedTo(sd.AppliedTo)
+			if err != nil {
+				return nil, errors.Wrap(nil, "found unknown error appliedto from store")
+			}
+			singleDiscounts[j] = &common.StoreDiscount{
+				Name:      sd.Name,
+				AppliedTo: appliedTo,
+			}
+		}
+		discounts[i] = &update.ExistingDiscount{
+			Code:      de.Code,
+			Discounts: singleDiscounts,
+		}
+	}
+
 	return &update.StoreOldRegistration{
 		IsStudent:       registration.IsStudent,
 		PassType:        passType,
@@ -63,5 +87,6 @@ func (d *Datastore) GetUpdateRegistration(ctx context.Context, id string) (*upda
 		TShirt:          tShirt,
 		UserId:          registration.UserId,
 		OrderIds:        registration.OrderIds,
+		Discounts:       discounts,
 	}, nil
 }

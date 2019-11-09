@@ -99,3 +99,7 @@
 #orders-div {
 	display: none;
 }
+
+#coupon-alert {
+	display: none;
+}

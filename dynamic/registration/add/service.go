@@ -85,7 +85,7 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 	discountKeys, discounts, err := s.store.GetDiscounts(ctx, registration.DiscountCodes)
 	if err != nil {
 		wrap := "error fetching discount codes from datastore"
-		if _, ok := errors.Cause(err).(ErrDiscountDoesNotExist); ok {
+		if _, ok := errors.Cause(err).(common.ErrDiscountDoesNotExist); ok {
 			s.logger.WithError(err).Debug(wrap)
 		} else {
 			s.logger.WithError(err).Error(wrap)

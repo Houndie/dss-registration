@@ -23,6 +23,7 @@ type Registration struct {
 	TeamCompetition *common.TeamCompetition
 	TShirt          *common.TShirt
 	Housing         common.Housing
+	DiscountCodes   []string
 }
 
 type StoreOldRegistration struct {
@@ -34,6 +35,12 @@ type StoreOldRegistration struct {
 	TShirt          *common.TShirt
 	UserId          string
 	OrderIds        []string
+	Discounts       []*ExistingDiscount
+}
+
+type ExistingDiscount struct {
+	Code      string
+	Discounts []*common.StoreDiscount
 }
 
 type StoreOrderUpdate struct {
@@ -42,22 +49,24 @@ type StoreOrderUpdate struct {
 }
 
 type StoreUpdateRegistration struct {
-	FirstName       string
-	LastName        string
-	StreetAddress   string
-	City            string
-	State           string
-	ZipCode         string
-	Email           string
-	HomeScene       string
-	IsStudent       bool
-	PassType        common.PassType
-	MixAndMatch     *common.MixAndMatch
-	SoloJazz        bool
-	TeamCompetition *common.TeamCompetition
-	TShirt          *common.TShirt
-	Housing         common.Housing
-	OrderUpdate     *StoreOrderUpdate
+	FirstName        string
+	LastName         string
+	StreetAddress    string
+	City             string
+	State            string
+	ZipCode          string
+	Email            string
+	HomeScene        string
+	IsStudent        bool
+	PassType         common.PassType
+	MixAndMatch      *common.MixAndMatch
+	SoloJazz         bool
+	TeamCompetition  *common.TeamCompetition
+	TShirt           *common.TShirt
+	Housing          common.Housing
+	NewOrderId       string
+	ObsoleteOrderIds []string
+	NewDiscounts     []string
 }
 
 type ErrBadRegistrationId struct {
@@ -75,4 +84,12 @@ type ErrAlreadyPurchased struct {
 
 func (e ErrAlreadyPurchased) Error() string {
 	return fmt.Sprintf("cannot update field %s to value %s, as a different value was already purchased", e.Field, e.ExistingValue)
+}
+
+type ErrDiscountAlreadyApplied struct {
+	Code string
+}
+
+func (e ErrDiscountAlreadyApplied) Error() string {
+	return fmt.Sprintf("discount with code %s already applied to this registration", e.Code)
 }

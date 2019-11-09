@@ -1,5 +1,7 @@
 package common
 
+import "fmt"
+
 type WeekendPassLevel int
 type WeekendPassTier int
 
@@ -112,4 +114,12 @@ func (*PercentDiscount) isItemDiscount() {}
 type StoreDiscount struct {
 	Name      string
 	AppliedTo PurchaseItem
+}
+
+type ErrDiscountDoesNotExist struct {
+	Code string
+}
+
+func (e ErrDiscountDoesNotExist) Error() string {
+	return fmt.Sprintf("discount for code %s does not exist", e.Code)
 }

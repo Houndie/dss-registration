@@ -31,6 +31,7 @@ type Registration struct {
 	Housing         common.Housing
 	UnpaidItems     *UnpaidItems
 	CreatedAt       time.Time
+	Discounts       []*Discount
 }
 
 type StoreRegistration struct {
@@ -52,6 +53,7 @@ type StoreRegistration struct {
 	UserId          string
 	OrderIds        []string
 	CreatedAt       time.Time
+	Discounts       []*StoreDiscount
 }
 
 type ErrBadRegistrationId struct {
@@ -60,4 +62,24 @@ type ErrBadRegistrationId struct {
 
 func (e ErrBadRegistrationId) Error() string {
 	return fmt.Sprintf("registration id %s does not correspond to a registration", e.RegistrationId)
+}
+
+type SingleStoreDiscount struct {
+	Name      string
+	AppliedTo common.PurchaseItem
+}
+
+type StoreDiscount struct {
+	Code      string
+	Discounts []*SingleStoreDiscount
+}
+
+type SingleDiscount struct {
+	ItemDiscount common.ItemDiscount
+	AppliedTo    common.PurchaseItem
+}
+
+type Discount struct {
+	Code      string
+	Discounts []*SingleDiscount
 }

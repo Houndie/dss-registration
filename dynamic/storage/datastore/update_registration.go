@@ -30,28 +30,25 @@ func (s *Datastore) UpdateRegistration(ctx context.Context, r *update.StoreUpdat
 	registration.HomeScene = r.HomeScene
 	registration.IsStudent = r.IsStudent
 	registration.SoloJazz = r.SoloJazz
-	if r.OrderUpdate != nil {
-		var newOrderIds []string
-		if len(r.OrderUpdate.ObsoleteIds) > 0 {
-			newOrderIds = []string{}
-			for _, oldOrderId := range registration.OrderIds {
-				found := false
-				for _, removeOrderId := range r.OrderUpdate.ObsoleteIds {
-					if removeOrderId == oldOrderId {
-						found = true
-						break
-					}
+	if len(r.ObsoleteOrderIds) > 0 {
+		newOrderIds := []string{}
+		for _, oldOrderId := range registration.OrderIds {
+			found := false
+			for _, removeOrderId := range r.ObsoleteOrderIds {
+				if removeOrderId == oldOrderId {
+					found = true
+					break
 				}
-				if found {
-					continue
-				}
-				newOrderIds = append(newOrderIds, oldOrderId)
 			}
-		} else {
-			newOrderIds = registration.OrderIds
+			if found {
+				continue
+			}
+			newOrderIds = append(newOrderIds, oldOrderId)
 		}
-		newOrderIds = append(newOrderIds, r.OrderUpdate.NewId)
 		registration.OrderIds = newOrderIds
+	}
+	if r.NewOrderId != "" {
+		registration.OrderIds = append(registration.OrderIds, r.NewOrderId)
 	}
 
 	switch p := r.PassType.(type) {
@@ -96,6 +93,22 @@ func (s *Datastore) UpdateRegistration(ctx context.Context, r *update.StoreUpdat
 		registration.HousingRequest = noHousing
 	default:
 		return fmt.Errorf("Found unknown type of housing")
+	}
+
+	for _, newDiscount := range r.NewDiscounts {
+		translatedKey, err := datastore.DecodeKey(newDiscount)
+		if err != nil {
+			return errors.Wrap(err, "unable to translate discount key")
+		}
+		found := false
+		for _, discount := range registration.Discounts {
+			if translatedKey == discount {
+				found = true
+			}
+		}
+		if !found {
+			registration.Discounts = append(registration.Discounts, translatedKey)
+		}
 	}
 	_, err = s.client.Put(ctx, key, &registration)
 	return errors.Wrap(err, "Error inserting registration into database")

@@ -84,6 +84,34 @@ func (d *Datastore) GetRegistrationById(ctx context.Context, id string) (*getbyi
 		housing = &common.NoHousing{}
 	}
 
+	discounts := make([]*getbyid.StoreDiscount, len(r.Discounts))
+	for i, key := range r.Discounts {
+		storeDiscount := discountEntity{}
+		err := d.client.Get(ctx, key, &storeDiscount)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error getting discount with key %v", key)
+		}
+
+		singleDiscounts := make([]*getbyid.SingleStoreDiscount, len(storeDiscount.Discounts))
+		for j, singleDiscount := range storeDiscount.Discounts {
+			appliedTo, err := parseAppliedTo(singleDiscount.AppliedTo)
+			if err != nil {
+				return nil, errors.Wrapf(err, "error parsing applied to %s for discount with key %v", singleDiscount.AppliedTo, key)
+			}
+
+			singleDiscounts[j] = &getbyid.SingleStoreDiscount{
+				Name:      singleDiscount.Name,
+				AppliedTo: appliedTo,
+			}
+		}
+
+		discounts[i] = &getbyid.StoreDiscount{
+			Code:      storeDiscount.Code,
+			Discounts: singleDiscounts,
+		}
+
+	}
+
 	return &getbyid.StoreRegistration{
 		FirstName:       r.FirstName,
 		LastName:        r.LastName,
@@ -103,5 +131,6 @@ func (d *Datastore) GetRegistrationById(ctx context.Context, id string) (*getbyi
 		UserId:          r.UserId,
 		OrderIds:        r.OrderIds,
 		CreatedAt:       createdAt,
+		Discounts:       discounts,
 	}, nil
 }

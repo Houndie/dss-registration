@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/datastore"
-	"github.com/Houndie/dss-registration/dynamic/registration/add"
 	"github.com/Houndie/dss-registration/dynamic/registration/common"
 	"github.com/pkg/errors"
 )
@@ -22,7 +21,7 @@ func (d *Datastore) GetDiscounts(ctx context.Context, codes []string) ([]string,
 		}
 
 		if len(discounts) == 0 {
-			return nil, nil, add.ErrDiscountDoesNotExist{
+			return nil, nil, common.ErrDiscountDoesNotExist{
 				Code: code,
 			}
 		}

@@ -8,6 +8,7 @@ import (
 
 	"github.com/Houndie/dss-registration/dynamic/registration/common"
 	"github.com/Houndie/dss-registration/dynamic/registration/update"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -92,7 +93,8 @@ func UpdateRegistration(w http.ResponseWriter, r *http.Request) {
 			PetAllergies          string `json:"pet_allergies"`
 			HousingRequestDetails string `json:"housing_request_details"`
 		} `json:"require_housing"`
-		RedirectUrl string `json:"redirect_url"`
+		RedirectUrl   string   `json:"redirect_url"`
+		DiscountCodes []string `json:"discount_codes"`
 	}{}
 
 	body, err := ioutil.ReadAll(r.Body)
@@ -273,10 +275,20 @@ func UpdateRegistration(w http.ResponseWriter, r *http.Request) {
 		TeamCompetition: teamCompetition,
 		TShirt:          tShirt,
 		Housing:         housing,
+		DiscountCodes:   inputs.DiscountCodes,
 	}, inputs.RedirectUrl)
 	if err != nil {
-		logger.WithError(err).Error("Error adding regitration to backend")
-		writeUpdateRegistrationResp(w, logger, "", []*jsonError{internalServerError()})
+		switch e := errors.Cause(err).(type) {
+		case update.ErrBadRegistrationId:
+			writeUpdateRegistrationResp(w, logger, "", []*jsonError{badParameterError("id", inputs.Id, e.Error())})
+		case update.ErrAlreadyPurchased:
+			writeUpdateRegistrationResp(w, logger, "", []*jsonError{badParameterError(e.Field, e.ExistingValue, e.Error())})
+		case update.ErrDiscountAlreadyApplied:
+			writeUpdateRegistrationResp(w, logger, "", []*jsonError{badParameterError("discount_codes", e.Code, e.Error())})
+		default:
+			logger.WithError(err).Error("Error adding regitration to backend")
+			writeUpdateRegistrationResp(w, logger, "", []*jsonError{internalServerError()})
+		}
 		return
 	}
 	writeUpdateRegistrationResp(w, logger, url, nil)

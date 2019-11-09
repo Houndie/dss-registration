@@ -1,8 +1,6 @@
 package add
 
 import (
-	"fmt"
-
 	"github.com/Houndie/dss-registration/dynamic/registration/common"
 )
 
@@ -44,11 +42,4 @@ type StoreRegistration struct {
 	UserId          string
 	OrderIds        []string
 	Discounts       []string
-}
-type ErrDiscountDoesNotExist struct {
-	Code string
-}
-
-func (e ErrDiscountDoesNotExist) Error() string {
-	return fmt.Sprintf("discount for code %s does not exist", e.Code)
 }
