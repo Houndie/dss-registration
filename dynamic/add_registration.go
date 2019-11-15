@@ -8,6 +8,7 @@ import (
 
 	"github.com/Houndie/dss-registration/dynamic/registration/add"
 	"github.com/Houndie/dss-registration/dynamic/registration/common"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -273,9 +274,16 @@ func AddRegistration(w http.ResponseWriter, r *http.Request) {
 		DiscountCodes:   inputs.DiscountCodes,
 	}, inputs.RedirectUrl, authToken)
 	if err != nil {
-		logger.WithError(err).Error("Error adding regitration to backend")
-		writeAddRegistrationResp(w, logger, "", []*jsonError{internalServerError()})
-		return
+		switch e := errors.Cause(err).(type) {
+		case add.ErrOutOfStock:
+			logger.WithError(err).Debug("out of stock")
+			writeAddRegistrationResp(w, logger, "", []*jsonError{outOfStockError(e.NextTier, e.NextCost)})
+			return
+		default:
+			logger.WithError(err).Error("Error adding regitration to backend")
+			writeAddRegistrationResp(w, logger, "", []*jsonError{internalServerError()})
+			return
+		}
 	}
 	writeAddRegistrationResp(w, logger, url, nil)
 }

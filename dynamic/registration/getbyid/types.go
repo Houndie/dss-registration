@@ -32,6 +32,7 @@ type Registration struct {
 	UnpaidItems     *UnpaidItems
 	CreatedAt       time.Time
 	Discounts       []*Discount
+	UpdatedTier     bool
 }
 
 type StoreRegistration struct {

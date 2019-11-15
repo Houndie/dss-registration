@@ -1,32 +1,3 @@
-function parseResponse(req) {
-	try {
-		var resp = JSON.parse(req.responseText);
-		if (typeof resp.errors !== "undefined" && resp.errors.length != 0) {
-			window.location.href = siteBase + "/error/?source_page=/my_registration&message="+encodeURI(responseText);
-			return null;
-		}
-
-		if (req.status != 200) {
-			window.location.href = siteBase + "/error/?source_page=/my_registration&message=status"+req.status;
-			return null;
-		}
-
-		return resp;
-	} catch(e) {
-		if (req.status != 200) {
-			window.location.href = siteBase + "/error/?source_page=/my_registration&message=status"+req.status;
-			return null;
-		}
-		if (req.responseText == "") {
-			window.location.href = siteBase + "/error/?source_page=/my_registration&message=empty_response_body";
-			return null;
-		}
-
-		window.location.href = siteBase + "/error/?source_page=/my_registration&message="+req.responseText;
-		return null;
-	}
-}
-
 var current_tier
 
 var danceOption = document.getElementById("dance_only_pass_option");
@@ -48,6 +19,7 @@ var petAllergiesBox = document.getElementById('root_petAllergies');
 var housingRequestDetailsBox = document.getElementById('root_housingRequestDetails');
 var myPetsBox = document.getElementById('root_myPets');
 var myHousingDetailsBox = document.getElementById('root_myHousingDetails');
+var submitAlert = document.getElementById('submit-alert');
 var submitButton = document.getElementById('submit-button');
 var submitLoading = document.getElementById('submit-loading');
 
@@ -68,7 +40,7 @@ function onLoad() {
 			teamCompLabel.innerHTML = "Team Competition (" + parseDollar(resp.team_comp_cost) + ")"
 			teamCompCost = resp.team_comp_cost;
 			tShirtLabel.innerHTML = "T-Shirt (" + parseDollar(resp.tshirt_cost) + ")"
-			resp.tshirtCost = resp.tshirt_cost;
+			tshirtCost = resp.tshirt_cost;
 			recalculateTotal();
 			document.getElementById("populate-loading").style.display='none';
 		}
@@ -139,11 +111,43 @@ function submitRegistration() {
 			return;
 		}
 
-		var registrationRes = parseResponse(req)
-		if (!registrationRes) {
-			return
+		var registrationRes
+		try {
+			registrationRes = JSON.parse(req.responseText);
+			if (typeof registrationRes.errors !== "undefined" && registrationRes.errors.length != 0 && (registrationRes.errors.length != 1 || registrationRes.errors[0].type != "OUT_OF_STOCK")) {
+				window.location.href = siteBase + "/error/?source_page=/my_registration&message="+encodeURI(registrationResonseText);
+				return;
+			}
+
+			if (req.status != 200) {
+				window.location.href = siteBase + "/error/?source_page=/my_registration&message=status"+req.status;
+				return;
+			}
+		} catch(e) {
+			if (req.status != 200) {
+				window.location.href = siteBase + "/error/?source_page=/my_registration&message=status"+req.status;
+				return;
+			}
+			if (req.registrationResonseText == "") {
+				window.location.href = siteBase + "/error/?source_page=/my_registration&message=empty_registrationResonse_body";
+				return;
+			}
+
+			window.location.href = siteBase + "/error/?source_page=/my_registration&message="+req.responseText;
+			return;
 		}
-		window.location.href = registrationRes.checkout_url;
+		if (typeof registrationRes.errors !== "undefined") {
+			current_tier = registrationRes.errors[0].out_of_stock_details.next_tier;
+			fullWeekendCost = registrationRes.errors[0].out_of_stock_details.next_cost;
+			fullWeekendOption.innerHTML = "Full Weekend Pass (Tier " + current_tier + " - " + parseDollar(fullWeekendCost) + ")"
+			recalculateTotal();
+			submitAlert.textContent = 'Unfortunately, that tier is now sold out.  Your registration has been updated to the next available tier, submit your registration again to confirm.';
+			submitAlert.style.display = 'block';
+			submitButton.disabled = false;
+			submitLoading.style.display = 'none';
+		} else {
+			window.location.href = registrationRes.checkout_url;
+		}
 	}
 
 	req.open("POST", dynamicBase + "/AddRegistration", true)

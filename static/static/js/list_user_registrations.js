@@ -34,7 +34,7 @@ function onLoad() {
 			window.location.href = siteBase + "/error/?source_page=/my_registrations&message="+req.responseText
 			return
 		}
-		if (resp.registrations.length > 0) {
+		if (typeof resp.registrations !== "undefined" && resp.registrations.length > 0) {
 			var body = document.getElementById("registrations-body")
 			var sorted_registrations = resp.registrations
 			sorted_registrations.sort(function(a,b){

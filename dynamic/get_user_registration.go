@@ -72,6 +72,7 @@ type getUserRegistrationsData struct {
 	CreatedAt       time.Time                              `json:"created_at"`
 	UnpaidItems     *getUserRegistrationUnpaidItems        `json:"unpaid_items,omitempty"`
 	Discounts       []*getUserRegistrationDiscount         `json:"discounts,omitempty"`
+	UpdatedTier     bool                                   `json:"updated_tier"`
 }
 
 type getUserRegistrationResponse struct {
@@ -174,18 +175,19 @@ func GetUserRegistration(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := &getUserRegistrationsData{
-		Id:        values.Id,
-		FirstName: registration.FirstName,
-		LastName:  registration.LastName,
-		Address:   registration.StreetAddress,
-		City:      registration.City,
-		State:     registration.State,
-		Zip:       registration.ZipCode,
-		Email:     registration.Email,
-		HomeScene: registration.HomeScene,
-		Student:   registration.IsStudent,
-		SoloJazz:  registration.SoloJazz,
-		CreatedAt: registration.CreatedAt,
+		Id:          values.Id,
+		FirstName:   registration.FirstName,
+		LastName:    registration.LastName,
+		Address:     registration.StreetAddress,
+		City:        registration.City,
+		State:       registration.State,
+		Zip:         registration.ZipCode,
+		Email:       registration.Email,
+		HomeScene:   registration.HomeScene,
+		Student:     registration.IsStudent,
+		SoloJazz:    registration.SoloJazz,
+		CreatedAt:   registration.CreatedAt,
+		UpdatedTier: registration.UpdatedTier,
 	}
 
 	switch t := registration.PassType.(type) {

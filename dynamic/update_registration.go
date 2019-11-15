@@ -279,6 +279,8 @@ func UpdateRegistration(w http.ResponseWriter, r *http.Request) {
 	}, inputs.RedirectUrl)
 	if err != nil {
 		switch e := errors.Cause(err).(type) {
+		case update.ErrOutOfStock:
+			writeUpdateRegistrationResp(w, logger, "", []*jsonError{outOfStockError(e.NextTier, e.NextCost)})
 		case update.ErrBadRegistrationId:
 			writeUpdateRegistrationResp(w, logger, "", []*jsonError{badParameterError("id", inputs.Id, e.Error())})
 		case update.ErrAlreadyPurchased:

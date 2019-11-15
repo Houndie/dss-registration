@@ -3,6 +3,8 @@ package update
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"time"
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/registration/common"
@@ -14,6 +16,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type tierData struct {
+	tier int
+	cost int
+}
+
 type Authorizer interface {
 	Userinfo(ctx context.Context, accessToken string) (*authorizer.Userinfo, error)
 }
@@ -21,6 +28,7 @@ type Authorizer interface {
 type Store interface {
 	GetUpdateRegistration(context.Context, string) (*StoreOldRegistration, error)
 	UpdateRegistration(context.Context, *StoreUpdateRegistration, string) error
+	UpdateRegistrationTier(ctx context.Context, id string, newTier common.WeekendPassTier) error
 	GetDiscounts(ctx context.Context, codes []string) ([]string, []*common.StoreDiscount, error)
 }
 type SquareClient interface {
@@ -29,6 +37,7 @@ type SquareClient interface {
 	CreateCheckout(ctx context.Context, locationId, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error)
 	UpdateOrder(ctx context.Context, locationId, orderId string, order *square.Order, fieldsToClear []string, idempotencyKey string) (*square.Order, error)
 	BatchRetrieveOrders(ctx context.Context, locationId string, orderIds []string) ([]*square.Order, error)
+	BatchRetrieveInventoryCounts(ctx context.Context, catalogObjectIds, locationIds []string, updatedAfter *time.Time) square.BatchRetrieveInventoryCountsIterator
 }
 
 type Service struct {
@@ -312,6 +321,7 @@ func (s *Service) Update(ctx context.Context, token string, registration *Regist
 
 		s.logger.Trace("Fetching all items from square")
 		objects := s.client.ListCatalog(ctx, []square.CatalogObjectType{square.CatalogObjectTypeItem, square.CatalogObjectTypeDiscount})
+		tiers := map[string]tierData{}
 		for objects.Next() {
 			switch o := objects.Value().CatalogObjectType.(type) {
 			case *square.CatalogItem:
@@ -410,28 +420,41 @@ func (s *Service) Update(ctx context.Context, token string, registration *Regist
 					s.logger.Trace("Found full weekend pass item")
 
 					for _, v := range o.Variations {
-						quantity, ok := unpaidItems[v.Id]
-						if ok {
-							purchaseItems[common.FullWeekendPurchaseItem] = &square.OrderLineItem{CatalogObjectId: v.Id, Quantity: quantity}
-							break
-						}
-						pi, ok := purchaseItems[common.FullWeekendPurchaseItem]
-						if !ok {
-							continue
-						}
-
 						variation, ok := v.CatalogObjectType.(*square.CatalogItemVariation)
 						if !ok {
 							err := "Invalid response from square...item variation isn't a variation?"
 							s.logger.Error(err)
 							return "", errors.New(err)
 						}
+
+						switch variation.Name {
+						case utility.WeekendPassTier1Name:
+							tiers[v.Id] = tierData{1, variation.PriceMoney.Amount}
+						case utility.WeekendPassTier2Name:
+							tiers[v.Id] = tierData{2, variation.PriceMoney.Amount}
+						case utility.WeekendPassTier3Name:
+							tiers[v.Id] = tierData{3, variation.PriceMoney.Amount}
+						case utility.WeekendPassTier4Name:
+							tiers[v.Id] = tierData{4, variation.PriceMoney.Amount}
+						case utility.WeekendPassTier5Name:
+							tiers[v.Id] = tierData{5, variation.PriceMoney.Amount}
+						default: // Do nothing, we have other names that are allowable
+						}
+
+						quantity, ok := unpaidItems[v.Id]
+						if ok {
+							purchaseItems[common.FullWeekendPurchaseItem] = &square.OrderLineItem{Quantity: quantity}
+						}
+						pi, ok := purchaseItems[common.FullWeekendPurchaseItem]
+						if !ok {
+							continue
+						}
 						if variation.Name != tierString {
 							continue
 						}
 						s.logger.Trace("Found weekend pass")
 						pi.CatalogObjectId = v.Id
-						break
+						continue
 					}
 				}
 			case *square.CatalogDiscount:
@@ -456,6 +479,54 @@ func (s *Service) Update(ctx context.Context, token string, registration *Regist
 			wrap := "error fetching all items from square"
 			utility.LogSquareError(s.logger, objects.Error(), wrap)
 			return "", errors.Wrap(objects.Error(), wrap)
+		}
+
+		fullWeekendItem, ok := purchaseItems[common.FullWeekendPurchaseItem]
+		if ok {
+			// Check stock to make sure the requested order is still available.
+			lowestTier := 999999
+			lowestTierCost := 0
+			outOfStock := false
+			weekendPassIds := []string{}
+			for weekendPassId, _ := range tiers {
+				weekendPassIds = append(weekendPassIds, weekendPassId)
+			}
+			counts := s.client.BatchRetrieveInventoryCounts(ctx, weekendPassIds, nil, nil)
+			for counts.Next() {
+				quantity, err := strconv.ParseFloat(counts.Value().Quantity, 64)
+				if err != nil {
+					s.logger.WithField("quantity", counts.Value().Quantity).Error("could not convert quantity to float")
+					return "", errors.Wrapf(err, "could not convert quantity %s to float", counts.Value().Quantity)
+				}
+				if counts.Value().CatalogObjectId == fullWeekendItem.CatalogObjectId {
+					s.logger.Tracef("found requested item with quantity %d", quantity)
+					if quantity < 1 {
+						outOfStock = true
+					} else {
+						break
+					}
+				}
+				if quantity > 0 {
+					thisTier := tiers[counts.Value().CatalogObjectId]
+					s.logger.Tracef("tier %d", thisTier.tier)
+					if thisTier.tier < lowestTier {
+						s.logger.Tracef("new lowest tier found")
+						lowestTier = thisTier.tier
+						lowestTierCost = thisTier.cost
+					}
+				}
+			}
+			if outOfStock {
+				err := s.store.UpdateRegistrationTier(ctx, registration.Id, common.WeekendPassTier(lowestTier))
+				if err != nil {
+					s.logger.WithError(err).Error("error updating registration tier")
+					return "", errors.Wrap(err, "error updating registration tier")
+				}
+				return "", ErrOutOfStock{
+					NextTier: lowestTier,
+					NextCost: lowestTierCost,
+				}
+			}
 		}
 
 		order := &square.CreateOrderRequest{

@@ -252,7 +252,6 @@ function submitDiscount() {
 				return;
 			}
 		} catch(e) {
-			alert(e);
 			if (req.status != 200) {
 				window.location.href = siteBase + "/error/?source_page=/registration&message=status"+req.status;
 				return;

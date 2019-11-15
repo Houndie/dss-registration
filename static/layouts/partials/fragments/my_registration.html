@@ -11,6 +11,7 @@
 				</div>
 				Populating pricing information...
 			</div>
+			<div class="alert alert-danger" role="alert" id="updated-registration-alert"></div>
 			<form class="rjsf" action="javascript:void(0)" onsubmit="submitRegistration()">
 				<div class="form-group field field-object">
 					<fieldset>
@@ -163,7 +164,7 @@
 						</div>
 						<div class="form-group field field-boolean">
 							<div class="checkbox ">
-								<label><input type="checkbox" id="root_soloJazz" name="solo_jazz" disabled><span id="solo_jazz_label">Solo Jazz Competition</span></label>
+								<label><input type="checkbox" id="root_soloJazz" name="solo_jazz" disabled onchange="soloJazzShowHide()"><span id="solo_jazz_label">Solo Jazz Competition</span></label>
 							</div>
 							<div></div><div></div>
 						</div>
@@ -258,7 +259,7 @@
 							<div></div><div></div>
 						</div>
 						<div>
-							<p>Total: <span id="totalCount"><span></p>
+							<p>New Items Total: <span id="totalCount"></span></p>
 						</div>
 					</fieldset>
 					<div></div><div></div>
@@ -267,8 +268,9 @@
 					<h2>Unpaid Items</h2>
 					<ul id="orders-list">
 					</ul>
-					<p id="orders-cost"></p>
+					<p>Unpaid Items Total: <span id="orders-cost"></span></p>
 				</div>
+				<div class="alert alert-danger" role="alert" id="submit-alert"></div>
 				<p><input type="submit" value="Update" class="btn btn-info" id="submit-button"/></p>
 				<div id="submit-loading">
 					<div class="spinner-border" role="status">

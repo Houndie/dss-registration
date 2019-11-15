@@ -4,6 +4,7 @@ type jsonError struct {
 	Type                    jsonErrorType            `json:"type,omitempty"`
 	MissingParameterDetails *missingParameterDetails `json:"missing_parameter_details,omitempty"`
 	BadParameterDetails     *badParameterDetails     `json:"bad_parameter_details,omitempty"`
+	OutOfStockDetails       *outOfStockDetails       `json:"out_of_stock_details,omitempty"`
 }
 
 type jsonErrorType string
@@ -13,6 +14,7 @@ const (
 	jsonErrorTypeMissingParameter    jsonErrorType = "MISSING_PARAMETER"
 	jsonErrorTypeBadParameter        jsonErrorType = "BAD_PARAMETER"
 	jsonErrorTypeUnauthorized        jsonErrorType = "UNAUTHORIZED"
+	jsonErrorTypeOutOfStock          jsonErrorType = "OUT_OF_STOCK"
 )
 
 type missingParameterDetails struct {
@@ -23,6 +25,11 @@ type badParameterDetails struct {
 	ParameterName string `json:"parameter_name"`
 	SuppliedValue string `json:"supplied_value"`
 	Reason        string `json:"reason"`
+}
+
+type outOfStockDetails struct {
+	NextTier int `json:"next_tier"`
+	NextCost int `json:"next_cost"`
 }
 
 func internalServerError() *jsonError {
@@ -54,5 +61,15 @@ func badParameterError(parameterName, suppliedValue, reason string) *jsonError {
 func unauthorizedError() *jsonError {
 	return &jsonError{
 		Type: jsonErrorTypeUnauthorized,
+	}
+}
+
+func outOfStockError(nextTier, nextCost int) *jsonError {
+	return &jsonError{
+		Type: jsonErrorTypeOutOfStock,
+		OutOfStockDetails: &outOfStockDetails{
+			NextTier: nextTier,
+			NextCost: nextCost,
+		},
 	}
 }

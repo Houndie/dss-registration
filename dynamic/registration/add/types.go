@@ -43,3 +43,12 @@ type StoreRegistration struct {
 	OrderIds        []string
 	Discounts       []string
 }
+
+type ErrOutOfStock struct {
+	NextTier int
+	NextCost int
+}
+
+func (ErrOutOfStock) Error() string {
+	return "this item is out of stock"
+}

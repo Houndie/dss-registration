@@ -93,3 +93,12 @@ type ErrDiscountAlreadyApplied struct {
 func (e ErrDiscountAlreadyApplied) Error() string {
 	return fmt.Sprintf("discount with code %s already applied to this registration", e.Code)
 }
+
+type ErrOutOfStock struct {
+	NextTier int
+	NextCost int
+}
+
+func (ErrOutOfStock) Error() string {
+	return "this item is out of stock"
+}

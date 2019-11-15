@@ -3,6 +3,7 @@ package populate
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/Houndie/dss-registration/dynamic/square"
@@ -210,7 +211,12 @@ func (s *Service) Populate(ctx context.Context) (*FormData, error) {
 	}
 	counts := s.client.BatchRetrieveInventoryCounts(ctx, weekendPassIds, nil, nil)
 	for counts.Next() {
-		if counts.Value().Quantity != "0" {
+		quantity, err := strconv.ParseFloat(counts.Value().Quantity, 64)
+		if err != nil {
+			s.logger.WithField("quantity", counts.Value().Quantity).Error("could not convert quantity to float")
+			return nil, errors.Wrapf(err, "could not convert quantity %s to float", counts.Value().Quantity)
+		}
+		if quantity > 0 {
 			thisTier := tiers[counts.Value().CatalogObjectId]
 			if thisTier.tier < res.WeekendPassTier {
 				res.WeekendPassTier = thisTier.tier

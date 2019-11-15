@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/registration/common"
@@ -15,6 +17,11 @@ import (
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"github.com/sirupsen/logrus"
 )
+
+type tierData struct {
+	tier int
+	cost int
+}
 
 type MailClient interface {
 	Send(email *mail.SGMailV3) (*rest.Response, error)
@@ -31,6 +38,7 @@ type SquareClient interface {
 	ListLocations(ctx context.Context) ([]*square.Location, error)
 	CreateCheckout(ctx context.Context, locationId, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error)
 	UpdateOrder(ctx context.Context, locationId, orderId string, order *square.Order, fieldsToClear []string, idempotencyKey string) (*square.Order, error)
+	BatchRetrieveInventoryCounts(ctx context.Context, catalogObjectIds, locationIds []string, updatedAfter *time.Time) square.BatchRetrieveInventoryCountsIterator
 }
 
 type Authorizer interface {
@@ -168,6 +176,8 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 			return "", errors.Wrap(err, wrap)
 		}
 
+		// We'll need to fetch all the weekend pass ids in case of out of stock
+		tiers := map[string]tierData{}
 		for objects.Next() {
 			switch o := objects.Value().CatalogObjectType.(type) {
 			case *square.CatalogItem:
@@ -265,10 +275,22 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 							s.logger.Error(err)
 							return "", errors.New(err)
 						}
+						switch variation.Name {
+						case utility.WeekendPassTier1Name:
+							tiers[v.Id] = tierData{1, variation.PriceMoney.Amount}
+						case utility.WeekendPassTier2Name:
+							tiers[v.Id] = tierData{2, variation.PriceMoney.Amount}
+						case utility.WeekendPassTier3Name:
+							tiers[v.Id] = tierData{3, variation.PriceMoney.Amount}
+						case utility.WeekendPassTier4Name:
+							tiers[v.Id] = tierData{4, variation.PriceMoney.Amount}
+						case utility.WeekendPassTier5Name:
+							tiers[v.Id] = tierData{5, variation.PriceMoney.Amount}
+						default: // Do nothing, we have other names that are allowable
+						}
 						if variation.Name == tierString {
 							s.logger.Trace("Found weekend pass")
 							pi.CatalogObjectId = v.Id
-							break
 						}
 					}
 				}
@@ -298,6 +320,48 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 			wrap := "error fetching all items from square"
 			utility.LogSquareError(s.logger, objects.Error(), wrap)
 			return "", errors.Wrap(objects.Error(), wrap)
+		}
+
+		fullWeekendItem, ok := purchaseItems[common.FullWeekendPurchaseItem]
+		if ok {
+			// Check stock so that an open registration from day 1 doesn't still register for tier 1
+			lowestTier := 999999
+			lowestTierCost := 0
+			outOfStock := false
+			weekendPassIds := []string{}
+			for weekendPassId, _ := range tiers {
+				weekendPassIds = append(weekendPassIds, weekendPassId)
+			}
+			counts := s.client.BatchRetrieveInventoryCounts(ctx, weekendPassIds, nil, nil)
+			for counts.Next() {
+				quantity, err := strconv.ParseFloat(counts.Value().Quantity, 64)
+				if err != nil {
+					s.logger.WithField("quantity", counts.Value().Quantity).Error("could not convert quantity to float")
+					return "", errors.Wrapf(err, "could not convert quantity %s to float", counts.Value().Quantity)
+				}
+				if counts.Value().CatalogObjectId == fullWeekendItem.CatalogObjectId {
+					if quantity < 1 {
+						outOfStock = true
+					} else {
+						break
+					}
+				}
+				if quantity > 0 {
+					thisTier := tiers[counts.Value().CatalogObjectId]
+					s.logger.Tracef("tier %d", thisTier.tier)
+					if thisTier.tier < lowestTier {
+						s.logger.Tracef("new lowest tier found")
+						lowestTier = thisTier.tier
+						lowestTierCost = thisTier.cost
+					}
+				}
+			}
+			if outOfStock {
+				return "", ErrOutOfStock{
+					NextTier: lowestTier,
+					NextCost: lowestTierCost,
+				}
+			}
 		}
 
 		if len(discountsMap) != 0 {

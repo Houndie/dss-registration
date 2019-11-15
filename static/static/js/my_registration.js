@@ -66,6 +66,9 @@ var ordersDiv = document.getElementById('orders-div');
 var ordersList = document.getElementById('orders-list');
 var ordersCost = document.getElementById('orders-cost');
 var submitButton = document.getElementById('submit-button');
+var updatedRegistrationAlert = document.getElementById('updated-registration-alert');
+var submitAlert = document.getElementById('submit-alert');
+var submitLoading = document.getElementById('submit-loading');
 
 function onLoad() {
 	urlparams = new URLSearchParams(window.location.search);
@@ -123,10 +126,13 @@ function populateForm(populateRes, myRegistrationRes) {
 		break;
 	default:
 		danceOption.innerHTML = "Dance Only Pass (" + parseDollar(populateRes.dance_pass_cost) + ")";
+		dancePassCost = populateRes.dance_pass_cost;
 		fullWeekendOption.innerHTML = "Full Weekend Pass (Tier " + populateRes.weekend_pass_tier + " - " + parseDollar(populateRes.weekend_pass_cost) + ")";
+		fullWeekendCost = populateRes.weekend_pass_cost
 		current_tier = populateRes.weekend_pass_tier;
 		weekendPassSelector.disabled = false;
 		studentBox.disabled = false;
+		workshopLevelBox.disabled = false;
 	}
 
 	if (myRegistrationRes.registration.mix_and_match) {
@@ -135,14 +141,16 @@ function populateForm(populateRes, myRegistrationRes) {
 		mixAndMatchShowHide();
 	} else {
 		mixAndMatchBox.disabled = false;
-		mixAndMatchRoleDiv.disabled = false;
+		mixAndMatchRoleInput.disabled = false;
 		mixAndMatchLabel.innerHTML = "Mix And Match Competition (" + parseDollar(populateRes.mix_and_match_cost) + ")";
+		mixAndMatchCost = populateRes.mix_and_match_cost;
 	}
 	if (myRegistrationRes.registration.solo_jazz) {
 		soloJazzBox.checked = true;
 	} else {
 		soloJazzBox.disabled = false;
 		soloJazzLabel.innerHTML = "Solo Jazz Competition (" + parseDollar(populateRes.solo_jazz_cost) + ")";
+		soloJazzCost = populateRes.solo_jazz_cost;
 	}
 	if (myRegistrationRes.registration.team_competition) {
 		teamCompBox.checked = true;
@@ -152,6 +160,7 @@ function populateForm(populateRes, myRegistrationRes) {
 		teamCompBox.disabled = false;
 		teamNameInput.disabled = false;
 		teamCompLabel.innerHTML = "Team Competition (" + parseDollar(populateRes.team_comp_cost) + ")";
+		teamCompCost = populateRes.team_comp_cost;
 	}
 	if (myRegistrationRes.registration.tshirt) {
 		tShirtBox.checked = true;
@@ -161,6 +170,7 @@ function populateForm(populateRes, myRegistrationRes) {
 		tShirtBox.disabled = false;
 		tShirtSizeInput.disabled = false;
 		tShirtLabel.innerHTML = "T-Shirt (" + parseDollar(populateRes.tshirt_cost) + ")";
+		tshirtCost = populateRes.tshirt_cost;
 	}
 
 	firstNameBox.value = myRegistrationRes.registration.first_name;
@@ -198,6 +208,7 @@ function populateForm(populateRes, myRegistrationRes) {
 	housingShowHide();
 
 	if (typeof myRegistrationRes.registration.unpaid_items !== 'undefined') {
+		ordersList.innerHTML = "";
 		for (var i = 0; i < myRegistrationRes.registration.unpaid_items.items.length; i++) {
 			var text = document.createTextNode(myRegistrationRes.registration.unpaid_items.items[i]);
 			var li = document.createElement("LI");
@@ -205,6 +216,7 @@ function populateForm(populateRes, myRegistrationRes) {
 			ordersList.appendChild(li);
 		}
 		var text = document.createTextNode(parseDollar(myRegistrationRes.registration.unpaid_items.cost));
+		ordersCost.innerHTML = "";
 		ordersCost.appendChild(text);
 		submitButton.value = "Update & Pay";
 		ordersDiv.style.display = 'block';
@@ -217,12 +229,17 @@ function populateForm(populateRes, myRegistrationRes) {
 		}
 	}
 
+	recalculateTotal();
 	document.getElementById('populate-loading').style.display = 'none';
+	if (myRegistrationRes.registration.updated_tier) {
+		updatedRegistrationAlert.textContent = 'Your unpaid full weekend pass tier has sold out, and your registration has been updated to the next tier';
+		updatedRegistrationAlert.style.display = 'block';
+	}
 }
 
 function submitRegistration() {
 	submitButton.disabled = true;
-	document.getElementById('submit-loading').style.display = 'block';
+	submitLoading.style.display = 'block';
 	var j = new Object();
 	j.id = urlparams.get('registration_id')
 	j.first_name = firstNameBox.value;
@@ -288,11 +305,44 @@ function submitRegistration() {
 		if (req.readyState != 4) {
 			return
 		}
-		res = parseResponse(req);
-		if (!res) {
-			return
+		var registrationRes
+		try {
+			registrationRes = JSON.parse(req.responseText);
+			if (typeof registrationRes.errors !== "undefined" && registrationRes.errors.length != 0 && (registrationRes.errors.length != 1 || registrationRes.errors[0].type != "OUT_OF_STOCK")) {
+				window.location.href = siteBase + "/error/?source_page=/my_registration&message="+encodeURI(registrationResonseText);
+				return;
+			}
+
+			if (req.status != 200) {
+				window.location.href = siteBase + "/error/?source_page=/my_registration&message=status"+req.status;
+				return;
+			}
+		} catch(e) {
+			if (req.status != 200) {
+				window.location.href = siteBase + "/error/?source_page=/my_registration&message=status"+req.status;
+				return;
+			}
+			if (req.registrationResonseText == "") {
+				window.location.href = siteBase + "/error/?source_page=/my_registration&message=empty_registrationResonse_body";
+				return;
+			}
+
+			window.location.href = siteBase + "/error/?source_page=/my_registration&message="+req.responseText;
+			return;
 		}
-		window.location.href = res.checkout_url;
+		if (typeof registrationRes.errors !== "undefined") {
+			// Awkward hack, but the fastest way to code the updated existing cost is to just reload the page start
+			onLoad()
+			//current_tier = registrationRes.errors[0].out_of_stock_details.next_tier;
+			//fullWeekendCost = registrationRes.errors[0].out_of_stock_details.next_cost;
+			//fullWeekendOption.innerHTML = "Full Weekend Pass (Tier " + current_tier + " - " + parseDollar(fullWeekendCost) + ")"
+			submitAlert.textContent = 'Unfortunately, that tier is now sold out.  Your registration has been updated to the next available tier, submit your registration again to confirm.';
+			submitAlert.style.display = 'block';
+			submitButton.disabled = false;
+			submitLoading.style.display = 'none';
+		} else {
+			window.location.href = registrationRes.checkout_url;
+		}
 	}
 	req.open("POST", dynamicBase + "/UpdateRegistration", true)
 	req.setRequestHeader("Content-Type", "application/json")
