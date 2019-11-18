@@ -50,6 +50,7 @@ type registrationEntity struct {
 	OrderIds  []string
 	CreatedAt string
 	Discounts []*datastore.Key
+	Disabled  bool
 }
 
 const (

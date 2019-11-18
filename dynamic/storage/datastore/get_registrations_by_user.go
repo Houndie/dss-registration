@@ -11,7 +11,7 @@ import (
 )
 
 func (d *Datastore) GetRegistrationsByUser(ctx context.Context, userId string) ([]*listbyuser.StoreRegistration, error) {
-	q := datastore.NewQuery(registrationKind).Filter("UserId =", userId)
+	q := datastore.NewQuery(registrationKind).Filter("UserId =", userId).Filter("Disabled =", false)
 	t := d.client.Run(ctx, q)
 	registrations := []*listbyuser.StoreRegistration{}
 	for {

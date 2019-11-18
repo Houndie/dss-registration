@@ -35,6 +35,7 @@ func (s *Datastore) AddRegistration(ctx context.Context, r *add.StoreRegistratio
 		UserId:        r.UserId,
 		OrderIds:      r.OrderIds,
 		CreatedAt:     time.Now().Format(time.RFC3339),
+		Disabled:      false,
 		Discounts:     keys,
 	}
 
