@@ -51,15 +51,17 @@ type Service struct {
 	authorizer Authorizer
 	logger     *logrus.Logger
 	mailClient MailClient
+	active     bool
 }
 
-func NewService(logger *logrus.Logger, store Store, client SquareClient, authorizer Authorizer, mailClient MailClient) *Service {
+func NewService(logger *logrus.Logger, store Store, client SquareClient, authorizer Authorizer, mailClient MailClient, active bool) *Service {
 	return &Service{
 		store:      store,
 		logger:     logger,
 		client:     client,
 		authorizer: authorizer,
 		mailClient: mailClient,
+		active:     active,
 	}
 }
 
@@ -70,6 +72,10 @@ func containsPaidItems(r *Registration) bool {
 
 func (s *Service) Add(ctx context.Context, registration *Registration, redirectUrl, accessToken string) (string, error) {
 	s.logger.Trace("in add registration service")
+	if !s.active {
+		s.logger.Error("registration found when service is not active")
+		return "", errors.New("registration found when service is not active")
+	}
 	userid := ""
 	if accessToken != "" {
 		s.logger.Trace("found access token, calling userinfo endpoint")

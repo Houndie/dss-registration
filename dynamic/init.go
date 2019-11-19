@@ -5,6 +5,7 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"strconv"
 
 	"cloud.google.com/go/datastore"
 	"github.com/Houndie/dss-registration/dynamic/authorizer/google"
@@ -28,6 +29,7 @@ const (
 	SQUARE_API_KEY_CONFIG_KEY = "projects/dayton-smackdown-test/configs/registration/variables/square_key"
 	MAIL_API_KEY_CONFIG_KEY   = "projects/dayton-smackdown-test/configs/registration/variables/mail_key"
 	LOG_LEVEL                 = "projects/dayton-smackdown-test/configs/registration/variables/log_level"
+	ACTIVE_CONFIG_KEY         = "projects/dayton-smackdown-test/configs/registration/variables/active"
 	LOG_TRACE                 = "TRACE"
 	LOG_DEBUG                 = "DEBUG"
 	LOG_INFO                  = "INFO"
@@ -120,6 +122,21 @@ func init() {
 		os.Exit(1)
 	}
 
+	activeString, err := service.Projects.Configs.Variables.Get(ACTIVE_CONFIG_KEY).Do()
+	if err != nil {
+		logger.WithError(err).Fatal("could not fetch if registration is active")
+		os.Exit(1)
+	}
+	if activeString.Value != "" {
+		logger.WithError(err).Fatal("active config key set as value")
+		os.Exit(1)
+	}
+	active, err := strconv.ParseBool(activeString.Text)
+	if err != nil {
+		logger.WithError(err).WithField("active", active).Fatal("could not convert active config key to bool")
+		os.Exit(1)
+	}
+
 	httpClient := &http.Client{
 		Transport: &logRequests{
 			logger: logger,
@@ -141,7 +158,7 @@ func init() {
 	mail := sendgrid.NewSendClient(mailkey.Text)
 
 	populateService = populate.NewService(logger, squareClient)
-	addService = add.NewService(logger, store, squareClient, authorizer, mail)
+	addService = add.NewService(logger, store, squareClient, authorizer, mail, active)
 	listByUserService = listbyuser.NewService(authorizer, logger, store, squareClient)
 	getByIdService = getbyid.NewService(logger, authorizer, store, squareClient)
 	updateService = update.NewService(logger, authorizer, store, squareClient)
