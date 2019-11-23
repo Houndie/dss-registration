@@ -22,6 +22,7 @@ var myHousingDetailsBox = document.getElementById('root_myHousingDetails');
 var submitAlert = document.getElementById('submit-alert');
 var submitButton = document.getElementById('submit-button');
 var submitLoading = document.getElementById('submit-loading');
+var loginWarningDiv = document.getElementById('login-warning');
 
 function onLoad() {
 	var req = new XMLHttpRequest();
@@ -158,4 +159,12 @@ function submitRegistration() {
 	req.setRequestHeader("Content-Type", "application/json")
 	req.setRequestHeader("Accept", "application/json")
 	req.send(jsonString)
+}
+
+function signInOutHook(isSignedIn) {
+	if (isSignedIn) {
+		loginWarningDiv.style.display = 'none';
+	} else {
+		loginWarningDiv.style.display = 'block';
+	}
 }

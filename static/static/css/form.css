@@ -3,7 +3,6 @@
 	width: 50%;
 	padding-right: 1em;
 }
-
 #dss-lastName {
 	float: left;
 	width: 50%;
@@ -102,4 +101,18 @@
 
 #submit-alert {
 	display: none;
+}
+
+#login-warning {
+	text-align: center;
+	display: none;
+	color: #ab0000;
+}
+
+#second-sign-in {
+	background: none;
+	border: none;
+	font-weight: bold;
+	text-decoration: underline;
+	color: #ab0000;
 }

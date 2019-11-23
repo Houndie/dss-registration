@@ -63,6 +63,10 @@ function updateSigninStatus(isSignedIn) {
 		signoutButton.style.display = 'none';
 		myRegistrationsButton.style.display = 'none';
 	}
+
+	if (typeof signInOutHook === 'function') {
+		signInOutHook(isSignedIn);
+	}
 }
 
 /**

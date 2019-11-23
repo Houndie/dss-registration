@@ -5,6 +5,11 @@
 <div class="overlay container-fluid {{- printf " bg-%s" $bg -}}">
 	<div data-portal="">
 		<div class="container editor-container">
+			<div id="login-warning">
+				<h2>Warning: You are not signed in!</h2>
+				<p>You can still register without signing in, however you will be unable to make modifications to your registration later</p>
+				<button id="second-sign-in" onclick="handleSigninClick(event)">Sign in here</button>
+			</div>
 			<div id="populate-loading">
 				<div class="spinner-border" role="status">
 					<span class="sr-only">Loading...</span>
