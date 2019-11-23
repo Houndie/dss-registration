@@ -5,8 +5,10 @@
   <div class="overlay container-fluid
     {{- printf " bg-%s" $bg -}}
   ">
-	  <center>
-		  <iframe src="{{- $fragment.google }}" width="800" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
-	  </center>
+    <div class="container py-5 %!s(&lt;nil&gt;)">
+		  <div class="embed-responsive embed-responsive-16by9">
+		     <iframe class="embed-responsive-item" src="{{- $fragment.google }}" width="800" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
+		  </div>
+	  <div>
   </div>
 </section>
