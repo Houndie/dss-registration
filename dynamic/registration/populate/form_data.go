@@ -8,4 +8,5 @@ type FormData struct {
 	SoloJazzCost    int
 	TeamCompCost    int
 	TShirtCost      int
+	StudentDiscount int
 }

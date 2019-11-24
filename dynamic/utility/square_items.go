@@ -8,6 +8,8 @@ const (
 	WeekendPassItem = "Full Weekend Pass"
 	TShirtItem      = "2020 T-Shirt"
 
+	StudentDiscountItem = "Student Discount"
+
 	WeekendPassTier1Name = "Tier 1"
 	WeekendPassTier2Name = "Tier 2"
 	WeekendPassTier3Name = "Tier 3"

@@ -36,7 +36,7 @@ func NewService(logger *logrus.Logger, client SquareClient) *Service {
 
 func (s *Service) Populate(ctx context.Context) (*FormData, error) {
 	s.logger.Trace("Fetching all items from square")
-	objects := s.client.ListCatalog(ctx, nil)
+	objects := s.client.ListCatalog(ctx, []square.CatalogObjectType{square.CatalogObjectTypeItem, square.CatalogObjectTypeDiscount})
 	s.logger.Trace("Iterating over square list catalog responses")
 	res := &FormData{}
 	tiers := map[string]tierData{}
@@ -47,125 +47,140 @@ func (s *Service) Populate(ctx context.Context) (*FormData, error) {
 	tShirtFound := false
 	dancePassFound := false
 	weekendPassFound := false
+	studentDiscountFound := false
 	for objects.Next() {
 		s.logger.Trace("Found square object")
-		item, ok := objects.Value().CatalogObjectType.(*square.CatalogItem)
-		if !ok {
-			s.logger.Trace("Square object was not of type catalog item")
-			continue
-		}
-		s.logger.Tracef("Comparing item name %s to legend", item.Name)
-		switch item.Name {
-		case utility.MixAndMatchItem, utility.TeamCompItem, utility.SoloJazzItem, utility.TShirtItem:
-			if len(item.Variations) != 1 {
-				err := &ErrUnxpectedVariationCount{item.Name, len(item.Variations)}
-				s.logger.Error(err)
-				return nil, err
-			}
-			variation, ok := item.Variations[0].CatalogObjectType.(*square.CatalogItemVariation)
-			if !ok {
-				err := "Invalid response from square...item variation isn't a variation?"
-				s.logger.Error(err)
-				return nil, errors.New(err)
-			}
+		switch item := objects.Value().CatalogObjectType.(type) {
+		case *square.CatalogItem:
+			s.logger.Tracef("Comparing item name %s to legend", item.Name)
 			switch item.Name {
-			case utility.MixAndMatchItem:
-				mixAndMatchFound = true
-				res.MixAndMatchCost = variation.PriceMoney.Amount
-			case utility.TeamCompItem:
-				teamCompFound = true
-				res.TeamCompCost = variation.PriceMoney.Amount
-			case utility.SoloJazzItem:
-				soloJazzFound = true
-				res.SoloJazzCost = variation.PriceMoney.Amount
-			case utility.TShirtItem:
-				tShirtFound = true
-				res.TShirtCost = variation.PriceMoney.Amount
+			case utility.MixAndMatchItem, utility.TeamCompItem, utility.SoloJazzItem, utility.TShirtItem:
+				if len(item.Variations) != 1 {
+					err := &ErrUnxpectedVariationCount{item.Name, len(item.Variations)}
+					s.logger.Error(err)
+					return nil, err
+				}
+				variation, ok := item.Variations[0].CatalogObjectType.(*square.CatalogItemVariation)
+				if !ok {
+					err := "Invalid response from square...item variation isn't a variation?"
+					s.logger.Error(err)
+					return nil, errors.New(err)
+				}
+				switch item.Name {
+				case utility.MixAndMatchItem:
+					mixAndMatchFound = true
+					res.MixAndMatchCost = variation.PriceMoney.Amount
+				case utility.TeamCompItem:
+					teamCompFound = true
+					res.TeamCompCost = variation.PriceMoney.Amount
+				case utility.SoloJazzItem:
+					soloJazzFound = true
+					res.SoloJazzCost = variation.PriceMoney.Amount
+				case utility.TShirtItem:
+					tShirtFound = true
+					res.TShirtCost = variation.PriceMoney.Amount
+				default:
+					err := errors.New("Impossible code path...how did I get here")
+					s.logger.Error(err)
+					return nil, err
+				}
+			case utility.DancePassItem:
+				s.logger.Trace("Found dance pass item")
+				for _, v := range item.Variations {
+					variation, ok := v.CatalogObjectType.(*square.CatalogItemVariation)
+					if !ok {
+						err := "Invalid response from square...item variation isn't a variation?"
+						s.logger.Error(err)
+						return nil, errors.New(err)
+					}
+					if variation.Name == utility.DancePassPresaleName {
+						s.logger.Trace("Found dance pass variant Presale")
+						dancePassFound = true
+						res.DancePassCost = variation.PriceMoney.Amount
+						break
+					}
+				}
+				if !dancePassFound {
+					err := &ErrMissingVariation{item.Name, utility.DancePassPresaleName}
+					s.logger.Error(err)
+					return nil, err
+				}
+			case utility.WeekendPassItem:
+				s.logger.Trace("Found weekend pass object")
+				weekendPassFound = true
+
+				weekendPassTier1Found := false
+				weekendPassTier2Found := false
+				weekendPassTier3Found := false
+				weekendPassTier4Found := false
+				weekendPassTier5Found := false
+				for _, v := range item.Variations {
+					variation, ok := v.CatalogObjectType.(*square.CatalogItemVariation)
+					if !ok {
+						err := "Invalid response from square...item variation isn't a variation?"
+						s.logger.Error(err)
+						return nil, errors.New(err)
+					}
+
+					s.logger.Tracef("Found variation with name %s and id %s", variation.Name, v.Id)
+					switch variation.Name {
+					case utility.WeekendPassTier1Name:
+						weekendPassTier1Found = true
+						s.logger.Trace("Variation matched tier 1")
+						tiers[v.Id] = tierData{1, variation.PriceMoney.Amount}
+					case utility.WeekendPassTier2Name:
+						weekendPassTier2Found = true
+						s.logger.Trace("Variation matched tier 2")
+						tiers[v.Id] = tierData{2, variation.PriceMoney.Amount}
+					case utility.WeekendPassTier3Name:
+						weekendPassTier3Found = true
+						s.logger.Trace("Variation matched tier 3")
+						tiers[v.Id] = tierData{3, variation.PriceMoney.Amount}
+					case utility.WeekendPassTier4Name:
+						weekendPassTier4Found = true
+						s.logger.Trace("Variation matched tier 4")
+						tiers[v.Id] = tierData{4, variation.PriceMoney.Amount}
+					case utility.WeekendPassTier5Name:
+						weekendPassTier5Found = true
+						s.logger.Trace("Variation matched tier 5")
+						tiers[v.Id] = tierData{5, variation.PriceMoney.Amount}
+					default: // Do nothing, we have other names that are allowable
+						s.logger.Trace("Variation did not match tier list, moving on")
+					}
+				}
+				var err error
+				if !weekendPassTier1Found {
+					err = &ErrMissingVariation{item.Name, utility.WeekendPassTier1Name}
+				} else if !weekendPassTier2Found {
+					err = &ErrMissingVariation{item.Name, utility.WeekendPassTier2Name}
+				} else if !weekendPassTier3Found {
+					err = &ErrMissingVariation{item.Name, utility.WeekendPassTier3Name}
+				} else if !weekendPassTier4Found {
+					err = &ErrMissingVariation{item.Name, utility.WeekendPassTier4Name}
+				} else if !weekendPassTier5Found {
+					err = &ErrMissingVariation{item.Name, utility.WeekendPassTier5Name}
+				}
+				if err != nil {
+					s.logger.Error(err)
+					return nil, err
+				}
+			}
+		case *square.CatalogDiscount:
+			if item.Name != utility.StudentDiscountItem {
+				continue
+			}
+			studentDiscountFound = true
+			switch dt := item.DiscountType.(type) {
+			case *square.CatalogDiscountFixedAmount:
+				res.StudentDiscount = dt.AmountMoney.Amount
+			case *square.CatalogDiscountVariableAmount:
+				res.StudentDiscount = dt.AmountMoney.Amount
 			default:
-				err := errors.New("Impossible code path...how did I get here")
-				s.logger.Error(err)
-				return nil, err
+				s.logger.Error("cannot handle a percentage student discount")
+				return nil, errors.New("cannot handle a percentage student discount")
 			}
-		case utility.DancePassItem:
-			s.logger.Trace("Found dance pass item")
-			for _, v := range item.Variations {
-				variation, ok := v.CatalogObjectType.(*square.CatalogItemVariation)
-				if !ok {
-					err := "Invalid response from square...item variation isn't a variation?"
-					s.logger.Error(err)
-					return nil, errors.New(err)
-				}
-				if variation.Name == utility.DancePassPresaleName {
-					s.logger.Trace("Found dance pass variant Presale")
-					dancePassFound = true
-					res.DancePassCost = variation.PriceMoney.Amount
-					break
-				}
-			}
-			if !dancePassFound {
-				err := &ErrMissingVariation{item.Name, utility.DancePassPresaleName}
-				s.logger.Error(err)
-				return nil, err
-			}
-		case utility.WeekendPassItem:
-			s.logger.Trace("Found weekend pass object")
-			weekendPassFound = true
-
-			weekendPassTier1Found := false
-			weekendPassTier2Found := false
-			weekendPassTier3Found := false
-			weekendPassTier4Found := false
-			weekendPassTier5Found := false
-			for _, v := range item.Variations {
-				variation, ok := v.CatalogObjectType.(*square.CatalogItemVariation)
-				if !ok {
-					err := "Invalid response from square...item variation isn't a variation?"
-					s.logger.Error(err)
-					return nil, errors.New(err)
-				}
-
-				s.logger.Tracef("Found variation with name %s and id %s", variation.Name, v.Id)
-				switch variation.Name {
-				case utility.WeekendPassTier1Name:
-					weekendPassTier1Found = true
-					s.logger.Trace("Variation matched tier 1")
-					tiers[v.Id] = tierData{1, variation.PriceMoney.Amount}
-				case utility.WeekendPassTier2Name:
-					weekendPassTier2Found = true
-					s.logger.Trace("Variation matched tier 2")
-					tiers[v.Id] = tierData{2, variation.PriceMoney.Amount}
-				case utility.WeekendPassTier3Name:
-					weekendPassTier3Found = true
-					s.logger.Trace("Variation matched tier 3")
-					tiers[v.Id] = tierData{3, variation.PriceMoney.Amount}
-				case utility.WeekendPassTier4Name:
-					weekendPassTier4Found = true
-					s.logger.Trace("Variation matched tier 4")
-					tiers[v.Id] = tierData{4, variation.PriceMoney.Amount}
-				case utility.WeekendPassTier5Name:
-					weekendPassTier5Found = true
-					s.logger.Trace("Variation matched tier 5")
-					tiers[v.Id] = tierData{5, variation.PriceMoney.Amount}
-				default: // Do nothing, we have other names that are allowable
-					s.logger.Trace("Variation did not match tier list, moving on")
-				}
-			}
-			var err error
-			if !weekendPassTier1Found {
-				err = &ErrMissingVariation{item.Name, utility.WeekendPassTier1Name}
-			} else if !weekendPassTier2Found {
-				err = &ErrMissingVariation{item.Name, utility.WeekendPassTier2Name}
-			} else if !weekendPassTier3Found {
-				err = &ErrMissingVariation{item.Name, utility.WeekendPassTier3Name}
-			} else if !weekendPassTier4Found {
-				err = &ErrMissingVariation{item.Name, utility.WeekendPassTier4Name}
-			} else if !weekendPassTier5Found {
-				err = &ErrMissingVariation{item.Name, utility.WeekendPassTier5Name}
-			}
-			if err != nil {
-				s.logger.Error(err)
-				return nil, err
-			}
+		default:
+			s.logger.Error("Unknown catalog item type found")
 		}
 	}
 	if objects.Error() != nil {
@@ -187,6 +202,8 @@ func (s *Service) Populate(ctx context.Context) (*FormData, error) {
 		err = &ErrMissingCatalogItem{utility.WeekendPassItem}
 	} else if !tShirtFound {
 		err = &ErrMissingCatalogItem{utility.TShirtItem}
+	} else if !studentDiscountFound {
+		err = &ErrMissingCatalogItem{utility.StudentDiscountItem}
 	}
 	if err != nil {
 		s.logger.Error(err)

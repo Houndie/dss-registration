@@ -14,7 +14,6 @@ var stateBox = document.getElementById('root_state');
 var zipBox = document.getElementById('root_zip');
 var emailBox = document.getElementById('root_email');
 var homeSceneBox = document.getElementById('root_homeScene');
-var studentBox = document.getElementById('root_homeScene');
 var petAllergiesBox = document.getElementById('root_petAllergies');
 var housingRequestDetailsBox = document.getElementById('root_housingRequestDetails');
 var myPetsBox = document.getElementById('root_myPets');
@@ -42,6 +41,7 @@ function onLoad() {
 			teamCompCost = resp.team_comp_cost;
 			tShirtLabel.innerHTML = "T-Shirt (" + parseDollar(resp.tshirt_cost) + ")"
 			tshirtCost = resp.tshirt_cost;
+			studentDiscount = resp.student_discount;
 			recalculateTotal();
 			document.getElementById("populate-loading").style.display='none';
 		}

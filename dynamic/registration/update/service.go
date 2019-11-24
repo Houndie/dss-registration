@@ -296,6 +296,10 @@ func (s *Service) Update(ctx context.Context, token string, registration *Regist
 			purchaseItems[common.TShirtPurchaseItem] = &square.OrderLineItem{Quantity: "1"}
 		}
 
+		if registration.IsStudent {
+			discountsMap[utility.StudentDiscountItem] = common.FullWeekendPurchaseItem
+		}
+
 		unpaidItems := map[string]string{}
 		unpaidOrderIds := []string{}
 		unpaidOrders := []*square.Order{}
@@ -499,7 +503,7 @@ func (s *Service) Update(ctx context.Context, token string, registration *Regist
 					return "", errors.Wrapf(err, "could not convert quantity %s to float", counts.Value().Quantity)
 				}
 				if counts.Value().CatalogObjectId == fullWeekendItem.CatalogObjectId {
-					s.logger.Tracef("found requested item with quantity %d", quantity)
+					s.logger.Tracef("found requested item with quantity %v", quantity)
 					if quantity < 1 {
 						outOfStock = true
 					} else {

@@ -57,7 +57,6 @@ var stateBox = document.getElementById('root_state');
 var zipBox = document.getElementById('root_zip');
 var emailBox = document.getElementById('root_email');
 var homeSceneBox = document.getElementById('root_homeScene');
-var studentBox = document.getElementById('root_homeScene');
 var petAllergiesBox = document.getElementById('root_petAllergies');
 var housingRequestDetailsBox = document.getElementById('root_housingRequestDetails');
 var myPetsBox = document.getElementById('root_myPets');
@@ -133,7 +132,9 @@ function populateForm(populateRes, myRegistrationRes) {
 		weekendPassSelector.disabled = false;
 		studentBox.disabled = false;
 		workshopLevelBox.disabled = false;
+		studentDiscount = popuateRes.student_discount;
 	}
+
 
 	if (myRegistrationRes.registration.mix_and_match) {
 		mixAndMatchBox.checked = true;

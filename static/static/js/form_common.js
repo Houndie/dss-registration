@@ -6,6 +6,7 @@ var soloJazzCost = 0;
 var mixAndMatchCost = 0;
 var teamCompCost = 0;
 var tshirtCost = 0;
+var studentDiscount = 0;
 
 var fullWeekendPercentDiscounts = [];
 var fullWeekendDollarDiscounts = [];
@@ -20,6 +21,7 @@ var teamCompDollarDiscounts = [];
 var tshirtPercentDiscounts = [];
 var tshirtDollarDiscounts = [];
 
+var studentBox = document.getElementById("root_student");
 var weekendPassSelector = document.getElementById("root_weekendPassType");
 var workshopLevelBox = document.getElementById('root_workshopLevel');
 var workshopLevelDiv = document.getElementById('dss-workshopLevel')
@@ -102,6 +104,10 @@ function tShirtShowHide() {
 }
 
 function soloJazzShowHide() {
+	recalculateTotal();
+}
+
+function studentDiscountShowHide() {
 	recalculateTotal();
 }
 
@@ -357,7 +363,13 @@ function recalculateTotal() {
 			total += calculateCost(dancePassCost, dancePassPercentDiscounts, dancePassDollarDiscounts)
 			break;
 		case "Full":
-			total += calculateCost(fullWeekendCost, fullWeekendPercentDiscounts, fullWeekendDollarDiscounts)
+			dollardiscounts = [...fullWeekendDollarDiscounts]
+			if (studentBox.checked) {
+				var itemDiscount = new Object();
+				itemDiscount.dollar = studentDiscount
+				dollardiscounts.push(itemDiscount)
+			}
+			total += calculateCost(fullWeekendCost, fullWeekendPercentDiscounts, dollardiscounts)
 			break;
 	}
 	if (mixAndMatchBox.checked) {

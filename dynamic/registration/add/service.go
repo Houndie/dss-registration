@@ -159,6 +159,10 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 			purchaseItems[common.TShirtPurchaseItem] = &square.OrderLineItem{Quantity: "1"}
 		}
 
+		if registration.IsStudent {
+			discountsMap[utility.StudentDiscountItem] = common.FullWeekendPurchaseItem
+		}
+
 		s.logger.Trace("Fetching all locations from square")
 		locations, err := s.client.ListLocations(ctx)
 		if err != nil {

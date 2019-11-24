@@ -28,6 +28,7 @@ func PopulateForm(w http.ResponseWriter, r *http.Request) {
 		SoloJazzCost    int `json:"solo_jazz_cost"`
 		TeamCompCost    int `json:"team_comp_cost"`
 		TShirtCost      int `json:"tshirt_cost"`
+		StudentDiscount int `json:"student_discount"`
 	}{
 		WeekendPassCost: res.WeekendPassCost,
 		WeekendPassTier: res.WeekendPassTier,
@@ -36,6 +37,7 @@ func PopulateForm(w http.ResponseWriter, r *http.Request) {
 		SoloJazzCost:    res.SoloJazzCost,
 		TeamCompCost:    res.TeamCompCost,
 		TShirtCost:      res.TShirtCost,
+		StudentDiscount: res.StudentDiscount,
 	}
 	bytes, err := json.Marshal(&httpres)
 	if err != nil {
