@@ -1,8 +1,3 @@
-// Client ID and API key from the Developer Console
-var CLIENT_ID = '166144116294-c115t8bqllktva4qp6tvjjeqe7mdggu3.apps.googleusercontent.com';
-var API_KEY = 'AIzaSyAJaUR7I6ADbch4OX-WdkjlYsnOrhBx3xU';
-
-
 // Array of API discovery doc URLs for APIs used by the quickstart
 var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/people/v1/rest"];
 
@@ -13,6 +8,9 @@ var SCOPES = "https://www.googleapis.com/auth/userinfo.email";
 var authorizeButton = document.getElementById('authorize_button');
 var signoutButton = document.getElementById('signout_button');
 var myRegistrationsButton = document.getElementById('my_registrations_button');
+var oauthDiv = document.getElementById('oauth-data')
+var CLIENT_ID = oauthDiv.getAttribute('data-clientid')
+var API_KEY = oauthDiv.getAttribute('data-apikey')
 
 /**
 *  On load, called to load the auth2 library and API client library.

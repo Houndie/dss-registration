@@ -35,5 +35,5 @@ type Order struct {
 	TotalTaxMoney           *Money                   `json:"total_tax_money,omitempty"`
 	TotalDiscountMoney      *Money                   `json:"total_discount_money,omitempty"`
 	TotalServiceChargeMoney *Money                   `json:"total_service_charge_money,omitempty"`
-	Version                 int                      `json:"version"`
+	Version                 int                      `json:"version,omitempty"`
 }

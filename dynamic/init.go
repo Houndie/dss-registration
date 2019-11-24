@@ -26,10 +26,10 @@ import (
 )
 
 const (
-	SQUARE_API_KEY_CONFIG_KEY = "projects/dayton-smackdown-test/configs/registration/variables/square_key"
-	MAIL_API_KEY_CONFIG_KEY   = "projects/dayton-smackdown-test/configs/registration/variables/mail_key"
-	LOG_LEVEL                 = "projects/dayton-smackdown-test/configs/registration/variables/log_level"
-	ACTIVE_CONFIG_KEY         = "projects/dayton-smackdown-test/configs/registration/variables/active"
+	SQUARE_API_KEY_CONFIG_KEY = "square_key"
+	MAIL_API_KEY_CONFIG_KEY   = "mail_key"
+	LOG_LEVEL                 = "log_level"
+	ACTIVE_CONFIG_KEY         = "active"
 	LOG_TRACE                 = "TRACE"
 	LOG_DEBUG                 = "DEBUG"
 	LOG_INFO                  = "INFO"
@@ -52,6 +52,11 @@ var (
 )
 
 func init() {
+	configRoot := os.Getenv("CONFIG_ROOT")
+	if configRoot == "" {
+		logger.Fatalf("Config root environment variable not set")
+		os.Exit(1)
+	}
 	logger = logrus.New()
 	logger.SetFormatter(stackdriver.NewFormatter(
 		stackdriver.WithService("Registration"),
@@ -65,7 +70,7 @@ func init() {
 		os.Exit(1)
 	}
 
-	loglevel, err := service.Projects.Configs.Variables.Get(LOG_LEVEL).Do()
+	loglevel, err := service.Projects.Configs.Variables.Get(configRoot + LOG_LEVEL).Do()
 	if err != nil {
 		logger.WithError(err).Fatal("Could not fetch log level config")
 		os.Exit(1)
@@ -94,7 +99,7 @@ func init() {
 	}
 	logger.SetLevel(level)
 
-	squarekey, err := service.Projects.Configs.Variables.Get(SQUARE_API_KEY_CONFIG_KEY).Do()
+	squarekey, err := service.Projects.Configs.Variables.Get(configRoot + SQUARE_API_KEY_CONFIG_KEY).Do()
 	if err != nil {
 		logger.WithError(err).Fatal("Could not fetch square api key")
 		os.Exit(1)
@@ -108,7 +113,7 @@ func init() {
 		os.Exit(1)
 	}
 
-	mailkey, err := service.Projects.Configs.Variables.Get(MAIL_API_KEY_CONFIG_KEY).Do()
+	mailkey, err := service.Projects.Configs.Variables.Get(configRoot + MAIL_API_KEY_CONFIG_KEY).Do()
 	if err != nil {
 		logger.WithError(err).Fatal("Could not fetch sendgrid api key")
 		os.Exit(1)
@@ -122,7 +127,7 @@ func init() {
 		os.Exit(1)
 	}
 
-	activeString, err := service.Projects.Configs.Variables.Get(ACTIVE_CONFIG_KEY).Do()
+	activeString, err := service.Projects.Configs.Variables.Get(configRoot + ACTIVE_CONFIG_KEY).Do()
 	if err != nil {
 		logger.WithError(err).Fatal("could not fetch if registration is active")
 		os.Exit(1)
