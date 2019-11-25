@@ -106,6 +106,60 @@ googleAnalytics = ""
   weight = 10
 
 [[menu.main]]
+  url = "/2011_competition_results"
+  name = "2011 Competition Results"
+  parent = "Competitions"
+  weight = 20
+
+[[menu.main]]
+  url = "/2012_competition_results"
+  name = "2012 Competition Results"
+  parent = "Competitions"
+  weight = 30
+
+[[menu.main]]
+  url = "/2013_competition_results"
+  name = "2013 Competition Results"
+  parent = "Competitions"
+  weight = 40
+
+[[menu.main]]
+  url = "/2014_competition_results"
+  name = "2014 Competition Results"
+  parent = "Competitions"
+  weight = 50
+
+[[menu.main]]
+  url = "/2015_competition_results"
+  name = "2015 Competition Results"
+  parent = "Competitions"
+  weight = 60
+
+[[menu.main]]
+  url = "/2016_competition_results"
+  name = "2016 Competition Results"
+  parent = "Competitions"
+  weight = 70
+
+[[menu.main]]
+  url = "/2017_competition_results"
+  name = "2017 Competition Results"
+  parent = "Competitions"
+  weight = 80
+
+[[menu.main]]
+  url = "/2018_competition_results"
+  name = "2018 Competition Results"
+  parent = "Competitions"
+  weight = 90
+
+[[menu.main]]
+  url = "/2019_competition_results"
+  name = "2019 Competition Results"
+  parent = "Competitions"
+  weight = 100
+
+[[menu.main]]
   url = "#"
   name = "Venues"
   identitifer = "Venues"
