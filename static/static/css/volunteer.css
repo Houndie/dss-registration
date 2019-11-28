@@ -1,0 +1,27 @@
+#please_log_in{
+	display: none;
+}
+
+#form{
+	display: none;
+}
+
+#volunteer_submitted{
+	display: none;
+}
+
+#volunteer_exists{
+	display: none;
+}
+
+#second-sign-in {
+	background: none;
+	border: none;
+	font-weight: bold;
+	text-decoration: underline;
+	color: #ab0000;
+}
+
+#submit-loading {
+	display: none;
+}

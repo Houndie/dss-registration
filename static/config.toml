@@ -84,6 +84,12 @@ googleAnalytics = ""
   weight = 30
 
 [[menu.main]]
+  url = "/volunteer"
+  name = "Volunteer"
+  parent = "registration"
+  weight = 40
+
+[[menu.main]]
   url = "/classes"
   name = "Classes"
   weight = 20

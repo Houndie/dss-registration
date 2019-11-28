@@ -15,6 +15,7 @@ const (
 	jsonErrorTypeBadParameter        jsonErrorType = "BAD_PARAMETER"
 	jsonErrorTypeUnauthorized        jsonErrorType = "UNAUTHORIZED"
 	jsonErrorTypeOutOfStock          jsonErrorType = "OUT_OF_STOCK"
+	jsonErrorTypeExists              jsonErrorType = "ALREADY_EXISTS"
 )
 
 type missingParameterDetails struct {
@@ -71,5 +72,11 @@ func outOfStockError(nextTier, nextCost int) *jsonError {
 			NextTier: nextTier,
 			NextCost: nextCost,
 		},
+	}
+}
+
+func alreadyExistsError() *jsonError {
+	return &jsonError{
+		Type: jsonErrorTypeExists,
 	}
 }

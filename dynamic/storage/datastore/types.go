@@ -1,6 +1,10 @@
 package datastore
 
-import "cloud.google.com/go/datastore"
+import (
+	"time"
+
+	"cloud.google.com/go/datastore"
+)
 
 const (
 	registrationKind = "Registration"
@@ -78,4 +82,16 @@ const adminKind = "Admin"
 
 type adminEntity struct {
 	UserId string
+}
+
+const (
+	volunteerKind = "Volunteer"
+)
+
+type volunteerEntity struct {
+	UserId   string
+	Name     string
+	Email    string
+	Disabled bool
+	Created  time.Time
 }

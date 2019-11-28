@@ -15,3 +15,11 @@ type ErrNotFound struct {
 func (e ErrNotFound) Error() string {
 	return fmt.Sprintf("registration item with key %s not found in datastore", e.Key)
 }
+
+type ErrVolunteerExists struct {
+	UserId string
+}
+
+func (e ErrVolunteerExists) Error() string {
+	return fmt.Sprintf("volunteer submission for userid %s already exists", e.UserId)
+}

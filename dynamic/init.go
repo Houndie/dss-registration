@@ -18,6 +18,7 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/registration/update"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	storage "github.com/Houndie/dss-registration/dynamic/storage/datastore"
+	"github.com/Houndie/dss-registration/dynamic/volunteer"
 	stackdriver "github.com/TV4/logrus-stackdriver-formatter"
 	"github.com/gorilla/schema"
 	"github.com/sendgrid/sendgrid-go"
@@ -49,6 +50,7 @@ var (
 	updateService      *update.Service
 	addDiscountService *adddiscount.Service
 	getDiscountService *getdiscount.Service
+	volunteerService   *volunteer.Service
 )
 
 func init() {
@@ -169,6 +171,7 @@ func init() {
 	updateService = update.NewService(logger, authorizer, store, squareClient)
 	addDiscountService = adddiscount.NewService(logger, store, authorizer)
 	getDiscountService = getdiscount.NewService(logger, store, squareClient)
+	volunteerService = volunteer.NewService(logger, store, authorizer)
 	decoder = schema.NewDecoder()
 }
 

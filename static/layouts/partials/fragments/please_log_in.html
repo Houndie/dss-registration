@@ -1,0 +1,14 @@
+{{- $fragment := .self.Params -}}
+{{- $name := strings.TrimSuffix ".md" (replace .self.Name "/index.md" "") -}}
+{{- $bg := $fragment.background | default "secondary" }}
+
+{{- partial "helpers/container.html" (dict "start" true "in_slot" .in_slot "bg" $bg "Name" .Name "Params" .Params "section_class" "please-sign-in" "container_class" "overlay") -}}
+	<div data-portal="">
+		<div class="container editor-container">
+			<div id="please-log-in">
+				<h2>Please sign in to access this page</h2>
+				<button id="second-sign-in" onclick="handleSigninClick(event)">Sign in here</button>
+			</div>
+		</div>
+	</div>
+{{- partial "helpers/container.html" (dict "end" true "in_slot" .in_slot) -}}
