@@ -454,7 +454,6 @@ func (s *Service) Add(ctx context.Context, registration *Registration, redirectU
 			"tshirt":           registration.TShirt != nil,
 		},
 		To: []*mail.Email{to},
-		CC: []*mail.Email{from},
 	}
 
 	if registration.MixAndMatch != nil {
