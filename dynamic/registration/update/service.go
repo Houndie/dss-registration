@@ -539,7 +539,7 @@ func (s *Service) Update(ctx context.Context, token string, registration *Regist
 				ReferenceId: referenceId.String(),
 				LocationId:  locations[0].Id,
 				LineItems:   []*square.OrderLineItem{},
-				Version:     1,
+				//Version:     1,
 			},
 		}
 		for appliedTo, orderItem := range purchaseItems {

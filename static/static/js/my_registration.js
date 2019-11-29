@@ -138,7 +138,7 @@ function populateForm(populateRes, myRegistrationRes) {
 
 	if (myRegistrationRes.registration.mix_and_match) {
 		mixAndMatchBox.checked = true;
-		mixAndMatchRoleDiv.value = myRegistrationRes.registration.mix_and_match_role;
+		mixAndMatchRoleInput.value = myRegistrationRes.registration.mix_and_match_role;
 		mixAndMatchShowHide();
 	} else {
 		mixAndMatchBox.disabled = false;
