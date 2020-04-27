@@ -2,39 +2,32 @@ package datastore
 
 import (
 	"context"
-	"time"
+	"fmt"
 
 	"cloud.google.com/go/datastore"
-	"github.com/Houndie/dss-registration/dynamic/registration/listbyuser"
+	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/pkg/errors"
 	"google.golang.org/api/iterator"
 )
 
-func (d *Datastore) GetRegistrationsByUser(ctx context.Context, userId string) ([]*listbyuser.StoreRegistration, error) {
+func (d *Datastore) GetRegistrationsByUser(ctx context.Context, userId string) ([]*storage.Registration, error) {
 	q := datastore.NewQuery(registrationKind).Filter("UserId =", userId).Filter("Disabled =", false)
 	t := d.client.Run(ctx, q)
-	registrations := []*listbyuser.StoreRegistration{}
+	registrations := []*storage.Registration{}
 	for {
-		var r registrationEntity
-		key, err := t.Next(&r)
+		var re *registrationEntity
+		key, err := t.Next(re)
 		if err == iterator.Done {
 			break
 		}
 		if err != nil {
 			return nil, errors.Wrap(err, "error fetching registration from datastore")
 		}
-		createdAt, err := time.Parse(time.RFC3339, r.CreatedAt)
+		r, err := fromRegistrationEntity(key, re)
 		if err != nil {
-			return nil, errors.Wrapf(err, "error converting registration created at %s to understandable time", r.CreatedAt)
+			return nil, fmt.Errorf("error converting registration: %w", err)
 		}
-		registrations = append(registrations, &listbyuser.StoreRegistration{
-			Id:        key.Encode(),
-			FirstName: r.FirstName,
-			LastName:  r.LastName,
-			Email:     r.Email,
-			CreatedAt: createdAt,
-			OrderIds:  r.OrderIds,
-		})
+		registrations = append(registrations, r)
 	}
 	return registrations, nil
 }

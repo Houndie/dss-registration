@@ -4,112 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	"cloud.google.com/go/datastore"
-	"github.com/Houndie/dss-registration/dynamic/registration/common"
-	"github.com/Houndie/dss-registration/dynamic/registration/update"
-	"github.com/pkg/errors"
+	"github.com/Houndie/dss-registration/dynamic/storage"
 )
 
-func (s *Datastore) UpdateRegistration(ctx context.Context, r *update.StoreUpdateRegistration, id string) error {
-	key, err := datastore.DecodeKey(id)
+func (s *Datastore) UpdateRegistration(ctx context.Context, r *storage.Registration, id string) error {
+	key, re, err := toRegistrationEntity(r)
 	if err != nil {
-		return errors.Wrap(err, "error decoding registration key")
+		return fmt.Errorf("error parsing registration: %w", err)
 	}
-	registration := registrationEntity{}
-	err = s.client.Get(ctx, key, &registration)
-	if err != nil {
-		return errors.Wrap(err, "error fetching existing registration from database")
-	}
-	registration.FirstName = r.FirstName
-	registration.LastName = r.LastName
-	registration.StreetAddress = r.StreetAddress
-	registration.City = r.City
-	registration.State = r.State
-	registration.ZipCode = r.ZipCode
-	registration.Email = r.Email
-	registration.HomeScene = r.HomeScene
-	registration.IsStudent = r.IsStudent
-	registration.SoloJazz = r.SoloJazz
-	if len(r.ObsoleteOrderIds) > 0 {
-		newOrderIds := []string{}
-		for _, oldOrderId := range registration.OrderIds {
-			found := false
-			for _, removeOrderId := range r.ObsoleteOrderIds {
-				if removeOrderId == oldOrderId {
-					found = true
-					break
-				}
-			}
-			if found {
-				continue
-			}
-			newOrderIds = append(newOrderIds, oldOrderId)
-		}
-		registration.OrderIds = newOrderIds
-	}
-	if r.NewOrderId != "" {
-		registration.OrderIds = append(registration.OrderIds, r.NewOrderId)
-	}
-
-	switch p := r.PassType.(type) {
-	case *common.WeekendPass:
-		registration.WeekendPass = fullWeekendPass
-		registration.FullWeekendPassInfo.Level = int(p.Level)
-		registration.FullWeekendPassInfo.Tier = int(p.Tier)
-	case *common.DanceOnlyPass:
-		registration.WeekendPass = danceOnlyPass
-	case *common.NoPass:
-		registration.WeekendPass = noPass
-	default:
-		return fmt.Errorf("Found unknown type of weekend pass")
-	}
-
-	if r.MixAndMatch != nil {
-		registration.HasMixAndMatch = true
-		registration.MixAndMatchRole = string(r.MixAndMatch.Role)
-	}
-
-	if r.TeamCompetition != nil {
-		registration.HasTeamCompetition = true
-		registration.TeamCompetitionName = r.TeamCompetition.Name
-	}
-
-	if r.TShirt != nil {
-		registration.WantsTShirt = true
-		registration.TShirtStyle = string(r.TShirt.Style)
-	}
-
-	switch h := r.Housing.(type) {
-	case *common.ProvideHousing:
-		registration.HousingRequest = providesHousing
-		registration.ProvideHousing.Pets = h.Pets
-		registration.ProvideHousing.Quantity = h.Quantity
-		registration.ProvideHousing.Details = h.Details
-	case *common.RequireHousing:
-		registration.HousingRequest = requiresHousing
-		registration.RequireHousing.PetAllergies = h.PetAllergies
-		registration.RequireHousing.Details = h.Details
-	case *common.NoHousing:
-		registration.HousingRequest = noHousing
-	default:
-		return fmt.Errorf("Found unknown type of housing")
-	}
-
-	for _, newDiscount := range r.NewDiscounts {
-		translatedKey, err := datastore.DecodeKey(newDiscount)
-		if err != nil {
-			return errors.Wrap(err, "unable to translate discount key")
-		}
-		found := false
-		for _, discount := range registration.Discounts {
-			if translatedKey == discount {
-				found = true
-			}
-		}
-		if !found {
-			registration.Discounts = append(registration.Discounts, translatedKey)
-		}
-	}
-	_, err = s.client.Put(ctx, key, &registration)
-	return errors.Wrap(err, "Error inserting registration into database")
+	_, err = s.client.Put(ctx, key, re)
+	return fmt.Errorf("Error inserting registration into database", err)
 }

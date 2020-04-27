@@ -1,4 +1,30 @@
-package common
+package storage
+
+import "time"
+
+type Registration struct {
+	ID              string
+	FirstName       string
+	LastName        string
+	StreetAddress   string
+	City            string
+	State           string
+	ZipCode         string
+	Email           string
+	HomeScene       string
+	IsStudent       bool
+	PassType        PassType
+	MixAndMatch     *MixAndMatch
+	SoloJazz        bool
+	TeamCompetition *TeamCompetition
+	TShirt          *TShirt
+	Housing         Housing
+	UserId          string
+	OrderIds        []string
+	CreatedAt       time.Time
+	Discounts       []string
+	Disabled        bool
+}
 
 type WeekendPassLevel int
 type WeekendPassTier int
@@ -82,34 +108,3 @@ type RequireHousing struct {
 func (*NoHousing) isHousing()      {}
 func (*ProvideHousing) isHousing() {}
 func (*RequireHousing) isHousing() {}
-
-type PurchaseItem string
-
-const (
-	FullWeekendPurchaseItem     PurchaseItem = "Full Weekend"
-	DanceOnlyPurchaseItem       PurchaseItem = "Dance Only"
-	MixAndMatchPurchaseItem     PurchaseItem = "Mix And Match"
-	SoloJazzPurchaseItem        PurchaseItem = "Solo Jazz"
-	TeamCompetitionPurchaseItem PurchaseItem = "Team Competition"
-	TShirtPurchaseItem          PurchaseItem = "TShirt"
-)
-
-type ItemDiscount interface {
-	isItemDiscount()
-}
-
-type PercentDiscount struct {
-	Amount string
-}
-
-type DollarDiscount struct {
-	Amount int
-}
-
-func (*DollarDiscount) isItemDiscount()  {}
-func (*PercentDiscount) isItemDiscount() {}
-
-type StoreDiscount struct {
-	Name      string
-	AppliedTo PurchaseItem
-}
