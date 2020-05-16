@@ -1,35 +1,11 @@
-package adddiscount
+package registration
 
 import (
 	"context"
 
-	"github.com/Houndie/dss-registration/dynamic/authorizer"
+	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
-
-type Store interface {
-	IsAdmin(context.Context, string) (bool, error)
-	AddDiscount(context.Context, *Discount) error
-}
-
-type Authorizer interface {
-	Userinfo(ctx context.Context, accessToken string) (*authorizer.Userinfo, error)
-}
-
-type Service struct {
-	store      Store
-	authorizer Authorizer
-	logger     *logrus.Logger
-}
-
-func NewService(logger *logrus.Logger, store Store, authorizer Authorizer) *Service {
-	return &Service{
-		store:      store,
-		logger:     logger,
-		authorizer: authorizer,
-	}
-}
 
 func (s *Service) AddDiscount(ctx context.Context, token string, discount *Discount) error {
 	s.logger.Trace("add discount service")
@@ -54,7 +30,17 @@ func (s *Service) AddDiscount(ctx context.Context, token string, discount *Disco
 		return e
 	}
 
-	err = s.store.AddDiscount(ctx, discount)
+	singleDiscounts := make([]*storage.SingleDiscount, len(discount.Discounts))
+	for i, sd := range discount.Discounts {
+		singleDiscounts[i] = &storage.SingleDiscount{
+			Name:      sd.Name,
+			AppliedTo: sd.AppliedTo,
+		}
+	}
+	err = s.store.AddDiscount(ctx, &storage.Discount{
+		Code:      discount.Code,
+		Discounts: singleDiscounts,
+	})
 	if err != nil {
 		msg := "could not add discount to store"
 		s.logger.WithError(err).Error(msg)

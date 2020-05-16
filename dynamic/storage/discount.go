@@ -8,6 +8,7 @@ type SingleDiscount struct {
 }
 
 type Discount struct {
+	ID        string
 	Code      string
 	Discounts []*SingleDiscount
 }

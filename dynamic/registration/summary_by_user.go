@@ -1,45 +1,14 @@
-package listbyuser
+package registration
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
-type Authorizer interface {
-	Userinfo(ctx context.Context, accessToken string) (*authorizer.Userinfo, error)
-}
-
-type Store interface {
-	GetRegistrationsByUser(ctx context.Context, userId string) ([]*StoreRegistration, error)
-}
-
-type Service struct {
-	authorizer Authorizer
-	logger     *logrus.Logger
-	store      Store
-	client     SquareClient
-}
-
-type SquareClient interface {
-	ListLocations(ctx context.Context) ([]*square.Location, error)
-	BatchRetrieveOrders(ctx context.Context, locationId string, orderIds []string) ([]*square.Order, error)
-}
-
-func NewService(authorizer Authorizer, logger *logrus.Logger, store Store, client SquareClient) *Service {
-	return &Service{
-		authorizer: authorizer,
-		logger:     logger,
-		store:      store,
-		client:     client,
-	}
-}
-
-func (s *Service) ListByUser(ctx context.Context, token string) ([]*Registration, error) {
+func (s *Service) SummaryByUser(ctx context.Context, token string) ([]*Summary, error) {
 	s.logger.Trace("In list by user service")
 	s.logger.Tracef("fetching user-info for token %s", token)
 	userinfo, err := s.authorizer.Userinfo(ctx, token)
@@ -97,7 +66,7 @@ func (s *Service) ListByUser(ctx context.Context, token string) ([]*Registration
 	}
 
 	s.logger.Trace("assembling registration response")
-	registrations := make([]*Registration, len(r))
+	registrations := make([]*Summary, len(r))
 	for i, reg := range r {
 		paid := true
 		for _, id := range reg.OrderIds {
@@ -107,8 +76,8 @@ func (s *Service) ListByUser(ctx context.Context, token string) ([]*Registration
 			}
 		}
 
-		registrations[i] = &Registration{
-			Id:        reg.Id,
+		registrations[i] = &Summary{
+			ID:        reg.ID,
 			FirstName: reg.FirstName,
 			LastName:  reg.LastName,
 			Email:     reg.Email,

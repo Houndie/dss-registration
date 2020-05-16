@@ -22,7 +22,7 @@ type Registration struct {
 	UserId          string
 	OrderIds        []string
 	CreatedAt       time.Time
-	Discounts       []string
+	DiscountCodes   []string
 	Disabled        bool
 }
 
@@ -30,15 +30,15 @@ type WeekendPassLevel int
 type WeekendPassTier int
 
 const (
-	WeekendPassLevel1 WeekendPassLevel = 1
-	WeekendPassLevel2 WeekendPassLevel = 2
-	WeekendPassLevel3 WeekendPassLevel = 3
+	Level1 WeekendPassLevel = 1
+	Level2 WeekendPassLevel = 2
+	Level3 WeekendPassLevel = 3
 
-	WeekendPassTier1 WeekendPassTier = 1
-	WeekendPassTier2 WeekendPassTier = 2
-	WeekendPassTier3 WeekendPassTier = 3
-	WeekendPassTier4 WeekendPassTier = 4
-	WeekendPassTier5 WeekendPassTier = 5
+	Tier1 WeekendPassTier = 1
+	Tier2 WeekendPassTier = 2
+	Tier3 WeekendPassTier = 3
+	Tier4 WeekendPassTier = 4
+	Tier5 WeekendPassTier = 5
 )
 
 type PassType interface {

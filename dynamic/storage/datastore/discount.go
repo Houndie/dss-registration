@@ -3,6 +3,7 @@ package datastore
 import (
 	"fmt"
 
+	"cloud.google.com/go/datastore"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 )
 
@@ -60,7 +61,7 @@ func toDiscountEntity(d *storage.Discount) (*discountEntity, error) {
 	}, nil
 }
 
-func fromDiscountEntity(de *discountEntity) (*storage.Discount, error) {
+func fromDiscountEntity(key *datastore.Key, de *discountEntity) (*storage.Discount, error) {
 	singleDiscounts := make([]*storage.SingleDiscount, len(de.Discounts))
 	for i, sd := range de.Discounts {
 		var appliedTo storage.PurchaseItem
@@ -88,6 +89,7 @@ func fromDiscountEntity(de *discountEntity) (*storage.Discount, error) {
 	}
 
 	return &storage.Discount{
+		ID:        key.Encode(),
 		Code:      de.Code,
 		Discounts: singleDiscounts,
 	}, nil

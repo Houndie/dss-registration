@@ -1,5 +1,7 @@
 package utility
 
+import "github.com/Houndie/dss-registration/dynamic/storage"
+
 const (
 	MixAndMatchItem = "Mix And Match"
 	TeamCompItem    = "Team Competition"
@@ -8,14 +10,16 @@ const (
 	WeekendPassItem = "Full Weekend Pass"
 	TShirtItem      = "2020 T-Shirt"
 
-	StudentDiscountItem = "Student Discount"
-
-	WeekendPassTier1Name = "Tier 1"
-	WeekendPassTier2Name = "Tier 2"
-	WeekendPassTier3Name = "Tier 3"
-	WeekendPassTier4Name = "Tier 4"
-	WeekendPassTier5Name = "Tier 5"
+	StudentDiscountItem  = "Student Discount"
 	DancePassPresaleName = "Presale"
 )
+
+var WeekendPassName = map[storage.WeekendPassTier]string{
+	storage.Tier1: "Tier 1",
+	storage.Tier2: "Tier 2",
+	storage.Tier3: "Tier 3",
+	storage.Tier4: "Tier 4",
+	storage.Tier5: "Tier 5",
+}
 
 const SmackdownEmail = "info@daytonswingsmackdown.com"

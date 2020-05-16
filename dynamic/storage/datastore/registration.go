@@ -52,11 +52,11 @@ type registrationEntity struct {
 		Level int
 		Tier  int
 	}
-	UserId    string
-	OrderIds  []string
-	CreatedAt string
-	Discounts []*datastore.Key
-	Disabled  bool
+	UserId        string
+	OrderIds      []string
+	CreatedAt     string
+	DiscountCodes []string
+	Disabled      bool
 }
 
 func toRegistrationEntity(r *storage.Registration) (*datastore.Key, *registrationEntity, error) {
@@ -73,6 +73,7 @@ func toRegistrationEntity(r *storage.Registration) (*datastore.Key, *registratio
 		SoloJazz:      r.SoloJazz,
 		UserId:        r.UserId,
 		OrderIds:      r.OrderIds,
+		DiscountCodes: r.DiscountCodes,
 		CreatedAt:     r.CreatedAt.Format(time.RFC3339),
 		Disabled:      r.Disabled,
 	}
@@ -119,15 +120,6 @@ func toRegistrationEntity(r *storage.Registration) (*datastore.Key, *registratio
 		registration.HousingRequest = noHousing
 	default:
 		return nil, nil, fmt.Errorf("Found unknown type of housing")
-	}
-
-	discounts := make([]*datastore.Key, len(r.Discounts))
-	for i, discount := range r.Discounts {
-		var err error
-		discounts[i], err = datastore.DecodeKey(discount)
-		if err != nil {
-			return nil, nil, fmt.Errorf("error decoding discount key: %s")
-		}
 	}
 
 	var key *datastore.Key
@@ -199,11 +191,6 @@ func fromRegistrationEntity(key *datastore.Key, re *registrationEntity) (*storag
 		housing = &storage.NoHousing{}
 	}
 
-	discounts := make([]string, len(re.Discounts))
-	for i, discount := range re.Discounts {
-		discounts[i] = discount.Encode()
-	}
-
 	return &storage.Registration{
 		ID:              key.Encode(),
 		FirstName:       re.FirstName,
@@ -224,6 +211,6 @@ func fromRegistrationEntity(key *datastore.Key, re *registrationEntity) (*storag
 		UserId:          re.UserId,
 		OrderIds:        re.OrderIds,
 		CreatedAt:       createdAt,
-		Discounts:       discounts,
+		DiscountCodes:   re.DiscountCodes,
 	}, nil
 }

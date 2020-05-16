@@ -11,7 +11,7 @@ import (
 func (d *Datastore) GetDiscount(ctx context.Context, code string) (*storage.Discount, error) {
 	q := datastore.NewQuery(discountKind).Filter("Code =", code).Limit(1)
 	discounts := []*discountEntity{}
-	_, err := d.client.GetAll(ctx, q, &discounts)
+	keys, err := d.client.GetAll(ctx, q, &discounts)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching discounts with code %s from datastore: %w", code, err)
 	}
@@ -26,7 +26,7 @@ func (d *Datastore) GetDiscount(ctx context.Context, code string) (*storage.Disc
 		return nil, fmt.Errorf("somehow discovered %d discounts with code %s when only one was expected", len(discounts), code)
 	}
 
-	result, err := fromDiscountEntity(discounts[0])
+	result, err := fromDiscountEntity(keys[0], discounts[0])
 	if err != nil {
 		return nil, fmt.Errorf("error converting discount entity to storage type")
 	}

@@ -1,0 +1,38 @@
+package registration
+
+const (
+	mailFirstNameKey               = "first_name"
+	mailLastNameKey                = "last_name"
+	mailStreetAddressKey           = "street_address"
+	mailCityKey                    = "city"
+	mailStateKey                   = "state"
+	mailZipCodeKey                 = "zip_code"
+	mailEmailKey                   = "email"
+	mailHomeSceneKey               = "home_scene"
+	mailStudentKey                 = "student"
+	mailRegistrationIDKey          = "registration_id"
+	mailMixAndMatchKey             = "mix_and_match"
+	mailMixAndMatchRoleKey         = "mix_and_match_role"
+	mailSoloJazzKey                = "solo_jazz"
+	mailTeamCompKey                = "team_competition"
+	mailTeamCompNameKey            = "team_competition_name"
+	mailTShirtKey                  = "tshirt"
+	mailTShirtStyleKey             = "tshirt_style"
+	mailWeekendPassKey             = "weekend_pass_type"
+	mailWorkshopLevelKey           = "workshop_level"
+	mailHousingKey                 = "housing"
+	mailProvideHousingKey          = "provide_housing"
+	mailProvideHousingGuestsKey    = "guests"
+	mailProvideHousingPetsKey      = "pets"
+	mailProvideHousingDetailsKey   = "details"
+	mailRequireHousingKey          = "require_housing"
+	mailRequireHousingAllergiesKey = "pet_allergies"
+	mailRequireHousingDetailsKey   = "details"
+
+	mailFullWeekendValue    = "Full Weekend Pass"
+	mailDanceOnlyValue      = "Dance Only Pass"
+	mailNoPassValue         = false
+	mailProvideHousingValue = "I can provide housing"
+	mailRequireHousingValue = "I require housing"
+	mailNoHousingValue      = "I neither require nor can provide housing"
+)

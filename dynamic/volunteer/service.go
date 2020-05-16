@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
+	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/sirupsen/logrus"
 )
 
 type Store interface {
-	InsertVolunteer(ctx context.Context, submission *StoreVolunteerSubmission) error
+	InsertVolunteer(ctx context.Context, submission *storage.Volunteer) error
 	VolunteerExists(ctx context.Context, userId string) (bool, error)
 }
 
