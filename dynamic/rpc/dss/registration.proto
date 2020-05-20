@@ -1,0 +1,120 @@
+syntax = "proto3";
+
+package dss;
+option go_package = "dynamic/rpc/dss";
+
+service Registration {
+  rpc Add(RegistrationAddReq) returns (RegistrationAddRes);
+}
+
+message RegistrationInfo {
+	string id = 1;
+	string first_name = 2;
+	string last_name = 3;
+	string street_address = 4;
+	string city = 5;
+	string state = 6;
+	string zip_code = 7;
+	string email = 8;
+	string home_scene = 9;
+	bool is_student = 10;
+	oneof pass_type {
+		FullWeekendPass full_weekend_pass = 11;
+		DanceOnlyPass dance_only_pass = 12;
+		NoPass no_pass = 13;	
+	}
+	MixAndMatch mix_and_match = 14;
+	SoloJazz solo_jazz = 15;
+	TeamCompetition team_competition = 16;
+	TShirt tshirt = 17;
+	oneof housing {
+		ProvideHousing provide_housing = 18;
+		RequireHousing require_housing = 19;
+		NoHousing no_housing = 20;
+	}
+	repeated string discount_codes = 21;
+	string created_at = 22;
+}
+
+message FullWeekendPass {
+	enum Tier {
+		Tier1 = 0;
+		Tier2 = 1;
+		Tier3 = 2;
+		Tier4 = 3;
+		Tier5 = 4;
+	}
+	enum Level {
+		Level1 = 0;
+		Level2 = 1;
+		Level3 = 2;
+	}
+	Tier tier = 1;
+	Level level = 2;
+	bool paid = 3;
+}
+
+message DanceOnlyPass {
+	bool paid = 1;
+}
+
+message NoPass{}
+
+message MixAndMatch {
+	enum Role {
+		Follower = 0;
+		Leader = 1;
+	}
+	Role role = 1;
+	bool paid = 2;
+}
+
+message SoloJazz {
+	bool paid = 1;
+}
+
+message TeamCompetition {
+	string name = 1;
+	bool paid = 2;
+}
+
+message TShirt {
+	enum Style {
+		UnisexS = 0;
+		UnisexM = 1;
+		UnisexL = 2;
+		UnisexXL = 3;
+		Unisex2XL = 4;
+		Unisex3XL = 5;
+		BellaS = 6;
+		BellaM = 7;
+		BellaL = 8;
+		BellaXL = 9;
+		Bella2XL = 10;
+	}
+	Style style = 1;
+	bool paid = 2;
+}
+
+message ProvideHousing {
+	string pets = 1;
+	int64 quantity = 2;
+	string details = 3;
+}
+
+message RequireHousing {
+	string pet_allergies = 1;
+	string details = 2;
+}
+
+message NoHousing {}
+
+message RegistrationAddReq {
+	string idempotency_key = 1; 
+	RegistrationInfo registration = 2;
+	string redirect_url = 3;
+}
+
+message RegistrationAddRes {
+	string redirect_url = 1;
+}
