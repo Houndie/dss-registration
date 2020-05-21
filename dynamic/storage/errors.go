@@ -23,3 +23,27 @@ type ErrVolunteerExists struct {
 func (e ErrVolunteerExists) Error() string {
 	return fmt.Sprintf("volunteer submission for userid %s already exists", e.UserId)
 }
+
+type ErrDiscountExists struct {
+	Code string
+}
+
+func (e ErrDiscountExists) Error() string {
+	return fmt.Sprintf("discount with code %s already exists", e.Code)
+}
+
+type ErrDiscountNotFound struct {
+	Code string
+}
+
+func (e ErrDiscountNotFound) Error() string {
+	return fmt.Sprintf("discount with code %s not found", e.Code)
+}
+
+type ErrNoRegistrationForID struct {
+	ID string
+}
+
+func (e ErrNoRegistrationForID) Error() string {
+	return fmt.Sprintf("no registration found for id %s", e.ID)
+}

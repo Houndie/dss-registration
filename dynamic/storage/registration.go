@@ -23,7 +23,7 @@ type Registration struct {
 	OrderIds        []string
 	CreatedAt       time.Time
 	DiscountCodes   []string
-	Disabled        bool
+	Enabled         bool
 }
 
 type WeekendPassLevel int

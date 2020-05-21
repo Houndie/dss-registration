@@ -1,0 +1,17 @@
+version: "3"
+services:
+  db: 
+    image: postgres:12.3
+    ports:
+    - "5432:5432"
+    environment:
+    - POSTGRES_USER=dbuser
+    - POSTGRES_PASSWORD=dbpass
+  db-migrate:
+    image: migrate/migrate
+    volumes:
+    - ./dynamic/storage/postgres/migrations:/migrations
+    restart: on-failure
+    depends_on:
+    - db
+    command: "-path=/migrations -database postgres://dbuser:dbpass@db:5432/dbuser?sslmode=disable up"

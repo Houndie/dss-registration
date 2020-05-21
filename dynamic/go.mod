@@ -12,7 +12,10 @@ require (
 	github.com/golang/protobuf v1.4.0
 	github.com/google/go-cmp v0.4.0
 	github.com/gorilla/schema v1.1.0
+	github.com/jackc/pgconn v1.5.0
+	github.com/jackc/pgerrcode v0.0.0-20190803225404-afa3381909a6
 	github.com/jackc/pgx v3.6.2+incompatible
+	github.com/jackc/pgx/v4 v4.6.0
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/magefile/mage v1.8.0 // indirect
 	github.com/peterhellberg/duration v0.0.0-20190124114432-484232d632c1

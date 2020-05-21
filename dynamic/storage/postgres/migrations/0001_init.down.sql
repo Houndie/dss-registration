@@ -1,3 +1,11 @@
+DROP TABLE registrations
+DROP TYPE housing_type
+DROP TYPE tshirt_style_type
+DROP TYPE mix_and_match_role_type
+DROP TYPE full_weekend_tier_type
+DROP TYPE full_weekend_level_type
+DROP TYPE pass_type
+DROP TABLE admins
 DROP TABLE discounts
 DROP TYPE applied_to_type
 DROP TABLE discount_bundles

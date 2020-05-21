@@ -1,13 +1,15 @@
 package postgres
 
-import "github.com/jackc/pgx"
+import (
+	"github.com/jackc/pgx/v4/pgxpool"
+)
 
 type Store struct {
-	conn *pgx.Conn
+	pool *pgxpool.Pool
 }
 
-func NewStore(conn *pgx.Conn) *Store {
+func NewStore(pool *pgxpool.Pool) *Store {
 	return &Store{
-		conn: conn,
+		pool: pool,
 	}
 }
