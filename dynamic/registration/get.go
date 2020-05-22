@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/Houndie/dss-registration/dynamic/storage"
-	"github.com/pkg/errors"
 )
 
 func (s *Service) Get(ctx context.Context, token, registrationID string) (*Info, error) {
@@ -13,9 +12,7 @@ func (s *Service) Get(ctx context.Context, token, registrationID string) (*Info,
 	s.logger.Tracef("fetching user-info for token %s", token)
 	userinfo, err := s.authorizer.Userinfo(ctx, token)
 	if err != nil {
-		msg := "could not authorize user"
-		s.logger.WithError(err).Debug(msg)
-		return nil, errors.Wrap(err, msg)
+		return nil, fmt.Errorf("could not authorize user: %w", err)
 	}
 	s.logger.Tracef("found user %s", userinfo.UserId)
 
@@ -37,16 +34,12 @@ func (s *Service) Get(ctx context.Context, token, registrationID string) (*Info,
 		s.logger.Trace("fetching locations from square")
 		locations, err := s.client.ListLocations(ctx)
 		if err != nil {
-			msg := "error listing locations from square"
-			s.logger.WithError(err).Error(msg)
-			return nil, errors.Wrap(err, msg)
+			return nil, fmt.Errorf("error listing locations from square: %w", err)
 		}
 		s.logger.Tracef("found %d locations", len(locations))
 
 		if len(locations) != 1 {
-			msg := fmt.Errorf("found unexpected number of locations %d", len(locations))
-			s.logger.Error(msg)
-			return nil, msg
+			return nil, fmt.Errorf("found unexpected number of locations %d", len(locations))
 		}
 		s.logger.Tracef("found location %s", locations[0].Id)
 

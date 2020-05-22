@@ -7,9 +7,7 @@ import (
 
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
-	"github.com/Houndie/dss-registration/dynamic/utility"
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
@@ -127,8 +125,7 @@ func discountCodeMap(ctx context.Context, store Store, discountCodes []string) (
 func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idempotencyKey, accessToken string) (string, error) {
 	s.logger.Trace("in add registration service")
 	if !s.active {
-		s.logger.Error("registration found when service is not active")
-		return "", errors.New("registration found when service is not active")
+		return "", ErrRegistrationDisabled
 	}
 
 	returnerURL := redirectUrl
@@ -138,9 +135,7 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 		s.logger.Trace("generating reference id")
 		referenceId, err := uuid.NewV4()
 		if err != nil {
-			wrap := "error generating reference id"
-			s.logger.WithError(err).Error(wrap)
-			return "", errors.Wrap(err, wrap)
+			return "", fmt.Errorf("error generating reference id: %w", err)
 		}
 
 		discounts, err := discountCodeMap(ctx, s.store, registration.DiscountCodes)
@@ -151,22 +146,16 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 		s.logger.Trace("Fetching all locations from square")
 		locations, err := s.client.ListLocations(ctx)
 		if err != nil {
-			wrap := "error listing locations from square"
-			utility.LogSquareError(s.logger, err, wrap)
-			return "", errors.Wrap(err, wrap)
+			return "", fmt.Errorf("error listing locations from square: %w", err)
 		}
 		if len(locations) != 1 {
-			err := fmt.Errorf("found wrong number of locations %v", len(locations))
-			s.logger.Error(err)
-			return "", err
+			return "", fmt.Errorf("found wrong number of locations %v", len(locations))
 		}
 
 		s.logger.Trace("Fetching all items from square")
 		squareData, err := getSquareCatalog(ctx, s.client)
 		if err != nil {
-			wrap := "error fetching all items from square"
-			utility.LogSquareError(s.logger, err, wrap)
-			return "", errors.Wrap(err, wrap)
+			return "", fmt.Errorf("error fetching all items from square: %w", err)
 		}
 
 		myFullWeekend, ok := registration.PassType.(*WeekendPass)
@@ -199,6 +188,9 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 
 		s.logger.Trace("creating checkout with square")
 		returnerURL, orderID, err = createCheckout(ctx, s.client, locations[0].Id, idempotencyKey, order, registration.Email, redirectUrl)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	s.logger.Trace("Adding registration to database")
@@ -207,9 +199,7 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 		s.logger.Trace("found access token, calling userinfo endpoint")
 		userinfo, err := s.authorizer.Userinfo(ctx, accessToken)
 		if err != nil {
-			msg := "error fetching userinfo"
-			s.logger.WithError(err).Debug(msg)
-			return "", errors.Wrap(err, msg)
+			return "", fmt.Errorf("error fetching userinfo: %w", err)
 		}
 		userid = userinfo.UserId
 	}
@@ -241,9 +231,7 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 	}
 	registrationId, err := s.store.AddRegistration(ctx, storeRegistration)
 	if err != nil {
-		wrap := "error adding registration to database"
-		s.logger.WithError(err).Error(wrap)
-		return "", errors.Wrap(err, wrap)
+		return "", fmt.Errorf("error adding registration to database: %w", err)
 	}
 
 	s.logger.Trace("sending registration email")
@@ -312,14 +300,10 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 	}
 	mailResp, err := s.mailClient.Send(message)
 	if err != nil {
-		wrap := "error sending registration email"
-		s.logger.WithError(err).Error(wrap)
-		return "", errors.Wrap(err, wrap)
+		return "", fmt.Errorf("error sending registration email: %w", err)
 	}
 	if mailResp.StatusCode != http.StatusAccepted {
-		err := fmt.Errorf("received bad status code %v", mailResp.StatusCode)
-		s.logger.WithField("sendgrid response", mailResp).Error(err)
-		return "", err
+		return "", fmt.Errorf("received bad status code %v", mailResp.StatusCode)
 	}
 	return returnerURL, nil
 }

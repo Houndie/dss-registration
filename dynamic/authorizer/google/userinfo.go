@@ -37,7 +37,10 @@ func (a *Authorizer) Userinfo(ctx context.Context, accessToken string) (*authori
 		return nil, errors.Wrap(err, "error fetching userinfo from open id endpoint")
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
+	switch res.StatusCode {
+	case http.StatusNotFound:
+		return nil, authorizer.Unauthenticated
+	default:
 		return nil, fmt.Errorf("call to fetch user info did not return %d, instead found %d", http.StatusOK, res.StatusCode)
 	}
 

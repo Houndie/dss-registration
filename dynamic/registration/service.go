@@ -25,7 +25,6 @@ type MailClient interface {
 }
 
 type Store interface {
-	AddDiscount(context.Context, *storage.Discount) error
 	AddRegistration(context.Context, *storage.Registration) (string, error)
 	GetDiscount(context.Context, string) (*storage.Discount, error)
 	GetRegistrationsByUser(ctx context.Context, userId string) ([]*storage.Registration, error)

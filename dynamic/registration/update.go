@@ -7,7 +7,6 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 )
 
 func checkOldPurchases(newRegistration *Info, oldRegistration *storage.Registration) error {
@@ -113,14 +112,13 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 	s.logger.Tracef("fetching user-info for token %s", token)
 	userinfo, err := s.authorizer.Userinfo(ctx, token)
 	if err != nil {
-		msg := "could not authorize user"
-		s.logger.WithError(err).Debug(msg)
-		return "", errors.Wrap(err, msg)
+		return "", fmt.Errorf("could not authorize user: %w", err)
 	}
 	s.logger.Tracef("found user %s", userinfo.UserId)
 
 	if oldRegistration.UserId != userinfo.UserId {
-		s.logger.Debugf("registration found does not belong to user")
+		s.logger.WithError(err).Debug("user id does not match that of found registration")
+		s.logger.WithError(err).Tracef("registration provided user id %s, user provided %s", oldRegistration.UserId, userinfo.UserId)
 		return "", storage.ErrNotFound{Key: registration.ID}
 	}
 

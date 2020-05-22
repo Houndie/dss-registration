@@ -15,3 +15,9 @@ services:
     depends_on:
     - db
     command: "-path=/migrations -database postgres://dbuser:dbpass@db:5432/dbuser?sslmode=disable up"
+  backend:
+    build: 
+      context: dynamic
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8080:80"

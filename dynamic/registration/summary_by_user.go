@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/Houndie/dss-registration/dynamic/square"
-	"github.com/pkg/errors"
 )
 
 func (s *Service) SummaryByUser(ctx context.Context, token string) ([]*Summary, error) {
@@ -13,34 +12,29 @@ func (s *Service) SummaryByUser(ctx context.Context, token string) ([]*Summary, 
 	s.logger.Tracef("fetching user-info for token %s", token)
 	userinfo, err := s.authorizer.Userinfo(ctx, token)
 	if err != nil {
-		msg := "could not authorize user"
-		s.logger.WithError(err).Debug(msg)
-		return nil, errors.Wrap(err, msg)
+		return nil, fmt.Errorf("could not authorize user: %w", err)
 	}
 	s.logger.Tracef("found user %s", userinfo.UserId)
 
 	s.logger.Tracef("fetching registrations for user %s", userinfo.UserId)
 	r, err := s.store.GetRegistrationsByUser(ctx, userinfo.UserId)
 	if err != nil {
-		msg := "error fetching registrations from store"
-		s.logger.WithError(err).Error(msg)
-		return nil, errors.Wrap(err, msg)
+		return nil, fmt.Errorf("error fetching registrations from store: %w", err)
 	}
 	s.logger.Tracef("found %d registrations", len(r))
+	if len(r) == 0 {
+		return nil, nil
+	}
 
 	s.logger.Trace("fetching locations from square")
 	locations, err := s.client.ListLocations(ctx)
 	if err != nil {
-		msg := "error listing locations from square"
-		s.logger.WithError(err).Error(msg)
-		return nil, errors.Wrap(err, msg)
+		return nil, fmt.Errorf("error listing locations from square: %w", err)
 	}
 	s.logger.Tracef("found %d locations", len(locations))
 
 	if len(locations) != 1 {
-		msg := fmt.Errorf("found unexpected number of locations %d", len(locations))
-		s.logger.Error(msg)
-		return nil, msg
+		return nil, fmt.Errorf("found unexpected number of locations %d", len(locations))
 	}
 	s.logger.Tracef("found location %s", locations[0].Id)
 
@@ -55,9 +49,7 @@ func (s *Service) SummaryByUser(ctx context.Context, token string) ([]*Summary, 
 		s.logger.Trace("retrieving orders from square")
 		orders, err := s.client.BatchRetrieveOrders(ctx, locations[0].Id, orderIds)
 		if err != nil {
-			msg := "error retrieving orders matching ids"
-			s.logger.WithError(err).Error(msg)
-			return nil, errors.Wrap(err, msg)
+			return nil, fmt.Errorf("error retrieving orders matching ids: %w", err)
 		}
 
 		for _, order := range orders {

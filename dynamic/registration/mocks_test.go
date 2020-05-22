@@ -17,7 +17,6 @@ func (m *mockMailClient) Send(email *mail.SGMailV3) (*rest.Response, error) {
 }
 
 type mockStore struct {
-	AddDiscountFunc            func(context.Context, *storage.Discount) error
 	AddRegistrationFunc        func(context.Context, *storage.Registration) (string, error)
 	GetDiscountFunc            func(context.Context, string) (*storage.Discount, error)
 	GetRegistrationFunc        func(context.Context, string) (*storage.Registration, error)
@@ -32,10 +31,6 @@ func (m *mockStore) AddRegistration(ctx context.Context, registration *storage.R
 
 func (m *mockStore) GetDiscount(ctx context.Context, code string) (*storage.Discount, error) {
 	return m.GetDiscountFunc(ctx, code)
-}
-
-func (m *mockStore) AddDiscount(ctx context.Context, discount *storage.Discount) error {
-	return m.AddDiscountFunc(ctx, discount)
 }
 
 func (m *mockStore) IsAdmin(ctx context.Context, userID string) (bool, error) {

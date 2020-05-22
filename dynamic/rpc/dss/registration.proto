@@ -5,6 +5,10 @@ option go_package = "dynamic/rpc/dss";
 
 service Registration {
   rpc Add(RegistrationAddReq) returns (RegistrationAddRes);
+  rpc Get(RegistrationGetReq) returns (RegistrationGetRes);
+  rpc GetSummary(RegistrationGetSummaryReq) returns (RegistrationGetSummaryRes);
+  rpc Prices(RegistrationPricesReq) returns (RegistrationPricesRes);
+  rpc Update(RegistrationUpdateReq) returns (RegistrationUpdateRes);
 }
 
 message RegistrationInfo {
@@ -36,21 +40,22 @@ message RegistrationInfo {
 	string created_at = 22;
 }
 
+enum FullWeekendPassTier {
+	Tier1 = 0;
+	Tier2 = 1;
+	Tier3 = 2;
+	Tier4 = 3;
+	Tier5 = 4;
+}
+enum FullWeekendPassLevel {
+	Level1 = 0;
+	Level2 = 1;
+	Level3 = 2;
+}
+
 message FullWeekendPass {
-	enum Tier {
-		Tier1 = 0;
-		Tier2 = 1;
-		Tier3 = 2;
-		Tier4 = 3;
-		Tier5 = 4;
-	}
-	enum Level {
-		Level1 = 0;
-		Level2 = 1;
-		Level3 = 2;
-	}
-	Tier tier = 1;
-	Level level = 2;
+	FullWeekendPassTier tier = 1;
+	FullWeekendPassLevel level = 2;
 	bool paid = 3;
 }
 
@@ -117,4 +122,57 @@ message RegistrationAddReq {
 
 message RegistrationAddRes {
 	string redirect_url = 1;
+}
+
+message RegistrationGetReq {
+	string id = 1;
+}
+
+message RegistrationGetRes {
+	RegistrationInfo registration = 1;
+}
+
+message RegistrationPricesReq {}
+
+message Discount {
+	oneof amount {
+		int64 dollar = 8;
+		string percent = 9;
+	}
+}
+
+message RegistrationPricesRes{
+	int64 weekend_pass_cost = 1;
+	FullWeekendPassTier weekend_pass_tier = 2;
+	int64 dance_pass_cost = 3;
+	int64 mix_and_match_cost = 4;
+	int64 solo_jazz_cost = 5;
+	int64 team_competition_cost = 6;
+	int64 tshirt_cost = 7;
+	Discount student_discount = 8;
+}
+
+message RegistrationUpdateReq {
+	string idempotency_key = 1;
+	RegistrationInfo registration = 2;
+	string redirect_url = 3;
+}
+
+message RegistrationUpdateRes {
+	string redirect_url = 1;
+}
+
+message RegistrationGetSummaryReq {}
+
+message RegistrationSummary{
+	string id = 1;
+	string first_name = 2;
+	string last_name = 3;
+	string email = 4;
+	string created_at = 5;
+	bool paid = 6;
+}
+
+message RegistrationGetSummaryRes{
+	repeated RegistrationSummary summaries = 1;
 }

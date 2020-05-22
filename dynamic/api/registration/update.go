@@ -5,16 +5,17 @@ import (
 	"errors"
 
 	"github.com/Houndie/dss-registration/dynamic/api"
+	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/registration"
 	pb "github.com/Houndie/dss-registration/dynamic/rpc/dss"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/twitchtv/twirp"
 )
 
-func (s *Server) Add(ctx context.Context, req *pb.RegistrationAddReq) (*pb.RegistrationAddRes, error) {
+func (s *Server) Update(ctx context.Context, req *pb.RegistrationUpdateReq) (*pb.RegistrationUpdateRes, error) {
 	auth, ok := api.GetAuth(ctx)
 	if !ok {
-		auth = ""
+		return nil, twirp.NewError(twirp.Unauthenticated, "unauthenticated")
 	}
 
 	info, err := fromProtoc(req.Registration)
@@ -40,7 +41,8 @@ func (s *Server) Add(ctx context.Context, req *pb.RegistrationAddReq) (*pb.Regis
 		}
 		return nil, err
 	}
-	redirectURL, err := s.service.Add(ctx, info, req.RedirectUrl, req.IdempotencyKey, auth)
+
+	redirectURL, err := s.service.Update(ctx, auth, req.IdempotencyKey, info, req.RedirectUrl)
 	if err != nil {
 		var noDiscountErr storage.ErrDiscountNotFound
 		var outOfStockErr registration.ErrOutOfStock
@@ -50,11 +52,12 @@ func (s *Server) Add(ctx context.Context, req *pb.RegistrationAddReq) (*pb.Regis
 			return nil, twirp.NewError(twirp.FailedPrecondition, "registration is disabled")
 		} else if errors.As(err, &outOfStockErr) {
 			return nil, twirp.NewError(twirp.FailedPrecondition, outOfStockErr.Error()).WithMeta("next_tier", string(outOfStockErr.NextTier)).WithMeta("next_cost", string(outOfStockErr.NextCost))
+		} else if errors.Is(err, authorizer.Unauthenticated) {
+			return nil, twirp.NewError(twirp.Unauthenticated, "unauthenticated")
 		}
 		return nil, err
 	}
-	return &pb.RegistrationAddRes{
+	return &pb.RegistrationUpdateRes{
 		RedirectUrl: redirectURL,
 	}, nil
-
 }
