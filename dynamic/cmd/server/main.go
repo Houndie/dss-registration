@@ -6,8 +6,11 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Houndie/dss-registration/dynamic/api"
+	api_discount "github.com/Houndie/dss-registration/dynamic/api/discount"
 	api_registration "github.com/Houndie/dss-registration/dynamic/api/registration"
 	"github.com/Houndie/dss-registration/dynamic/authorizer/google"
+	"github.com/Houndie/dss-registration/dynamic/discount"
 	"github.com/Houndie/dss-registration/dynamic/registration"
 	pb "github.com/Houndie/dss-registration/dynamic/rpc/dss"
 	"github.com/Houndie/dss-registration/dynamic/square"
@@ -40,10 +43,19 @@ func run() error {
 	}
 	store := postgres.NewStore(pool)
 	mailClient := sendgrid.NewSendClient(viper.GetString("mail_key"))
-	service := registration.NewService(true, logger, squareClient, authorizer, store, mailClient)
-	server := api_registration.NewServer(service)
-	twirpHandler := pb.NewRegistrationServer(server, nil)
 
-	http.ListenAndServe(":80", twirpHandler)
+	mux := http.NewServeMux()
+
+	registrationService := registration.NewService(true, logger, squareClient, authorizer, store, mailClient)
+	registrationServer := api_registration.NewServer(registrationService)
+	registrationHandler := pb.NewRegistrationServer(registrationServer, nil)
+	mux.Handle(pb.RegistrationPathPrefix, registrationHandler)
+
+	discountService := discount.NewService(store, squareClient, logger, authorizer)
+	discountServer := api_discount.NewServer(discountService)
+	discountHandler := pb.NewDiscountServer(discountServer, nil)
+	mux.Handle(pb.DiscountPathPrefix, discountHandler)
+
+	http.ListenAndServe(":80", api.WithAuthHandler(mux))
 	return nil
 }

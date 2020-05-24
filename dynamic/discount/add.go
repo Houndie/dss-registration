@@ -1,33 +1,27 @@
-package registration
+package discount
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Houndie/dss-registration/dynamic/storage"
-	"github.com/pkg/errors"
 )
 
-func (s *Service) AddDiscount(ctx context.Context, token string, discount *Discount) error {
+func (s *Service) Add(ctx context.Context, token string, discount *Bundle) error {
 	s.logger.Trace("add discount service")
 	s.logger.Tracef("fetching user-info for token %s", token)
 	userinfo, err := s.authorizer.Userinfo(ctx, token)
 	if err != nil {
-		msg := "could not authorize user"
-		s.logger.WithError(err).Debug(msg)
-		return errors.Wrap(err, msg)
+		return fmt.Errorf("could not authorize user: %w", err)
 	}
 	s.logger.Tracef("found user %s", userinfo.UserId)
 	isAdmin, err := s.store.IsAdmin(ctx, userinfo.UserId)
 	if err != nil {
-		msg := "could not fetch admin status from store"
-		s.logger.WithError(err).Error(msg)
-		return errors.Wrap(err, msg)
+		return fmt.Errorf("could not fetch admin status from store: %w", err)
 	}
 
 	if !isAdmin {
-		e := ErrUnauthorized{}
-		s.logger.Debug(e)
-		return e
+		return ErrUnauthorized
 	}
 
 	singleDiscounts := make([]*storage.SingleDiscount, len(discount.Discounts))
@@ -42,9 +36,7 @@ func (s *Service) AddDiscount(ctx context.Context, token string, discount *Disco
 		Discounts: singleDiscounts,
 	})
 	if err != nil {
-		msg := "could not add discount to store"
-		s.logger.WithError(err).Error(msg)
-		return errors.Wrap(err, msg)
+		return fmt.Errorf("could not add discount to store: %w", err)
 	}
 
 	return nil

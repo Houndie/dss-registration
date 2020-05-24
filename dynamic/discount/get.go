@@ -1,39 +1,31 @@
-package registration
+package discount
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/Houndie/dss-registration/dynamic/storage"
-	"github.com/pkg/errors"
+	"github.com/Houndie/dss-registration/dynamic/common"
 )
 
-func (s *Service) GetDiscount(ctx context.Context, code string) (*Discount, error) {
+func (s *Service) Get(ctx context.Context, code string) (*Bundle, error) {
 	s.logger.Tracef("in get discount service, with code %s", code)
 
 	discount, err := s.store.GetDiscount(ctx, code)
 	if err != nil {
-		switch errors.Cause(err).(type) {
-		case storage.ErrDiscountDoesNotExist:
-			s.logger.Debug(err)
-			return nil, err
-		default:
-			msg := "error getting discount from store"
-			s.logger.WithError(err).Error(msg)
-			return nil, errors.Wrap(err, msg)
-		}
+		return nil, fmt.Errorf("error getting discount from store: %w", err)
 	}
 
-	squareData, err := getSquareCatalog(ctx, s.client)
-	singleDiscounts := make([]*SingleDiscount, len(discount.Discounts))
+	squareData, err := common.GetSquareCatalog(ctx, s.client)
+	singleDiscounts := make([]*Single, len(discount.Discounts))
 	for i, singleDiscount := range discount.Discounts {
-		singleDiscounts[i] = &SingleDiscount{
-			Amount:    squareData.discounts[singleDiscount.Name].amount,
+		singleDiscounts[i] = &Single{
+			Amount:    squareData.Discounts[singleDiscount.Name].Amount,
 			Name:      singleDiscount.Name,
 			AppliedTo: singleDiscount.AppliedTo,
 		}
 
 	}
-	return &Discount{
+	return &Bundle{
 		Code:      discount.Code,
 		Discounts: singleDiscounts,
 	}, nil

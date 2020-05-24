@@ -4,6 +4,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -17,5 +19,8 @@ func Tools() error {
 func GenerateServerProtoc() error {
 	mg.Deps(Tools)
 	fmt.Println("generating server protocs")
-	return sh.Run("toolbox", "do", "--", "protoc", "--twirp_out=.", "--go_out=.", "dynamic/rpc/dss/registration.proto")
+	cmd := exec.Command("toolbox", "do", "--", "protoc", "--twirp_out=.", "--go_out=.", "rpc/dss/registration.proto", "rpc/dss/discount.proto")
+	cmd.Stderr = os.Stderr
+	cmd.Dir = "dynamic"
+	return cmd.Run()
 }

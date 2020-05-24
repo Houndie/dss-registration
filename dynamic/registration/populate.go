@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/utility"
 )
@@ -16,12 +17,12 @@ type FormData struct {
 	SoloJazzCost    int
 	TeamCompCost    int
 	TShirtCost      int
-	StudentDiscount DiscountAmount
+	StudentDiscount common.DiscountAmount
 }
 
 func (s *Service) Populate(ctx context.Context) (*FormData, error) {
 	s.logger.Trace("Fetching all items from square")
-	catalogData, err := getSquareCatalog(ctx, s.client)
+	catalogData, err := common.GetSquareCatalog(ctx, s.client)
 	if err != nil {
 		utility.LogSquareError(s.logger, err, "error fetching square catalog data")
 		return nil, fmt.Errorf("error fetching square catalog data: %w", err)
@@ -29,7 +30,7 @@ func (s *Service) Populate(ctx context.Context) (*FormData, error) {
 
 	s.logger.Tracef("Finished parsing square catalog list response")
 
-	bestTier, bestCost, err := lowestInStockTier(ctx, catalogData, s.client)
+	bestTier, bestCost, err := common.LowestInStockTier(ctx, catalogData, s.client)
 	if err != nil {
 		utility.LogSquareError(s.logger, err, "error finding best tier and cost")
 		return nil, fmt.Errorf("error finding best tier and cost: %w", err)
@@ -38,11 +39,11 @@ func (s *Service) Populate(ctx context.Context) (*FormData, error) {
 	return &FormData{
 		WeekendPassTier: bestTier,
 		WeekendPassCost: bestCost,
-		DancePassCost:   catalogData.danceOnly.cost,
-		SoloJazzCost:    catalogData.soloJazz.cost,
-		MixAndMatchCost: catalogData.mixAndMatch.cost,
-		TeamCompCost:    catalogData.teamCompetition.cost,
-		TShirtCost:      catalogData.tShirt.cost,
-		StudentDiscount: catalogData.studentDiscount.amount,
+		DancePassCost:   catalogData.DanceOnly.Cost,
+		SoloJazzCost:    catalogData.SoloJazz.Cost,
+		MixAndMatchCost: catalogData.MixAndMatch.Cost,
+		TeamCompCost:    catalogData.TeamCompetition.Cost,
+		TShirtCost:      catalogData.TShirt.Cost,
+		StudentDiscount: catalogData.StudentDiscount.Amount,
 	}, nil
 }

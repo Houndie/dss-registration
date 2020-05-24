@@ -334,22 +334,3 @@ func toProtoc(r *registration.Info) (*pb.RegistrationInfo, error) {
 
 	return result, nil
 }
-
-func discountToProtoc(d registration.DiscountAmount) (*pb.Discount, error) {
-	switch t := d.(type) {
-	case registration.PercentDiscount:
-		return &pb.Discount{
-			Amount: &pb.Discount_Percent{
-				Percent: string(t),
-			},
-		}, nil
-	case registration.DollarDiscount:
-		return &pb.Discount{
-			Amount: &pb.Discount_Dollar{
-				Dollar: int64(t),
-			},
-		}, nil
-	default:
-		return nil, fmt.Errorf("unknown discount type %T", t)
-	}
-}

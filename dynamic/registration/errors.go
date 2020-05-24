@@ -16,12 +16,6 @@ func (ErrOutOfStock) Error() string {
 	return "this item is out of stock"
 }
 
-type ErrUnauthorized struct{}
-
-func (ErrUnauthorized) Error() string {
-	return "User is not authorized for this operation"
-}
-
 type ErrAlreadyPurchased struct {
 	Field         string
 	ExistingValue string

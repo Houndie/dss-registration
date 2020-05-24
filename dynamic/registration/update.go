@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/gofrs/uuid"
@@ -119,7 +120,7 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 	if oldRegistration.UserId != userinfo.UserId {
 		s.logger.WithError(err).Debug("user id does not match that of found registration")
 		s.logger.WithError(err).Tracef("registration provided user id %s, user provided %s", oldRegistration.UserId, userinfo.UserId)
-		return "", storage.ErrNotFound{Key: registration.ID}
+		return "", storage.ErrNoRegistrationForID{ID: registration.ID}
 	}
 
 	if err := checkOldPurchases(registration, oldRegistration); err != nil {
@@ -143,14 +144,14 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 			return "", fmt.Errorf("found wrong number of locations %v", len(locations))
 		}
 
-		squareData, err := getSquareCatalog(ctx, s.client)
+		squareData, err := common.GetSquareCatalog(ctx, s.client)
 		if err != nil {
 			return "", err
 		}
 
-		paymentData := &paymentData{}
+		paymentData := &common.PaymentData{}
 		if len(oldRegistration.OrderIds) > 0 {
-			paymentData, err = getSquarePayments(ctx, s.client, squareData, locations[0].Id, oldRegistration.OrderIds)
+			paymentData, err = common.GetSquarePayments(ctx, s.client, squareData, locations[0].Id, oldRegistration.OrderIds)
 			if err != nil {
 				return "", err
 			}
@@ -163,12 +164,12 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 		if hasNewFullWeekend && !hasOldFullWeekend {
 			newFullWeekendPurchase = true
 			newFullWeekendPurchaseTier = newFullWeekend.Tier
-		} else if hasOldFullWeekend && !paymentData.weekendPassPaid {
+		} else if hasOldFullWeekend && !paymentData.WeekendPassPaid {
 			newFullWeekendPurchase = true
 			newFullWeekendPurchaseTier = oldFullWeekend.Tier
 		}
 		if newFullWeekendPurchase {
-			bestTier, bestCost, err := lowestInStockTier(ctx, squareData, s.client)
+			bestTier, bestCost, err := common.LowestInStockTier(ctx, squareData, s.client)
 			if err != nil {
 				return "", fmt.Errorf("error finding best tier and cost: %w", err)
 			}
@@ -200,7 +201,7 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 		}
 
 		s.logger.Trace("creating checkout with square")
-		returnerURL, orderID, err = createCheckout(ctx, s.client, locations[0].Id, idempotencyKey, order, registration.Email, redirectUrl)
+		returnerURL, orderID, err = common.CreateCheckout(ctx, s.client, locations[0].Id, idempotencyKey, order, registration.Email, redirectUrl)
 	}
 
 	s.logger.Trace("Updating registration in database")

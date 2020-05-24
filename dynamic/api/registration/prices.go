@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Houndie/dss-registration/dynamic/api/discount"
 	pb "github.com/Houndie/dss-registration/dynamic/rpc/dss"
 )
 
@@ -17,7 +18,7 @@ func (s *Server) Prices(ctx context.Context, req *pb.RegistrationPricesReq) (*pb
 	if !ok {
 		return nil, fmt.Errorf("unknown weekend pass tier %v", tier)
 	}
-	studentDiscount, err := discountToProtoc(prices.StudentDiscount)
+	studentDiscount, err := discount.AmountToProto(prices.StudentDiscount)
 	if err != nil {
 		return nil, fmt.Errorf("error converting student discount to protoc discount: %w", err)
 	}

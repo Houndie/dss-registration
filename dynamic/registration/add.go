@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/gofrs/uuid"
@@ -16,19 +17,19 @@ func containsPaidItems(r *Info) bool {
 	return !noPassOk || r.MixAndMatch != nil || r.TeamCompetition != nil || r.TShirt != nil || r.SoloJazz != nil
 }
 
-func makeLineItems(registration *Info, squareData *squareData, paymentData *paymentData, discounts map[storage.PurchaseItem][]string) ([]*square.OrderLineItem, error) {
+func makeLineItems(registration *Info, squareData *common.SquareData, paymentData *common.PaymentData, discounts map[storage.PurchaseItem][]string) ([]*square.OrderLineItem, error) {
 	lineItems := []*square.OrderLineItem{}
 	switch t := registration.PassType.(type) {
 	case *WeekendPass:
-		if !paymentData.weekendPassPaid {
-			li, err := makeLineItem(squareData.fullWeekend[t.Tier].variationID, discounts[storage.FullWeekendPurchaseItem], squareData.discounts)
+		if !paymentData.WeekendPassPaid {
+			li, err := makeLineItem(squareData.FullWeekend[t.Tier].VariationID, discounts[storage.FullWeekendPurchaseItem], squareData.Discounts)
 			if err != nil {
 				return nil, fmt.Errorf("error making full weekend line item: %w", err)
 			}
 
 			if registration.IsStudent {
 				studentDiscount := &square.OrderLineItemDiscount{
-					CatalogObjectId: squareData.studentDiscount.id,
+					CatalogObjectId: squareData.StudentDiscount.ID,
 				}
 
 				if li.Discounts == nil {
@@ -40,8 +41,8 @@ func makeLineItems(registration *Info, squareData *squareData, paymentData *paym
 			lineItems = append(lineItems, li)
 		}
 	case *DanceOnlyPass:
-		if !paymentData.danceOnlyPaid {
-			li, err := makeLineItem(squareData.danceOnly.variationID, discounts[storage.DanceOnlyPurchaseItem], squareData.discounts)
+		if !paymentData.DanceOnlyPaid {
+			li, err := makeLineItem(squareData.DanceOnly.VariationID, discounts[storage.DanceOnlyPurchaseItem], squareData.Discounts)
 			if err != nil {
 				return nil, fmt.Errorf("error making dance only item: %w", err)
 			}
@@ -49,32 +50,32 @@ func makeLineItems(registration *Info, squareData *squareData, paymentData *paym
 		}
 	}
 
-	if registration.MixAndMatch != nil && !paymentData.mixAndMatchPaid {
-		li, err := makeLineItem(squareData.mixAndMatch.variationID, discounts[storage.MixAndMatchPurchaseItem], squareData.discounts)
+	if registration.MixAndMatch != nil && !paymentData.MixAndMatchPaid {
+		li, err := makeLineItem(squareData.MixAndMatch.VariationID, discounts[storage.MixAndMatchPurchaseItem], squareData.Discounts)
 		if err != nil {
 			return nil, fmt.Errorf("error making mix and match line item: %w", err)
 		}
 		lineItems = append(lineItems, li)
 	}
 
-	if registration.SoloJazz != nil && !paymentData.soloJazzPaid {
-		li, err := makeLineItem(squareData.soloJazz.variationID, discounts[storage.SoloJazzPurchaseItem], squareData.discounts)
+	if registration.SoloJazz != nil && !paymentData.SoloJazzPaid {
+		li, err := makeLineItem(squareData.SoloJazz.VariationID, discounts[storage.SoloJazzPurchaseItem], squareData.Discounts)
 		if err != nil {
 			return nil, fmt.Errorf("error making solo jazz line item: %w", err)
 		}
 		lineItems = append(lineItems, li)
 	}
 
-	if registration.TeamCompetition != nil && !paymentData.teamCompetitionPaid {
-		li, err := makeLineItem(squareData.teamCompetition.variationID, discounts[storage.TeamCompetitionPurchaseItem], squareData.discounts)
+	if registration.TeamCompetition != nil && !paymentData.TeamCompetitionPaid {
+		li, err := makeLineItem(squareData.TeamCompetition.VariationID, discounts[storage.TeamCompetitionPurchaseItem], squareData.Discounts)
 		if err != nil {
 			return nil, fmt.Errorf("error making team competition line item: %w", err)
 		}
 		lineItems = append(lineItems, li)
 	}
 
-	if registration.TShirt != nil && !paymentData.tShirtPaid {
-		li, err := makeLineItem(squareData.tShirt.variationID, discounts[storage.TShirtPurchaseItem], squareData.discounts)
+	if registration.TShirt != nil && !paymentData.TShirtPaid {
+		li, err := makeLineItem(squareData.TShirt.VariationID, discounts[storage.TShirtPurchaseItem], squareData.Discounts)
 		if err != nil {
 			return nil, fmt.Errorf("error making t-shirt line item: %w", err)
 		}
@@ -83,7 +84,7 @@ func makeLineItems(registration *Info, squareData *squareData, paymentData *paym
 	return lineItems, nil
 }
 
-func makeLineItem(catalogID string, discountNames []string, discounts map[string]*discount) (*square.OrderLineItem, error) {
+func makeLineItem(catalogID string, discountNames []string, discounts map[string]*common.Discount) (*square.OrderLineItem, error) {
 	var orderDiscounts []*square.OrderLineItemDiscount
 	if len(discountNames) != 0 {
 		orderDiscounts = make([]*square.OrderLineItemDiscount, len(discountNames))
@@ -94,7 +95,7 @@ func makeLineItem(catalogID string, discountNames []string, discounts map[string
 			}
 
 			orderDiscounts[i] = &square.OrderLineItemDiscount{
-				CatalogObjectId: d.id,
+				CatalogObjectId: d.ID,
 			}
 		}
 	}
@@ -153,14 +154,14 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 		}
 
 		s.logger.Trace("Fetching all items from square")
-		squareData, err := getSquareCatalog(ctx, s.client)
+		squareData, err := common.GetSquareCatalog(ctx, s.client)
 		if err != nil {
 			return "", fmt.Errorf("error fetching all items from square: %w", err)
 		}
 
 		myFullWeekend, ok := registration.PassType.(*WeekendPass)
 		if ok {
-			bestTier, bestCost, err := lowestInStockTier(ctx, squareData, s.client)
+			bestTier, bestCost, err := common.LowestInStockTier(ctx, squareData, s.client)
 			if err != nil {
 				return "", fmt.Errorf("error finding best tier and cost: %w", err)
 			}
@@ -172,7 +173,7 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 			}
 		}
 
-		lineItems, err := makeLineItems(registration, squareData, &paymentData{}, discounts)
+		lineItems, err := makeLineItems(registration, squareData, &common.PaymentData{}, discounts)
 		if err != nil {
 			return "", err
 		}
@@ -187,7 +188,7 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 		}
 
 		s.logger.Trace("creating checkout with square")
-		returnerURL, orderID, err = createCheckout(ctx, s.client, locations[0].Id, idempotencyKey, order, registration.Email, redirectUrl)
+		returnerURL, orderID, err = common.CreateCheckout(ctx, s.client, locations[0].Id, idempotencyKey, order, registration.Email, redirectUrl)
 		if err != nil {
 			return "", err
 		}

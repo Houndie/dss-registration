@@ -2,17 +2,16 @@
 // versions:
 // 	protoc-gen-go v1.23.0
 // 	protoc        v3.11.4
-// source: dynamic/rpc/dss/registration.proto
+// source: rpc/dss/registration.proto
 
 package dss
 
 import (
-	reflect "reflect"
-	sync "sync"
-
 	proto "github.com/golang/protobuf/proto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	reflect "reflect"
+	sync "sync"
 )
 
 const (
@@ -65,11 +64,11 @@ func (x FullWeekendPassTier) String() string {
 }
 
 func (FullWeekendPassTier) Descriptor() protoreflect.EnumDescriptor {
-	return file_dynamic_rpc_dss_registration_proto_enumTypes[0].Descriptor()
+	return file_rpc_dss_registration_proto_enumTypes[0].Descriptor()
 }
 
 func (FullWeekendPassTier) Type() protoreflect.EnumType {
-	return &file_dynamic_rpc_dss_registration_proto_enumTypes[0]
+	return &file_rpc_dss_registration_proto_enumTypes[0]
 }
 
 func (x FullWeekendPassTier) Number() protoreflect.EnumNumber {
@@ -78,7 +77,7 @@ func (x FullWeekendPassTier) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use FullWeekendPassTier.Descriptor instead.
 func (FullWeekendPassTier) EnumDescriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{0}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{0}
 }
 
 type FullWeekendPassLevel int32
@@ -114,11 +113,11 @@ func (x FullWeekendPassLevel) String() string {
 }
 
 func (FullWeekendPassLevel) Descriptor() protoreflect.EnumDescriptor {
-	return file_dynamic_rpc_dss_registration_proto_enumTypes[1].Descriptor()
+	return file_rpc_dss_registration_proto_enumTypes[1].Descriptor()
 }
 
 func (FullWeekendPassLevel) Type() protoreflect.EnumType {
-	return &file_dynamic_rpc_dss_registration_proto_enumTypes[1]
+	return &file_rpc_dss_registration_proto_enumTypes[1]
 }
 
 func (x FullWeekendPassLevel) Number() protoreflect.EnumNumber {
@@ -127,7 +126,7 @@ func (x FullWeekendPassLevel) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use FullWeekendPassLevel.Descriptor instead.
 func (FullWeekendPassLevel) EnumDescriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{1}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{1}
 }
 
 type MixAndMatch_Role int32
@@ -160,11 +159,11 @@ func (x MixAndMatch_Role) String() string {
 }
 
 func (MixAndMatch_Role) Descriptor() protoreflect.EnumDescriptor {
-	return file_dynamic_rpc_dss_registration_proto_enumTypes[2].Descriptor()
+	return file_rpc_dss_registration_proto_enumTypes[2].Descriptor()
 }
 
 func (MixAndMatch_Role) Type() protoreflect.EnumType {
-	return &file_dynamic_rpc_dss_registration_proto_enumTypes[2]
+	return &file_rpc_dss_registration_proto_enumTypes[2]
 }
 
 func (x MixAndMatch_Role) Number() protoreflect.EnumNumber {
@@ -173,7 +172,7 @@ func (x MixAndMatch_Role) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MixAndMatch_Role.Descriptor instead.
 func (MixAndMatch_Role) EnumDescriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{4, 0}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{4, 0}
 }
 
 type TShirt_Style int32
@@ -233,11 +232,11 @@ func (x TShirt_Style) String() string {
 }
 
 func (TShirt_Style) Descriptor() protoreflect.EnumDescriptor {
-	return file_dynamic_rpc_dss_registration_proto_enumTypes[3].Descriptor()
+	return file_rpc_dss_registration_proto_enumTypes[3].Descriptor()
 }
 
 func (TShirt_Style) Type() protoreflect.EnumType {
-	return &file_dynamic_rpc_dss_registration_proto_enumTypes[3]
+	return &file_rpc_dss_registration_proto_enumTypes[3]
 }
 
 func (x TShirt_Style) Number() protoreflect.EnumNumber {
@@ -246,7 +245,7 @@ func (x TShirt_Style) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TShirt_Style.Descriptor instead.
 func (TShirt_Style) EnumDescriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{7, 0}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{7, 0}
 }
 
 type RegistrationInfo struct {
@@ -285,7 +284,7 @@ type RegistrationInfo struct {
 func (x *RegistrationInfo) Reset() {
 	*x = RegistrationInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[0]
+		mi := &file_rpc_dss_registration_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -298,7 +297,7 @@ func (x *RegistrationInfo) String() string {
 func (*RegistrationInfo) ProtoMessage() {}
 
 func (x *RegistrationInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[0]
+	mi := &file_rpc_dss_registration_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -311,7 +310,7 @@ func (x *RegistrationInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationInfo.ProtoReflect.Descriptor instead.
 func (*RegistrationInfo) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{0}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *RegistrationInfo) GetId() string {
@@ -539,7 +538,7 @@ type FullWeekendPass struct {
 func (x *FullWeekendPass) Reset() {
 	*x = FullWeekendPass{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[1]
+		mi := &file_rpc_dss_registration_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -552,7 +551,7 @@ func (x *FullWeekendPass) String() string {
 func (*FullWeekendPass) ProtoMessage() {}
 
 func (x *FullWeekendPass) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[1]
+	mi := &file_rpc_dss_registration_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -565,7 +564,7 @@ func (x *FullWeekendPass) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FullWeekendPass.ProtoReflect.Descriptor instead.
 func (*FullWeekendPass) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{1}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *FullWeekendPass) GetTier() FullWeekendPassTier {
@@ -600,7 +599,7 @@ type DanceOnlyPass struct {
 func (x *DanceOnlyPass) Reset() {
 	*x = DanceOnlyPass{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[2]
+		mi := &file_rpc_dss_registration_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -613,7 +612,7 @@ func (x *DanceOnlyPass) String() string {
 func (*DanceOnlyPass) ProtoMessage() {}
 
 func (x *DanceOnlyPass) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[2]
+	mi := &file_rpc_dss_registration_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -626,7 +625,7 @@ func (x *DanceOnlyPass) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DanceOnlyPass.ProtoReflect.Descriptor instead.
 func (*DanceOnlyPass) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{2}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *DanceOnlyPass) GetPaid() bool {
@@ -645,7 +644,7 @@ type NoPass struct {
 func (x *NoPass) Reset() {
 	*x = NoPass{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[3]
+		mi := &file_rpc_dss_registration_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -658,7 +657,7 @@ func (x *NoPass) String() string {
 func (*NoPass) ProtoMessage() {}
 
 func (x *NoPass) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[3]
+	mi := &file_rpc_dss_registration_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -671,7 +670,7 @@ func (x *NoPass) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoPass.ProtoReflect.Descriptor instead.
 func (*NoPass) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{3}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{3}
 }
 
 type MixAndMatch struct {
@@ -686,7 +685,7 @@ type MixAndMatch struct {
 func (x *MixAndMatch) Reset() {
 	*x = MixAndMatch{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[4]
+		mi := &file_rpc_dss_registration_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -699,7 +698,7 @@ func (x *MixAndMatch) String() string {
 func (*MixAndMatch) ProtoMessage() {}
 
 func (x *MixAndMatch) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[4]
+	mi := &file_rpc_dss_registration_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -712,7 +711,7 @@ func (x *MixAndMatch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MixAndMatch.ProtoReflect.Descriptor instead.
 func (*MixAndMatch) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{4}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *MixAndMatch) GetRole() MixAndMatch_Role {
@@ -740,7 +739,7 @@ type SoloJazz struct {
 func (x *SoloJazz) Reset() {
 	*x = SoloJazz{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[5]
+		mi := &file_rpc_dss_registration_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -753,7 +752,7 @@ func (x *SoloJazz) String() string {
 func (*SoloJazz) ProtoMessage() {}
 
 func (x *SoloJazz) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[5]
+	mi := &file_rpc_dss_registration_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -766,7 +765,7 @@ func (x *SoloJazz) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SoloJazz.ProtoReflect.Descriptor instead.
 func (*SoloJazz) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{5}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SoloJazz) GetPaid() bool {
@@ -788,7 +787,7 @@ type TeamCompetition struct {
 func (x *TeamCompetition) Reset() {
 	*x = TeamCompetition{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[6]
+		mi := &file_rpc_dss_registration_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -801,7 +800,7 @@ func (x *TeamCompetition) String() string {
 func (*TeamCompetition) ProtoMessage() {}
 
 func (x *TeamCompetition) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[6]
+	mi := &file_rpc_dss_registration_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -814,7 +813,7 @@ func (x *TeamCompetition) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TeamCompetition.ProtoReflect.Descriptor instead.
 func (*TeamCompetition) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{6}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *TeamCompetition) GetName() string {
@@ -843,7 +842,7 @@ type TShirt struct {
 func (x *TShirt) Reset() {
 	*x = TShirt{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[7]
+		mi := &file_rpc_dss_registration_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -856,7 +855,7 @@ func (x *TShirt) String() string {
 func (*TShirt) ProtoMessage() {}
 
 func (x *TShirt) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[7]
+	mi := &file_rpc_dss_registration_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -869,7 +868,7 @@ func (x *TShirt) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TShirt.ProtoReflect.Descriptor instead.
 func (*TShirt) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{7}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *TShirt) GetStyle() TShirt_Style {
@@ -899,7 +898,7 @@ type ProvideHousing struct {
 func (x *ProvideHousing) Reset() {
 	*x = ProvideHousing{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[8]
+		mi := &file_rpc_dss_registration_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -912,7 +911,7 @@ func (x *ProvideHousing) String() string {
 func (*ProvideHousing) ProtoMessage() {}
 
 func (x *ProvideHousing) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[8]
+	mi := &file_rpc_dss_registration_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -925,7 +924,7 @@ func (x *ProvideHousing) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProvideHousing.ProtoReflect.Descriptor instead.
 func (*ProvideHousing) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{8}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ProvideHousing) GetPets() string {
@@ -961,7 +960,7 @@ type RequireHousing struct {
 func (x *RequireHousing) Reset() {
 	*x = RequireHousing{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[9]
+		mi := &file_rpc_dss_registration_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -974,7 +973,7 @@ func (x *RequireHousing) String() string {
 func (*RequireHousing) ProtoMessage() {}
 
 func (x *RequireHousing) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[9]
+	mi := &file_rpc_dss_registration_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -987,7 +986,7 @@ func (x *RequireHousing) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequireHousing.ProtoReflect.Descriptor instead.
 func (*RequireHousing) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{9}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *RequireHousing) GetPetAllergies() string {
@@ -1013,7 +1012,7 @@ type NoHousing struct {
 func (x *NoHousing) Reset() {
 	*x = NoHousing{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[10]
+		mi := &file_rpc_dss_registration_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1026,7 +1025,7 @@ func (x *NoHousing) String() string {
 func (*NoHousing) ProtoMessage() {}
 
 func (x *NoHousing) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[10]
+	mi := &file_rpc_dss_registration_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1039,7 +1038,7 @@ func (x *NoHousing) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoHousing.ProtoReflect.Descriptor instead.
 func (*NoHousing) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{10}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{10}
 }
 
 type RegistrationAddReq struct {
@@ -1055,7 +1054,7 @@ type RegistrationAddReq struct {
 func (x *RegistrationAddReq) Reset() {
 	*x = RegistrationAddReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[11]
+		mi := &file_rpc_dss_registration_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1068,7 +1067,7 @@ func (x *RegistrationAddReq) String() string {
 func (*RegistrationAddReq) ProtoMessage() {}
 
 func (x *RegistrationAddReq) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[11]
+	mi := &file_rpc_dss_registration_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1081,7 +1080,7 @@ func (x *RegistrationAddReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationAddReq.ProtoReflect.Descriptor instead.
 func (*RegistrationAddReq) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{11}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *RegistrationAddReq) GetIdempotencyKey() string {
@@ -1116,7 +1115,7 @@ type RegistrationAddRes struct {
 func (x *RegistrationAddRes) Reset() {
 	*x = RegistrationAddRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[12]
+		mi := &file_rpc_dss_registration_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1129,7 +1128,7 @@ func (x *RegistrationAddRes) String() string {
 func (*RegistrationAddRes) ProtoMessage() {}
 
 func (x *RegistrationAddRes) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[12]
+	mi := &file_rpc_dss_registration_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1142,7 +1141,7 @@ func (x *RegistrationAddRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationAddRes.ProtoReflect.Descriptor instead.
 func (*RegistrationAddRes) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{12}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *RegistrationAddRes) GetRedirectUrl() string {
@@ -1163,7 +1162,7 @@ type RegistrationGetReq struct {
 func (x *RegistrationGetReq) Reset() {
 	*x = RegistrationGetReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[13]
+		mi := &file_rpc_dss_registration_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1176,7 +1175,7 @@ func (x *RegistrationGetReq) String() string {
 func (*RegistrationGetReq) ProtoMessage() {}
 
 func (x *RegistrationGetReq) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[13]
+	mi := &file_rpc_dss_registration_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1189,7 +1188,7 @@ func (x *RegistrationGetReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationGetReq.ProtoReflect.Descriptor instead.
 func (*RegistrationGetReq) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{13}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *RegistrationGetReq) GetId() string {
@@ -1210,7 +1209,7 @@ type RegistrationGetRes struct {
 func (x *RegistrationGetRes) Reset() {
 	*x = RegistrationGetRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[14]
+		mi := &file_rpc_dss_registration_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1223,7 +1222,7 @@ func (x *RegistrationGetRes) String() string {
 func (*RegistrationGetRes) ProtoMessage() {}
 
 func (x *RegistrationGetRes) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[14]
+	mi := &file_rpc_dss_registration_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1236,7 +1235,7 @@ func (x *RegistrationGetRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationGetRes.ProtoReflect.Descriptor instead.
 func (*RegistrationGetRes) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{14}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *RegistrationGetRes) GetRegistration() *RegistrationInfo {
@@ -1255,7 +1254,7 @@ type RegistrationPricesReq struct {
 func (x *RegistrationPricesReq) Reset() {
 	*x = RegistrationPricesReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[15]
+		mi := &file_rpc_dss_registration_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1268,7 +1267,7 @@ func (x *RegistrationPricesReq) String() string {
 func (*RegistrationPricesReq) ProtoMessage() {}
 
 func (x *RegistrationPricesReq) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[15]
+	mi := &file_rpc_dss_registration_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1281,88 +1280,8 @@ func (x *RegistrationPricesReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationPricesReq.ProtoReflect.Descriptor instead.
 func (*RegistrationPricesReq) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{15}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{15}
 }
-
-type Discount struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// Types that are assignable to Amount:
-	//	*Discount_Dollar
-	//	*Discount_Percent
-	Amount isDiscount_Amount `protobuf_oneof:"amount"`
-}
-
-func (x *Discount) Reset() {
-	*x = Discount{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[16]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *Discount) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Discount) ProtoMessage() {}
-
-func (x *Discount) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[16]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Discount.ProtoReflect.Descriptor instead.
-func (*Discount) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{16}
-}
-
-func (m *Discount) GetAmount() isDiscount_Amount {
-	if m != nil {
-		return m.Amount
-	}
-	return nil
-}
-
-func (x *Discount) GetDollar() int64 {
-	if x, ok := x.GetAmount().(*Discount_Dollar); ok {
-		return x.Dollar
-	}
-	return 0
-}
-
-func (x *Discount) GetPercent() string {
-	if x, ok := x.GetAmount().(*Discount_Percent); ok {
-		return x.Percent
-	}
-	return ""
-}
-
-type isDiscount_Amount interface {
-	isDiscount_Amount()
-}
-
-type Discount_Dollar struct {
-	Dollar int64 `protobuf:"varint,8,opt,name=dollar,proto3,oneof"`
-}
-
-type Discount_Percent struct {
-	Percent string `protobuf:"bytes,9,opt,name=percent,proto3,oneof"`
-}
-
-func (*Discount_Dollar) isDiscount_Amount() {}
-
-func (*Discount_Percent) isDiscount_Amount() {}
 
 type RegistrationPricesRes struct {
 	state         protoimpl.MessageState
@@ -1376,13 +1295,13 @@ type RegistrationPricesRes struct {
 	SoloJazzCost        int64               `protobuf:"varint,5,opt,name=solo_jazz_cost,json=soloJazzCost,proto3" json:"solo_jazz_cost,omitempty"`
 	TeamCompetitionCost int64               `protobuf:"varint,6,opt,name=team_competition_cost,json=teamCompetitionCost,proto3" json:"team_competition_cost,omitempty"`
 	TshirtCost          int64               `protobuf:"varint,7,opt,name=tshirt_cost,json=tshirtCost,proto3" json:"tshirt_cost,omitempty"`
-	StudentDiscount     *Discount           `protobuf:"bytes,8,opt,name=student_discount,json=studentDiscount,proto3" json:"student_discount,omitempty"`
+	StudentDiscount     *DiscountAmount     `protobuf:"bytes,8,opt,name=student_discount,json=studentDiscount,proto3" json:"student_discount,omitempty"`
 }
 
 func (x *RegistrationPricesRes) Reset() {
 	*x = RegistrationPricesRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[17]
+		mi := &file_rpc_dss_registration_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1395,7 +1314,7 @@ func (x *RegistrationPricesRes) String() string {
 func (*RegistrationPricesRes) ProtoMessage() {}
 
 func (x *RegistrationPricesRes) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[17]
+	mi := &file_rpc_dss_registration_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1408,7 +1327,7 @@ func (x *RegistrationPricesRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationPricesRes.ProtoReflect.Descriptor instead.
 func (*RegistrationPricesRes) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{17}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *RegistrationPricesRes) GetWeekendPassCost() int64 {
@@ -1460,7 +1379,7 @@ func (x *RegistrationPricesRes) GetTshirtCost() int64 {
 	return 0
 }
 
-func (x *RegistrationPricesRes) GetStudentDiscount() *Discount {
+func (x *RegistrationPricesRes) GetStudentDiscount() *DiscountAmount {
 	if x != nil {
 		return x.StudentDiscount
 	}
@@ -1480,7 +1399,7 @@ type RegistrationUpdateReq struct {
 func (x *RegistrationUpdateReq) Reset() {
 	*x = RegistrationUpdateReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[18]
+		mi := &file_rpc_dss_registration_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1493,7 +1412,7 @@ func (x *RegistrationUpdateReq) String() string {
 func (*RegistrationUpdateReq) ProtoMessage() {}
 
 func (x *RegistrationUpdateReq) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[18]
+	mi := &file_rpc_dss_registration_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1506,7 +1425,7 @@ func (x *RegistrationUpdateReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationUpdateReq.ProtoReflect.Descriptor instead.
 func (*RegistrationUpdateReq) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{18}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *RegistrationUpdateReq) GetIdempotencyKey() string {
@@ -1541,7 +1460,7 @@ type RegistrationUpdateRes struct {
 func (x *RegistrationUpdateRes) Reset() {
 	*x = RegistrationUpdateRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[19]
+		mi := &file_rpc_dss_registration_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1554,7 +1473,7 @@ func (x *RegistrationUpdateRes) String() string {
 func (*RegistrationUpdateRes) ProtoMessage() {}
 
 func (x *RegistrationUpdateRes) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[19]
+	mi := &file_rpc_dss_registration_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1567,7 +1486,7 @@ func (x *RegistrationUpdateRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationUpdateRes.ProtoReflect.Descriptor instead.
 func (*RegistrationUpdateRes) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{19}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *RegistrationUpdateRes) GetRedirectUrl() string {
@@ -1586,7 +1505,7 @@ type RegistrationGetSummaryReq struct {
 func (x *RegistrationGetSummaryReq) Reset() {
 	*x = RegistrationGetSummaryReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[20]
+		mi := &file_rpc_dss_registration_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1599,7 +1518,7 @@ func (x *RegistrationGetSummaryReq) String() string {
 func (*RegistrationGetSummaryReq) ProtoMessage() {}
 
 func (x *RegistrationGetSummaryReq) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[20]
+	mi := &file_rpc_dss_registration_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1612,7 +1531,7 @@ func (x *RegistrationGetSummaryReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationGetSummaryReq.ProtoReflect.Descriptor instead.
 func (*RegistrationGetSummaryReq) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{20}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{19}
 }
 
 type RegistrationSummary struct {
@@ -1631,7 +1550,7 @@ type RegistrationSummary struct {
 func (x *RegistrationSummary) Reset() {
 	*x = RegistrationSummary{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[21]
+		mi := &file_rpc_dss_registration_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1644,7 +1563,7 @@ func (x *RegistrationSummary) String() string {
 func (*RegistrationSummary) ProtoMessage() {}
 
 func (x *RegistrationSummary) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[21]
+	mi := &file_rpc_dss_registration_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1657,7 +1576,7 @@ func (x *RegistrationSummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationSummary.ProtoReflect.Descriptor instead.
 func (*RegistrationSummary) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{21}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *RegistrationSummary) GetId() string {
@@ -1713,7 +1632,7 @@ type RegistrationGetSummaryRes struct {
 func (x *RegistrationGetSummaryRes) Reset() {
 	*x = RegistrationGetSummaryRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[22]
+		mi := &file_rpc_dss_registration_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1726,7 +1645,7 @@ func (x *RegistrationGetSummaryRes) String() string {
 func (*RegistrationGetSummaryRes) ProtoMessage() {}
 
 func (x *RegistrationGetSummaryRes) ProtoReflect() protoreflect.Message {
-	mi := &file_dynamic_rpc_dss_registration_proto_msgTypes[22]
+	mi := &file_rpc_dss_registration_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1739,7 +1658,7 @@ func (x *RegistrationGetSummaryRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationGetSummaryRes.ProtoReflect.Descriptor instead.
 func (*RegistrationGetSummaryRes) Descriptor() ([]byte, []int) {
-	return file_dynamic_rpc_dss_registration_proto_rawDescGZIP(), []int{22}
+	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *RegistrationGetSummaryRes) GetSummaries() []*RegistrationSummary {
@@ -1749,12 +1668,13 @@ func (x *RegistrationGetSummaryRes) GetSummaries() []*RegistrationSummary {
 	return nil
 }
 
-var File_dynamic_rpc_dss_registration_proto protoreflect.FileDescriptor
+var File_rpc_dss_registration_proto protoreflect.FileDescriptor
 
-var file_dynamic_rpc_dss_registration_proto_rawDesc = []byte{
-	0x0a, 0x22, 0x64, 0x79, 0x6e, 0x61, 0x6d, 0x69, 0x63, 0x2f, 0x72, 0x70, 0x63, 0x2f, 0x64, 0x73,
-	0x73, 0x2f, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x12, 0x03, 0x64, 0x73, 0x73, 0x22, 0x9f, 0x07, 0x0a, 0x10, 0x52, 0x65,
+var file_rpc_dss_registration_proto_rawDesc = []byte{
+	0x0a, 0x1a, 0x72, 0x70, 0x63, 0x2f, 0x64, 0x73, 0x73, 0x2f, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74,
+	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x03, 0x64, 0x73,
+	0x73, 0x1a, 0x16, 0x72, 0x70, 0x63, 0x2f, 0x64, 0x73, 0x73, 0x2f, 0x64, 0x69, 0x73, 0x63, 0x6f,
+	0x75, 0x6e, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x9f, 0x07, 0x0a, 0x10, 0x52, 0x65,
 	0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x0e,
 	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1d,
 	0x0a, 0x0a, 0x66, 0x69, 0x72, 0x73, 0x74, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01,
@@ -1885,117 +1805,112 @@ var file_dynamic_rpc_dss_registration_proto_rawDesc = []byte{
 	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x0c, 0x72, 0x65, 0x67, 0x69,
 	0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x17, 0x0a, 0x15, 0x52, 0x65, 0x67, 0x69,
 	0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x69, 0x63, 0x65, 0x73, 0x52, 0x65,
-	0x71, 0x22, 0x4a, 0x0a, 0x08, 0x44, 0x69, 0x73, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x18, 0x0a,
-	0x06, 0x64, 0x6f, 0x6c, 0x6c, 0x61, 0x72, 0x18, 0x08, 0x20, 0x01, 0x28, 0x03, 0x48, 0x00, 0x52,
-	0x06, 0x64, 0x6f, 0x6c, 0x6c, 0x61, 0x72, 0x12, 0x1a, 0x0a, 0x07, 0x70, 0x65, 0x72, 0x63, 0x65,
-	0x6e, 0x74, 0x18, 0x09, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x07, 0x70, 0x65, 0x72, 0x63,
-	0x65, 0x6e, 0x74, 0x42, 0x08, 0x0a, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x22, 0x93, 0x03,
-	0x0a, 0x15, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x72,
-	0x69, 0x63, 0x65, 0x73, 0x52, 0x65, 0x73, 0x12, 0x2a, 0x0a, 0x11, 0x77, 0x65, 0x65, 0x6b, 0x65,
-	0x6e, 0x64, 0x5f, 0x70, 0x61, 0x73, 0x73, 0x5f, 0x63, 0x6f, 0x73, 0x74, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x03, 0x52, 0x0f, 0x77, 0x65, 0x65, 0x6b, 0x65, 0x6e, 0x64, 0x50, 0x61, 0x73, 0x73, 0x43,
-	0x6f, 0x73, 0x74, 0x12, 0x44, 0x0a, 0x11, 0x77, 0x65, 0x65, 0x6b, 0x65, 0x6e, 0x64, 0x5f, 0x70,
-	0x61, 0x73, 0x73, 0x5f, 0x74, 0x69, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x18,
-	0x2e, 0x64, 0x73, 0x73, 0x2e, 0x46, 0x75, 0x6c, 0x6c, 0x57, 0x65, 0x65, 0x6b, 0x65, 0x6e, 0x64,
-	0x50, 0x61, 0x73, 0x73, 0x54, 0x69, 0x65, 0x72, 0x52, 0x0f, 0x77, 0x65, 0x65, 0x6b, 0x65, 0x6e,
-	0x64, 0x50, 0x61, 0x73, 0x73, 0x54, 0x69, 0x65, 0x72, 0x12, 0x26, 0x0a, 0x0f, 0x64, 0x61, 0x6e,
-	0x63, 0x65, 0x5f, 0x70, 0x61, 0x73, 0x73, 0x5f, 0x63, 0x6f, 0x73, 0x74, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x03, 0x52, 0x0d, 0x64, 0x61, 0x6e, 0x63, 0x65, 0x50, 0x61, 0x73, 0x73, 0x43, 0x6f, 0x73,
-	0x74, 0x12, 0x2b, 0x0a, 0x12, 0x6d, 0x69, 0x78, 0x5f, 0x61, 0x6e, 0x64, 0x5f, 0x6d, 0x61, 0x74,
-	0x63, 0x68, 0x5f, 0x63, 0x6f, 0x73, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0f, 0x6d,
-	0x69, 0x78, 0x41, 0x6e, 0x64, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x43, 0x6f, 0x73, 0x74, 0x12, 0x24,
-	0x0a, 0x0e, 0x73, 0x6f, 0x6c, 0x6f, 0x5f, 0x6a, 0x61, 0x7a, 0x7a, 0x5f, 0x63, 0x6f, 0x73, 0x74,
-	0x18, 0x05, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0c, 0x73, 0x6f, 0x6c, 0x6f, 0x4a, 0x61, 0x7a, 0x7a,
-	0x43, 0x6f, 0x73, 0x74, 0x12, 0x32, 0x0a, 0x15, 0x74, 0x65, 0x61, 0x6d, 0x5f, 0x63, 0x6f, 0x6d,
-	0x70, 0x65, 0x74, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x63, 0x6f, 0x73, 0x74, 0x18, 0x06, 0x20,
-	0x01, 0x28, 0x03, 0x52, 0x13, 0x74, 0x65, 0x61, 0x6d, 0x43, 0x6f, 0x6d, 0x70, 0x65, 0x74, 0x69,
-	0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x73, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x74, 0x73, 0x68, 0x69,
-	0x72, 0x74, 0x5f, 0x63, 0x6f, 0x73, 0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0a, 0x74,
-	0x73, 0x68, 0x69, 0x72, 0x74, 0x43, 0x6f, 0x73, 0x74, 0x12, 0x38, 0x0a, 0x10, 0x73, 0x74, 0x75,
-	0x64, 0x65, 0x6e, 0x74, 0x5f, 0x64, 0x69, 0x73, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x08, 0x20,
-	0x01, 0x28, 0x0b, 0x32, 0x0d, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x44, 0x69, 0x73, 0x63, 0x6f, 0x75,
-	0x6e, 0x74, 0x52, 0x0f, 0x73, 0x74, 0x75, 0x64, 0x65, 0x6e, 0x74, 0x44, 0x69, 0x73, 0x63, 0x6f,
-	0x75, 0x6e, 0x74, 0x22, 0x9e, 0x01, 0x0a, 0x15, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x12, 0x27, 0x0a,
-	0x0f, 0x69, 0x64, 0x65, 0x6d, 0x70, 0x6f, 0x74, 0x65, 0x6e, 0x63, 0x79, 0x5f, 0x6b, 0x65, 0x79,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x69, 0x64, 0x65, 0x6d, 0x70, 0x6f, 0x74, 0x65,
-	0x6e, 0x63, 0x79, 0x4b, 0x65, 0x79, 0x12, 0x39, 0x0a, 0x0c, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74,
-	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x15, 0x2e, 0x64,
-	0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x49,
-	0x6e, 0x66, 0x6f, 0x52, 0x0c, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x12, 0x21, 0x0a, 0x0c, 0x72, 0x65, 0x64, 0x69, 0x72, 0x65, 0x63, 0x74, 0x5f, 0x75, 0x72,
-	0x6c, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x72, 0x65, 0x64, 0x69, 0x72, 0x65, 0x63,
-	0x74, 0x55, 0x72, 0x6c, 0x22, 0x3a, 0x0a, 0x15, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x12, 0x21, 0x0a,
-	0x0c, 0x72, 0x65, 0x64, 0x69, 0x72, 0x65, 0x63, 0x74, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x0b, 0x72, 0x65, 0x64, 0x69, 0x72, 0x65, 0x63, 0x74, 0x55, 0x72, 0x6c,
-	0x22, 0x1b, 0x0a, 0x19, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e,
-	0x47, 0x65, 0x74, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x52, 0x65, 0x71, 0x22, 0xaa, 0x01,
-	0x0a, 0x13, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x75,
-	0x6d, 0x6d, 0x61, 0x72, 0x79, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1d, 0x0a, 0x0a, 0x66, 0x69, 0x72, 0x73, 0x74, 0x5f, 0x6e,
-	0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x66, 0x69, 0x72, 0x73, 0x74,
-	0x4e, 0x61, 0x6d, 0x65, 0x12, 0x1b, 0x0a, 0x09, 0x6c, 0x61, 0x73, 0x74, 0x5f, 0x6e, 0x61, 0x6d,
-	0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6c, 0x61, 0x73, 0x74, 0x4e, 0x61, 0x6d,
-	0x65, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x05, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x12, 0x1d, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74,
-	0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x63, 0x72, 0x65,
-	0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x61, 0x69, 0x64, 0x18, 0x06,
-	0x20, 0x01, 0x28, 0x08, 0x52, 0x04, 0x70, 0x61, 0x69, 0x64, 0x22, 0x53, 0x0a, 0x19, 0x52, 0x65,
+	0x71, 0x22, 0x99, 0x03, 0x0a, 0x15, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x50, 0x72, 0x69, 0x63, 0x65, 0x73, 0x52, 0x65, 0x73, 0x12, 0x2a, 0x0a, 0x11, 0x77,
+	0x65, 0x65, 0x6b, 0x65, 0x6e, 0x64, 0x5f, 0x70, 0x61, 0x73, 0x73, 0x5f, 0x63, 0x6f, 0x73, 0x74,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0f, 0x77, 0x65, 0x65, 0x6b, 0x65, 0x6e, 0x64, 0x50,
+	0x61, 0x73, 0x73, 0x43, 0x6f, 0x73, 0x74, 0x12, 0x44, 0x0a, 0x11, 0x77, 0x65, 0x65, 0x6b, 0x65,
+	0x6e, 0x64, 0x5f, 0x70, 0x61, 0x73, 0x73, 0x5f, 0x74, 0x69, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0e, 0x32, 0x18, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x46, 0x75, 0x6c, 0x6c, 0x57, 0x65, 0x65,
+	0x6b, 0x65, 0x6e, 0x64, 0x50, 0x61, 0x73, 0x73, 0x54, 0x69, 0x65, 0x72, 0x52, 0x0f, 0x77, 0x65,
+	0x65, 0x6b, 0x65, 0x6e, 0x64, 0x50, 0x61, 0x73, 0x73, 0x54, 0x69, 0x65, 0x72, 0x12, 0x26, 0x0a,
+	0x0f, 0x64, 0x61, 0x6e, 0x63, 0x65, 0x5f, 0x70, 0x61, 0x73, 0x73, 0x5f, 0x63, 0x6f, 0x73, 0x74,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0d, 0x64, 0x61, 0x6e, 0x63, 0x65, 0x50, 0x61, 0x73,
+	0x73, 0x43, 0x6f, 0x73, 0x74, 0x12, 0x2b, 0x0a, 0x12, 0x6d, 0x69, 0x78, 0x5f, 0x61, 0x6e, 0x64,
+	0x5f, 0x6d, 0x61, 0x74, 0x63, 0x68, 0x5f, 0x63, 0x6f, 0x73, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28,
+	0x03, 0x52, 0x0f, 0x6d, 0x69, 0x78, 0x41, 0x6e, 0x64, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x43, 0x6f,
+	0x73, 0x74, 0x12, 0x24, 0x0a, 0x0e, 0x73, 0x6f, 0x6c, 0x6f, 0x5f, 0x6a, 0x61, 0x7a, 0x7a, 0x5f,
+	0x63, 0x6f, 0x73, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0c, 0x73, 0x6f, 0x6c, 0x6f,
+	0x4a, 0x61, 0x7a, 0x7a, 0x43, 0x6f, 0x73, 0x74, 0x12, 0x32, 0x0a, 0x15, 0x74, 0x65, 0x61, 0x6d,
+	0x5f, 0x63, 0x6f, 0x6d, 0x70, 0x65, 0x74, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x63, 0x6f, 0x73,
+	0x74, 0x18, 0x06, 0x20, 0x01, 0x28, 0x03, 0x52, 0x13, 0x74, 0x65, 0x61, 0x6d, 0x43, 0x6f, 0x6d,
+	0x70, 0x65, 0x74, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x73, 0x74, 0x12, 0x1f, 0x0a, 0x0b,
+	0x74, 0x73, 0x68, 0x69, 0x72, 0x74, 0x5f, 0x63, 0x6f, 0x73, 0x74, 0x18, 0x07, 0x20, 0x01, 0x28,
+	0x03, 0x52, 0x0a, 0x74, 0x73, 0x68, 0x69, 0x72, 0x74, 0x43, 0x6f, 0x73, 0x74, 0x12, 0x3e, 0x0a,
+	0x10, 0x73, 0x74, 0x75, 0x64, 0x65, 0x6e, 0x74, 0x5f, 0x64, 0x69, 0x73, 0x63, 0x6f, 0x75, 0x6e,
+	0x74, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x44, 0x69,
+	0x73, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x41, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x0f, 0x73, 0x74,
+	0x75, 0x64, 0x65, 0x6e, 0x74, 0x44, 0x69, 0x73, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x22, 0x9e, 0x01,
+	0x0a, 0x15, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x55, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x12, 0x27, 0x0a, 0x0f, 0x69, 0x64, 0x65, 0x6d, 0x70,
+	0x6f, 0x74, 0x65, 0x6e, 0x63, 0x79, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x0e, 0x69, 0x64, 0x65, 0x6d, 0x70, 0x6f, 0x74, 0x65, 0x6e, 0x63, 0x79, 0x4b, 0x65, 0x79,
+	0x12, 0x39, 0x0a, 0x0c, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x15, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67,
+	0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x0c, 0x72,
+	0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x21, 0x0a, 0x0c, 0x72,
+	0x65, 0x64, 0x69, 0x72, 0x65, 0x63, 0x74, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0b, 0x72, 0x65, 0x64, 0x69, 0x72, 0x65, 0x63, 0x74, 0x55, 0x72, 0x6c, 0x22, 0x3a,
+	0x0a, 0x15, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x55, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x12, 0x21, 0x0a, 0x0c, 0x72, 0x65, 0x64, 0x69, 0x72,
+	0x65, 0x63, 0x74, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x72,
+	0x65, 0x64, 0x69, 0x72, 0x65, 0x63, 0x74, 0x55, 0x72, 0x6c, 0x22, 0x1b, 0x0a, 0x19, 0x52, 0x65,
 	0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x47, 0x65, 0x74, 0x53, 0x75, 0x6d,
-	0x6d, 0x61, 0x72, 0x79, 0x52, 0x65, 0x73, 0x12, 0x36, 0x0a, 0x09, 0x73, 0x75, 0x6d, 0x6d, 0x61,
-	0x72, 0x69, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x64, 0x73, 0x73,
-	0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x75, 0x6d,
-	0x6d, 0x61, 0x72, 0x79, 0x52, 0x09, 0x73, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x69, 0x65, 0x73, 0x2a,
-	0x4c, 0x0a, 0x13, 0x46, 0x75, 0x6c, 0x6c, 0x57, 0x65, 0x65, 0x6b, 0x65, 0x6e, 0x64, 0x50, 0x61,
-	0x73, 0x73, 0x54, 0x69, 0x65, 0x72, 0x12, 0x09, 0x0a, 0x05, 0x54, 0x69, 0x65, 0x72, 0x31, 0x10,
-	0x00, 0x12, 0x09, 0x0a, 0x05, 0x54, 0x69, 0x65, 0x72, 0x32, 0x10, 0x01, 0x12, 0x09, 0x0a, 0x05,
-	0x54, 0x69, 0x65, 0x72, 0x33, 0x10, 0x02, 0x12, 0x09, 0x0a, 0x05, 0x54, 0x69, 0x65, 0x72, 0x34,
-	0x10, 0x03, 0x12, 0x09, 0x0a, 0x05, 0x54, 0x69, 0x65, 0x72, 0x35, 0x10, 0x04, 0x2a, 0x3a, 0x0a,
-	0x14, 0x46, 0x75, 0x6c, 0x6c, 0x57, 0x65, 0x65, 0x6b, 0x65, 0x6e, 0x64, 0x50, 0x61, 0x73, 0x73,
-	0x4c, 0x65, 0x76, 0x65, 0x6c, 0x12, 0x0a, 0x0a, 0x06, 0x4c, 0x65, 0x76, 0x65, 0x6c, 0x31, 0x10,
-	0x00, 0x12, 0x0a, 0x0a, 0x06, 0x4c, 0x65, 0x76, 0x65, 0x6c, 0x32, 0x10, 0x01, 0x12, 0x0a, 0x0a,
-	0x06, 0x4c, 0x65, 0x76, 0x65, 0x6c, 0x33, 0x10, 0x02, 0x32, 0xd2, 0x02, 0x0a, 0x0c, 0x52, 0x65,
-	0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x37, 0x0a, 0x03, 0x41, 0x64,
-	0x64, 0x12, 0x17, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x41, 0x64, 0x64, 0x52, 0x65, 0x71, 0x1a, 0x17, 0x2e, 0x64, 0x73, 0x73,
-	0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x41, 0x64, 0x64,
-	0x52, 0x65, 0x73, 0x12, 0x37, 0x0a, 0x03, 0x47, 0x65, 0x74, 0x12, 0x17, 0x2e, 0x64, 0x73, 0x73,
-	0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x47, 0x65, 0x74,
-	0x52, 0x65, 0x71, 0x1a, 0x17, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74,
-	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x47, 0x65, 0x74, 0x52, 0x65, 0x73, 0x12, 0x4c, 0x0a, 0x0a,
-	0x47, 0x65, 0x74, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x12, 0x1e, 0x2e, 0x64, 0x73, 0x73,
-	0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x47, 0x65, 0x74,
-	0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x52, 0x65, 0x71, 0x1a, 0x1e, 0x2e, 0x64, 0x73, 0x73,
-	0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x47, 0x65, 0x74,
-	0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x52, 0x65, 0x73, 0x12, 0x40, 0x0a, 0x06, 0x50, 0x72,
-	0x69, 0x63, 0x65, 0x73, 0x12, 0x1a, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73,
-	0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x69, 0x63, 0x65, 0x73, 0x52, 0x65, 0x71,
-	0x1a, 0x1a, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x50, 0x72, 0x69, 0x63, 0x65, 0x73, 0x52, 0x65, 0x73, 0x12, 0x40, 0x0a, 0x06,
-	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x12, 0x1a, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67,
-	0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52,
-	0x65, 0x71, 0x1a, 0x1a, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72,
-	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x42, 0x11,
-	0x5a, 0x0f, 0x64, 0x79, 0x6e, 0x61, 0x6d, 0x69, 0x63, 0x2f, 0x72, 0x70, 0x63, 0x2f, 0x64, 0x73,
-	0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6d, 0x61, 0x72, 0x79, 0x52, 0x65, 0x71, 0x22, 0xaa, 0x01, 0x0a, 0x13, 0x52, 0x65, 0x67, 0x69,
+	0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x12,
+	0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12,
+	0x1d, 0x0a, 0x0a, 0x66, 0x69, 0x72, 0x73, 0x74, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x09, 0x66, 0x69, 0x72, 0x73, 0x74, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x1b,
+	0x0a, 0x09, 0x6c, 0x61, 0x73, 0x74, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x08, 0x6c, 0x61, 0x73, 0x74, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x65,
+	0x6d, 0x61, 0x69, 0x6c, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x65, 0x6d, 0x61, 0x69,
+	0x6c, 0x12, 0x1d, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18,
+	0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74,
+	0x12, 0x12, 0x0a, 0x04, 0x70, 0x61, 0x69, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x08, 0x52, 0x04,
+	0x70, 0x61, 0x69, 0x64, 0x22, 0x53, 0x0a, 0x19, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x47, 0x65, 0x74, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x52, 0x65,
+	0x73, 0x12, 0x36, 0x0a, 0x09, 0x73, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x69, 0x65, 0x73, 0x18, 0x01,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73,
+	0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x52, 0x09,
+	0x73, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x69, 0x65, 0x73, 0x2a, 0x4c, 0x0a, 0x13, 0x46, 0x75, 0x6c,
+	0x6c, 0x57, 0x65, 0x65, 0x6b, 0x65, 0x6e, 0x64, 0x50, 0x61, 0x73, 0x73, 0x54, 0x69, 0x65, 0x72,
+	0x12, 0x09, 0x0a, 0x05, 0x54, 0x69, 0x65, 0x72, 0x31, 0x10, 0x00, 0x12, 0x09, 0x0a, 0x05, 0x54,
+	0x69, 0x65, 0x72, 0x32, 0x10, 0x01, 0x12, 0x09, 0x0a, 0x05, 0x54, 0x69, 0x65, 0x72, 0x33, 0x10,
+	0x02, 0x12, 0x09, 0x0a, 0x05, 0x54, 0x69, 0x65, 0x72, 0x34, 0x10, 0x03, 0x12, 0x09, 0x0a, 0x05,
+	0x54, 0x69, 0x65, 0x72, 0x35, 0x10, 0x04, 0x2a, 0x3a, 0x0a, 0x14, 0x46, 0x75, 0x6c, 0x6c, 0x57,
+	0x65, 0x65, 0x6b, 0x65, 0x6e, 0x64, 0x50, 0x61, 0x73, 0x73, 0x4c, 0x65, 0x76, 0x65, 0x6c, 0x12,
+	0x0a, 0x0a, 0x06, 0x4c, 0x65, 0x76, 0x65, 0x6c, 0x31, 0x10, 0x00, 0x12, 0x0a, 0x0a, 0x06, 0x4c,
+	0x65, 0x76, 0x65, 0x6c, 0x32, 0x10, 0x01, 0x12, 0x0a, 0x0a, 0x06, 0x4c, 0x65, 0x76, 0x65, 0x6c,
+	0x33, 0x10, 0x02, 0x32, 0xd2, 0x02, 0x0a, 0x0c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x12, 0x37, 0x0a, 0x03, 0x41, 0x64, 0x64, 0x12, 0x17, 0x2e, 0x64, 0x73,
+	0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x41, 0x64,
+	0x64, 0x52, 0x65, 0x71, 0x1a, 0x17, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73,
+	0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x41, 0x64, 0x64, 0x52, 0x65, 0x73, 0x12, 0x37, 0x0a,
+	0x03, 0x47, 0x65, 0x74, 0x12, 0x17, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73,
+	0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x47, 0x65, 0x74, 0x52, 0x65, 0x71, 0x1a, 0x17, 0x2e,
+	0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x47, 0x65, 0x74, 0x52, 0x65, 0x73, 0x12, 0x4c, 0x0a, 0x0a, 0x47, 0x65, 0x74, 0x53, 0x75, 0x6d,
+	0x6d, 0x61, 0x72, 0x79, 0x12, 0x1e, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73,
+	0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x47, 0x65, 0x74, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72,
+	0x79, 0x52, 0x65, 0x71, 0x1a, 0x1e, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73,
+	0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x47, 0x65, 0x74, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72,
+	0x79, 0x52, 0x65, 0x73, 0x12, 0x40, 0x0a, 0x06, 0x50, 0x72, 0x69, 0x63, 0x65, 0x73, 0x12, 0x1a,
+	0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x50, 0x72, 0x69, 0x63, 0x65, 0x73, 0x52, 0x65, 0x71, 0x1a, 0x1a, 0x2e, 0x64, 0x73, 0x73,
+	0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x69,
+	0x63, 0x65, 0x73, 0x52, 0x65, 0x73, 0x12, 0x40, 0x0a, 0x06, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
+	0x12, 0x1a, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x1a, 0x1a, 0x2e, 0x64,
+	0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x55,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x42, 0x09, 0x5a, 0x07, 0x72, 0x70, 0x63, 0x2f,
+	0x64, 0x73, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
-	file_dynamic_rpc_dss_registration_proto_rawDescOnce sync.Once
-	file_dynamic_rpc_dss_registration_proto_rawDescData = file_dynamic_rpc_dss_registration_proto_rawDesc
+	file_rpc_dss_registration_proto_rawDescOnce sync.Once
+	file_rpc_dss_registration_proto_rawDescData = file_rpc_dss_registration_proto_rawDesc
 )
 
-func file_dynamic_rpc_dss_registration_proto_rawDescGZIP() []byte {
-	file_dynamic_rpc_dss_registration_proto_rawDescOnce.Do(func() {
-		file_dynamic_rpc_dss_registration_proto_rawDescData = protoimpl.X.CompressGZIP(file_dynamic_rpc_dss_registration_proto_rawDescData)
+func file_rpc_dss_registration_proto_rawDescGZIP() []byte {
+	file_rpc_dss_registration_proto_rawDescOnce.Do(func() {
+		file_rpc_dss_registration_proto_rawDescData = protoimpl.X.CompressGZIP(file_rpc_dss_registration_proto_rawDescData)
 	})
-	return file_dynamic_rpc_dss_registration_proto_rawDescData
+	return file_rpc_dss_registration_proto_rawDescData
 }
 
-var file_dynamic_rpc_dss_registration_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_dynamic_rpc_dss_registration_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
-var file_dynamic_rpc_dss_registration_proto_goTypes = []interface{}{
+var file_rpc_dss_registration_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_rpc_dss_registration_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_rpc_dss_registration_proto_goTypes = []interface{}{
 	(FullWeekendPassTier)(0),          // 0: dss.FullWeekendPassTier
 	(FullWeekendPassLevel)(0),         // 1: dss.FullWeekendPassLevel
 	(MixAndMatch_Role)(0),             // 2: dss.MixAndMatch.Role
@@ -2016,15 +1931,15 @@ var file_dynamic_rpc_dss_registration_proto_goTypes = []interface{}{
 	(*RegistrationGetReq)(nil),        // 17: dss.RegistrationGetReq
 	(*RegistrationGetRes)(nil),        // 18: dss.RegistrationGetRes
 	(*RegistrationPricesReq)(nil),     // 19: dss.RegistrationPricesReq
-	(*Discount)(nil),                  // 20: dss.Discount
-	(*RegistrationPricesRes)(nil),     // 21: dss.RegistrationPricesRes
-	(*RegistrationUpdateReq)(nil),     // 22: dss.RegistrationUpdateReq
-	(*RegistrationUpdateRes)(nil),     // 23: dss.RegistrationUpdateRes
-	(*RegistrationGetSummaryReq)(nil), // 24: dss.RegistrationGetSummaryReq
-	(*RegistrationSummary)(nil),       // 25: dss.RegistrationSummary
-	(*RegistrationGetSummaryRes)(nil), // 26: dss.RegistrationGetSummaryRes
+	(*RegistrationPricesRes)(nil),     // 20: dss.RegistrationPricesRes
+	(*RegistrationUpdateReq)(nil),     // 21: dss.RegistrationUpdateReq
+	(*RegistrationUpdateRes)(nil),     // 22: dss.RegistrationUpdateRes
+	(*RegistrationGetSummaryReq)(nil), // 23: dss.RegistrationGetSummaryReq
+	(*RegistrationSummary)(nil),       // 24: dss.RegistrationSummary
+	(*RegistrationGetSummaryRes)(nil), // 25: dss.RegistrationGetSummaryRes
+	(*DiscountAmount)(nil),            // 26: dss.DiscountAmount
 }
-var file_dynamic_rpc_dss_registration_proto_depIdxs = []int32{
+var file_rpc_dss_registration_proto_depIdxs = []int32{
 	5,  // 0: dss.RegistrationInfo.full_weekend_pass:type_name -> dss.FullWeekendPass
 	6,  // 1: dss.RegistrationInfo.dance_only_pass:type_name -> dss.DanceOnlyPass
 	7,  // 2: dss.RegistrationInfo.no_pass:type_name -> dss.NoPass
@@ -2042,19 +1957,19 @@ var file_dynamic_rpc_dss_registration_proto_depIdxs = []int32{
 	4,  // 14: dss.RegistrationAddReq.registration:type_name -> dss.RegistrationInfo
 	4,  // 15: dss.RegistrationGetRes.registration:type_name -> dss.RegistrationInfo
 	0,  // 16: dss.RegistrationPricesRes.weekend_pass_tier:type_name -> dss.FullWeekendPassTier
-	20, // 17: dss.RegistrationPricesRes.student_discount:type_name -> dss.Discount
+	26, // 17: dss.RegistrationPricesRes.student_discount:type_name -> dss.DiscountAmount
 	4,  // 18: dss.RegistrationUpdateReq.registration:type_name -> dss.RegistrationInfo
-	25, // 19: dss.RegistrationGetSummaryRes.summaries:type_name -> dss.RegistrationSummary
+	24, // 19: dss.RegistrationGetSummaryRes.summaries:type_name -> dss.RegistrationSummary
 	15, // 20: dss.Registration.Add:input_type -> dss.RegistrationAddReq
 	17, // 21: dss.Registration.Get:input_type -> dss.RegistrationGetReq
-	24, // 22: dss.Registration.GetSummary:input_type -> dss.RegistrationGetSummaryReq
+	23, // 22: dss.Registration.GetSummary:input_type -> dss.RegistrationGetSummaryReq
 	19, // 23: dss.Registration.Prices:input_type -> dss.RegistrationPricesReq
-	22, // 24: dss.Registration.Update:input_type -> dss.RegistrationUpdateReq
+	21, // 24: dss.Registration.Update:input_type -> dss.RegistrationUpdateReq
 	16, // 25: dss.Registration.Add:output_type -> dss.RegistrationAddRes
 	18, // 26: dss.Registration.Get:output_type -> dss.RegistrationGetRes
-	26, // 27: dss.Registration.GetSummary:output_type -> dss.RegistrationGetSummaryRes
-	21, // 28: dss.Registration.Prices:output_type -> dss.RegistrationPricesRes
-	23, // 29: dss.Registration.Update:output_type -> dss.RegistrationUpdateRes
+	25, // 27: dss.Registration.GetSummary:output_type -> dss.RegistrationGetSummaryRes
+	20, // 28: dss.Registration.Prices:output_type -> dss.RegistrationPricesRes
+	22, // 29: dss.Registration.Update:output_type -> dss.RegistrationUpdateRes
 	25, // [25:30] is the sub-list for method output_type
 	20, // [20:25] is the sub-list for method input_type
 	20, // [20:20] is the sub-list for extension type_name
@@ -2062,13 +1977,14 @@ var file_dynamic_rpc_dss_registration_proto_depIdxs = []int32{
 	0,  // [0:20] is the sub-list for field type_name
 }
 
-func init() { file_dynamic_rpc_dss_registration_proto_init() }
-func file_dynamic_rpc_dss_registration_proto_init() {
-	if File_dynamic_rpc_dss_registration_proto != nil {
+func init() { file_rpc_dss_registration_proto_init() }
+func file_rpc_dss_registration_proto_init() {
+	if File_rpc_dss_registration_proto != nil {
 		return
 	}
+	file_rpc_dss_discount_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_dynamic_rpc_dss_registration_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationInfo); i {
 			case 0:
 				return &v.state
@@ -2080,7 +1996,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*FullWeekendPass); i {
 			case 0:
 				return &v.state
@@ -2092,7 +2008,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DanceOnlyPass); i {
 			case 0:
 				return &v.state
@@ -2104,7 +2020,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*NoPass); i {
 			case 0:
 				return &v.state
@@ -2116,7 +2032,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MixAndMatch); i {
 			case 0:
 				return &v.state
@@ -2128,7 +2044,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SoloJazz); i {
 			case 0:
 				return &v.state
@@ -2140,7 +2056,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*TeamCompetition); i {
 			case 0:
 				return &v.state
@@ -2152,7 +2068,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*TShirt); i {
 			case 0:
 				return &v.state
@@ -2164,7 +2080,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ProvideHousing); i {
 			case 0:
 				return &v.state
@@ -2176,7 +2092,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RequireHousing); i {
 			case 0:
 				return &v.state
@@ -2188,7 +2104,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*NoHousing); i {
 			case 0:
 				return &v.state
@@ -2200,7 +2116,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationAddReq); i {
 			case 0:
 				return &v.state
@@ -2212,7 +2128,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationAddRes); i {
 			case 0:
 				return &v.state
@@ -2224,7 +2140,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationGetReq); i {
 			case 0:
 				return &v.state
@@ -2236,7 +2152,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationGetRes); i {
 			case 0:
 				return &v.state
@@ -2248,7 +2164,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationPricesReq); i {
 			case 0:
 				return &v.state
@@ -2260,19 +2176,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Discount); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationPricesRes); i {
 			case 0:
 				return &v.state
@@ -2284,7 +2188,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationUpdateReq); i {
 			case 0:
 				return &v.state
@@ -2296,7 +2200,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationUpdateRes); i {
 			case 0:
 				return &v.state
@@ -2308,7 +2212,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationGetSummaryReq); i {
 			case 0:
 				return &v.state
@@ -2320,7 +2224,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationSummary); i {
 			case 0:
 				return &v.state
@@ -2332,7 +2236,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_dynamic_rpc_dss_registration_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+		file_rpc_dss_registration_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationGetSummaryRes); i {
 			case 0:
 				return &v.state
@@ -2345,7 +2249,7 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 			}
 		}
 	}
-	file_dynamic_rpc_dss_registration_proto_msgTypes[0].OneofWrappers = []interface{}{
+	file_rpc_dss_registration_proto_msgTypes[0].OneofWrappers = []interface{}{
 		(*RegistrationInfo_FullWeekendPass)(nil),
 		(*RegistrationInfo_DanceOnlyPass)(nil),
 		(*RegistrationInfo_NoPass)(nil),
@@ -2353,27 +2257,23 @@ func file_dynamic_rpc_dss_registration_proto_init() {
 		(*RegistrationInfo_RequireHousing)(nil),
 		(*RegistrationInfo_NoHousing)(nil),
 	}
-	file_dynamic_rpc_dss_registration_proto_msgTypes[16].OneofWrappers = []interface{}{
-		(*Discount_Dollar)(nil),
-		(*Discount_Percent)(nil),
-	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_dynamic_rpc_dss_registration_proto_rawDesc,
+			RawDescriptor: file_rpc_dss_registration_proto_rawDesc,
 			NumEnums:      4,
-			NumMessages:   23,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_dynamic_rpc_dss_registration_proto_goTypes,
-		DependencyIndexes: file_dynamic_rpc_dss_registration_proto_depIdxs,
-		EnumInfos:         file_dynamic_rpc_dss_registration_proto_enumTypes,
-		MessageInfos:      file_dynamic_rpc_dss_registration_proto_msgTypes,
+		GoTypes:           file_rpc_dss_registration_proto_goTypes,
+		DependencyIndexes: file_rpc_dss_registration_proto_depIdxs,
+		EnumInfos:         file_rpc_dss_registration_proto_enumTypes,
+		MessageInfos:      file_rpc_dss_registration_proto_msgTypes,
 	}.Build()
-	File_dynamic_rpc_dss_registration_proto = out.File
-	file_dynamic_rpc_dss_registration_proto_rawDesc = nil
-	file_dynamic_rpc_dss_registration_proto_goTypes = nil
-	file_dynamic_rpc_dss_registration_proto_depIdxs = nil
+	File_rpc_dss_registration_proto = out.File
+	file_rpc_dss_registration_proto_rawDesc = nil
+	file_rpc_dss_registration_proto_goTypes = nil
+	file_rpc_dss_registration_proto_depIdxs = nil
 }

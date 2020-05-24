@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package dss;
+option go_package = "rpc/dss";
+
+service Discount {
+	rpc Add(DiscountAddReq) returns (DiscountAddRes);
+	rpc Get(DiscountGetReq) returns (DiscountGetRes);
+}
+
+message DiscountAmount {
+	oneof amount {
+		int64 dollar = 8;
+		string percent = 9;
+	}
+}
+
+message SingleDiscount {
+	string name = 1;
+	DiscountAmount amount = 2;
+}
+
+message DiscountBundle {
+	string code = 1;
+	repeated SingleDiscount discounts = 2;
+}
+
+message DiscountAddReq {
+	DiscountBundle bundle = 1;
+}
+
+message DiscountAddRes {}
+
+message DiscountGetReq {
+	string code = 1;
+}
+
+message DiscountGetRes {
+	DiscountBundle bundle = 1;
+}

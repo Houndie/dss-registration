@@ -46,8 +46,11 @@ func (s *Server) Update(ctx context.Context, req *pb.RegistrationUpdateReq) (*pb
 	if err != nil {
 		var noDiscountErr storage.ErrDiscountNotFound
 		var outOfStockErr registration.ErrOutOfStock
+		var noRegistrationErr storage.ErrNoRegistrationForID
 		if errors.As(err, &noDiscountErr) {
-			return nil, twirp.InvalidArgumentError("registration.discounts", noDiscountErr.Error()).WithMeta("Code", noDiscountErr.Code)
+			return nil, twirp.NewError(twirp.NotFound, noDiscountErr.Error()).WithMeta("Code", noDiscountErr.Code)
+		} else if errors.As(err, &noRegistrationErr) {
+			return nil, twirp.NewError(twirp.NotFound, noRegistrationErr.Error()).WithMeta("id", noRegistrationErr.ID)
 		} else if errors.Is(err, registration.ErrRegistrationDisabled) {
 			return nil, twirp.NewError(twirp.FailedPrecondition, "registration is disabled")
 		} else if errors.As(err, &outOfStockErr) {

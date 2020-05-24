@@ -5,20 +5,12 @@ import (
 	"time"
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
-	"github.com/Houndie/dss-registration/dynamic/square"
+	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/sendgrid/rest"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"github.com/sirupsen/logrus"
 )
-
-type SquareClient interface {
-	ListCatalog(ctx context.Context, types []square.CatalogObjectType) square.ListCatalogIterator
-	BatchRetrieveInventoryCounts(ctx context.Context, catalogObjectIds, locationIds []string, updatedAfter *time.Time) square.BatchRetrieveInventoryCountsIterator
-	BatchRetrieveOrders(ctx context.Context, locationId string, orderIds []string) ([]*square.Order, error)
-	ListLocations(ctx context.Context) ([]*square.Location, error)
-	CreateCheckout(ctx context.Context, locationId, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error)
-}
 
 type MailClient interface {
 	Send(email *mail.SGMailV3) (*rest.Response, error)
@@ -34,7 +26,7 @@ type Store interface {
 }
 
 type Service struct {
-	client     SquareClient
+	client     common.SquareClient
 	logger     *logrus.Logger
 	active     bool
 	authorizer Authorizer
@@ -42,7 +34,7 @@ type Service struct {
 	mailClient MailClient
 }
 
-func NewService(active bool, logger *logrus.Logger, client SquareClient, authorizer Authorizer, store Store, mailClient MailClient) *Service {
+func NewService(active bool, logger *logrus.Logger, client common.SquareClient, authorizer Authorizer, store Store, mailClient MailClient) *Service {
 	return &Service{
 		active:     active,
 		client:     client,
@@ -64,15 +56,4 @@ type Summary struct {
 	Email     string
 	CreatedAt time.Time
 	Paid      bool
-}
-
-type SingleDiscount struct {
-	Amount    DiscountAmount
-	Name      string
-	AppliedTo storage.PurchaseItem
-}
-
-type Discount struct {
-	Code      string
-	Discounts []*SingleDiscount
 }

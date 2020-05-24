@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 )
 
@@ -29,7 +30,7 @@ func (s *Service) Get(ctx context.Context, token, registrationID string) (*Info,
 		return nil, storage.ErrNotFound{Key: registrationID}
 	}
 
-	pd := &paymentData{}
+	pd := &common.PaymentData{}
 	if len(r.OrderIds) > 0 {
 		s.logger.Trace("fetching locations from square")
 		locations, err := s.client.ListLocations(ctx)
@@ -43,12 +44,12 @@ func (s *Service) Get(ctx context.Context, token, registrationID string) (*Info,
 		}
 		s.logger.Tracef("found location %s", locations[0].Id)
 
-		squareData, err := getSquareCatalog(ctx, s.client)
+		squareData, err := common.GetSquareCatalog(ctx, s.client)
 		if err != nil {
 			return nil, err
 		}
 
-		pd, err = getSquarePayments(ctx, s.client, squareData, locations[0].Id, r.OrderIds)
+		pd, err = common.GetSquarePayments(ctx, s.client, squareData, locations[0].Id, r.OrderIds)
 		if err != nil {
 			return nil, err
 		}
@@ -65,11 +66,11 @@ func (s *Service) Get(ctx context.Context, token, registrationID string) (*Info,
 		Email:           r.Email,
 		HomeScene:       r.HomeScene,
 		IsStudent:       r.IsStudent,
-		PassType:        fromStoragePassType(r.PassType, pd.weekendPassPaid, pd.danceOnlyPaid),
-		MixAndMatch:     fromStorageMixAndMatch(r.MixAndMatch, pd.mixAndMatchPaid),
-		SoloJazz:        fromStorageSoloJazz(r.SoloJazz, pd.soloJazzPaid),
-		TeamCompetition: fromStorageTeamCompetition(r.TeamCompetition, pd.teamCompetitionPaid),
-		TShirt:          fromStorageTShirt(r.TShirt, pd.tShirtPaid),
+		PassType:        fromStoragePassType(r.PassType, pd.WeekendPassPaid, pd.DanceOnlyPaid),
+		MixAndMatch:     fromStorageMixAndMatch(r.MixAndMatch, pd.MixAndMatchPaid),
+		SoloJazz:        fromStorageSoloJazz(r.SoloJazz, pd.SoloJazzPaid),
+		TeamCompetition: fromStorageTeamCompetition(r.TeamCompetition, pd.TeamCompetitionPaid),
+		TShirt:          fromStorageTShirt(r.TShirt, pd.TShirtPaid),
 		Housing:         r.Housing,
 		DiscountCodes:   r.DiscountCodes,
 		CreatedAt:       r.CreatedAt,
