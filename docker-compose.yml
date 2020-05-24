@@ -20,4 +20,10 @@ services:
       context: dynamic
       dockerfile: docker/Dockerfile
     ports:
-      - "8080:80"
+    - "8080:80"
+  frontend:
+    build:
+      context: static
+      dockerfile: docker/Dockerfile
+    ports:
+    - "8081:80"
