@@ -1,5 +1,5 @@
 # Site settings
-baseurl = "https://daytonswingsmackdown.com"
+baseurl = "http://locahost:8081"
 languageCode = "en-us"
 title = "Dayton Swing Smackdown"
 theme = "syna"
