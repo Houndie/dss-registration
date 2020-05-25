@@ -25,7 +25,24 @@ func GenerateServerProtoc() error {
 	return cmd.Run()
 }
 
+func CompileReact() error {
+	fmt.Println("Compiling react components")
+
+	cmd := exec.Command("npx", "webpack", "--mode", "development")
+	cmd.Dir = "static"
+	if mg.Verbose() {
+		cmd.Stdout = os.Stdout
+	}
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("error generating react component: %w", err)
+	}
+	return nil
+}
+
 func BuildStatic() error {
+	mg.Deps(CompileReact)
 	fmt.Println("Building static site")
 	sitename := "http://localhost:8081"
 	dynamicsite := "https://us-central1-dayton-smackdown-test.cloudfunctions.net"

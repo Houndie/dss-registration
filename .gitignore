@@ -1,4 +1,6 @@
 /static/public
+/static/static/js/react
 /static/resources
+/static/node_modules
 *.swp
 /_tools
