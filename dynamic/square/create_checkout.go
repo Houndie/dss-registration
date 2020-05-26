@@ -39,7 +39,7 @@ func (c *Client) CreateCheckout(ctx context.Context, locationId, idempotencyKey 
 
 	bodyBuf := bytes.NewBuffer(jsonBody)
 
-	req, err := http.NewRequest("POST", "https://connect.squareup.com/v2/locations/"+locationId+"/checkouts", bodyBuf)
+	req, err := http.NewRequest("POST", c.endpoint("locations/"+locationId+"/checkouts").String(), bodyBuf)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error creating request")
 	}

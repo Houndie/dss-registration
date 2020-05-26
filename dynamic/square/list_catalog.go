@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -55,17 +54,13 @@ func (i *listCatalogIterator) Next() bool {
 		return false
 	}
 
-	baseurl, err := url.Parse("https://connect.squareup.com/v2/catalog/list")
-	if err != nil {
-		return i.setError(errors.Wrap(err, "Error parsing url"))
-	}
-
+	baseurl := i.c.endpoint("catalog/list")
 	q := baseurl.Query()
 	stringTypes := make([]string, len(i.types))
 	for i, oneType := range i.types {
 		stringTypes[i] = string(oneType)
 	}
-	err = encoder.Encode(&struct {
+	err := encoder.Encode(&struct {
 		Types  string `schema:"types,omitempty"`
 		Cursor string `schema:"cursor,omitempty"`
 	}{

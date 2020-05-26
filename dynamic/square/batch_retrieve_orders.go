@@ -24,7 +24,7 @@ func (c *Client) BatchRetrieveOrders(ctx context.Context, locationId string, ord
 
 	bodyBuf := bytes.NewBuffer(reqBodyBytes)
 
-	req, err := http.NewRequest("POST", "https://connect.squareup.com/v2/locations/"+locationId+"/orders/batch-retrieve", bodyBuf)
+	req, err := http.NewRequest("POST", c.endpoint("locations/"+locationId+"/orders/batch-retrieve").String(), bodyBuf)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating request")
 	}

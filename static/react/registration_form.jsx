@@ -1,8 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { Formik, Form, useField } from 'formik';
+import { v4 as uuidv4 } from 'uuid';
+//import createRegistrationClient from "../rpc/registration_pb_twirp.js";
+const registrationTwirp = require("../rpc/registration_pb_twirp.js")
 
 'use strict';
+
+const registrationClient = registrationTwirp.createRegistrationClient("http://localhost:8080");
+
+function parseDollar(intCost) {
+	let dollar = intCost.toString()
+	while(dollar.length < 3) {
+		dollar = "0" + dollar;
+	}
+	return "$" + dollar.slice(0, -2) + "." + dollar.slice(-2)
+}
+
+function tierToString(tier) {
+	switch (tier) {
+	case registrationTwirp.FullWeekendPassTier.TIER1:
+		return "Tier 1";
+	case registrationTwirp.FullWeekendPassTier.TIER2:
+		return "Tier 2";
+	case registrationTwirp.FullWeekendPassTier.TIER3:
+		return "Tier 3";
+	case registrationTwirp.FullWeekendPassTier.TIER4:
+		return "Tier 4";
+	case registrationTwirp.FullWeekendPassTier.TIER5:
+		return "Tier 5";
+	}
+}
 
 const DSSTextInput = ({ label, ...props }) => {
 	const [field, meta] = useField(props);
@@ -82,18 +110,133 @@ const DSSCheckbox = ({ children, ...props }) => {
 	);
 };
 
+const fullWeekendPassOption = "Full";
+const danceOnlyPassOption = "Dance";
+const noPassOption = "None";
+
+const provideOption = "Provide";
+const requireOption = "Require";
+const noHousingOption = "None";
+
 const RegistrationForm = () => {
+	const [prices, setPrices] = useState(null)
+	useEffect(() => {
+		registrationClient.prices(new registrationTwirp.RegistrationPricesReq()).then(res => {
+			setPrices(res);
+		}, err => {
+			alert(JSON.stringify(err.message));
+		});
+	}, [])
+
 	return (
 		<Formik
-			initialValues={{firstName: '', lastName: ''}}
+			initialValues={{
+				firstName: '', 
+				lastName: '',
+				streetAddress: '',
+				city: '',
+				state: '',
+				zipCode: '',
+				email: '',
+				homeScene: '',
+				isStudent: false,
+				passType: noPassOption,
+				level: '',
+				mixAndMatch: false,
+				role: '',
+				soloJazz: false,
+				teamCompetition: false,
+				teamName: '',
+				tshirt: false,
+				style: '',
+				housing: noHousingOption,
+				pets: '',
+				quantity: 0,
+				provideDetails: '',
+				petAllergies: '',
+				requireDetails: '',
+			}}
 			onSubmit={(values, { setSubmitting }) => {
-				setTimeout(() => {
-				alert(JSON.stringify(values, null, 2));
-				setSubmitting(false);
-				}, 400);
+
+				const r = new registrationTwirp.RegistrationInfo();
+				r.setFirstName(values.firstName);
+				r.setLastName(values.lastName);
+				r.setStreetAddress(values.streetAddress);
+				r.setCity(values.city);
+				r.setState(values.state);
+				r.setZipCode(values.zipCode);
+				r.setEmail(values.email);
+				r.setHomeScene(values.homeScene);
+				r.setIsStudent(values.isStudent);
+
+				switch (values.passType) {
+					case fullWeekendPassOption: {
+						const f = new registrationTwirp.FullWeekendPass();
+						f.setTier(prices.weekendPassTier);
+						f.setLevel(parseInt(values.level));
+						r.setFullWeekendPass(f);
+					}
+					case danceOnlyPassOption:
+						r.setDanceOnlyPass(new registrationTwirp.DanceOnlyPass());
+					default:
+						r.setNoPass(new registrationTwirp.NoPass());
+				}
+
+				if (values.mixAndMatch) {
+					const m = new registrationTwirp.MixAndMatch();
+					m.setRole(parseInt(values.role));
+					r.setMixAndMatch(m);
+				}
+
+				if (values.soloJazz) {
+					r.setSoloJazz(new registrationTwirp.SoloJazz());
+				}
+
+				if (values.teamCompetition) {
+					const t = new registrationTwirp.TeamCompetition();
+					t.setName(values.teamName);
+					r.setTeamCompetition(t);
+				}
+
+				if (values.tshirt) {
+					const t = new registrationTwirp.TShirt();
+					t.setStyle(parseInt(values.style));
+					r.setTshirt(t);
+				}
+
+				switch (values.housing) {
+					case provideOption: {
+						const h = new registrationTwirp.ProvideHousing();
+						h.setPets(values.pets);
+						h.setQuantity(values.quantity);
+						h.setDetails(values.provideDetails);
+						r.setProvideHousing(h);
+					}
+					case requireOption: {
+						const h = new registrationTwirp.RequireHousing();
+						h.setPetAllergies(values.petAllergies);
+						h.setDetails(values.requireDetails);
+						r.setRequireHousing(h);
+					}
+					default:
+						r.setNoHousing(new registrationTwirp.NoHousing());
+				}
+
+				const req = new registrationTwirp.RegistrationAddReq();
+				req.setIdempotencyKey(uuidv4());
+				req.setRedirectUrl("http://localhost:8081");
+				req.setRegistration(r);
+
+				return registrationClient.add(req).then(
+					res => {
+						window.location.href = res.redirect_url;	
+					}, err => {
+						alert(JSON.stringify(err.message));
+					}
+				);
 			}}
 		>
-		{props => (
+		{props => prices != null ? (
 			<Form>
 				<fieldset>
 					<h2>Personal Information</h2>
@@ -166,7 +309,7 @@ const RegistrationForm = () => {
 							</DSSSelect>
 						</div>
 						<div className="col-3"> 
-							<DSSTextInput label="Zip Code" name="zip code" type="text" />
+							<DSSTextInput label="Zip Code" name="zipCode" type="text" />
 						</div>
 					</div>
 					<DSSTextInput label="Email" name="email" type="email" />
@@ -178,9 +321,9 @@ const RegistrationForm = () => {
 					<h2>Purchase</h2>
 					<div className="col-6">
 						<DSSSelect label="Weekend Pass Type" name="passType">
-							<option value="None" />
-							<option value="Full">Full Weekend Pass</option>
-							<option value="Dance">Dance Only Pass</option>
+							<option value={noPassOption} />
+							<option value={fullWeekendPassOption}>{"Full Weekend Pass - "+tierToString(prices.weekendPassTier)+" ("+parseDollar(prices.weekendPassCost)+")"}</option>
+							<option value={danceOnlyPassOption}>{"Dance Only Pass ("+parseDollar(prices.dancePassCost)+")"}</option>
 						</DSSSelect>
 					</div>
 					{props.values.passType === "Full" ? (
@@ -188,29 +331,29 @@ const RegistrationForm = () => {
 							<div className="col-1"></div>
 							<div className="col-6">
 								<DSSSelect label="Level" name="level">
-									<option value="None" />
-									<option value="Level1">Level 1</option>
-									<option value="Level2">Level 2</option>
-									<option value="Level3">Level 3</option>
+									<option value="" />
+									<option value={registrationTwirp.FullWeekendPassLevel.LEVEL1}>Level 1</option>
+									<option value={registrationTwirp.FullWeekendPassLevel.LEVEL2}>Level 2</option>
+									<option value={registrationTwirp.FullWeekendPassLevel.LEVEL3}>Level 3</option>
 								</DSSSelect>
 							</div>
 						</div>
 					) : null}
-					<DSSCheckbox name="mixAndMatch">Mix & Match Competition</DSSCheckbox>
+					<DSSCheckbox name="mixAndMatch">{"Mix & Match Competition ("+parseDollar(prices.mixAndMatchCost)+")"}</DSSCheckbox>
 					{props.values.mixAndMatch ? (
 						<div className="form-row">
 							<div className="col-1"></div>
 							<div className="col-6">
-								<DSSSelect label="Role" name="level">
-									<option value="None" />
-									<option value="Follower">Follower</option>
-									<option value="Leader">Leader</option>
+								<DSSSelect label="Role" name="role">
+									<option value="" />
+									<option value={registrationTwirp.MixAndMatch.Role.FOLLOWER}>Follower</option>
+									<option value={registrationTwirp.MixAndMatch.Role.LEADER}>Leader</option>
 								</DSSSelect>
 							</div>
 						</div>
 					) : null}
-					<DSSCheckbox name="soloJazz">Solo Jazz Competition</DSSCheckbox>
-					<DSSCheckbox name="teamCompetition">Team Competition</DSSCheckbox>
+					<DSSCheckbox name="soloJazz">{"Solo Jazz Competition ("+parseDollar(prices.soloJazzCost)+")"}</DSSCheckbox>
+					<DSSCheckbox name="teamCompetition">{"Team Competition ("+parseDollar(prices.teamCompetitionCost)+")"}</DSSCheckbox>
 					{props.values.teamCompetition ? (
 						<div className="form-row">
 							<div className="col-1"></div>
@@ -219,24 +362,24 @@ const RegistrationForm = () => {
 							</div>
 						</div>
 					) : null}
-					<DSSCheckbox name="tshirt">T-Shirt</DSSCheckbox>
+					<DSSCheckbox name="tshirt">{"T-Shirt ("+parseDollar(prices.tshirtCost)+")"}</DSSCheckbox>
 					{props.values.tshirt ? (
 						<div className="form-row">
 							<div className="col-1"></div>
 							<div className="col-6">
 								<DSSSelect label="T-Shirt Size/Style" name="style">
-									<option value=""></option>
-									<option value="Unisex S">Unisex S</option>
-									<option value="Unisex M">Unisex M</option>
-									<option value="Unisex L">Unisex L</option>
-									<option value="Unisex XL">Unisex XL</option>
-									<option value="Unisex 2XL">Unisex 2XL</option>
-									<option value="Unisex 3XL">Unisex 3XL</option>
-									<option value="Bella S">Bella S</option>
-									<option value="Bella M">Bella M</option>
-									<option value="Bella L">Bella L</option>
-									<option value="Bella XL">Bella XL</option>
-									<option value="Bella 2XL">Bella 2XL</option>
+									<option value=''></option>
+									<option value={registrationTwirp.TShirt.Style.UNISEXS}>Unisex S</option>
+									<option value={registrationTwirp.TShirt.Style.UNISEXM}>Unisex M</option>
+									<option value={registrationTwirp.TShirt.Style.UNISEXL}>Unisex L</option>
+									<option value={registrationTwirp.TShirt.Style.UNISEXXL}>Unisex XL</option>
+									<option value={registrationTwirp.TShirt.Style.UNISEX2XL}>Unisex 2XL</option>
+									<option value={registrationTwirp.TShirt.Style.UNISEX3XL}>Unisex 3XL</option>
+									<option value={registrationTwirp.TShirt.Style.BELLAS}>Bella S</option>
+									<option value={registrationTwirp.TShirt.Style.BELLAM}>Bella M</option>
+									<option value={registrationTwirp.TShirt.Style.BELLAL}>Bella L</option>
+									<option value={registrationTwirp.TShirt.Style.BELLAXL}>Bella XL</option>
+									<option value={registrationTwirp.TShirt.Style.BELLA2XL}>Bella 2XL</option>
 								</DSSSelect>
 							</div>
 					</div>
@@ -246,9 +389,9 @@ const RegistrationForm = () => {
 				<fieldset>
 					<h2>Housing</h2>
 					<DSSSelect label="Housing Status" name="housing">
-						<option value="None">I neither require nor can provide housing</option>
-						<option value="Provide">I can provide housing</option>
-						<option value="Require">I require housing</option>
+						<option value={noHousingOption}>I neither require nor can provide housing</option>
+						<option value={provideOption}>I can provide housing</option>
+						<option value={requireOption}>I require housing</option>
 					</DSSSelect>
 					{props.values.housing === "Provide" ? (
 						<>
@@ -265,7 +408,7 @@ const RegistrationForm = () => {
 				</fieldset>
 				<button type="submit" className="btn btn-info">Submit</button>
 			</Form>
-		)}
+		) : null}
 		</Formik>
 	);
 };

@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/pkg/errors"
@@ -56,10 +55,6 @@ func (i *batchRetrieveInventoryCountsIterator) Next() bool {
 		return false
 	}
 
-	url, err := url.Parse("https://connect.squareup.com/v2/inventory/batch-retrieve-counts")
-	if err != nil {
-		return i.setError(errors.Wrap(err, "Error parsing url"))
-	}
 	body := struct {
 		CatalogObjectIds []string   `json:"catalog_object_ids,omitempty"`
 		LocationIds      []string   `json:"location_ids,omitempty"`
@@ -78,7 +73,7 @@ func (i *batchRetrieveInventoryCountsIterator) Next() bool {
 	}
 	buf := bytes.NewBuffer(jsonBody)
 
-	req, err := http.NewRequest("POST", url.String(), buf)
+	req, err := http.NewRequest("POST", i.c.endpoint("inventory/batch-retrieve-counts").String(), buf)
 	if err != nil {
 		return i.setError(errors.Wrap(err, "error generating new request"))
 	}

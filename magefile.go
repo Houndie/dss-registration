@@ -16,12 +16,12 @@ func Tools() error {
 	return sh.Run("toolbox", "sync")
 }
 
-func GenerateServerProtoc() error {
+func GenerateProtoc() error {
 	mg.Deps(Tools)
-	fmt.Println("generating server protocs")
-	cmd := exec.Command("toolbox", "do", "--", "protoc", "--twirp_out=.", "--go_out=.", "rpc/dss/registration.proto", "rpc/dss/discount.proto")
+	fmt.Println("generating protocs")
+	cmd := exec.Command("toolbox", "do", "--", "protoc", "--proto_path", "rpc/dss", "--twirp_out=dynamic/", "--go_out=dynamic/", "--twirp_js_out=static/rpc", "--js_out=import_style=commonjs,binary:static/rpc", "registration.proto", "discount.proto")
 	cmd.Stderr = os.Stderr
-	cmd.Dir = "dynamic"
+	//cmd.Dir = "dynamic"
 	return cmd.Run()
 }
 

@@ -16,6 +16,7 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage/postgres"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/rs/cors"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -28,6 +29,16 @@ func main() {
 	}
 }
 
+type logHttp struct {
+	logger *logrus.Logger
+}
+
+func (l *logHttp) RoundTrip(r *http.Request) (*http.Response, error) {
+	l.logger.Info(r.URL)
+	l.logger.Info(r.Header)
+	return http.DefaultTransport.RoundTrip(r)
+}
+
 func run() error {
 	viper.AddConfigPath(".")
 	viper.SetConfigName("config")
@@ -35,7 +46,24 @@ func run() error {
 		return fmt.Errorf("error parsing viper config: %w", err)
 	}
 	logger := logrus.New()
-	squareClient := square.NewClient(viper.GetString("square_key"), &http.Client{})
+
+	var squareEnvironment square.Environment
+	switch viper.GetString("environment") {
+	case "production":
+		squareEnvironment = square.Production
+	case "development":
+		squareEnvironment = square.Sandbox
+	default:
+		return fmt.Errorf("unknown environment: %s", viper.GetString("environment"))
+	}
+	squareClient, err := square.NewClient(viper.GetString("square_key"), squareEnvironment, &http.Client{
+		Transport: &logHttp{
+			logger: logger,
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("error creating square client: %w", err)
+	}
 	authorizer := google.NewAuthorizer(&http.Client{})
 	pool, err := pgxpool.Connect(context.Background(), viper.GetString("storage_dsn"))
 	if err != nil {
@@ -56,6 +84,16 @@ func run() error {
 	discountHandler := pb.NewDiscountServer(discountServer, nil)
 	mux.Handle(pb.DiscountPathPrefix, discountHandler)
 
-	http.ListenAndServe(":80", api.WithAuthHandler(mux))
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:8081"},
+		AllowedMethods: []string{"POST"},
+		AllowedHeaders: []string{"Content-Type", "Twirp-Version"},
+	})
+	corsHandler.Log = logger
+
+	http.ListenAndServe(":80",
+		api.WithLogRequest(logger,
+			corsHandler.Handler(
+				api.WithAuthHandler(mux))))
 	return nil
 }

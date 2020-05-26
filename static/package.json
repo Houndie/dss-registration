@@ -13,8 +13,11 @@
     "babel-cli": "^6.26.0",
     "babel-preset-react-app": "^3.1.2",
     "formik": "^2.1.4",
+    "google-protobuf": "^3.12.1",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "twirp": "0.0.7",
+    "uuid": "^8.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",

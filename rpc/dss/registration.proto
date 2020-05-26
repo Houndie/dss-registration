@@ -3,7 +3,7 @@ syntax = "proto3";
 package dss;
 option go_package = "rpc/dss";
 
-import "rpc/dss/discount.proto";
+import "discount.proto";
 
 service Registration {
   rpc Add(RegistrationAddReq) returns (RegistrationAddRes);

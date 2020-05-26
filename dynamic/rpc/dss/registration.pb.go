@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.23.0
 // 	protoc        v3.11.4
-// source: rpc/dss/registration.proto
+// source: registration.proto
 
 package dss
 
@@ -64,11 +64,11 @@ func (x FullWeekendPassTier) String() string {
 }
 
 func (FullWeekendPassTier) Descriptor() protoreflect.EnumDescriptor {
-	return file_rpc_dss_registration_proto_enumTypes[0].Descriptor()
+	return file_registration_proto_enumTypes[0].Descriptor()
 }
 
 func (FullWeekendPassTier) Type() protoreflect.EnumType {
-	return &file_rpc_dss_registration_proto_enumTypes[0]
+	return &file_registration_proto_enumTypes[0]
 }
 
 func (x FullWeekendPassTier) Number() protoreflect.EnumNumber {
@@ -77,7 +77,7 @@ func (x FullWeekendPassTier) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use FullWeekendPassTier.Descriptor instead.
 func (FullWeekendPassTier) EnumDescriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{0}
+	return file_registration_proto_rawDescGZIP(), []int{0}
 }
 
 type FullWeekendPassLevel int32
@@ -113,11 +113,11 @@ func (x FullWeekendPassLevel) String() string {
 }
 
 func (FullWeekendPassLevel) Descriptor() protoreflect.EnumDescriptor {
-	return file_rpc_dss_registration_proto_enumTypes[1].Descriptor()
+	return file_registration_proto_enumTypes[1].Descriptor()
 }
 
 func (FullWeekendPassLevel) Type() protoreflect.EnumType {
-	return &file_rpc_dss_registration_proto_enumTypes[1]
+	return &file_registration_proto_enumTypes[1]
 }
 
 func (x FullWeekendPassLevel) Number() protoreflect.EnumNumber {
@@ -126,7 +126,7 @@ func (x FullWeekendPassLevel) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use FullWeekendPassLevel.Descriptor instead.
 func (FullWeekendPassLevel) EnumDescriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{1}
+	return file_registration_proto_rawDescGZIP(), []int{1}
 }
 
 type MixAndMatch_Role int32
@@ -159,11 +159,11 @@ func (x MixAndMatch_Role) String() string {
 }
 
 func (MixAndMatch_Role) Descriptor() protoreflect.EnumDescriptor {
-	return file_rpc_dss_registration_proto_enumTypes[2].Descriptor()
+	return file_registration_proto_enumTypes[2].Descriptor()
 }
 
 func (MixAndMatch_Role) Type() protoreflect.EnumType {
-	return &file_rpc_dss_registration_proto_enumTypes[2]
+	return &file_registration_proto_enumTypes[2]
 }
 
 func (x MixAndMatch_Role) Number() protoreflect.EnumNumber {
@@ -172,7 +172,7 @@ func (x MixAndMatch_Role) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MixAndMatch_Role.Descriptor instead.
 func (MixAndMatch_Role) EnumDescriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{4, 0}
+	return file_registration_proto_rawDescGZIP(), []int{4, 0}
 }
 
 type TShirt_Style int32
@@ -232,11 +232,11 @@ func (x TShirt_Style) String() string {
 }
 
 func (TShirt_Style) Descriptor() protoreflect.EnumDescriptor {
-	return file_rpc_dss_registration_proto_enumTypes[3].Descriptor()
+	return file_registration_proto_enumTypes[3].Descriptor()
 }
 
 func (TShirt_Style) Type() protoreflect.EnumType {
-	return &file_rpc_dss_registration_proto_enumTypes[3]
+	return &file_registration_proto_enumTypes[3]
 }
 
 func (x TShirt_Style) Number() protoreflect.EnumNumber {
@@ -245,7 +245,7 @@ func (x TShirt_Style) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TShirt_Style.Descriptor instead.
 func (TShirt_Style) EnumDescriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{7, 0}
+	return file_registration_proto_rawDescGZIP(), []int{7, 0}
 }
 
 type RegistrationInfo struct {
@@ -284,7 +284,7 @@ type RegistrationInfo struct {
 func (x *RegistrationInfo) Reset() {
 	*x = RegistrationInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[0]
+		mi := &file_registration_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -297,7 +297,7 @@ func (x *RegistrationInfo) String() string {
 func (*RegistrationInfo) ProtoMessage() {}
 
 func (x *RegistrationInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[0]
+	mi := &file_registration_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -310,7 +310,7 @@ func (x *RegistrationInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationInfo.ProtoReflect.Descriptor instead.
 func (*RegistrationInfo) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{0}
+	return file_registration_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *RegistrationInfo) GetId() string {
@@ -538,7 +538,7 @@ type FullWeekendPass struct {
 func (x *FullWeekendPass) Reset() {
 	*x = FullWeekendPass{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[1]
+		mi := &file_registration_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -551,7 +551,7 @@ func (x *FullWeekendPass) String() string {
 func (*FullWeekendPass) ProtoMessage() {}
 
 func (x *FullWeekendPass) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[1]
+	mi := &file_registration_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -564,7 +564,7 @@ func (x *FullWeekendPass) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FullWeekendPass.ProtoReflect.Descriptor instead.
 func (*FullWeekendPass) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{1}
+	return file_registration_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *FullWeekendPass) GetTier() FullWeekendPassTier {
@@ -599,7 +599,7 @@ type DanceOnlyPass struct {
 func (x *DanceOnlyPass) Reset() {
 	*x = DanceOnlyPass{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[2]
+		mi := &file_registration_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -612,7 +612,7 @@ func (x *DanceOnlyPass) String() string {
 func (*DanceOnlyPass) ProtoMessage() {}
 
 func (x *DanceOnlyPass) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[2]
+	mi := &file_registration_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -625,7 +625,7 @@ func (x *DanceOnlyPass) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DanceOnlyPass.ProtoReflect.Descriptor instead.
 func (*DanceOnlyPass) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{2}
+	return file_registration_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *DanceOnlyPass) GetPaid() bool {
@@ -644,7 +644,7 @@ type NoPass struct {
 func (x *NoPass) Reset() {
 	*x = NoPass{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[3]
+		mi := &file_registration_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -657,7 +657,7 @@ func (x *NoPass) String() string {
 func (*NoPass) ProtoMessage() {}
 
 func (x *NoPass) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[3]
+	mi := &file_registration_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -670,7 +670,7 @@ func (x *NoPass) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoPass.ProtoReflect.Descriptor instead.
 func (*NoPass) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{3}
+	return file_registration_proto_rawDescGZIP(), []int{3}
 }
 
 type MixAndMatch struct {
@@ -685,7 +685,7 @@ type MixAndMatch struct {
 func (x *MixAndMatch) Reset() {
 	*x = MixAndMatch{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[4]
+		mi := &file_registration_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -698,7 +698,7 @@ func (x *MixAndMatch) String() string {
 func (*MixAndMatch) ProtoMessage() {}
 
 func (x *MixAndMatch) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[4]
+	mi := &file_registration_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -711,7 +711,7 @@ func (x *MixAndMatch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MixAndMatch.ProtoReflect.Descriptor instead.
 func (*MixAndMatch) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{4}
+	return file_registration_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *MixAndMatch) GetRole() MixAndMatch_Role {
@@ -739,7 +739,7 @@ type SoloJazz struct {
 func (x *SoloJazz) Reset() {
 	*x = SoloJazz{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[5]
+		mi := &file_registration_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -752,7 +752,7 @@ func (x *SoloJazz) String() string {
 func (*SoloJazz) ProtoMessage() {}
 
 func (x *SoloJazz) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[5]
+	mi := &file_registration_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -765,7 +765,7 @@ func (x *SoloJazz) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SoloJazz.ProtoReflect.Descriptor instead.
 func (*SoloJazz) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{5}
+	return file_registration_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SoloJazz) GetPaid() bool {
@@ -787,7 +787,7 @@ type TeamCompetition struct {
 func (x *TeamCompetition) Reset() {
 	*x = TeamCompetition{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[6]
+		mi := &file_registration_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -800,7 +800,7 @@ func (x *TeamCompetition) String() string {
 func (*TeamCompetition) ProtoMessage() {}
 
 func (x *TeamCompetition) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[6]
+	mi := &file_registration_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -813,7 +813,7 @@ func (x *TeamCompetition) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TeamCompetition.ProtoReflect.Descriptor instead.
 func (*TeamCompetition) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{6}
+	return file_registration_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *TeamCompetition) GetName() string {
@@ -842,7 +842,7 @@ type TShirt struct {
 func (x *TShirt) Reset() {
 	*x = TShirt{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[7]
+		mi := &file_registration_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -855,7 +855,7 @@ func (x *TShirt) String() string {
 func (*TShirt) ProtoMessage() {}
 
 func (x *TShirt) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[7]
+	mi := &file_registration_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -868,7 +868,7 @@ func (x *TShirt) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TShirt.ProtoReflect.Descriptor instead.
 func (*TShirt) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{7}
+	return file_registration_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *TShirt) GetStyle() TShirt_Style {
@@ -898,7 +898,7 @@ type ProvideHousing struct {
 func (x *ProvideHousing) Reset() {
 	*x = ProvideHousing{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[8]
+		mi := &file_registration_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -911,7 +911,7 @@ func (x *ProvideHousing) String() string {
 func (*ProvideHousing) ProtoMessage() {}
 
 func (x *ProvideHousing) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[8]
+	mi := &file_registration_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -924,7 +924,7 @@ func (x *ProvideHousing) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProvideHousing.ProtoReflect.Descriptor instead.
 func (*ProvideHousing) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{8}
+	return file_registration_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ProvideHousing) GetPets() string {
@@ -960,7 +960,7 @@ type RequireHousing struct {
 func (x *RequireHousing) Reset() {
 	*x = RequireHousing{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[9]
+		mi := &file_registration_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -973,7 +973,7 @@ func (x *RequireHousing) String() string {
 func (*RequireHousing) ProtoMessage() {}
 
 func (x *RequireHousing) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[9]
+	mi := &file_registration_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -986,7 +986,7 @@ func (x *RequireHousing) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequireHousing.ProtoReflect.Descriptor instead.
 func (*RequireHousing) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{9}
+	return file_registration_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *RequireHousing) GetPetAllergies() string {
@@ -1012,7 +1012,7 @@ type NoHousing struct {
 func (x *NoHousing) Reset() {
 	*x = NoHousing{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[10]
+		mi := &file_registration_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1025,7 +1025,7 @@ func (x *NoHousing) String() string {
 func (*NoHousing) ProtoMessage() {}
 
 func (x *NoHousing) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[10]
+	mi := &file_registration_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1038,7 +1038,7 @@ func (x *NoHousing) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoHousing.ProtoReflect.Descriptor instead.
 func (*NoHousing) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{10}
+	return file_registration_proto_rawDescGZIP(), []int{10}
 }
 
 type RegistrationAddReq struct {
@@ -1054,7 +1054,7 @@ type RegistrationAddReq struct {
 func (x *RegistrationAddReq) Reset() {
 	*x = RegistrationAddReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[11]
+		mi := &file_registration_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1067,7 +1067,7 @@ func (x *RegistrationAddReq) String() string {
 func (*RegistrationAddReq) ProtoMessage() {}
 
 func (x *RegistrationAddReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[11]
+	mi := &file_registration_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1080,7 +1080,7 @@ func (x *RegistrationAddReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationAddReq.ProtoReflect.Descriptor instead.
 func (*RegistrationAddReq) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{11}
+	return file_registration_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *RegistrationAddReq) GetIdempotencyKey() string {
@@ -1115,7 +1115,7 @@ type RegistrationAddRes struct {
 func (x *RegistrationAddRes) Reset() {
 	*x = RegistrationAddRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[12]
+		mi := &file_registration_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1128,7 +1128,7 @@ func (x *RegistrationAddRes) String() string {
 func (*RegistrationAddRes) ProtoMessage() {}
 
 func (x *RegistrationAddRes) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[12]
+	mi := &file_registration_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1141,7 +1141,7 @@ func (x *RegistrationAddRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationAddRes.ProtoReflect.Descriptor instead.
 func (*RegistrationAddRes) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{12}
+	return file_registration_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *RegistrationAddRes) GetRedirectUrl() string {
@@ -1162,7 +1162,7 @@ type RegistrationGetReq struct {
 func (x *RegistrationGetReq) Reset() {
 	*x = RegistrationGetReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[13]
+		mi := &file_registration_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1175,7 +1175,7 @@ func (x *RegistrationGetReq) String() string {
 func (*RegistrationGetReq) ProtoMessage() {}
 
 func (x *RegistrationGetReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[13]
+	mi := &file_registration_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1188,7 +1188,7 @@ func (x *RegistrationGetReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationGetReq.ProtoReflect.Descriptor instead.
 func (*RegistrationGetReq) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{13}
+	return file_registration_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *RegistrationGetReq) GetId() string {
@@ -1209,7 +1209,7 @@ type RegistrationGetRes struct {
 func (x *RegistrationGetRes) Reset() {
 	*x = RegistrationGetRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[14]
+		mi := &file_registration_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1222,7 +1222,7 @@ func (x *RegistrationGetRes) String() string {
 func (*RegistrationGetRes) ProtoMessage() {}
 
 func (x *RegistrationGetRes) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[14]
+	mi := &file_registration_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1235,7 +1235,7 @@ func (x *RegistrationGetRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationGetRes.ProtoReflect.Descriptor instead.
 func (*RegistrationGetRes) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{14}
+	return file_registration_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *RegistrationGetRes) GetRegistration() *RegistrationInfo {
@@ -1254,7 +1254,7 @@ type RegistrationPricesReq struct {
 func (x *RegistrationPricesReq) Reset() {
 	*x = RegistrationPricesReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[15]
+		mi := &file_registration_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1267,7 +1267,7 @@ func (x *RegistrationPricesReq) String() string {
 func (*RegistrationPricesReq) ProtoMessage() {}
 
 func (x *RegistrationPricesReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[15]
+	mi := &file_registration_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1280,7 +1280,7 @@ func (x *RegistrationPricesReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationPricesReq.ProtoReflect.Descriptor instead.
 func (*RegistrationPricesReq) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{15}
+	return file_registration_proto_rawDescGZIP(), []int{15}
 }
 
 type RegistrationPricesRes struct {
@@ -1301,7 +1301,7 @@ type RegistrationPricesRes struct {
 func (x *RegistrationPricesRes) Reset() {
 	*x = RegistrationPricesRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[16]
+		mi := &file_registration_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1314,7 +1314,7 @@ func (x *RegistrationPricesRes) String() string {
 func (*RegistrationPricesRes) ProtoMessage() {}
 
 func (x *RegistrationPricesRes) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[16]
+	mi := &file_registration_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1327,7 +1327,7 @@ func (x *RegistrationPricesRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationPricesRes.ProtoReflect.Descriptor instead.
 func (*RegistrationPricesRes) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{16}
+	return file_registration_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *RegistrationPricesRes) GetWeekendPassCost() int64 {
@@ -1399,7 +1399,7 @@ type RegistrationUpdateReq struct {
 func (x *RegistrationUpdateReq) Reset() {
 	*x = RegistrationUpdateReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[17]
+		mi := &file_registration_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1412,7 +1412,7 @@ func (x *RegistrationUpdateReq) String() string {
 func (*RegistrationUpdateReq) ProtoMessage() {}
 
 func (x *RegistrationUpdateReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[17]
+	mi := &file_registration_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1425,7 +1425,7 @@ func (x *RegistrationUpdateReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationUpdateReq.ProtoReflect.Descriptor instead.
 func (*RegistrationUpdateReq) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{17}
+	return file_registration_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *RegistrationUpdateReq) GetIdempotencyKey() string {
@@ -1460,7 +1460,7 @@ type RegistrationUpdateRes struct {
 func (x *RegistrationUpdateRes) Reset() {
 	*x = RegistrationUpdateRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[18]
+		mi := &file_registration_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1473,7 +1473,7 @@ func (x *RegistrationUpdateRes) String() string {
 func (*RegistrationUpdateRes) ProtoMessage() {}
 
 func (x *RegistrationUpdateRes) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[18]
+	mi := &file_registration_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1486,7 +1486,7 @@ func (x *RegistrationUpdateRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationUpdateRes.ProtoReflect.Descriptor instead.
 func (*RegistrationUpdateRes) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{18}
+	return file_registration_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *RegistrationUpdateRes) GetRedirectUrl() string {
@@ -1505,7 +1505,7 @@ type RegistrationGetSummaryReq struct {
 func (x *RegistrationGetSummaryReq) Reset() {
 	*x = RegistrationGetSummaryReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[19]
+		mi := &file_registration_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1518,7 +1518,7 @@ func (x *RegistrationGetSummaryReq) String() string {
 func (*RegistrationGetSummaryReq) ProtoMessage() {}
 
 func (x *RegistrationGetSummaryReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[19]
+	mi := &file_registration_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1531,7 +1531,7 @@ func (x *RegistrationGetSummaryReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationGetSummaryReq.ProtoReflect.Descriptor instead.
 func (*RegistrationGetSummaryReq) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{19}
+	return file_registration_proto_rawDescGZIP(), []int{19}
 }
 
 type RegistrationSummary struct {
@@ -1550,7 +1550,7 @@ type RegistrationSummary struct {
 func (x *RegistrationSummary) Reset() {
 	*x = RegistrationSummary{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[20]
+		mi := &file_registration_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1563,7 +1563,7 @@ func (x *RegistrationSummary) String() string {
 func (*RegistrationSummary) ProtoMessage() {}
 
 func (x *RegistrationSummary) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[20]
+	mi := &file_registration_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1576,7 +1576,7 @@ func (x *RegistrationSummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationSummary.ProtoReflect.Descriptor instead.
 func (*RegistrationSummary) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{20}
+	return file_registration_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *RegistrationSummary) GetId() string {
@@ -1632,7 +1632,7 @@ type RegistrationGetSummaryRes struct {
 func (x *RegistrationGetSummaryRes) Reset() {
 	*x = RegistrationGetSummaryRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_rpc_dss_registration_proto_msgTypes[21]
+		mi := &file_registration_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1645,7 +1645,7 @@ func (x *RegistrationGetSummaryRes) String() string {
 func (*RegistrationGetSummaryRes) ProtoMessage() {}
 
 func (x *RegistrationGetSummaryRes) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_dss_registration_proto_msgTypes[21]
+	mi := &file_registration_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1658,7 +1658,7 @@ func (x *RegistrationGetSummaryRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegistrationGetSummaryRes.ProtoReflect.Descriptor instead.
 func (*RegistrationGetSummaryRes) Descriptor() ([]byte, []int) {
-	return file_rpc_dss_registration_proto_rawDescGZIP(), []int{21}
+	return file_registration_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *RegistrationGetSummaryRes) GetSummaries() []*RegistrationSummary {
@@ -1668,12 +1668,11 @@ func (x *RegistrationGetSummaryRes) GetSummaries() []*RegistrationSummary {
 	return nil
 }
 
-var File_rpc_dss_registration_proto protoreflect.FileDescriptor
+var File_registration_proto protoreflect.FileDescriptor
 
-var file_rpc_dss_registration_proto_rawDesc = []byte{
-	0x0a, 0x1a, 0x72, 0x70, 0x63, 0x2f, 0x64, 0x73, 0x73, 0x2f, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74,
-	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x03, 0x64, 0x73,
-	0x73, 0x1a, 0x16, 0x72, 0x70, 0x63, 0x2f, 0x64, 0x73, 0x73, 0x2f, 0x64, 0x69, 0x73, 0x63, 0x6f,
+var file_registration_proto_rawDesc = []byte{
+	0x0a, 0x12, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x12, 0x03, 0x64, 0x73, 0x73, 0x1a, 0x0e, 0x64, 0x69, 0x73, 0x63, 0x6f,
 	0x75, 0x6e, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x9f, 0x07, 0x0a, 0x10, 0x52, 0x65,
 	0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x0e,
 	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1d,
@@ -1897,20 +1896,20 @@ var file_rpc_dss_registration_proto_rawDesc = []byte{
 }
 
 var (
-	file_rpc_dss_registration_proto_rawDescOnce sync.Once
-	file_rpc_dss_registration_proto_rawDescData = file_rpc_dss_registration_proto_rawDesc
+	file_registration_proto_rawDescOnce sync.Once
+	file_registration_proto_rawDescData = file_registration_proto_rawDesc
 )
 
-func file_rpc_dss_registration_proto_rawDescGZIP() []byte {
-	file_rpc_dss_registration_proto_rawDescOnce.Do(func() {
-		file_rpc_dss_registration_proto_rawDescData = protoimpl.X.CompressGZIP(file_rpc_dss_registration_proto_rawDescData)
+func file_registration_proto_rawDescGZIP() []byte {
+	file_registration_proto_rawDescOnce.Do(func() {
+		file_registration_proto_rawDescData = protoimpl.X.CompressGZIP(file_registration_proto_rawDescData)
 	})
-	return file_rpc_dss_registration_proto_rawDescData
+	return file_registration_proto_rawDescData
 }
 
-var file_rpc_dss_registration_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_rpc_dss_registration_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
-var file_rpc_dss_registration_proto_goTypes = []interface{}{
+var file_registration_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_registration_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_registration_proto_goTypes = []interface{}{
 	(FullWeekendPassTier)(0),          // 0: dss.FullWeekendPassTier
 	(FullWeekendPassLevel)(0),         // 1: dss.FullWeekendPassLevel
 	(MixAndMatch_Role)(0),             // 2: dss.MixAndMatch.Role
@@ -1939,7 +1938,7 @@ var file_rpc_dss_registration_proto_goTypes = []interface{}{
 	(*RegistrationGetSummaryRes)(nil), // 25: dss.RegistrationGetSummaryRes
 	(*DiscountAmount)(nil),            // 26: dss.DiscountAmount
 }
-var file_rpc_dss_registration_proto_depIdxs = []int32{
+var file_registration_proto_depIdxs = []int32{
 	5,  // 0: dss.RegistrationInfo.full_weekend_pass:type_name -> dss.FullWeekendPass
 	6,  // 1: dss.RegistrationInfo.dance_only_pass:type_name -> dss.DanceOnlyPass
 	7,  // 2: dss.RegistrationInfo.no_pass:type_name -> dss.NoPass
@@ -1977,14 +1976,14 @@ var file_rpc_dss_registration_proto_depIdxs = []int32{
 	0,  // [0:20] is the sub-list for field type_name
 }
 
-func init() { file_rpc_dss_registration_proto_init() }
-func file_rpc_dss_registration_proto_init() {
-	if File_rpc_dss_registration_proto != nil {
+func init() { file_registration_proto_init() }
+func file_registration_proto_init() {
+	if File_registration_proto != nil {
 		return
 	}
-	file_rpc_dss_discount_proto_init()
+	file_discount_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_rpc_dss_registration_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationInfo); i {
 			case 0:
 				return &v.state
@@ -1996,7 +1995,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*FullWeekendPass); i {
 			case 0:
 				return &v.state
@@ -2008,7 +2007,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DanceOnlyPass); i {
 			case 0:
 				return &v.state
@@ -2020,7 +2019,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*NoPass); i {
 			case 0:
 				return &v.state
@@ -2032,7 +2031,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MixAndMatch); i {
 			case 0:
 				return &v.state
@@ -2044,7 +2043,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SoloJazz); i {
 			case 0:
 				return &v.state
@@ -2056,7 +2055,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*TeamCompetition); i {
 			case 0:
 				return &v.state
@@ -2068,7 +2067,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*TShirt); i {
 			case 0:
 				return &v.state
@@ -2080,7 +2079,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ProvideHousing); i {
 			case 0:
 				return &v.state
@@ -2092,7 +2091,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RequireHousing); i {
 			case 0:
 				return &v.state
@@ -2104,7 +2103,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*NoHousing); i {
 			case 0:
 				return &v.state
@@ -2116,7 +2115,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationAddReq); i {
 			case 0:
 				return &v.state
@@ -2128,7 +2127,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationAddRes); i {
 			case 0:
 				return &v.state
@@ -2140,7 +2139,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationGetReq); i {
 			case 0:
 				return &v.state
@@ -2152,7 +2151,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationGetRes); i {
 			case 0:
 				return &v.state
@@ -2164,7 +2163,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationPricesReq); i {
 			case 0:
 				return &v.state
@@ -2176,7 +2175,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationPricesRes); i {
 			case 0:
 				return &v.state
@@ -2188,7 +2187,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationUpdateReq); i {
 			case 0:
 				return &v.state
@@ -2200,7 +2199,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationUpdateRes); i {
 			case 0:
 				return &v.state
@@ -2212,7 +2211,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationGetSummaryReq); i {
 			case 0:
 				return &v.state
@@ -2224,7 +2223,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationSummary); i {
 			case 0:
 				return &v.state
@@ -2236,7 +2235,7 @@ func file_rpc_dss_registration_proto_init() {
 				return nil
 			}
 		}
-		file_rpc_dss_registration_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+		file_registration_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegistrationGetSummaryRes); i {
 			case 0:
 				return &v.state
@@ -2249,7 +2248,7 @@ func file_rpc_dss_registration_proto_init() {
 			}
 		}
 	}
-	file_rpc_dss_registration_proto_msgTypes[0].OneofWrappers = []interface{}{
+	file_registration_proto_msgTypes[0].OneofWrappers = []interface{}{
 		(*RegistrationInfo_FullWeekendPass)(nil),
 		(*RegistrationInfo_DanceOnlyPass)(nil),
 		(*RegistrationInfo_NoPass)(nil),
@@ -2261,19 +2260,19 @@ func file_rpc_dss_registration_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_rpc_dss_registration_proto_rawDesc,
+			RawDescriptor: file_registration_proto_rawDesc,
 			NumEnums:      4,
 			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_rpc_dss_registration_proto_goTypes,
-		DependencyIndexes: file_rpc_dss_registration_proto_depIdxs,
-		EnumInfos:         file_rpc_dss_registration_proto_enumTypes,
-		MessageInfos:      file_rpc_dss_registration_proto_msgTypes,
+		GoTypes:           file_registration_proto_goTypes,
+		DependencyIndexes: file_registration_proto_depIdxs,
+		EnumInfos:         file_registration_proto_enumTypes,
+		MessageInfos:      file_registration_proto_msgTypes,
 	}.Build()
-	File_rpc_dss_registration_proto = out.File
-	file_rpc_dss_registration_proto_rawDesc = nil
-	file_rpc_dss_registration_proto_goTypes = nil
-	file_rpc_dss_registration_proto_depIdxs = nil
+	File_registration_proto = out.File
+	file_registration_proto_rawDesc = nil
+	file_registration_proto_goTypes = nil
+	file_registration_proto_depIdxs = nil
 }

@@ -14,6 +14,7 @@ require (
 	github.com/jackc/pgx/v4 v4.6.0
 	github.com/peterhellberg/duration v0.0.0-20190124114432-484232d632c1
 	github.com/pkg/errors v0.8.1
+	github.com/rs/cors v1.7.0
 	github.com/sendgrid/rest v2.4.1+incompatible
 	github.com/sendgrid/sendgrid-go v3.5.0+incompatible
 	github.com/sirupsen/logrus v1.4.2

@@ -16,6 +16,7 @@ services:
     - db
     command: "-path=/migrations -database postgres://dbuser:dbpass@db:5432/dbuser?sslmode=disable up"
   backend:
+    restart: on-failure
     build: 
       context: dynamic
       dockerfile: docker/Dockerfile

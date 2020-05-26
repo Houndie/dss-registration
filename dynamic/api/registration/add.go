@@ -20,7 +20,7 @@ func (s *Server) Add(ctx context.Context, req *pb.RegistrationAddReq) (*pb.Regis
 	info, err := fromProtoc(req.Registration)
 	if err != nil {
 		var parseErr errParseField
-		if errors.As(err, parseErr) {
+		if errors.As(err, &parseErr) {
 			switch parseErr.field {
 			case parseFieldFailureCreatedAt:
 				return nil, twirp.InvalidArgumentError("registration.created_at", err.Error())

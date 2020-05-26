@@ -194,11 +194,15 @@ func fromProtoc(r *pb.RegistrationInfo) (*registration.Info, error) {
 		}
 	}
 
-	createdAt, err := time.Parse(time.RFC3339, r.CreatedAt)
-	if err != nil {
-		return nil, errParseField{
-			field: parseFieldFailureCreatedAt,
-			msg:   err,
+	createdAt := time.Unix(0, 0)
+	if r.CreatedAt != "" {
+		var err error
+		createdAt, err = time.Parse(time.RFC3339, r.CreatedAt)
+		if err != nil {
+			return nil, errParseField{
+				field: parseFieldFailureCreatedAt,
+				msg:   err,
+			}
 		}
 	}
 

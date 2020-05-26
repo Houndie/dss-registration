@@ -10,7 +10,7 @@ import (
 )
 
 func (c *Client) ListLocations(ctx context.Context) ([]*Location, error) {
-	req, err := http.NewRequest("GET", "https://connect.squareup.com/v2/locations", nil)
+	req, err := http.NewRequest("GET", c.endpoint("locations").String(), nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating new request")
 	}

@@ -1,3 +1,0 @@
-square_key = "square_key"
-storage_dsn = "postgres://dbuser:dbpass@db:5432/dbuser?sslmode=disable"
-mail_key = "mail_key"
