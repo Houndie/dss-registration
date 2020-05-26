@@ -131,7 +131,11 @@ func TestListCatalog(t *testing.T) {
 			},
 		},
 	}
-	catalogObjects := NewClient(apiKey, client).ListCatalog(context.Background(), types)
+	squareClient, err := NewClient(apiKey, Production, client)
+	if err != nil {
+		t.Fatalf("error creating square client: %v", err)
+	}
+	catalogObjects := squareClient.ListCatalog(context.Background(), types)
 
 	idx := 0
 	for catalogObjects.Next() {
@@ -168,7 +172,11 @@ func TestListCatalogClientError(t *testing.T) {
 			},
 		},
 	}
-	catalogObjects := NewClient(apiKey, client).ListCatalog(context.Background(), types)
+	squareClient, err := NewClient(apiKey, Production, client)
+	if err != nil {
+		t.Fatalf("error creating square client: %v", err)
+	}
+	catalogObjects := squareClient.ListCatalog(context.Background(), types)
 
 	idx := 0
 	for catalogObjects.Next() {
@@ -207,7 +215,11 @@ func TestListCatalogHttpError(t *testing.T) {
 			},
 		},
 	}
-	catalogObjects := NewClient(apiKey, client).ListCatalog(context.Background(), types)
+	squareClient, err := NewClient(apiKey, Production, client)
+	if err != nil {
+		t.Fatalf("error creating square client: %v", err)
+	}
+	catalogObjects := squareClient.ListCatalog(context.Background(), types)
 
 	idx := 0
 	for catalogObjects.Next() {
@@ -272,7 +284,11 @@ func TestListCatalogErrorMessage(t *testing.T) {
 			},
 		},
 	}
-	catalogObjects := NewClient(apiKey, client).ListCatalog(context.Background(), types)
+	squareClient, err := NewClient(apiKey, Production, client)
+	if err != nil {
+		t.Fatalf("error creating square client: %v", err)
+	}
+	catalogObjects := squareClient.ListCatalog(context.Background(), types)
 
 	idx := 0
 	for catalogObjects.Next() {

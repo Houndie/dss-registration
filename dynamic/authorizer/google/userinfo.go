@@ -40,6 +40,7 @@ func (a *Authorizer) Userinfo(ctx context.Context, accessToken string) (*authori
 	switch res.StatusCode {
 	case http.StatusNotFound:
 		return nil, authorizer.Unauthenticated
+	case http.StatusOK:
 	default:
 		return nil, fmt.Errorf("call to fetch user info did not return %d, instead found %d", http.StatusOK, res.StatusCode)
 	}

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
+	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
@@ -59,11 +60,11 @@ func TestAdd(t *testing.T) {
 	logger.SetOutput(devnull)
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
-	co := commonCatalogObjects()
+	co := commontest.CommonCatalogObjects()
 
-	inventoryCounts := make([]*square.InventoryCount, len(co.weekendPassID))
+	inventoryCounts := make([]*square.InventoryCount, len(co.WeekendPassID))
 	idx := 0
-	for _, id := range co.weekendPassID {
+	for _, id := range co.WeekendPassID {
 		inventoryCounts[idx] = &square.InventoryCount{
 			CatalogObjectId: id,
 			Quantity:        "25",
@@ -142,25 +143,25 @@ func TestAdd(t *testing.T) {
 		},
 	}
 
-	authorizer := &mockAuthorizer{
-		UserinfoFunc: UserinfoFromIDCheck(t, expectedAccessToken, expectedUserID),
+	authorizer := &commontest.MockAuthorizer{
+		UserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedAccessToken, expectedUserID),
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			client := &mockSquareClient{
+			client := &commontest.MockSquareClient{
 				ListCatalogFunc: func(ctx context.Context, types []square.CatalogObjectType) square.ListCatalogIterator {
 					if !test.makeOrder {
 						t.Fatalf("no orderable items found, square should not be called")
 					}
-					return listCatalogFuncFromSlice(co.catalog())(ctx, types)
+					return commontest.ListCatalogFuncFromSlice(co.Catalog())(ctx, types)
 				},
 				BatchRetrieveInventoryCountsFunc: func(ctx context.Context, catalogObjectIds, locationIds []string, updatedAfter *time.Time) square.BatchRetrieveInventoryCountsIterator {
 					if !test.makeOrder {
 						t.Fatalf("no orderable items found, square should not be called")
 					}
-					return inventoryCountsFromSliceCheck(t, co.weekendPassID, inventoryCounts)(ctx, catalogObjectIds, locationIds, updatedAfter)
+					return commontest.InventoryCountsFromSliceCheck(t, co.WeekendPassID, inventoryCounts)(ctx, catalogObjectIds, locationIds, updatedAfter)
 				},
 				ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
 					if !test.makeOrder {
@@ -191,22 +192,22 @@ func TestAdd(t *testing.T) {
 					itemChecks := []*itemCheck{}
 					switch p := test.registration.PassType.(type) {
 					case *WeekendPass:
-						itemChecks = append(itemChecks, &itemCheck{id: co.weekendPassID[p.Tier]})
+						itemChecks = append(itemChecks, &itemCheck{id: co.WeekendPassID[p.Tier]})
 					case *DanceOnlyPass:
-						itemChecks = append(itemChecks, &itemCheck{id: co.dancePassID})
+						itemChecks = append(itemChecks, &itemCheck{id: co.DancePassID})
 						// default, do nothing
 					}
 					if test.registration.MixAndMatch != nil {
-						itemChecks = append(itemChecks, &itemCheck{id: co.mixAndMatchID})
+						itemChecks = append(itemChecks, &itemCheck{id: co.MixAndMatchID})
 					}
 					if test.registration.TeamCompetition != nil {
-						itemChecks = append(itemChecks, &itemCheck{id: co.teamCompetitionID})
+						itemChecks = append(itemChecks, &itemCheck{id: co.TeamCompetitionID})
 					}
 					if test.registration.TShirt != nil {
-						itemChecks = append(itemChecks, &itemCheck{id: co.tShirtID})
+						itemChecks = append(itemChecks, &itemCheck{id: co.TShirtID})
 					}
 					if test.registration.SoloJazz != nil {
-						itemChecks = append(itemChecks, &itemCheck{id: co.soloJazzID})
+						itemChecks = append(itemChecks, &itemCheck{id: co.SoloJazzID})
 					}
 					for _, lineItem := range order.Order.LineItems {
 						if lineItem.Quantity != "1" {
@@ -221,15 +222,15 @@ func TestAdd(t *testing.T) {
 								itemCheck.found = true
 								found = true
 
-								if p, ok := test.registration.PassType.(*WeekendPass); ok && lineItem.CatalogObjectId == co.weekendPassID[p.Tier] {
+								if p, ok := test.registration.PassType.(*WeekendPass); ok && lineItem.CatalogObjectId == co.WeekendPassID[p.Tier] {
 									if len(test.registration.DiscountCodes) > 0 {
-										discountCheck(t, lineItem.Discounts, co.fullWeekendDiscountID)
+										discountCheck(t, lineItem.Discounts, co.FullWeekendDiscountID)
 									}
 									if test.registration.IsStudent {
-										discountCheck(t, lineItem.Discounts, co.studentDiscountID)
+										discountCheck(t, lineItem.Discounts, co.StudentDiscountID)
 									}
-								} else if test.registration.MixAndMatch != nil && lineItem.CatalogObjectId == co.mixAndMatchID && len(test.registration.DiscountCodes) > 0 {
-									discountCheck(t, lineItem.Discounts, co.mixAndMatchDiscountID)
+								} else if test.registration.MixAndMatch != nil && lineItem.CatalogObjectId == co.MixAndMatchID && len(test.registration.DiscountCodes) > 0 {
+									discountCheck(t, lineItem.Discounts, co.MixAndMatchDiscountID)
 								}
 								break
 							}
@@ -254,7 +255,7 @@ func TestAdd(t *testing.T) {
 			}
 
 			storeAdded := false
-			store := &mockStore{
+			store := &commontest.MockStore{
 				AddRegistrationFunc: func(ctx context.Context, r *storage.Registration) (string, error) {
 					storeAdded = true
 					if r.FirstName != test.registration.FirstName {
@@ -373,11 +374,11 @@ func TestAdd(t *testing.T) {
 						Code: code,
 						Discounts: []*storage.SingleDiscount{
 							{
-								Name:      co.fullWeekendDiscountName,
+								Name:      co.FullWeekendDiscountName,
 								AppliedTo: storage.FullWeekendPurchaseItem,
 							},
 							{
-								Name:      co.mixAndMatchDiscountName,
+								Name:      co.MixAndMatchDiscountName,
 								AppliedTo: storage.MixAndMatchPurchaseItem,
 							},
 						},
@@ -386,7 +387,7 @@ func TestAdd(t *testing.T) {
 			}
 
 			mailSent := false
-			mailClient := &mockMailClient{
+			mailClient := &commontest.MockMailClient{
 				SendFunc: func(msg *mail.SGMailV3) (*rest.Response, error) {
 					mailSent = true
 					if len(msg.Personalizations) != 1 {
@@ -539,7 +540,7 @@ func TestAddNotActive(t *testing.T) {
 	}
 	logger.SetOutput(devnull)
 
-	service := NewService(active, logger, &mockSquareClient{}, &mockAuthorizer{}, &mockStore{}, &mockMailClient{})
+	service := NewService(active, logger, &commontest.MockSquareClient{}, &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{})
 
 	registration := &Info{
 		FirstName: "John",
@@ -564,11 +565,11 @@ func TestAddCostNothing(t *testing.T) {
 	}
 	logger.SetOutput(devnull)
 
-	co := commonCatalogObjects()
+	co := commontest.CommonCatalogObjects()
 
-	inventoryCounts := make([]*square.InventoryCount, len(co.weekendPassID))
+	inventoryCounts := make([]*square.InventoryCount, len(co.WeekendPassID))
 	idx := 0
-	for _, id := range co.weekendPassID {
+	for _, id := range co.WeekendPassID {
 		inventoryCounts[idx] = &square.InventoryCount{
 			CatalogObjectId: id,
 			Quantity:        "25",
@@ -576,9 +577,9 @@ func TestAddCostNothing(t *testing.T) {
 		idx++
 	}
 
-	client := &mockSquareClient{
-		ListCatalogFunc:                  listCatalogFuncFromSlice(co.catalog()),
-		BatchRetrieveInventoryCountsFunc: inventoryCountsFromSlice(inventoryCounts),
+	client := &commontest.MockSquareClient{
+		ListCatalogFunc:                  commontest.ListCatalogFuncFromSlice(co.Catalog()),
+		BatchRetrieveInventoryCountsFunc: commontest.InventoryCountsFromSlice(inventoryCounts),
 		ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
 			return []*square.Location{{Id: "7"}}, nil
 		},
@@ -595,7 +596,7 @@ func TestAddCostNothing(t *testing.T) {
 		},
 	}
 
-	authorizer := &mockAuthorizer{
+	authorizer := &commontest.MockAuthorizer{
 		UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
 			return &authorizer.Userinfo{
 				UserId: "1235",
@@ -612,7 +613,7 @@ func TestAddCostNothing(t *testing.T) {
 	}
 
 	storeAdded := false
-	store := &mockStore{
+	store := &commontest.MockStore{
 		AddRegistrationFunc: func(ctx context.Context, r *storage.Registration) (string, error) {
 			storeAdded = true
 			if r.FirstName != registration.FirstName {
@@ -629,7 +630,7 @@ func TestAddCostNothing(t *testing.T) {
 	}
 
 	mailSent := false
-	mailClient := &mockMailClient{
+	mailClient := &commontest.MockMailClient{
 		SendFunc: func(msg *mail.SGMailV3) (*rest.Response, error) {
 			mailSent = true
 			if len(msg.Personalizations) != 1 {

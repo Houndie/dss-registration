@@ -1,31 +1,43 @@
-# Golang CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-go/ for more details
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
       # specify the version
       - image: circleci/golang:1.14
         environment:
-          DSS_PG_URL: postgres://root@localhost/circle_test
+          DSS_PG_URL: postgres://root:password@localhost/circle_test?sslmode=disable
+          GOPROXY: https://proxy.golang.org
       - image: circleci/postgres:9.4
-        name: db
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-
-    #### TEMPLATE_NOTE: go expects specific checkout path representing url
-    #### expecting it in the form of
-    ####   /go/src/github.com/circleci/go-tool
-    ####   /go/src/bitbucket.org/circleci/go-tool
-    environment:
-       GOPROXY: https://proxy.golang.org
+        environment:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password
     steps:
       - checkout
-      - run: go get github.com/Houndie/toolbox
-      - run: toolbox sync
-      - run: toolbox do -- migrate -path=dynamic/storage/postgres/migrations -database $DSS_PG_URL up
+      - run:
+          name: install tools
+          command: go get github.com/Houndie/toolbox && toolbox sync
 
-      - run: cd dynamic && go test ./...
+      - run: pwd
+
+      - run:
+          name: install migrate
+          command: go get -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate/
+          environment: 
+            GOBIN: /home/circleci/project/_tools
+
+      - run: 
+          name: Wait on DB
+          command: |
+            timeout 300 sh -c \
+              'until nc -z localhost 5432; do
+                 echo "Waiting for port ..."
+                 sleep 1
+               done'
+
+      - run: 
+          name: Perform DB Migrations
+          command: toolbox do -- migrate -path=dynamic/storage/postgres/migrations -database $DSS_PG_URL up
+
+      - run: 
+          name: Perform tests
+          command: cd dynamic && go test ./...

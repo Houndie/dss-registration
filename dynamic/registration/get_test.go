@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
@@ -29,18 +30,18 @@ func TestGet(t *testing.T) {
 	logger.SetOutput(devnull)
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
-	authorizer := &mockAuthorizer{
-		UserinfoFunc: UserinfoFromIDCheck(t, expectedToken, expectedUserID),
+	authorizer := &commontest.MockAuthorizer{
+		UserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, expectedUserID),
 	}
-	co := commonCatalogObjects()
+	co := commontest.CommonCatalogObjects()
 	expectedOrders := []*square.Order{
 		{
 			Id:    "order1",
 			State: square.OrderStateCompleted,
 			LineItems: []*square.OrderLineItem{
-				{CatalogObjectId: co.weekendPassID[storage.Tier2]},
-				{CatalogObjectId: co.soloJazzID},
-				{CatalogObjectId: co.tShirtID},
+				{CatalogObjectId: co.WeekendPassID[storage.Tier2]},
+				{CatalogObjectId: co.SoloJazzID},
+				{CatalogObjectId: co.TShirtID},
 			},
 		},
 	}
@@ -85,7 +86,7 @@ func TestGet(t *testing.T) {
 		CreatedAt: time.Now(),
 	}
 
-	store := &mockStore{
+	store := &commontest.MockStore{
 		GetRegistrationFunc: func(ctx context.Context, registrationID string) (*storage.Registration, error) {
 			if registrationID != expectedRegistrationID {
 				t.Fatalf("found unexpected registration id %s, expected %s", registrationID, expectedRegistrationID)
@@ -115,15 +116,15 @@ func TestGet(t *testing.T) {
 		},
 	}
 
-	client := &mockSquareClient{
+	client := &commontest.MockSquareClient{
 		ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
 			return []*square.Location{{Id: expectedLocationID}}, nil
 		},
-		ListCatalogFunc:         listCatalogFuncFromSlice(co.catalog()),
-		BatchRetrieveOrdersFunc: ordersFromSliceCheck(t, expectedLocationID, expectedOrders),
+		ListCatalogFunc:         commontest.ListCatalogFuncFromSlice(co.Catalog()),
+		BatchRetrieveOrdersFunc: commontest.OrdersFromSliceCheck(t, expectedLocationID, expectedOrders),
 	}
 
-	service := NewService(true, logger, client, authorizer, store, &mockMailClient{})
+	service := NewService(true, logger, client, authorizer, store, &commontest.MockMailClient{})
 	r, err := service.Get(context.Background(), expectedToken, expectedRegistrationID)
 	if err != nil {
 		t.Fatalf("error in get registration call: %v", err)
@@ -147,18 +148,18 @@ func TestGetWrongUser(t *testing.T) {
 	logger.SetOutput(devnull)
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
-	authorizer := &mockAuthorizer{
-		UserinfoFunc: UserinfoFromIDCheck(t, expectedToken, expectedUserID),
+	authorizer := &commontest.MockAuthorizer{
+		UserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, expectedUserID),
 	}
-	co := commonCatalogObjects()
+	co := commontest.CommonCatalogObjects()
 	expectedOrders := []*square.Order{
 		{
 			Id:    "order1",
 			State: square.OrderStateCompleted,
 			LineItems: []*square.OrderLineItem{
-				{CatalogObjectId: co.weekendPassID[storage.Tier2]},
-				{CatalogObjectId: co.soloJazzID},
-				{CatalogObjectId: co.tShirtID},
+				{CatalogObjectId: co.WeekendPassID[storage.Tier2]},
+				{CatalogObjectId: co.SoloJazzID},
+				{CatalogObjectId: co.TShirtID},
 			},
 		},
 	}
@@ -202,12 +203,12 @@ func TestGetWrongUser(t *testing.T) {
 		CreatedAt: time.Now(),
 	}
 
-	client := &mockSquareClient{
+	client := &commontest.MockSquareClient{
 		ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
 			return []*square.Location{{Id: expectedLocationID}}, nil
 		},
-		ListCatalogFunc:         listCatalogFuncFromSlice(co.catalog()),
-		BatchRetrieveOrdersFunc: ordersFromSliceCheck(t, expectedLocationID, expectedOrders),
+		ListCatalogFunc:         commontest.ListCatalogFuncFromSlice(co.Catalog()),
+		BatchRetrieveOrdersFunc: commontest.OrdersFromSliceCheck(t, expectedLocationID, expectedOrders),
 	}
 
 	for _, test := range []struct {
@@ -227,7 +228,7 @@ func TestGetWrongUser(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			store := &mockStore{
+			store := &commontest.MockStore{
 				GetRegistrationFunc: func(ctx context.Context, registrationID string) (*storage.Registration, error) {
 					if !test.registrationFound {
 						return nil, storage.ErrNotFound{}
@@ -256,7 +257,7 @@ func TestGetWrongUser(t *testing.T) {
 				},
 			}
 
-			service := NewService(true, logger, client, authorizer, store, &mockMailClient{})
+			service := NewService(true, logger, client, authorizer, store, &commontest.MockMailClient{})
 			_, err = service.Get(context.Background(), expectedToken, expectedRegistrationID)
 			if err == nil {
 				t.Fatalf("expected error, found none")

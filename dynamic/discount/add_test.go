@@ -2,9 +2,11 @@ package discount
 
 import (
 	"context"
+	"errors"
 	"os"
 	"testing"
 
+	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
 	"github.com/sirupsen/logrus"
@@ -22,13 +24,13 @@ func TestAddDiscount(t *testing.T) {
 	token := "some auth token"
 	thisUserID := "123456"
 
-	authorizer := &mockAuthorizer{
-		UserinfoFunc: UserinfoFromIDCheck(t, token, thisUserID),
+	authorizer := &commontest.MockAuthorizer{
+		UserinfoFunc: commontest.UserinfoFromIDCheck(t, token, thisUserID),
 	}
 
-	inDiscount := &Discount{
+	inDiscount := &Bundle{
 		Code: "some code",
-		Discounts: []*SingleDiscount{
+		Discounts: []*Single{
 			{
 				Name:      "DJ Discount",
 				AppliedTo: storage.FullWeekendPurchaseItem,
@@ -36,7 +38,7 @@ func TestAddDiscount(t *testing.T) {
 		},
 	}
 
-	store := &mockStore{
+	store := &commontest.MockStore{
 		AddDiscountFunc: func(ctx context.Context, discount *storage.Discount) error {
 			if discount.Code != inDiscount.Code {
 				t.Fatalf("expected discount code %s, found %s", inDiscount.Code, discount.Code)
@@ -69,8 +71,8 @@ func TestAddDiscount(t *testing.T) {
 		},
 	}
 
-	service := NewService(true, logger, &mockSquareClient{}, authorizer, store, &mockMailClient{})
-	err = service.AddDiscount(context.Background(), token, inDiscount)
+	service := NewService(store, &commontest.MockSquareClient{}, logger, authorizer)
+	err = service.Add(context.Background(), token, inDiscount)
 	if err != nil {
 		t.Fatalf("unexpected error found in call to Add Discount: %v", err)
 	}
@@ -88,13 +90,13 @@ func TestAddDiscountNotAuthorized(t *testing.T) {
 	token := "some auth token"
 	thisUserID := "123456"
 
-	authorizer := &mockAuthorizer{
-		UserinfoFunc: UserinfoFromID(thisUserID),
+	authorizer := &commontest.MockAuthorizer{
+		UserinfoFunc: commontest.UserinfoFromID(thisUserID),
 	}
 
-	inDiscount := &Discount{
+	inDiscount := &Bundle{
 		Code: "some code",
-		Discounts: []*SingleDiscount{
+		Discounts: []*Single{
 			{
 				Name:      "DJ Discount",
 				AppliedTo: storage.FullWeekendPurchaseItem,
@@ -102,7 +104,7 @@ func TestAddDiscountNotAuthorized(t *testing.T) {
 		},
 	}
 
-	store := &mockStore{
+	store := &commontest.MockStore{
 		AddDiscountFunc: func(ctx context.Context, discount *storage.Discount) error {
 			t.Fatalf("Discount added when non admin user given")
 			return nil
@@ -112,12 +114,12 @@ func TestAddDiscountNotAuthorized(t *testing.T) {
 		},
 	}
 
-	service := NewService(true, logger, &mockSquareClient{}, authorizer, store, &mockMailClient{})
-	err = service.AddDiscount(context.Background(), token, inDiscount)
+	service := NewService(store, &commontest.MockSquareClient{}, logger, authorizer)
+	err = service.Add(context.Background(), token, inDiscount)
 	if err == nil {
 		t.Fatalf("unexpected error, found none")
 	}
-	if _, ok := err.(ErrUnauthorized); !ok {
+	if !errors.Is(err, ErrUnauthorized) {
 		t.Fatalf("expected unauthorzed error, found: %v", err)
 	}
 }

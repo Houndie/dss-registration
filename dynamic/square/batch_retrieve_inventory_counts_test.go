@@ -147,7 +147,11 @@ func TestBatchRetrieveInventoryCounts(t *testing.T) {
 			},
 		},
 	}
-	inventoryCounts := NewClient(apiKey, client).BatchRetrieveInventoryCounts(context.Background(), catalogObjectIds, locationIds, &updatedAfter)
+	squareClient, err := NewClient(apiKey, Production, client)
+	if err != nil {
+		t.Fatalf("error creating square client: %v", err)
+	}
+	inventoryCounts := squareClient.BatchRetrieveInventoryCounts(context.Background(), catalogObjectIds, locationIds, &updatedAfter)
 
 	idx := 0
 	for inventoryCounts.Next() {
@@ -194,7 +198,11 @@ func TestBatchRetrieveInventoryCountsClientError(t *testing.T) {
 			},
 		},
 	}
-	inventoryCounts := NewClient(apiKey, client).BatchRetrieveInventoryCounts(context.Background(), catalogObjectIds, locationIds, &updatedAfter)
+	squareClient, err := NewClient(apiKey, Production, client)
+	if err != nil {
+		t.Fatalf("error creating square client: %v", err)
+	}
+	inventoryCounts := squareClient.BatchRetrieveInventoryCounts(context.Background(), catalogObjectIds, locationIds, &updatedAfter)
 
 	idx := 0
 	for inventoryCounts.Next() {
@@ -232,7 +240,11 @@ func TestBatchRetrieveInventoryCountsErrorCode(t *testing.T) {
 			},
 		},
 	}
-	inventoryCounts := NewClient(apiKey, client).BatchRetrieveInventoryCounts(context.Background(), catalogObjectIds, locationIds, &updatedAfter)
+	squareClient, err := NewClient(apiKey, Production, client)
+	if err != nil {
+		t.Fatalf("error creating square client: %v", err)
+	}
+	inventoryCounts := squareClient.BatchRetrieveInventoryCounts(context.Background(), catalogObjectIds, locationIds, &updatedAfter)
 
 	idx := 0
 	for inventoryCounts.Next() {
@@ -296,7 +308,11 @@ func TestBatchRetrieveInventoryCountsErrorMessage(t *testing.T) {
 			},
 		},
 	}
-	inventoryCounts := NewClient(apiKey, client).BatchRetrieveInventoryCounts(context.Background(), catalogObjectIds, locationIds, &updatedAfter)
+	squareClient, err := NewClient(apiKey, Production, client)
+	if err != nil {
+		t.Fatalf("error creating square client: %v", err)
+	}
+	inventoryCounts := squareClient.BatchRetrieveInventoryCounts(context.Background(), catalogObjectIds, locationIds, &updatedAfter)
 
 	idx := 0
 	for inventoryCounts.Next() {

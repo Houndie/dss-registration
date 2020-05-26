@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
@@ -70,11 +71,11 @@ func TestSummaryByUser(t *testing.T) {
 	logger.SetOutput(devnull)
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
-	authorizer := &mockAuthorizer{
-		UserinfoFunc: UserinfoFromIDCheck(t, expectedToken, expectedUserID),
+	authorizer := &commontest.MockAuthorizer{
+		UserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, expectedUserID),
 	}
 
-	squareClient := &mockSquareClient{
+	squareClient := &commontest.MockSquareClient{
 		ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
 			return []*square.Location{
 				{
@@ -82,10 +83,10 @@ func TestSummaryByUser(t *testing.T) {
 				},
 			}, nil
 		},
-		BatchRetrieveOrdersFunc: ordersFromSliceCheck(t, expectedLocationID, expectedOrders),
+		BatchRetrieveOrdersFunc: commontest.OrdersFromSliceCheck(t, expectedLocationID, expectedOrders),
 	}
 
-	store := &mockStore{
+	store := &commontest.MockStore{
 		GetRegistrationsByUserFunc: func(ctx context.Context, userID string) ([]*storage.Registration, error) {
 			if userID != expectedUserID {
 				t.Fatalf("expectedIncorrectUserID")
@@ -112,7 +113,7 @@ func TestSummaryByUser(t *testing.T) {
 		},
 	}
 
-	service := NewService(true, logger, squareClient, authorizer, store, &mockMailClient{})
+	service := NewService(true, logger, squareClient, authorizer, store, &commontest.MockMailClient{})
 
 	summaries, err := service.SummaryByUser(context.Background(), expectedToken)
 	if err != nil {

@@ -1,4 +1,4 @@
-package registration
+package commontest
 
 import (
 	"context"
@@ -7,11 +7,11 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
 )
 
-type mockAuthorizer struct {
+type MockAuthorizer struct {
 	UserinfoFunc func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error)
 }
 
-func (m *mockAuthorizer) Userinfo(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
+func (m *MockAuthorizer) Userinfo(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
 	return m.UserinfoFunc(ctx, accessToken)
 }
 

@@ -21,7 +21,7 @@ func (s *Server) Update(ctx context.Context, req *pb.RegistrationUpdateReq) (*pb
 	info, err := fromProtoc(req.Registration)
 	if err != nil {
 		var parseErr errParseField
-		if errors.As(err, parseErr) {
+		if errors.As(err, &parseErr) {
 			switch parseErr.field {
 			case parseFieldFailureCreatedAt:
 				return nil, twirp.InvalidArgumentError("registration.created_at", err.Error())

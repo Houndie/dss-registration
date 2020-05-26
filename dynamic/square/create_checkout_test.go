@@ -120,8 +120,8 @@ func TestCreateCheckout(t *testing.T) {
 					AdditionalRecipients       []*ChargeRequestAdditionalRecipient `json:"additional_recipients,omitempty"`
 					Note                       string                              `json:"note,omitempty"`
 				}{
-					IdempotencyKey: idempotencyKey,
-					Order:          order,
+					IdempotencyKey:             idempotencyKey,
+					Order:                      order,
 					AskForShippingAddress:      askForShippingAddress,
 					MerchantSupportEmail:       merchantSupportEmail,
 					PrePopulateBuyerEmail:      prePopulateBuyerEmail,
@@ -205,8 +205,13 @@ func TestCreateCheckout(t *testing.T) {
 			},
 		},
 	}
-	checkout, err := NewClient(apiKey, client).CreateCheckout(context.Background(), locationId, idempotencyKey, order, askForShippingAddress, merchantSupportEmail, prePopulateBuyerEmail, prePopulateShippingAddress, redirectUrl, additionalRecipients, note)
 
+	squareClient, err := NewClient(apiKey, Production, client)
+	if err != nil {
+		t.Fatalf("error creating square client: %v", err)
+	}
+
+	checkout, err := squareClient.CreateCheckout(context.Background(), locationId, idempotencyKey, order, askForShippingAddress, merchantSupportEmail, prePopulateBuyerEmail, prePopulateShippingAddress, redirectUrl, additionalRecipients, note)
 	if err != nil {
 		t.Fatalf("found unxpected error from CreateCheckout: %v", err)
 	}
@@ -280,7 +285,11 @@ func TestCreateCheckoutClientError(t *testing.T) {
 		},
 	}
 
-	_, err := NewClient(apiKey, client).CreateCheckout(context.Background(), locationId, idempotencyKey, order, askForShippingAddress, merchantSupportEmail, prePopulateBuyerEmail, prePopulateShippingAddress, redirectUrl, additionalRecipients, note)
+	squareClient, err := NewClient(apiKey, Production, client)
+	if err != nil {
+		t.Fatalf("error creating square client: %v", err)
+	}
+	_, err = squareClient.CreateCheckout(context.Background(), locationId, idempotencyKey, order, askForShippingAddress, merchantSupportEmail, prePopulateBuyerEmail, prePopulateShippingAddress, redirectUrl, additionalRecipients, note)
 
 	if err == nil {
 		t.Fatal("found no error when client returned one?")
@@ -360,7 +369,11 @@ func TestCreateCheckoutErrorCode(t *testing.T) {
 		},
 	}
 
-	_, err := NewClient(apiKey, client).CreateCheckout(context.Background(), locationId, idempotencyKey, order, askForShippingAddress, merchantSupportEmail, prePopulateBuyerEmail, prePopulateShippingAddress, redirectUrl, additionalRecipients, note)
+	squareClient, err := NewClient(apiKey, Production, client)
+	if err != nil {
+		t.Fatalf("error creating square client: %v", err)
+	}
+	_, err = squareClient.CreateCheckout(context.Background(), locationId, idempotencyKey, order, askForShippingAddress, merchantSupportEmail, prePopulateBuyerEmail, prePopulateShippingAddress, redirectUrl, additionalRecipients, note)
 
 	if err == nil {
 		t.Fatal("found no error when client returned one?")
@@ -466,7 +479,11 @@ func TestCreateCheckoutErrorMessage(t *testing.T) {
 		},
 	}
 
-	_, err := NewClient(apiKey, client).CreateCheckout(context.Background(), locationId, idempotencyKey, order, askForShippingAddress, merchantSupportEmail, prePopulateBuyerEmail, prePopulateShippingAddress, redirectUrl, additionalRecipients, note)
+	squareClient, err := NewClient(apiKey, Production, client)
+	if err != nil {
+		t.Fatalf("error creating square client: %v", err)
+	}
+	_, err = squareClient.CreateCheckout(context.Background(), locationId, idempotencyKey, order, askForShippingAddress, merchantSupportEmail, prePopulateBuyerEmail, prePopulateShippingAddress, redirectUrl, additionalRecipients, note)
 
 	if err == nil {
 		t.Fatal("found no error when client returned one?")
