@@ -1,6 +1,6 @@
 module github.com/Houndie/dss-registration/dynamic
 
-go 1.12
+go 1.14
 
 require (
 	github.com/bluele/gcache v0.0.0-20190518031135-bc40bd653833
@@ -19,6 +19,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.5.0+incompatible
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/viper v1.7.0
+	github.com/thechriswalker/protoc-gen-twirp_js v0.0.0-20190627152235-0fe8731d4d8f // indirect
 	github.com/twitchtv/twirp v5.10.2+incompatible
 	google.golang.org/protobuf v1.23.0
 )

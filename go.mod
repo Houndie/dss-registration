@@ -1,6 +1,6 @@
 module github.com/Houndie/dss-registration
 
-go 1.12
+go 1.14
 
 require (
 	github.com/Houndie/dss-registration/dynamic v0.0.0-20191201212422-53199c0b4a1b // indirect

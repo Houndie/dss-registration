@@ -6,12 +6,15 @@ jobs:
   build:
     docker:
       # specify the version
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.14
+        environment:
+          DSS_PG_URL: postgres://root@localhost/circle_test
+      - image: circleci/postgres:9.4
+        name: db
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
 
     #### TEMPLATE_NOTE: go expects specific checkout path representing url
     #### expecting it in the form of
@@ -21,6 +24,8 @@ jobs:
        GOPROXY: https://proxy.golang.org
     steps:
       - checkout
+      - run: go get github.com/Houndie/toolbox
+      - run: toolbox sync
+      - run: toolbox do -- migrate -path=dynamic/storage/postgres/migrations -database $DSS_PG_URL up
 
-      - run: cd dynamic && go get -v
       - run: cd dynamic && go test ./...
