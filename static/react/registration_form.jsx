@@ -124,7 +124,8 @@ const RegistrationForm = () => {
 		registrationClient.prices(new registrationTwirp.RegistrationPricesReq()).then(res => {
 			setPrices(res);
 		}, err => {
-			alert(JSON.stringify(err.message));
+			console.log(err.message);
+			window.location.href = 'http://localhost:8081/error/';	
 		});
 	}, [])
 
@@ -231,13 +232,14 @@ const RegistrationForm = () => {
 					res => {
 						window.location.href = res.redirect_url;	
 					}, err => {
-						alert(JSON.stringify(err.message));
+						console.log(err.message);
+						window.location.href = 'http://localhost:8081/error/';	
 					}
 				);
 			}}
 		>
 		{props => prices != null ? (
-			<Form>
+			<Form id="formElement">
 				<fieldset>
 					<h2>Personal Information</h2>
 					<div className="form-row">
@@ -326,7 +328,7 @@ const RegistrationForm = () => {
 							<option value={danceOnlyPassOption}>{"Dance Only Pass ("+parseDollar(prices.dancePassCost)+")"}</option>
 						</DSSSelect>
 					</div>
-					{props.values.passType === "Full" ? (
+					{props.values.passType === fullWeekendPassOption ? (
 						<div className="form-row">
 							<div className="col-1"></div>
 							<div className="col-6">
