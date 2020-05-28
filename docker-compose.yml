@@ -1,30 +1,46 @@
 version: "3"
 services:
   db: 
-    image: postgres:12.3
+    build:
+      context: dynamic
+      dockerfile: docker/Dockerfile.postgres
     ports:
-    - "5432:5432"
+      - "5432:5432"
     environment:
-    - POSTGRES_USER=dbuser
-    - POSTGRES_PASSWORD=dbpass
-  db-migrate:
-    image: migrate/migrate
-    volumes:
-    - ./dynamic/storage/postgres/migrations:/migrations
-    restart: on-failure
-    depends_on:
-    - db
-    command: "-path=/migrations -database postgres://dbuser:dbpass@db:5432/dbuser?sslmode=disable up"
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=dbpass
+        #  db-migrate:
+    #    image: migrate/migrate
+    #    volumes:
+    #      - ./dynamic/storage/postgres/migrations:/migrations
+    #    restart: on-failure
+    #    depends_on:
+    #      - db
+    #    command: "-path=/migrations -database postgres://dbuser:dbpass@db:5432/dbuser?sslmode=disable up"
   backend:
     restart: on-failure
     build: 
       context: dynamic
       dockerfile: docker/Dockerfile
     ports:
-    - "8080:80"
+      - "8080:80"
+    environment:
+      - DSS_FRONTEND=http://localhost:8081
+      - DSS_STORAGE_HOST=db
+      - DSS_STORAGE_PORT=5432
+      - DSS_STORAGE_NAME=dbuser
+      - DSS_STORAGE_USER=dbuser
+      - DSS_STORAGE_PASSWORD=dbpass
+      - DSS_STORAGE_SSLMODE=disable
+      - DSS_ENVIRONMENT=development
+      - DSS_SQUAREKEY
+      - DSS_MAILKEY
   frontend:
     build:
       context: static
       dockerfile: docker/Dockerfile
+      args:
+        - HUGO_BASEURL=http://localhost:8081
+        - HUGO_DYNAMIC=http://localhost:8080
     ports:
-    - "8081:80"
+      - "8081:80"

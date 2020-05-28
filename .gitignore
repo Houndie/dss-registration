@@ -5,3 +5,4 @@ node_modules
 *.swp
 /_tools
 /dynamic/docker/*.toml
+/.env

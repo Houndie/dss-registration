@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/Houndie/dss-registration/dynamic/api"
 	api_discount "github.com/Houndie/dss-registration/dynamic/api/discount"
@@ -41,11 +42,9 @@ func (l *logHttp) RoundTrip(r *http.Request) (*http.Response, error) {
 }
 
 func run() error {
-	viper.AddConfigPath(".")
-	viper.SetConfigName("config")
-	if err := viper.ReadInConfig(); err != nil {
-		return fmt.Errorf("error parsing viper config: %w", err)
-	}
+	viper.SetEnvPrefix("DSS")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.AutomaticEnv()
 	logger := logrus.New()
 	logger.SetLevel(logrus.TraceLevel)
 
@@ -58,21 +57,25 @@ func run() error {
 	default:
 		return fmt.Errorf("unknown environment: %s", viper.GetString("environment"))
 	}
-	squareClient, err := square.NewClient(viper.GetString("square_key"), squareEnvironment, &http.Client{
-		Transport: &logHttp{
-			logger: logger,
-		},
-	})
+	squareClient, err := square.NewClient(viper.GetString("squarekey"), squareEnvironment, &http.Client{})
 	if err != nil {
 		return fmt.Errorf("error creating square client: %w", err)
 	}
 	authorizer := google.NewAuthorizer(&http.Client{})
-	pool, err := pgxpool.Connect(context.Background(), viper.GetString("storage_dsn"))
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s",
+		viper.GetString("storage.user"),
+		viper.GetString("storage.password"),
+		viper.GetString("storage.host"),
+		viper.GetInt("storage.port"),
+		viper.GetString("storage.name"),
+		viper.GetString("storage.sslmode"),
+	)
+	pool, err := pgxpool.Connect(context.Background(), dsn)
 	if err != nil {
 		return fmt.Errorf("error making postgres connection")
 	}
 	store := postgres.NewStore(pool)
-	mailClient := sendgrid.NewSendClient(viper.GetString("mail_key"))
+	mailClient := sendgrid.NewSendClient(viper.GetString("mailkey"))
 
 	errorHook := &twirp.ServerHooks{
 		Error: func(ctx context.Context, e twirp.Error) context.Context {
@@ -109,7 +112,7 @@ func run() error {
 	mux.Handle(pb.DiscountPathPrefix, discountHandler)
 
 	corsHandler := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://localhost:8081"},
+		AllowedOrigins: viper.GetStringSlice("frontend"),
 		AllowedMethods: []string{"POST"},
 		AllowedHeaders: []string{"Content-Type", "Twirp-Version"},
 	})

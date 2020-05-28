@@ -1,5 +1,8 @@
 FROM jojomi/hugo:0.70.0 as hugobuilder
 
+ARG HUGO_BASEURL
+ARG HUGO_DYNAMIC
+
 WORKDIR /app
 COPY hugo .
 RUN hugo

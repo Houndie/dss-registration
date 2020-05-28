@@ -2,6 +2,11 @@
 {{- $name := strings.TrimSuffix ".md" (replace .self.Name "/index.md" "") -}}
 {{- $bg := $fragment.background | default "secondary" }}
 
+<script>
+	var siteBase = {{.Site.BaseURL}}
+	var backend = {{getenv "HUGO_DYNAMIC"}}
+</script>
+
 <section id="{{ $name }}">
 	<div class="overlay container-fluid {{- printf " bg-%s" $bg -}}">
 		<div data-portal="">

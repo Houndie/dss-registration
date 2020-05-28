@@ -7,7 +7,14 @@ const registrationTwirp = require("./rpc/registration_pb_twirp.js")
 
 'use strict';
 
-const registrationClient = registrationTwirp.createRegistrationClient("http://localhost:8080");
+//const siteBase = document.getElementById("hugoVariables").getAttribute('data-sitebase');
+//const backend = document.getElementById("hugoVariables").getAttribute('data-backend');
+
+const errString = (err) => {
+	return JSON.stringify({ code: err.code, msg: err.message, meta: err.meta }, null, 2)
+}
+
+const registrationClient = registrationTwirp.createRegistrationClient(backend);
 
 function parseDollar(intCost) {
 	let dollar = intCost.toString()
@@ -124,8 +131,8 @@ const RegistrationForm = () => {
 		registrationClient.prices(new registrationTwirp.RegistrationPricesReq()).then(res => {
 			setPrices(res);
 		}, err => {
-			console.error(JSON.stringify(err.message));
-			window.location.href = 'http://localhost:8081/error/';	
+			console.error(errString(err));
+			window.location.href = siteBase+'/error/';	
 		});
 	}, [])
 
@@ -225,15 +232,15 @@ const RegistrationForm = () => {
 
 				const req = new registrationTwirp.RegistrationAddReq();
 				req.setIdempotencyKey(uuidv4());
-				req.setRedirectUrl("http://localhost:8081");
+				req.setRedirectUrl(siteBase+"/registration-complete");
 				req.setRegistration(r);
 
 				return registrationClient.add(req).then(
 					res => {
 						window.location.href = res.redirectUrl;	
 					}, err => {
-						console.error(JSON.stringify(err));
-						window.location.href = 'http://localhost:8081/error/';	
+						console.error(errString(err));
+						window.location.href = siteBase+'/error/';	
 					}
 				);
 			}}

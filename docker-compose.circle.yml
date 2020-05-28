@@ -1,0 +1,20 @@
+version: "3"
+services:
+  end_to_end:
+    build: 
+      context: test
+      args:
+        - DOCKER_FRONTEND=http://frontend
+        - DOCKER_BACKEND=http://backend
+    depends_on:
+      - backend
+      - frontend
+  frontend:
+    build:
+      args:
+        - HUGO_BASEURL=http://localhost
+        - HUGO_DYNAMIC=http://backend
+  backend:
+    environment:
+      - DSS_FRONTEND=http://localhost
+
