@@ -3,7 +3,7 @@ baseurl = "http://locahost:8081"
 languageCode = "en-us"
 title = "Dayton Swing Smackdown"
 theme = "syna"
-enableGitInfo = true
+#enableGitInfo = true
 version = "0.1"
 
 [outputs]

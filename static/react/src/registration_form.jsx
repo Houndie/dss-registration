@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { Formik, Form, useField } from 'formik';
 import { v4 as uuidv4 } from 'uuid';
 //import createRegistrationClient from "../rpc/registration_pb_twirp.js";
-const registrationTwirp = require("../rpc/registration_pb_twirp.js")
+const registrationTwirp = require("./rpc/registration_pb_twirp.js")
 
 'use strict';
 

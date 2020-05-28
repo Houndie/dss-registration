@@ -1,5 +1,5 @@
 module.exports = {
-	entry: './react/registration_form.jsx',
+	entry: './src/registration_form.jsx',
 	module: {
 		rules: [
 			{
@@ -13,7 +13,7 @@ module.exports = {
 		extensions: ['*', '.js', '.jsx']
 	},
 	output: {
-		path: __dirname + '/static/js/react',
+		path: __dirname + '/output',
 		publicPath: '/',
 		filename: 'bundle.js'
 	},
