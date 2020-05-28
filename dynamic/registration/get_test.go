@@ -124,7 +124,7 @@ func TestGet(t *testing.T) {
 		BatchRetrieveOrdersFunc: commontest.OrdersFromSliceCheck(t, expectedLocationID, expectedOrders),
 	}
 
-	service := NewService(true, logger, client, authorizer, store, &commontest.MockMailClient{})
+	service := NewService(true, false, logger, client, authorizer, store, &commontest.MockMailClient{})
 	r, err := service.Get(context.Background(), expectedToken, expectedRegistrationID)
 	if err != nil {
 		t.Fatalf("error in get registration call: %v", err)
@@ -257,7 +257,7 @@ func TestGetWrongUser(t *testing.T) {
 				},
 			}
 
-			service := NewService(true, logger, client, authorizer, store, &commontest.MockMailClient{})
+			service := NewService(true, false, logger, client, authorizer, store, &commontest.MockMailClient{})
 			_, err = service.Get(context.Background(), expectedToken, expectedRegistrationID)
 			if err == nil {
 				t.Fatalf("expected error, found none")

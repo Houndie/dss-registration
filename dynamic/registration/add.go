@@ -294,17 +294,30 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 	default:
 		personalization.SetDynamicTemplateData(mailHousingKey, mailNoHousingValue)
 	}
+
+	var mailSettings *mail.MailSettings
+	if s.useMailSandbox {
+		mailSettings = &mail.MailSettings{
+			SandboxMode: mail.NewSetting(true),
+		}
+
+	}
 	message := &mail.SGMailV3{
 		From:             from,
 		Personalizations: []*mail.Personalization{personalization},
 		TemplateID:       "d-15759d9e2e3d4dfa9602dc7ec6512e8c",
+		MailSettings:     mailSettings,
 	}
 	mailResp, err := s.mailClient.Send(message)
 	if err != nil {
 		return "", fmt.Errorf("error sending registration email: %w", err)
 	}
-	if mailResp.StatusCode != http.StatusAccepted {
-		return "", fmt.Errorf("received bad status code %v", mailResp.StatusCode)
+	okCode := http.StatusAccepted
+	if s.useMailSandbox {
+		okCode = http.StatusOK
+	}
+	if mailResp.StatusCode != okCode {
+		return "", fmt.Errorf("received bad status code from mailserver %v", mailResp.StatusCode)
 	}
 	return returnerURL, nil
 }

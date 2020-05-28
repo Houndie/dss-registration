@@ -508,7 +508,7 @@ func TestAdd(t *testing.T) {
 				},
 			}
 
-			service := NewService(active, logger, client, authorizer, store, mailClient)
+			service := NewService(active, false, logger, client, authorizer, store, mailClient)
 
 			checkoutUrl, err := service.Add(context.Background(), test.registration, expectedRedirectUrl, expectedIdempotencyKey.String(), expectedAccessToken)
 			if err != nil {
@@ -540,7 +540,7 @@ func TestAddNotActive(t *testing.T) {
 	}
 	logger.SetOutput(devnull)
 
-	service := NewService(active, logger, &commontest.MockSquareClient{}, &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{})
+	service := NewService(active, false, logger, &commontest.MockSquareClient{}, &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{})
 
 	registration := &Info{
 		FirstName: "John",
@@ -652,7 +652,7 @@ func TestAddCostNothing(t *testing.T) {
 		},
 	}
 
-	service := NewService(active, logger, client, authorizer, store, mailClient)
+	service := NewService(active, false, logger, client, authorizer, store, mailClient)
 
 	redirectUrl := "https://smackdown.com"
 	checkoutUrl, err := service.Add(context.Background(), registration, redirectUrl, "7", "7")

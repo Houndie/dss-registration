@@ -47,7 +47,7 @@ func BuildStatic() error {
 	sitename := "http://localhost:8081"
 	dynamicsite := "https://us-central1-dayton-smackdown-test.cloudfunctions.net"
 	clientId, apiKey := "166144116294-c115t8bqllktva4qp6tvjjeqe7mdggu3.apps.googleusercontent.com", "AIzaSyAJaUR7I6ADbch4OX-WdkjlYsnOrhBx3xU"
-	cmd := exec.Command("hugo")
+	cmd := exec.Command("toolbox", "do", "--", "hugo")
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, "HUGO_BASEURL="+sitename)
 	cmd.Env = append(cmd.Env, "HUGO_DYNAMIC="+dynamicsite)

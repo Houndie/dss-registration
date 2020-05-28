@@ -26,22 +26,24 @@ type Store interface {
 }
 
 type Service struct {
-	client     common.SquareClient
-	logger     *logrus.Logger
-	active     bool
-	authorizer Authorizer
-	store      Store
-	mailClient MailClient
+	client         common.SquareClient
+	logger         *logrus.Logger
+	active         bool
+	useMailSandbox bool
+	authorizer     Authorizer
+	store          Store
+	mailClient     MailClient
 }
 
-func NewService(active bool, logger *logrus.Logger, client common.SquareClient, authorizer Authorizer, store Store, mailClient MailClient) *Service {
+func NewService(active, useMailSandbox bool, logger *logrus.Logger, client common.SquareClient, authorizer Authorizer, store Store, mailClient MailClient) *Service {
 	return &Service{
-		active:     active,
-		client:     client,
-		logger:     logger,
-		authorizer: authorizer,
-		store:      store,
-		mailClient: mailClient,
+		active:         active,
+		useMailSandbox: useMailSandbox,
+		client:         client,
+		logger:         logger,
+		authorizer:     authorizer,
+		store:          store,
+		mailClient:     mailClient,
 	}
 }
 

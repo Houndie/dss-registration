@@ -124,7 +124,7 @@ const RegistrationForm = () => {
 		registrationClient.prices(new registrationTwirp.RegistrationPricesReq()).then(res => {
 			setPrices(res);
 		}, err => {
-			console.log(err.message);
+			console.error(JSON.stringify(err.message));
 			window.location.href = 'http://localhost:8081/error/';	
 		});
 	}, [])
@@ -230,9 +230,9 @@ const RegistrationForm = () => {
 
 				return registrationClient.add(req).then(
 					res => {
-						window.location.href = res.redirect_url;	
+						window.location.href = res.redirectUrl;	
 					}, err => {
-						console.log(err.message);
+						console.error(JSON.stringify(err));
 						window.location.href = 'http://localhost:8081/error/';	
 					}
 				);

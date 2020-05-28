@@ -1,7 +1,7 @@
 /static/public
 /static/static/js/react
 /static/resources
-/static/node_modules
+node_modules
 *.swp
 /_tools
 /dynamic/docker/*.toml

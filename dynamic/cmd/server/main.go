@@ -20,6 +20,7 @@ import (
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"github.com/twitchtv/twirp"
 )
 
 func main() {
@@ -46,6 +47,7 @@ func run() error {
 		return fmt.Errorf("error parsing viper config: %w", err)
 	}
 	logger := logrus.New()
+	logger.SetLevel(logrus.TraceLevel)
 
 	var squareEnvironment square.Environment
 	switch viper.GetString("environment") {
@@ -72,16 +74,38 @@ func run() error {
 	store := postgres.NewStore(pool)
 	mailClient := sendgrid.NewSendClient(viper.GetString("mail_key"))
 
+	errorHook := &twirp.ServerHooks{
+		Error: func(ctx context.Context, e twirp.Error) context.Context {
+			if e.Code() == twirp.Canceled ||
+				e.Code() == twirp.InvalidArgument ||
+				e.Code() == twirp.DeadlineExceeded ||
+				e.Code() == twirp.NotFound ||
+				e.Code() == twirp.BadRoute ||
+				e.Code() == twirp.AlreadyExists ||
+				e.Code() == twirp.PermissionDenied ||
+				e.Code() == twirp.Unauthenticated ||
+				e.Code() == twirp.ResourceExhausted ||
+				e.Code() == twirp.FailedPrecondition ||
+				e.Code() == twirp.Aborted ||
+				e.Code() == twirp.OutOfRange {
+				logger.Debug(e.Error())
+				return ctx
+			}
+			logger.Error(e.Error())
+			return ctx
+		},
+	}
+
 	mux := http.NewServeMux()
 
-	registrationService := registration.NewService(true, logger, squareClient, authorizer, store, mailClient)
+	registrationService := registration.NewService(true, viper.GetString("environment") != "production", logger, squareClient, authorizer, store, mailClient)
 	registrationServer := api_registration.NewServer(registrationService)
-	registrationHandler := pb.NewRegistrationServer(registrationServer, nil)
+	registrationHandler := pb.NewRegistrationServer(registrationServer, errorHook)
 	mux.Handle(pb.RegistrationPathPrefix, registrationHandler)
 
 	discountService := discount.NewService(store, squareClient, logger, authorizer)
 	discountServer := api_discount.NewServer(discountService)
-	discountHandler := pb.NewDiscountServer(discountServer, nil)
+	discountHandler := pb.NewDiscountServer(discountServer, errorHook)
 	mux.Handle(pb.DiscountPathPrefix, discountHandler)
 
 	corsHandler := cors.New(cors.Options{

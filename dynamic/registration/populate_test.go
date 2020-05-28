@@ -55,7 +55,7 @@ func TestPopulate(t *testing.T) {
 				BatchRetrieveInventoryCountsFunc: commontest.InventoryCountsFromSliceCheck(t, co.WeekendPassID, inventoryCounts),
 			}
 
-			formData, err := NewService(true, logger, client, &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{}).Populate(context.Background())
+			formData, err := NewService(true, false, logger, client, &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{}).Populate(context.Background())
 			if err != nil {
 				t.Fatalf("error populating form data: %v", err)
 			}
