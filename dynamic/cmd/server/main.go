@@ -62,15 +62,8 @@ func run() error {
 		return fmt.Errorf("error creating square client: %w", err)
 	}
 	authorizer := google.NewAuthorizer(&http.Client{})
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s",
-		viper.GetString("storage.user"),
-		viper.GetString("storage.password"),
-		viper.GetString("storage.host"),
-		viper.GetInt("storage.port"),
-		viper.GetString("storage.name"),
-		viper.GetString("storage.sslmode"),
-	)
-	pool, err := pgxpool.Connect(context.Background(), dsn)
+
+	pool, err := pgxpool.Connect(context.Background(), viper.GetString("postgresurl"))
 	if err != nil {
 		return fmt.Errorf("error making postgres connection")
 	}
@@ -118,9 +111,12 @@ func run() error {
 	})
 	corsHandler.Log = logger
 
-	http.ListenAndServe(":80",
+	err = http.ListenAndServe(":"+viper.GetString("port"),
 		api.WithLogRequest(logger,
 			corsHandler.Handler(
 				api.WithAuthHandler(mux))))
+	if err != nil {
+		return err
+	}
 	return nil
 }

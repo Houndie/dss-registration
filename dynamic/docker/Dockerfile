@@ -14,10 +14,5 @@ RUN apk add --no-cache netcat-openbsd
 
 WORKDIR /root/
 COPY --from=builder /app/server .
-
-EXPOSE 80
-CMD until nc -z $DSS_STORAGE_HOST $DSS_STORAGE_PORT; do \
-		echo "Waiting for database ..."; \
-		sleep 1; \
-	done; \
-	./server
+COPY docker/startup.sh .
+CMD ./startup.sh
