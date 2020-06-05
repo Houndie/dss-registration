@@ -1,6 +1,8 @@
 version: 2.1
+orbs:
+  heroku: circleci/heroku@1.0.1
 jobs:
-  build:
+  go-test:
     docker:
       # specify the version
       - image: circleci/golang:1.14
@@ -35,7 +37,7 @@ jobs:
           command: cd dynamic && go test ./...
   end-to-end:
     docker:
-      - image: circleci/node:9.9.0
+      - image: cimg/base:2020.01
     steps:
       - checkout
       - run: git submodule sync --recursive && git submodule update --recursive --init
@@ -44,7 +46,7 @@ jobs:
 
       - run:
           name: Perform tests
-          command: docker-compose -f docker-compose.yml -f docker-compose.circle.yml up --build --abort-on-container-exit 
+          command: docker-compose -f docker-compose.yml -f docker-compose.circle-testing.yml up --build --abort-on-container-exit 
 
       - run:
           name: Retrieve Test Results
@@ -59,10 +61,63 @@ jobs:
       - store_artifacts:
           path: junit/
 
+  deploy:
+    docker:
+      - image: circleci/golang:1.14-node
+    steps: 
+      - heroku/install
+      - run:
+          working_directory: /tmp
+          command: npm install netlify-cli
+
+      - checkout
+      - run: git submodule sync --recursive && git submodule update --recursive --init
+
+      - setup_remote_docker
+      - run:
+          name: Build source
+          command: docker-compose -f docker-compose.circle-testdeploy.yml up --build --no-start
+
+      - run:
+          name: Perform migrations
+          command: |
+            go get github.com/Houndie/toolbox@v0.3.0 
+            toolbox -v sync
+            toolbox do -- migrate -path=dynamic/storage/postgres/migrations -database $(heroku config:get -a dayton-swing-smackdown-testing DATABASE_URL) up
+
+      - run:
+          name: Deploy Frontend
+          working_directory: /tmp
+          command: |
+            docker cp project_frontend_1:/usr/share/nginx/html site/
+            npx netlify deploy --prod --dir site --site 0d6d2212-a391-4f2b-8d20-6d5122f86019
+
+      - run:
+          name: Deploy Backend
+          command: |
+            heroku container:login
+            docker tag project_backend registry.heroku.com/dayton-swing-smackdown-testing/web
+            docker push registry.heroku.com/dayton-swing-smackdown-testing/web
+            heroku container:release -a dayton-swing-smackdown-testing web
 
 workflows:
   version: 2
-  build_and_test:
+  test-and-deploy:
     jobs:
-      - build
-      - end-to-end
+      - go-test:
+          filters:
+            tags:
+              only: /^v[0-9]\.[0-9]\.[0-9]$/
+      - end-to-end:
+          filters:
+            tags:
+              only: /^v[0-9]\.[0-9]\.[0-9]$/
+      - deploy:
+          requires:
+            - go-test
+            - end-to-end
+          filters:
+            tags:
+              only: /^v[0-9]\.[0-9]\.[0-9]$/
+            branches:
+              ignore: /.*/

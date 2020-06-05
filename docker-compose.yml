@@ -9,16 +9,7 @@ services:
     environment:
       - POSTGRES_USER=dbuser
       - POSTGRES_PASSWORD=dbpass
-        #  db-migrate:
-    #    image: migrate/migrate
-    #    volumes:
-    #      - ./dynamic/storage/postgres/migrations:/migrations
-    #    restart: on-failure
-    #    depends_on:
-    #      - db
-    #    command: "-path=/migrations -database postgres://dbuser:dbpass@db:5432/dbuser?sslmode=disable up"
   backend:
-    restart: on-failure
     build: 
       context: dynamic
       dockerfile: docker/Dockerfile
