@@ -62,8 +62,8 @@ func TestAddGetRegistration(t *testing.T) {
 					Quantity: 7,
 					Details:  "dogs are great",
 				},
-				UserId:        "1234355634",
-				OrderIds:      []string{"12352q35234", "98709812087123"},
+				UserID:        "1234355634",
+				OrderIDs:      []string{"12352q35234", "98709812087123"},
 				DiscountCodes: []string{"doe", "a deer"},
 			},
 		},
@@ -78,8 +78,8 @@ func TestAddGetRegistration(t *testing.T) {
 					PetAllergies: "cats",
 					Details:      "dogs are great",
 				},
-				UserId:        "1234355634",
-				OrderIds:      []string{},
+				UserID:        "1234355634",
+				OrderIDs:      []string{},
 				DiscountCodes: []string{},
 			},
 		},
@@ -141,8 +141,8 @@ func TestAddGetRegistration(t *testing.T) {
 			if testRegistration.SoloJazz != test.registration.SoloJazz {
 				t.Fatalf("expected registration solo jazz status %v, found %v", test.registration.SoloJazz, testRegistration.SoloJazz)
 			}
-			if testRegistration.UserId != test.registration.UserId {
-				t.Fatalf("expected registration user id %s, found %s", test.registration.UserId, testRegistration.UserId)
+			if testRegistration.UserID != test.registration.UserID {
+				t.Fatalf("expected registration user id %s, found %s", test.registration.UserID, testRegistration.UserID)
 			}
 			if !reflect.DeepEqual(testRegistration.PassType, test.registration.PassType) {
 				t.Fatalf("expected registration pass type %#v, found %#v", test.registration.PassType, testRegistration.PassType)
@@ -159,11 +159,11 @@ func TestAddGetRegistration(t *testing.T) {
 			if !reflect.DeepEqual(testRegistration.Housing, test.registration.Housing) {
 				t.Fatalf("expected registration housing %#v, found %#v", test.registration.Housing, testRegistration.Housing)
 			}
-			if len(testRegistration.OrderIds) != len(test.registration.OrderIds) {
-				t.Fatalf("expected number of registration order ids %d, found %d", len(test.registration.OrderIds), len(testRegistration.OrderIds))
+			if len(testRegistration.OrderIDs) != len(test.registration.OrderIDs) {
+				t.Fatalf("expected number of registration order ids %d, found %d", len(test.registration.OrderIDs), len(testRegistration.OrderIDs))
 			}
-			if len(testRegistration.OrderIds) > 0 && !reflect.DeepEqual(testRegistration.OrderIds, test.registration.OrderIds) {
-				t.Fatalf("expected registration order ids %#v, found %#v", test.registration.OrderIds, testRegistration.OrderIds)
+			if len(testRegistration.OrderIDs) > 0 && !reflect.DeepEqual(testRegistration.OrderIDs, test.registration.OrderIDs) {
+				t.Fatalf("expected registration order ids %#v, found %#v", test.registration.OrderIDs, testRegistration.OrderIDs)
 			}
 			if len(testRegistration.DiscountCodes) != len(test.registration.DiscountCodes) {
 				t.Fatalf("expected number of registration discount codes %d, found %d", len(test.registration.DiscountCodes), len(testRegistration.DiscountCodes))

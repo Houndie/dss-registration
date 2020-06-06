@@ -88,7 +88,7 @@ func CommonCatalogObjects() *CatalogObjects {
 
 func discountItem(name string, amt int, id string) *square.CatalogObject {
 	return &square.CatalogObject{
-		Id: id,
+		ID: id,
 		CatalogObjectType: &square.CatalogDiscount{
 			Name: name,
 			DiscountType: &square.CatalogDiscountFixedAmount{
@@ -106,7 +106,7 @@ func soloJazzItem(id string, cost int) *square.CatalogObject {
 			Name: utility.SoloJazzItem,
 			Variations: []*square.CatalogObject{
 				&square.CatalogObject{
-					Id: id,
+					ID: id,
 					CatalogObjectType: &square.CatalogItemVariation{
 						PriceMoney: &square.Money{
 							Amount: cost,
@@ -124,7 +124,7 @@ func mixAndMatchItem(id string, cost int) *square.CatalogObject {
 			Name: utility.MixAndMatchItem,
 			Variations: []*square.CatalogObject{
 				&square.CatalogObject{
-					Id: id,
+					ID: id,
 					CatalogObjectType: &square.CatalogItemVariation{
 						PriceMoney: &square.Money{
 							Amount: cost,
@@ -142,7 +142,7 @@ func teamCompItem(id string, cost int) *square.CatalogObject {
 			Name: utility.TeamCompItem,
 			Variations: []*square.CatalogObject{
 				&square.CatalogObject{
-					Id: id,
+					ID: id,
 					CatalogObjectType: &square.CatalogItemVariation{
 						PriceMoney: &square.Money{
 							Amount: cost,
@@ -160,7 +160,7 @@ func tShirtItem(id string, cost int) *square.CatalogObject {
 			Name: utility.TShirtItem,
 			Variations: []*square.CatalogObject{
 				&square.CatalogObject{
-					Id: id,
+					ID: id,
 					CatalogObjectType: &square.CatalogItemVariation{
 						PriceMoney: &square.Money{
 							Amount: cost,
@@ -178,7 +178,7 @@ func dancePassItem(id string, cost int) *square.CatalogObject {
 			Name: utility.DancePassItem,
 			Variations: []*square.CatalogObject{
 				&square.CatalogObject{
-					Id: id,
+					ID: id,
 					CatalogObjectType: &square.CatalogItemVariation{
 						Name: utility.DancePassPresaleName,
 						PriceMoney: &square.Money{
@@ -191,12 +191,12 @@ func dancePassItem(id string, cost int) *square.CatalogObject {
 	}
 }
 
-func weekendPassItem(weekendPassIds map[storage.WeekendPassTier]string, weekendPassCosts map[storage.WeekendPassTier]int) *square.CatalogObject {
-	variations := make([]*square.CatalogObject, len(weekendPassIds))
+func weekendPassItem(weekendPassIDs map[storage.WeekendPassTier]string, weekendPassCosts map[storage.WeekendPassTier]int) *square.CatalogObject {
+	variations := make([]*square.CatalogObject, len(weekendPassIDs))
 	idx := 0
-	for tier, id := range weekendPassIds {
+	for tier, id := range weekendPassIDs {
 		variations[idx] = &square.CatalogObject{
-			Id: id,
+			ID: id,
 			CatalogObjectType: &square.CatalogItemVariation{
 				Name: utility.WeekendPassName[tier],
 				PriceMoney: &square.Money{

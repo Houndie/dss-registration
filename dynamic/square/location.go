@@ -21,14 +21,14 @@ const (
 )
 
 type Location struct {
-	Id                string               `json:"id,omitempty"`
+	ID                string               `json:"id,omitempty"`
 	Name              string               `json:"name,omitempty"`
 	Address           *Address             `json:"address,omitempty"`
 	Timezone          string               `json:"timezone,omitempty"`
 	Capabilities      []LocationCapability `json:"capabilities,omitempty"`
 	Status            LocationStatus       `json:"status,omitempty"`
 	CreatedAt         *time.Time           `json:"created_at,omitempty"`
-	MerchantId        string               `json:"merchant_id,omitempty"`
+	MerchantID        string               `json:"merchant_id,omitempty"`
 	Country           string               `json:"country,omitempty"`
 	LanguageCode      string               `json:"language_code,omitempty"`
 	Currency          string               `json:"currency,omitempty"`

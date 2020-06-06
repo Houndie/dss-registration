@@ -14,10 +14,10 @@ func (s *Service) SummaryByUser(ctx context.Context, token string) ([]*Summary, 
 	if err != nil {
 		return nil, fmt.Errorf("could not authorize user: %w", err)
 	}
-	s.logger.Tracef("found user %s", userinfo.UserId)
+	s.logger.Tracef("found user %s", userinfo.UserID)
 
-	s.logger.Tracef("fetching registrations for user %s", userinfo.UserId)
-	r, err := s.store.GetRegistrationsByUser(ctx, userinfo.UserId)
+	s.logger.Tracef("fetching registrations for user %s", userinfo.UserID)
+	r, err := s.store.GetRegistrationsByUser(ctx, userinfo.UserID)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching registrations from store: %w", err)
 	}
@@ -36,24 +36,24 @@ func (s *Service) SummaryByUser(ctx context.Context, token string) ([]*Summary, 
 	if len(locations) != 1 {
 		return nil, fmt.Errorf("found unexpected number of locations %d", len(locations))
 	}
-	s.logger.Tracef("found location %s", locations[0].Id)
+	s.logger.Tracef("found location %s", locations[0].ID)
 
-	orderIds := []string{}
+	orderIDs := []string{}
 	for _, reg := range r {
-		orderIds = append(orderIds, reg.OrderIds...)
+		orderIDs = append(orderIDs, reg.OrderIDs...)
 	}
-	s.logger.Tracef("found %d total orders between all locations", len(orderIds))
+	s.logger.Tracef("found %d total orders between all locations", len(orderIDs))
 
 	orderMap := map[string]*square.Order{}
-	if len(orderIds) > 0 {
+	if len(orderIDs) > 0 {
 		s.logger.Trace("retrieving orders from square")
-		orders, err := s.client.BatchRetrieveOrders(ctx, locations[0].Id, orderIds)
+		orders, err := s.client.BatchRetrieveOrders(ctx, locations[0].ID, orderIDs)
 		if err != nil {
 			return nil, fmt.Errorf("error retrieving orders matching ids: %w", err)
 		}
 
 		for _, order := range orders {
-			orderMap[order.Id] = order
+			orderMap[order.ID] = order
 		}
 	}
 
@@ -61,7 +61,7 @@ func (s *Service) SummaryByUser(ctx context.Context, token string) ([]*Summary, 
 	registrations := make([]*Summary, len(r))
 	for i, reg := range r {
 		paid := true
-		for _, id := range reg.OrderIds {
+		for _, id := range reg.OrderIDs {
 			if orderMap[id].State != square.OrderStateCompleted {
 				paid = false
 				break

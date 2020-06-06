@@ -44,7 +44,7 @@ func TestPopulate(t *testing.T) {
 			idx := 0
 			for tier, count := range counts {
 				inventoryCounts[idx] = &square.InventoryCount{
-					CatalogObjectId: co.WeekendPassID[tier],
+					CatalogObjectID: co.WeekendPassID[tier],
 					Quantity:        count,
 				}
 				idx++

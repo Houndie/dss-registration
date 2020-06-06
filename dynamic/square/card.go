@@ -15,7 +15,7 @@ const (
 )
 
 type Card struct {
-	Id             string    `json:"string,omitempty"`
+	ID             string    `json:"string,omitempty"`
 	CardBrand      CardBrand `json:"card_brand,omitempty"`
 	Last4          string    `json:"last_4,omitempty"`
 	ExpMonth       int       `json:"exp_month,omitempty"`

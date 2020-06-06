@@ -26,7 +26,7 @@ const (
 
 type orderLineItemDiscount struct {
 	Uid             string                     `json:"uid,omitempty"`
-	CatalogObjectId string                     `json:"catalog_object_id,omitempty"`
+	CatalogObjectID string                     `json:"catalog_object_id,omitempty"`
 	Name            string                     `json:"name,omitempty"`
 	Type            orderLineItemDiscountType  `json:"type,omitempty"`
 	Percentage      string                     `json:"percentage,omitempty"`
@@ -65,7 +65,7 @@ func (*OrderLineItemDiscountVariableAmount) isOrderLineItemDiscountType()     {}
 
 type OrderLineItemDiscount struct {
 	Uid             string
-	CatalogObjectId string
+	CatalogObjectID string
 	Name            string
 	Type            OrderLineItemDiscountType
 	AppliedMoney    *Money
@@ -75,7 +75,7 @@ type OrderLineItemDiscount struct {
 func (o *OrderLineItemDiscount) MarshalJSON() ([]byte, error) {
 	jsonData := orderLineItemDiscount{
 		Uid:             o.Uid,
-		CatalogObjectId: o.CatalogObjectId,
+		CatalogObjectID: o.CatalogObjectID,
 		Name:            o.Name,
 		AppliedMoney:    o.AppliedMoney,
 		Scope:           o.Scope,
@@ -113,7 +113,7 @@ func (o *OrderLineItemDiscount) UnmarshalJSON(input []byte) error {
 	}
 
 	o.Uid = jsonData.Uid
-	o.CatalogObjectId = jsonData.CatalogObjectId
+	o.CatalogObjectID = jsonData.CatalogObjectID
 	o.Name = jsonData.Name
 	o.AppliedMoney = jsonData.AppliedMoney
 	o.Scope = jsonData.Scope

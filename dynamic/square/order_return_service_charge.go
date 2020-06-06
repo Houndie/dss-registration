@@ -4,7 +4,7 @@ type OrderReturnServiceCharge struct {
 	Uid                    string                             `json:"uid,omitempty"`
 	SourceServiceChargeUid string                             `json:"source_service_charge_uid,omitempty"`
 	Name                   string                             `json:"name,omitempty"`
-	CatalogObjectId        string                             `json:"catalog_object_id,omitempty"`
+	CatalogObjectID        string                             `json:"catalog_object_id,omitempty"`
 	Percentage             string                             `json:"percentage,omitempty"`
 	AmountMoney            *Money                             `json:"amount_money,omitempty"`
 	AppliedMoney           *Money                             `json:"applied_money,omitempty"`

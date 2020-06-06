@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *Client) CreateCheckout(ctx context.Context, locationId, idempotencyKey string, order *CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail string, prePopulateBuyerEmail string, prePopulateShippingAddress *Address, redirectUrl string, additionalRecipients []*ChargeRequestAdditionalRecipient, note string) (*Checkout, error) {
+func (c *Client) CreateCheckout(ctx context.Context, locationID, idempotencyKey string, order *CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail string, prePopulateBuyerEmail string, prePopulateShippingAddress *Address, redirectUrl string, additionalRecipients []*ChargeRequestAdditionalRecipient, note string) (*Checkout, error) {
 	body := struct {
 		IdempotencyKey             string                              `json:"idempotency_key,omitempty"`
 		Order                      *CreateOrderRequest                 `json:"order,omitempty"`
@@ -39,7 +39,7 @@ func (c *Client) CreateCheckout(ctx context.Context, locationId, idempotencyKey 
 
 	bodyBuf := bytes.NewBuffer(jsonBody)
 
-	req, err := http.NewRequest("POST", c.endpoint("locations/"+locationId+"/checkouts").String(), bodyBuf)
+	req, err := http.NewRequest("POST", c.endpoint("locations/"+locationID+"/checkouts").String(), bodyBuf)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error creating request")
 	}

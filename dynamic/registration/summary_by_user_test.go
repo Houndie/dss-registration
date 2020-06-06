@@ -45,22 +45,22 @@ func TestSummaryByUser(t *testing.T) {
 
 	expectedOrders := []*square.Order{
 		{
-			Id:    "order1",
+			ID:    "order1",
 			State: square.OrderStateCompleted,
 		},
 		{
-			Id:    "order2",
+			ID:    "order2",
 			State: square.OrderStateCompleted,
 		},
 		{
-			Id:    "order3",
+			ID:    "order3",
 			State: square.OrderStateOpen,
 		},
 	}
 
 	regToOrderMap := map[string][]string{
-		summary1ID: []string{expectedOrders[0].Id},
-		summary2ID: []string{expectedOrders[1].Id, expectedOrders[2].Id},
+		summary1ID: []string{expectedOrders[0].ID},
+		summary2ID: []string{expectedOrders[1].ID, expectedOrders[2].ID},
 	}
 
 	logger := logrus.New()
@@ -79,7 +79,7 @@ func TestSummaryByUser(t *testing.T) {
 		ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
 			return []*square.Location{
 				{
-					Id: expectedLocationID,
+					ID: expectedLocationID,
 				},
 			}, nil
 		},
@@ -105,7 +105,7 @@ func TestSummaryByUser(t *testing.T) {
 					LastName:  summary.LastName,
 					Email:     summary.Email,
 					CreatedAt: summary.CreatedAt,
-					OrderIds:  orderIDs,
+					OrderIDs:  orderIDs,
 				}
 				idx++
 			}

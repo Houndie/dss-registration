@@ -49,7 +49,7 @@ func (s *Store) GetRegistrationsByUser(ctx context.Context, userID string) ([]*s
 	registrations := []*storage.Registration{}
 	for rows.Next() {
 		r := &storage.Registration{
-			UserId: userID,
+			UserID: userID,
 		}
 		var passType string
 		var fullWeekendLevel *string
@@ -94,7 +94,7 @@ func (s *Store) GetRegistrationsByUser(ctx context.Context, userID string) ([]*s
 			&provideHousingDetails,
 			&requireHousingPetAllergies,
 			&requireHousingDetails,
-			&r.OrderIds,
+			&r.OrderIDs,
 			&r.DiscountCodes,
 			&r.Enabled)
 		if err != nil {

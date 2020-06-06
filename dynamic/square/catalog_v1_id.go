@@ -1,6 +1,6 @@
 package square
 
-type CatalogV1Id struct {
-	CatalogV1Id string `json:"string,omitempty"`
-	LocationId  string `json:"location_id,omitempty"`
+type CatalogV1ID struct {
+	CatalogV1ID string `json:"string,omitempty"`
+	LocationID  string `json:"location_id,omitempty"`
 }

@@ -27,14 +27,14 @@ func TestListCatalog(t *testing.T) {
 	updatedAt2 := time.Unix(2363094, 0)
 	expectedObjects := []*CatalogObject{
 		&CatalogObject{
-			Id:                    "some id",
+			ID:                    "some id",
 			UpdatedAt:             &updatedAt,
 			Version:               7,
 			IsDeleted:             true,
-			CatalogV1Ids:          nil,
+			CatalogV1IDs:          nil,
 			PresentAtAllLocations: true,
-			PresentAtLocationIds:  nil,
-			ImageId:               "some image id",
+			PresentAtLocationIDs:  nil,
+			ImageID:               "some image id",
 			CatalogObjectType: &CatalogTax{
 				Name:                   "tax",
 				CalculationPhase:       "phase",
@@ -45,14 +45,14 @@ func TestListCatalog(t *testing.T) {
 			},
 		},
 		&CatalogObject{
-			Id:                    "some other id",
+			ID:                    "some other id",
 			UpdatedAt:             &updatedAt2,
 			Version:               2,
 			IsDeleted:             false,
-			CatalogV1Ids:          nil,
+			CatalogV1IDs:          nil,
 			PresentAtAllLocations: false,
-			PresentAtLocationIds:  []string{"location 1", "location 2"},
-			ImageId:               "some other image id",
+			PresentAtLocationIDs:  []string{"location 1", "location 2"},
+			ImageID:               "some other image id",
 			CatalogObjectType: &CatalogModifier{
 				Name: "modifier",
 				PriceMoney: &Money{

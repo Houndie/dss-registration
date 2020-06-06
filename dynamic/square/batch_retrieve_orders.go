@@ -10,11 +10,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *Client) BatchRetrieveOrders(ctx context.Context, locationId string, orderIds []string) ([]*Order, error) {
+func (c *Client) BatchRetrieveOrders(ctx context.Context, locationID string, orderIDs []string) ([]*Order, error) {
 	reqBody := struct {
-		OrderIds []string `json:"order_ids"`
+		OrderIDs []string `json:"order_ids"`
 	}{
-		OrderIds: orderIds,
+		OrderIDs: orderIDs,
 	}
 
 	reqBodyBytes, err := json.Marshal(&reqBody)
@@ -24,7 +24,7 @@ func (c *Client) BatchRetrieveOrders(ctx context.Context, locationId string, ord
 
 	bodyBuf := bytes.NewBuffer(reqBodyBytes)
 
-	req, err := http.NewRequest("POST", c.endpoint("locations/"+locationId+"/orders/batch-retrieve").String(), bodyBuf)
+	req, err := http.NewRequest("POST", c.endpoint("locations/"+locationID+"/orders/batch-retrieve").String(), bodyBuf)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating request")
 	}

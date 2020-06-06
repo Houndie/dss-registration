@@ -14,8 +14,8 @@ func (s *Service) Add(ctx context.Context, token string, discount *Bundle) error
 	if err != nil {
 		return fmt.Errorf("could not authorize user: %w", err)
 	}
-	s.logger.Tracef("found user %s", userinfo.UserId)
-	isAdmin, err := s.store.IsAdmin(ctx, userinfo.UserId)
+	s.logger.Tracef("found user %s", userinfo.UserID)
+	isAdmin, err := s.store.IsAdmin(ctx, userinfo.UserID)
 	if err != nil {
 		return fmt.Errorf("could not fetch admin status from store: %w", err)
 	}

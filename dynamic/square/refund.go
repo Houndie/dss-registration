@@ -12,10 +12,10 @@ const (
 )
 
 type Refund struct {
-	Id                   string                 `json:"id,omitempty"`
-	LocationId           string                 `json:"location_id,omitempty"`
-	TransactionId        string                 `json:"transaction_id,omitempty"`
-	TenderId             string                 `json:"tender_id,omitempty"`
+	ID                   string                 `json:"id,omitempty"`
+	LocationID           string                 `json:"location_id,omitempty"`
+	TransactionID        string                 `json:"transaction_id,omitempty"`
+	TenderID             string                 `json:"tender_id,omitempty"`
 	CreatedAt            *time.Time             `json:"created_at,omitempty"`
 	Reason               string                 `json:"reason,omitempty"`
 	AmountMoney          *Money                 `json:"amount_money,omitempty"`

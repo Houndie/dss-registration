@@ -93,8 +93,8 @@ func (s *Store) GetRegistration(ctx context.Context, id string) (*storage.Regist
 		&provideHousingDetails,
 		&requireHousingPetAllergies,
 		&requireHousingDetails,
-		&r.UserId,
-		&r.OrderIds,
+		&r.UserID,
+		&r.OrderIDs,
 		&r.DiscountCodes,
 		&r.Enabled)
 	if err != nil {

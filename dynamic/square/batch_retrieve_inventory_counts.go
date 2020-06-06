@@ -18,8 +18,8 @@ type BatchRetrieveInventoryCountsIterator interface {
 }
 
 type batchRetrieveInventoryCountsIterator struct {
-	catalogObjectIds []string
-	locationIds      []string
+	catalogObjectIDs []string
+	locationIDs      []string
 	updatedAfter     *time.Time
 	cursor           string
 
@@ -56,13 +56,13 @@ func (i *batchRetrieveInventoryCountsIterator) Next() bool {
 	}
 
 	body := struct {
-		CatalogObjectIds []string   `json:"catalog_object_ids,omitempty"`
-		LocationIds      []string   `json:"location_ids,omitempty"`
+		CatalogObjectIDs []string   `json:"catalog_object_ids,omitempty"`
+		LocationIDs      []string   `json:"location_ids,omitempty"`
 		UpdatedAfter     *time.Time `json:"updated_after,omitempty"`
 		Cursor           string     `json:"cursor,omitempty"`
 	}{
-		CatalogObjectIds: i.catalogObjectIds,
-		LocationIds:      i.locationIds,
+		CatalogObjectIDs: i.catalogObjectIDs,
+		LocationIDs:      i.locationIDs,
 		UpdatedAfter:     i.updatedAfter,
 		Cursor:           i.cursor,
 	}
@@ -134,10 +134,10 @@ func (i *batchRetrieveInventoryCountsIterator) Next() bool {
 	return true
 }
 
-func (c *Client) BatchRetrieveInventoryCounts(ctx context.Context, catalogObjectIds, locationIds []string, updatedAfter *time.Time) BatchRetrieveInventoryCountsIterator {
+func (c *Client) BatchRetrieveInventoryCounts(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) BatchRetrieveInventoryCountsIterator {
 	return &batchRetrieveInventoryCountsIterator{
-		catalogObjectIds: catalogObjectIds,
-		locationIds:      locationIds,
+		catalogObjectIDs: catalogObjectIDs,
+		locationIDs:      locationIDs,
 		updatedAfter:     updatedAfter,
 		cursor:           "",
 		counts:           nil,

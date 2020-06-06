@@ -29,7 +29,7 @@ func makeLineItems(registration *Info, squareData *common.SquareData, paymentDat
 
 			if registration.IsStudent {
 				studentDiscount := &square.OrderLineItemDiscount{
-					CatalogObjectId: squareData.StudentDiscount.ID,
+					CatalogObjectID: squareData.StudentDiscount.ID,
 				}
 
 				if li.Discounts == nil {
@@ -95,13 +95,13 @@ func makeLineItem(catalogID string, discountNames []string, discounts map[string
 			}
 
 			orderDiscounts[i] = &square.OrderLineItemDiscount{
-				CatalogObjectId: d.ID,
+				CatalogObjectID: d.ID,
 			}
 		}
 	}
 	return &square.OrderLineItem{
 		Quantity:        "1",
-		CatalogObjectId: catalogID,
+		CatalogObjectID: catalogID,
 		Discounts:       orderDiscounts,
 	}, nil
 }
@@ -134,7 +134,7 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 	if containsPaidItems(registration) {
 
 		s.logger.Trace("generating reference id")
-		referenceId, err := uuid.NewV4()
+		referenceID, err := uuid.NewV4()
 		if err != nil {
 			return "", fmt.Errorf("error generating reference id: %w", err)
 		}
@@ -181,14 +181,14 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 		order := &square.CreateOrderRequest{
 			IdempotencyKey: idempotencyKey,
 			Order: &square.Order{
-				ReferenceId: referenceId.String(),
-				LocationId:  locations[0].Id,
+				ReferenceID: referenceID.String(),
+				LocationID:  locations[0].ID,
 				LineItems:   lineItems,
 			},
 		}
 
 		s.logger.Trace("creating checkout with square")
-		returnerURL, orderID, err = common.CreateCheckout(ctx, s.client, locations[0].Id, idempotencyKey, order, registration.Email, redirectUrl)
+		returnerURL, orderID, err = common.CreateCheckout(ctx, s.client, locations[0].ID, idempotencyKey, order, registration.Email, redirectUrl)
 		if err != nil {
 			return "", err
 		}
@@ -202,7 +202,7 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 		if err != nil {
 			return "", fmt.Errorf("error fetching userinfo: %w", err)
 		}
-		userid = userinfo.UserId
+		userid = userinfo.UserID
 	}
 
 	var orderIDs []string
@@ -226,11 +226,11 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 		TeamCompetition: toStorageTeamCompetition(registration.TeamCompetition),
 		TShirt:          toStorageTShirt(registration.TShirt),
 		Housing:         registration.Housing,
-		UserId:          userid,
+		UserID:          userid,
 		DiscountCodes:   registration.DiscountCodes,
-		OrderIds:        orderIDs,
+		OrderIDs:        orderIDs,
 	}
-	registrationId, err := s.store.AddRegistration(ctx, storeRegistration)
+	registrationID, err := s.store.AddRegistration(ctx, storeRegistration)
 	if err != nil {
 		return "", fmt.Errorf("error adding registration to database: %w", err)
 	}
@@ -249,7 +249,7 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 			mailEmailKey:          registration.Email,
 			mailHomeSceneKey:      registration.HomeScene,
 			mailStudentKey:        registration.IsStudent,
-			mailRegistrationIDKey: registrationId,
+			mailRegistrationIDKey: registrationID,
 			mailMixAndMatchKey:    registration.MixAndMatch != nil,
 			mailSoloJazzKey:       registration.SoloJazz,
 			mailTeamCompKey:       registration.TeamCompetition != nil,

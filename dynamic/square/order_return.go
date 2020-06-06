@@ -2,7 +2,7 @@ package square
 
 type OrderReturn struct {
 	Uid                  string                      `json:"uid,omitempty"`
-	SourceOrderId        string                      `json:"source_order_id,omitempty"`
+	SourceOrderID        string                      `json:"source_order_id,omitempty"`
 	ReturnLineItems      []*OrderReturnLineItem      `json:"return_line_items,omitempty"`
 	ReturnServiceCharges []*OrderReturnServiceCharge `json:"return_service_charges,omitempty"`
 	ReturnTaxes          []*OrderReturnTax           `json:"return_taxes,omitempty"`

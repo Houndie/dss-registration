@@ -24,7 +24,7 @@ func UserinfoFromIDCheck(t *testing.T, expectedToken, ID string) func(ctx contex
 			t.Fatalf("found unexpected access token %s, expected %s", accessToken, expectedToken)
 		}
 		return &authorizer.Userinfo{
-			UserId: ID,
+			UserID: ID,
 		}, nil
 	}
 }
@@ -32,7 +32,7 @@ func UserinfoFromIDCheck(t *testing.T, expectedToken, ID string) func(ctx contex
 func UserinfoFromID(ID string) func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
 	return func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
 		return &authorizer.Userinfo{
-			UserId: ID,
+			UserID: ID,
 		}, nil
 	}
 }

@@ -8,15 +8,15 @@ import (
 )
 
 type tender struct {
-	Id                   string                 `json:"id,omitempty"`
-	LocationId           string                 `json:"location_id,omitempty"`
-	TransactionId        string                 `json:"transaction_id,omitempty"`
+	ID                   string                 `json:"id,omitempty"`
+	LocationID           string                 `json:"location_id,omitempty"`
+	TransactionID        string                 `json:"transaction_id,omitempty"`
 	CreatedAt            *time.Time             `json:"created_at,omitempty"`
 	Note                 string                 `json:"note,omitempty"`
 	AmountMoney          *Money                 `json:"amount_money,omitempty"`
 	TipMoney             *Money                 `json:"tip_money,omitempty"`
 	ProcessingFeeMoney   *Money                 `json:"processing_fee_money,omitempty"`
-	CustomerId           string                 `json:"customer_id,omitempty"`
+	CustomerID           string                 `json:"customer_id,omitempty"`
 	Type                 TenderType             `json:"type,omitempty"`
 	CardDetails          *TenderCardDetails     `json:"card_details,omitempty"`
 	CashDetails          *TenderCashDetails     `json:"cash_details,omitempty"`
@@ -38,15 +38,15 @@ func (*NoSaleDetails) isTenderType()          {}
 func (*OtherTenderTypeDetails) isTenderType() {}
 
 type Tender struct {
-	Id                   string
-	LocationId           string
-	TransactionId        string
+	ID                   string
+	LocationID           string
+	TransactionID        string
 	CreatedAt            *time.Time
 	Note                 string
 	AmountMoney          *Money
 	TipMoney             *Money
 	ProcessingFeeMoney   *Money
-	CustomerId           string
+	CustomerID           string
 	Type                 tenderType
 	AdditionalRecipients []*AdditionalRecipient
 }
@@ -64,15 +64,15 @@ const (
 
 func (t *Tender) MarshalJSON() ([]byte, error) {
 	tJson := tender{
-		Id:                   t.Id,
-		LocationId:           t.LocationId,
-		TransactionId:        t.TransactionId,
+		ID:                   t.ID,
+		LocationID:           t.LocationID,
+		TransactionID:        t.TransactionID,
 		CreatedAt:            t.CreatedAt,
 		Note:                 t.Note,
 		AmountMoney:          t.AmountMoney,
 		TipMoney:             t.TipMoney,
 		ProcessingFeeMoney:   t.ProcessingFeeMoney,
-		CustomerId:           t.CustomerId,
+		CustomerID:           t.CustomerID,
 		AdditionalRecipients: t.AdditionalRecipients,
 	}
 
@@ -105,15 +105,15 @@ func (t *Tender) UnmarshalJSON(b []byte) error {
 		return errors.Wrap(err, "Error unmarshaling Tender json")
 	}
 
-	t.Id = tJson.Id
-	t.LocationId = tJson.LocationId
-	t.TransactionId = tJson.TransactionId
+	t.ID = tJson.ID
+	t.LocationID = tJson.LocationID
+	t.TransactionID = tJson.TransactionID
 	t.CreatedAt = tJson.CreatedAt
 	t.Note = tJson.Note
 	t.AmountMoney = tJson.AmountMoney
 	t.TipMoney = tJson.TipMoney
 	t.ProcessingFeeMoney = tJson.ProcessingFeeMoney
-	t.CustomerId = tJson.CustomerId
+	t.CustomerID = tJson.CustomerID
 	t.AdditionalRecipients = tJson.AdditionalRecipients
 
 	switch tJson.Type {

@@ -61,8 +61,8 @@ func TestGetRegistrationsByUser(t *testing.T) {
 					Quantity: 7,
 					Details:  "dogs are great",
 				},
-				UserId:        "1234354",
-				OrderIds:      []string{"12352q35234", "98709812087123"},
+				UserID:        "1234354",
+				OrderIDs:      []string{"12352q35234", "98709812087123"},
 				DiscountCodes: []string{"doe", "a deer"},
 			},
 		},
@@ -78,8 +78,8 @@ func TestGetRegistrationsByUser(t *testing.T) {
 					PetAllergies: "cats",
 					Details:      "dogs are great",
 				},
-				UserId:        "1234355634",
-				OrderIds:      []string{},
+				UserID:        "1234355634",
+				OrderIDs:      []string{},
 				DiscountCodes: []string{},
 			},
 		},
@@ -92,7 +92,7 @@ func TestGetRegistrationsByUser(t *testing.T) {
 				Email:     "birds@flyfast.com",
 				PassType:  &storage.NoPass{},
 				Housing:   &storage.NoHousing{},
-				UserId:    "12sdfa34355634",
+				UserID:    "12sdfa34355634",
 			},
 		},
 	}
@@ -105,7 +105,7 @@ func TestGetRegistrationsByUser(t *testing.T) {
 				t.Fatalf("unexpected error adding registration: %v", err)
 			}
 
-			testRegistration, err := store.GetRegistrationsByUser(context.Background(), test.registration.UserId)
+			testRegistration, err := store.GetRegistrationsByUser(context.Background(), test.registration.UserID)
 			if err != nil {
 				t.Fatalf("unexpected error getting registration: %v", err)
 			}
@@ -147,8 +147,8 @@ func TestGetRegistrationsByUser(t *testing.T) {
 			if testRegistration[0].SoloJazz != test.registration.SoloJazz {
 				t.Fatalf("expected registration solo jazz status %v, found %v", test.registration.SoloJazz, testRegistration[0].SoloJazz)
 			}
-			if testRegistration[0].UserId != test.registration.UserId {
-				t.Fatalf("expected registration user id %s, found %s", test.registration.UserId, testRegistration[0].UserId)
+			if testRegistration[0].UserID != test.registration.UserID {
+				t.Fatalf("expected registration user id %s, found %s", test.registration.UserID, testRegistration[0].UserID)
 			}
 			if !reflect.DeepEqual(testRegistration[0].PassType, test.registration.PassType) {
 				t.Fatalf("expected registration pass type %#v, found %#v", test.registration.PassType, testRegistration[0].PassType)
@@ -165,11 +165,11 @@ func TestGetRegistrationsByUser(t *testing.T) {
 			if !reflect.DeepEqual(testRegistration[0].Housing, test.registration.Housing) {
 				t.Fatalf("expected registration housing %#v, found %#v", test.registration.Housing, testRegistration[0].Housing)
 			}
-			if len(testRegistration[0].OrderIds) != len(test.registration.OrderIds) {
-				t.Fatalf("expected number of registration order ids %d, found %d", len(test.registration.OrderIds), len(testRegistration[0].OrderIds))
+			if len(testRegistration[0].OrderIDs) != len(test.registration.OrderIDs) {
+				t.Fatalf("expected number of registration order ids %d, found %d", len(test.registration.OrderIDs), len(testRegistration[0].OrderIDs))
 			}
-			if len(testRegistration[0].OrderIds) > 0 && !reflect.DeepEqual(testRegistration[0].OrderIds, test.registration.OrderIds) {
-				t.Fatalf("expected registration order ids %#v, found %#v", test.registration.OrderIds, testRegistration[0].OrderIds)
+			if len(testRegistration[0].OrderIDs) > 0 && !reflect.DeepEqual(testRegistration[0].OrderIDs, test.registration.OrderIDs) {
+				t.Fatalf("expected registration order ids %#v, found %#v", test.registration.OrderIDs, testRegistration[0].OrderIDs)
 			}
 			if len(testRegistration[0].DiscountCodes) != len(test.registration.DiscountCodes) {
 				t.Fatalf("expected number of registration discount codes %d, found %d", len(test.registration.DiscountCodes), len(testRegistration[0].DiscountCodes))

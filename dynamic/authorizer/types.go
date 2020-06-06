@@ -3,7 +3,7 @@ package authorizer
 import "errors"
 
 type Userinfo struct {
-	UserId string
+	UserID string
 }
 
 var Unauthenticated = errors.New("unauthenticated")

@@ -18,8 +18,8 @@ type CatalogItem struct {
 	AvailableOnline         bool                           `json:"available_online,omitempty"`
 	AvailableForPickup      bool                           `json:"available_for_pickup,omitempty"`
 	AvailableElectronically bool                           `json:"available_electronically,omitempty"`
-	CategoryId              string                         `json:"category_id,omitempty"`
-	TaxIds                  []string                       `json:"tax_ids,omitempty"`
+	CategoryID              string                         `json:"category_id,omitempty"`
+	TaxIDs                  []string                       `json:"tax_ids,omitempty"`
 	ModifierListInfo        []*CatalogItemModifierListInfo `json:"modifier_list_info,omitempty"`
 	Variations              []*CatalogObject               `json:"variations,omitempty"`
 	ProductType             CatalogItemProductType         `json:"product_type,omitempty"`

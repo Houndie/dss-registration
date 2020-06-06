@@ -53,8 +53,8 @@ func (s *Store) UpdateRegistration(ctx context.Context, registration *storage.Re
 	}
 
 	orderIDs := []string{}
-	if len(registration.OrderIds) > 0 {
-		orderIDs = registration.OrderIds
+	if len(registration.OrderIDs) > 0 {
+		orderIDs = registration.OrderIDs
 	}
 
 	discountCodes := []string{}
@@ -118,7 +118,7 @@ func (s *Store) UpdateRegistration(ctx context.Context, registration *storage.Re
 		provideHousingDetails,
 		requireHousingPetAllergies,
 		requireHousingDetails,
-		registration.UserId,
+		registration.UserID,
 		orderIDs,
 		discountCodes,
 		id)

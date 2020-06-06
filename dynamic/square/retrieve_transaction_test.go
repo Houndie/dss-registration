@@ -16,21 +16,21 @@ import (
 )
 
 func TestRetrieveTransaction(t *testing.T) {
-	locationId := "some location id"
-	transactionId := "some transaction id"
+	locationID := "some location id"
+	transactionID := "some transaction id"
 	apiKey := "apiKey"
 
 	createdAt := time.Unix(1234567, 0)
 
 	expectedTransaction := &Transaction{
-		Id:          transactionId,
-		LocationId:  locationId,
+		ID:          transactionID,
+		LocationID:  locationID,
 		CreatedAt:   &createdAt,
 		Tenders:     nil,
 		Refunds:     nil,
-		ReferenceId: "some reference id",
+		ReferenceID: "some reference id",
 		Product:     TransactionProductRegister,
-		ClientId:    "some client id",
+		ClientID:    "some client id",
 		ShippingAddress: &Address{
 			AddressLine1:                 "123 Any St.",
 			Locality:                     "New York",
@@ -41,7 +41,7 @@ func TestRetrieveTransaction(t *testing.T) {
 			LastName:                     "Doe",
 			Organization:                 "Crazy People",
 		},
-		OrderId: "some order id",
+		OrderID: "some order id",
 	}
 	client := &http.Client{
 		Transport: &testRoundTripper{
@@ -82,7 +82,7 @@ func TestRetrieveTransaction(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error creating square client: %v", err)
 	}
-	transaction, err := squareClient.RetrieveTransaction(context.Background(), locationId, transactionId)
+	transaction, err := squareClient.RetrieveTransaction(context.Background(), locationID, transactionID)
 	if err != nil {
 		t.Fatalf("unexpected error returned when retrieving transaction: %v", err)
 	}
@@ -93,8 +93,8 @@ func TestRetrieveTransaction(t *testing.T) {
 }
 
 func TestRetrieveTransactionHttpError(t *testing.T) {
-	locationId := "some location id"
-	transactionId := "some transaction id"
+	locationID := "some location id"
+	transactionID := "some transaction id"
 	apiKey := "apiKey"
 
 	client := &http.Client{
@@ -108,15 +108,15 @@ func TestRetrieveTransactionHttpError(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error creating square client: %v", err)
 	}
-	_, err = squareClient.RetrieveTransaction(context.Background(), locationId, transactionId)
+	_, err = squareClient.RetrieveTransaction(context.Background(), locationID, transactionID)
 	if err == nil {
 		t.Fatalf("expected error returned, found none")
 	}
 }
 
 func TestRetrieveTransactionErrorCode(t *testing.T) {
-	locationId := "some location id"
-	transactionId := "some transaction id"
+	locationID := "some location id"
+	transactionID := "some transaction id"
 	apiKey := "apiKey"
 
 	client := &http.Client{
@@ -139,7 +139,7 @@ func TestRetrieveTransactionErrorCode(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error creating square client: %v", err)
 	}
-	_, err = squareClient.RetrieveTransaction(context.Background(), locationId, transactionId)
+	_, err = squareClient.RetrieveTransaction(context.Background(), locationID, transactionID)
 	if err == nil {
 		t.Fatalf("expected error returned, found none")
 	}
@@ -154,8 +154,8 @@ func TestRetrieveTransactionErrorCode(t *testing.T) {
 }
 
 func TestRetrieveTransactionErrorMessage(t *testing.T) {
-	locationId := "some location id"
-	transactionId := "some transaction id"
+	locationID := "some location id"
+	transactionID := "some transaction id"
 	apiKey := "apiKey"
 
 	testError := &Error{
@@ -196,7 +196,7 @@ func TestRetrieveTransactionErrorMessage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error creating square client: %v", err)
 	}
-	_, err = squareClient.RetrieveTransaction(context.Background(), locationId, transactionId)
+	_, err = squareClient.RetrieveTransaction(context.Background(), locationID, transactionID)
 	if err == nil {
 		t.Fatalf("expected error returned, found none")
 	}

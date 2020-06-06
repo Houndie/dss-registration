@@ -36,18 +36,18 @@ func TestGet(t *testing.T) {
 	co := commontest.CommonCatalogObjects()
 	expectedOrders := []*square.Order{
 		{
-			Id:    "order1",
+			ID:    "order1",
 			State: square.OrderStateCompleted,
 			LineItems: []*square.OrderLineItem{
-				{CatalogObjectId: co.WeekendPassID[storage.Tier2]},
-				{CatalogObjectId: co.SoloJazzID},
-				{CatalogObjectId: co.TShirtID},
+				{CatalogObjectID: co.WeekendPassID[storage.Tier2]},
+				{CatalogObjectID: co.SoloJazzID},
+				{CatalogObjectID: co.TShirtID},
 			},
 		},
 	}
 
 	userID := expectedUserID
-	orderIDs := []string{expectedOrders[0].Id}
+	orderIDs := []string{expectedOrders[0].ID}
 
 	registration := &Info{
 		ID:            expectedRegistrationID,
@@ -110,15 +110,15 @@ func TestGet(t *testing.T) {
 				TShirt:          toStorageTShirt(registration.TShirt),
 				Housing:         registration.Housing,
 				CreatedAt:       registration.CreatedAt,
-				OrderIds:        orderIDs,
-				UserId:          userID,
+				OrderIDs:        orderIDs,
+				UserID:          userID,
 			}, nil
 		},
 	}
 
 	client := &commontest.MockSquareClient{
 		ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
-			return []*square.Location{{Id: expectedLocationID}}, nil
+			return []*square.Location{{ID: expectedLocationID}}, nil
 		},
 		ListCatalogFunc:         commontest.ListCatalogFuncFromSlice(co.Catalog()),
 		BatchRetrieveOrdersFunc: commontest.OrdersFromSliceCheck(t, expectedLocationID, expectedOrders),
@@ -154,17 +154,17 @@ func TestGetWrongUser(t *testing.T) {
 	co := commontest.CommonCatalogObjects()
 	expectedOrders := []*square.Order{
 		{
-			Id:    "order1",
+			ID:    "order1",
 			State: square.OrderStateCompleted,
 			LineItems: []*square.OrderLineItem{
-				{CatalogObjectId: co.WeekendPassID[storage.Tier2]},
-				{CatalogObjectId: co.SoloJazzID},
-				{CatalogObjectId: co.TShirtID},
+				{CatalogObjectID: co.WeekendPassID[storage.Tier2]},
+				{CatalogObjectID: co.SoloJazzID},
+				{CatalogObjectID: co.TShirtID},
 			},
 		},
 	}
 
-	orderIDs := []string{expectedOrders[0].Id}
+	orderIDs := []string{expectedOrders[0].ID}
 
 	registration := &Info{
 		ID:            expectedRegistrationID,
@@ -205,7 +205,7 @@ func TestGetWrongUser(t *testing.T) {
 
 	client := &commontest.MockSquareClient{
 		ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
-			return []*square.Location{{Id: expectedLocationID}}, nil
+			return []*square.Location{{ID: expectedLocationID}}, nil
 		},
 		ListCatalogFunc:         commontest.ListCatalogFuncFromSlice(co.Catalog()),
 		BatchRetrieveOrdersFunc: commontest.OrdersFromSliceCheck(t, expectedLocationID, expectedOrders),
@@ -251,8 +251,8 @@ func TestGetWrongUser(t *testing.T) {
 						TShirt:          toStorageTShirt(registration.TShirt),
 						Housing:         registration.Housing,
 						CreatedAt:       registration.CreatedAt,
-						OrderIds:        orderIDs,
-						UserId:          test.userID,
+						OrderIDs:        orderIDs,
+						UserID:          test.userID,
 					}, nil
 				},
 			}

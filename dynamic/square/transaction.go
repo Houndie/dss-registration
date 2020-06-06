@@ -16,14 +16,14 @@ const (
 )
 
 type Transaction struct {
-	Id              string             `json:"id,omitempty"`
-	LocationId      string             `json:"location_id,omitempty"`
+	ID              string             `json:"id,omitempty"`
+	LocationID      string             `json:"location_id,omitempty"`
 	CreatedAt       *time.Time         `json:"created_at,omitempty"`
 	Tenders         []*Tender          `json:"tenders,omitempty"`
 	Refunds         []*Refund          `json:"refunds,omitempty"`
-	ReferenceId     string             `json:"reference_id,omitempty"`
+	ReferenceID     string             `json:"reference_id,omitempty"`
 	Product         TransactionProduct `json:"product,omitempty"`
-	ClientId        string             `json:"client_id,omitempty"`
+	ClientID        string             `json:"client_id,omitempty"`
 	ShippingAddress *Address           `json:"shipping_address,omitempty"`
-	OrderId         string             `json:"order_id,omitempty"`
+	OrderID         string             `json:"order_id,omitempty"`
 }

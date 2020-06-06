@@ -19,8 +19,8 @@ type Registration struct {
 	TeamCompetition *TeamCompetition
 	TShirt          *TShirt
 	Housing         Housing
-	UserId          string
-	OrderIds        []string
+	UserID          string
+	OrderIDs        []string
 	CreatedAt       time.Time
 	DiscountCodes   []string
 	Enabled         bool

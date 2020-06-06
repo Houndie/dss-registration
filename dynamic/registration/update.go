@@ -115,11 +115,11 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 	if err != nil {
 		return "", fmt.Errorf("could not authorize user: %w", err)
 	}
-	s.logger.Tracef("found user %s", userinfo.UserId)
+	s.logger.Tracef("found user %s", userinfo.UserID)
 
-	if oldRegistration.UserId != userinfo.UserId {
+	if oldRegistration.UserID != userinfo.UserID {
 		s.logger.WithError(err).Debug("user id does not match that of found registration")
-		s.logger.WithError(err).Tracef("registration provided user id %s, user provided %s", oldRegistration.UserId, userinfo.UserId)
+		s.logger.WithError(err).Tracef("registration provided user id %s, user provided %s", oldRegistration.UserID, userinfo.UserID)
 		return "", storage.ErrNoRegistrationForID{ID: registration.ID}
 	}
 
@@ -129,9 +129,9 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 
 	returnerURL := redirectUrl
 	orderID := ""
-	if hasPurchase := hasUpdatePurchase(registration, oldRegistration); hasPurchase || len(oldRegistration.OrderIds) > 0 {
+	if hasPurchase := hasUpdatePurchase(registration, oldRegistration); hasPurchase || len(oldRegistration.OrderIDs) > 0 {
 		s.logger.Trace("generating reference id")
-		referenceId, err := uuid.NewV4()
+		referenceID, err := uuid.NewV4()
 		if err != nil {
 			return "", fmt.Errorf("error generating reference id: %w", err)
 		}
@@ -150,8 +150,8 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 		}
 
 		paymentData := &common.PaymentData{}
-		if len(oldRegistration.OrderIds) > 0 {
-			paymentData, err = common.GetSquarePayments(ctx, s.client, squareData, locations[0].Id, oldRegistration.OrderIds)
+		if len(oldRegistration.OrderIDs) > 0 {
+			paymentData, err = common.GetSquarePayments(ctx, s.client, squareData, locations[0].ID, oldRegistration.OrderIDs)
 			if err != nil {
 				return "", err
 			}
@@ -194,14 +194,14 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 		order := &square.CreateOrderRequest{
 			IdempotencyKey: idempotencyKey,
 			Order: &square.Order{
-				ReferenceId: referenceId.String(),
-				LocationId:  locations[0].Id,
+				ReferenceID: referenceID.String(),
+				LocationID:  locations[0].ID,
 				LineItems:   lineItems,
 			},
 		}
 
 		s.logger.Trace("creating checkout with square")
-		returnerURL, orderID, err = common.CreateCheckout(ctx, s.client, locations[0].Id, idempotencyKey, order, registration.Email, redirectUrl)
+		returnerURL, orderID, err = common.CreateCheckout(ctx, s.client, locations[0].ID, idempotencyKey, order, registration.Email, redirectUrl)
 	}
 
 	s.logger.Trace("Updating registration in database")
@@ -228,9 +228,9 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 		TeamCompetition: toStorageTeamCompetition(registration.TeamCompetition),
 		TShirt:          toStorageTShirt(registration.TShirt),
 		Housing:         registration.Housing,
-		UserId:          userinfo.UserId,
+		UserID:          userinfo.UserID,
 		DiscountCodes:   registration.DiscountCodes,
-		OrderIds:        orderIDs,
+		OrderIDs:        orderIDs,
 	}
 	err = s.store.UpdateRegistration(ctx, storeRegistration)
 	if err != nil {

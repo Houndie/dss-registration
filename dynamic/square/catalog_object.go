@@ -24,15 +24,15 @@ const (
 
 type catalogObject struct {
 	Type                  CatalogObjectType       `json:"type,omitempty"`
-	Id                    string                  `json:"id,omitempty"`
+	ID                    string                  `json:"id,omitempty"`
 	UpdatedAt             *time.Time              `json:"updated_at,omitempty"`
 	Version               int                     `json:"version,omitempty"`
 	IsDeleted             bool                    `json:"is_deleted,omitempty"`
-	CatalogV1Ids          []*CatalogV1Id          `json:"catalog_v1_ids,omitempty"`
+	CatalogV1IDs          []*CatalogV1ID          `json:"catalog_v1_ids,omitempty"`
 	PresentAtAllLocations bool                    `json:"present_at_all_locations,omitempty"`
-	PresentAtLocationIds  []string                `json:"present_at_location_ids,omitempty"`
-	AbsentAtLocationIds   []string                `json:"absent_at_location_ids,omitempty"`
-	ImageId               string                  `json:"image_id,omitempty"`
+	PresentAtLocationIDs  []string                `json:"present_at_location_ids,omitempty"`
+	AbsentAtLocationIDs   []string                `json:"absent_at_location_ids,omitempty"`
+	ImageID               string                  `json:"image_id,omitempty"`
 	ItemData              *CatalogItem            `json:"item_data,omitempty"`
 	CategoryData          *CatalogCategory        `json:"category_data,omitempty"`
 	ItemVariationData     *CatalogItemVariation   `json:"item_variation_data,omitempty"`
@@ -49,29 +49,29 @@ type catalogObjectType interface {
 }
 
 type CatalogObject struct {
-	Id                    string
+	ID                    string
 	UpdatedAt             *time.Time
 	Version               int
 	IsDeleted             bool
-	CatalogV1Ids          []*CatalogV1Id
+	CatalogV1IDs          []*CatalogV1ID
 	PresentAtAllLocations bool
-	PresentAtLocationIds  []string
-	AbsentAtLocationIds   []string
-	ImageId               string
+	PresentAtLocationIDs  []string
+	AbsentAtLocationIDs   []string
+	ImageID               string
 	CatalogObjectType     catalogObjectType
 }
 
 func (c *CatalogObject) MarshalJSON() ([]byte, error) {
 	cJson := catalogObject{
-		Id:                    c.Id,
+		ID:                    c.ID,
 		UpdatedAt:             c.UpdatedAt,
 		Version:               c.Version,
 		IsDeleted:             c.IsDeleted,
-		CatalogV1Ids:          c.CatalogV1Ids,
+		CatalogV1IDs:          c.CatalogV1IDs,
 		PresentAtAllLocations: c.PresentAtAllLocations,
-		PresentAtLocationIds:  c.PresentAtLocationIds,
-		AbsentAtLocationIds:   c.AbsentAtLocationIds,
-		ImageId:               c.ImageId,
+		PresentAtLocationIDs:  c.PresentAtLocationIDs,
+		AbsentAtLocationIDs:   c.AbsentAtLocationIDs,
+		ImageID:               c.ImageID,
 	}
 	switch t := c.CatalogObjectType.(type) {
 	case *CatalogItem:
@@ -114,15 +114,15 @@ func (c *CatalogObject) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return errors.Wrap(err, "Error unmarshaling catalog object")
 	}
-	c.Id = cJson.Id
+	c.ID = cJson.ID
 	c.UpdatedAt = cJson.UpdatedAt
 	c.Version = cJson.Version
 	c.IsDeleted = cJson.IsDeleted
-	c.CatalogV1Ids = cJson.CatalogV1Ids
+	c.CatalogV1IDs = cJson.CatalogV1IDs
 	c.PresentAtAllLocations = cJson.PresentAtAllLocations
-	c.PresentAtLocationIds = cJson.PresentAtLocationIds
-	c.AbsentAtLocationIds = cJson.AbsentAtLocationIds
-	c.ImageId = cJson.ImageId
+	c.PresentAtLocationIDs = cJson.PresentAtLocationIDs
+	c.AbsentAtLocationIDs = cJson.AbsentAtLocationIDs
+	c.ImageID = cJson.ImageID
 
 	switch cJson.Type {
 	case CatalogObjectTypeItem:

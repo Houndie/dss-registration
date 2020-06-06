@@ -9,8 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *Client) RetrieveTransaction(ctx context.Context, locationId, transactionId string) (*Transaction, error) {
-	req, err := http.NewRequest("GET", "https://connect.squareup.com/v2/locations/"+locationId+"/transactions/"+transactionId, nil)
+func (c *Client) RetrieveTransaction(ctx context.Context, locationID, transactionID string) (*Transaction, error) {
+	req, err := http.NewRequest("GET", "https://connect.squareup.com/v2/locations/"+locationID+"/transactions/"+transactionID, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error creating request")
 	}

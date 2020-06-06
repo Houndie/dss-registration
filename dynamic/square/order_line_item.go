@@ -6,7 +6,7 @@ type OrderLineItem struct {
 	Quantity                 string                   `json:"quantity,omitempty"`
 	QuantityUnit             *OrderQuantityUnit       `json:"quantity_unit,omitempty"`
 	Note                     string                   `json:"note,omitempty"`
-	CatalogObjectId          string                   `json:"catalog_object_id,omitempty"`
+	CatalogObjectID          string                   `json:"catalog_object_id,omitempty"`
 	VariationName            string                   `json:"variation_name,omitempty"`
 	Modifiers                []*OrderLineItemModifier `json:"modifiers,omitempty"`
 	Taxes                    []*OrderLineItemTax      `json:"taxes,omitempty"`

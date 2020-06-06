@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *Client) UpdateOrder(ctx context.Context, locationId, orderId string, order *Order, fieldsToClear []string, idempotencyKey string) (*Order, error) {
+func (c *Client) UpdateOrder(ctx context.Context, locationID, orderID string, order *Order, fieldsToClear []string, idempotencyKey string) (*Order, error) {
 	reqBody := struct {
 		Order          *Order   `json:"order"`
 		FieldsToClear  []string `json:"fields_to_clear"`
@@ -28,7 +28,7 @@ func (c *Client) UpdateOrder(ctx context.Context, locationId, orderId string, or
 
 	bodyBuf := bytes.NewBuffer(reqBodyBytes)
 
-	req, err := http.NewRequest("PUT", "http://connect.squareup.com/v2/locations/"+locationId+"/orders/"+orderId, bodyBuf)
+	req, err := http.NewRequest("PUT", "http://connect.squareup.com/v2/locations/"+locationID+"/orders/"+orderID, bodyBuf)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating request")
 	}

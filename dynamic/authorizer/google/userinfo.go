@@ -57,7 +57,7 @@ func (a *Authorizer) Userinfo(ctx context.Context, accessToken string) (*authori
 	}
 
 	tuserinfo := &authorizer.Userinfo{
-		UserId: guserinfo.Sub,
+		UserID: guserinfo.Sub,
 	}
 
 	return tuserinfo, nil

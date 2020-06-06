@@ -28,7 +28,7 @@ type itemCheck struct {
 func discountCheck(t *testing.T, discountArray []*square.OrderLineItemDiscount, discountID string) {
 	found := false
 	for _, d := range discountArray {
-		if d.CatalogObjectId == discountID {
+		if d.CatalogObjectID == discountID {
 			found = true
 		}
 	}
@@ -66,7 +66,7 @@ func TestAdd(t *testing.T) {
 	idx := 0
 	for _, id := range co.WeekendPassID {
 		inventoryCounts[idx] = &square.InventoryCount{
-			CatalogObjectId: id,
+			CatalogObjectID: id,
 			Quantity:        "25",
 		}
 		idx++
@@ -157,17 +157,17 @@ func TestAdd(t *testing.T) {
 					}
 					return commontest.ListCatalogFuncFromSlice(co.Catalog())(ctx, types)
 				},
-				BatchRetrieveInventoryCountsFunc: func(ctx context.Context, catalogObjectIds, locationIds []string, updatedAfter *time.Time) square.BatchRetrieveInventoryCountsIterator {
+				BatchRetrieveInventoryCountsFunc: func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) square.BatchRetrieveInventoryCountsIterator {
 					if !test.makeOrder {
 						t.Fatalf("no orderable items found, square should not be called")
 					}
-					return commontest.InventoryCountsFromSliceCheck(t, co.WeekendPassID, inventoryCounts)(ctx, catalogObjectIds, locationIds, updatedAfter)
+					return commontest.InventoryCountsFromSliceCheck(t, co.WeekendPassID, inventoryCounts)(ctx, catalogObjectIDs, locationIDs, updatedAfter)
 				},
 				ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
 					if !test.makeOrder {
 						t.Fatalf("no orderable items found, square should not be called")
 					}
-					return []*square.Location{{Id: expectedLocationID}}, nil
+					return []*square.Location{{ID: expectedLocationID}}, nil
 				},
 				CreateCheckoutFunc: func(ctx context.Context, locationID, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error) {
 					if !test.makeOrder {
@@ -215,28 +215,28 @@ func TestAdd(t *testing.T) {
 						}
 						found := false
 						for _, itemCheck := range itemChecks {
-							if itemCheck.id == lineItem.CatalogObjectId {
+							if itemCheck.id == lineItem.CatalogObjectID {
 								if itemCheck.found {
 									t.Fatalf("order item with id %q found twice", itemCheck.id)
 								}
 								itemCheck.found = true
 								found = true
 
-								if p, ok := test.registration.PassType.(*WeekendPass); ok && lineItem.CatalogObjectId == co.WeekendPassID[p.Tier] {
+								if p, ok := test.registration.PassType.(*WeekendPass); ok && lineItem.CatalogObjectID == co.WeekendPassID[p.Tier] {
 									if len(test.registration.DiscountCodes) > 0 {
 										discountCheck(t, lineItem.Discounts, co.FullWeekendDiscountID)
 									}
 									if test.registration.IsStudent {
 										discountCheck(t, lineItem.Discounts, co.StudentDiscountID)
 									}
-								} else if test.registration.MixAndMatch != nil && lineItem.CatalogObjectId == co.MixAndMatchID && len(test.registration.DiscountCodes) > 0 {
+								} else if test.registration.MixAndMatch != nil && lineItem.CatalogObjectID == co.MixAndMatchID && len(test.registration.DiscountCodes) > 0 {
 									discountCheck(t, lineItem.Discounts, co.MixAndMatchDiscountID)
 								}
 								break
 							}
 						}
 						if !found {
-							t.Fatalf("found order for unexpected item id %q", lineItem.CatalogObjectId)
+							t.Fatalf("found order for unexpected item id %q", lineItem.CatalogObjectID)
 						}
 
 					}
@@ -248,7 +248,7 @@ func TestAdd(t *testing.T) {
 					return &square.Checkout{
 						CheckoutPageUrl: expectedCheckoutUrl,
 						Order: &square.Order{
-							Id: expectedOrderID,
+							ID: expectedOrderID,
 						},
 					}, nil
 				},
@@ -347,8 +347,8 @@ func TestAdd(t *testing.T) {
 					if !reflect.DeepEqual(r.Housing, test.registration.Housing) {
 						t.Fatalf("expected registration housing %#q, found %#q", test.registration.Housing, r.Housing)
 					}
-					if r.UserId != expectedUserID {
-						t.Fatalf("expected registration user id %s, found %s", r.UserId, expectedUserID)
+					if r.UserID != expectedUserID {
+						t.Fatalf("expected registration user id %s, found %s", r.UserID, expectedUserID)
 					}
 					if len(r.DiscountCodes) != len(test.registration.DiscountCodes) {
 						t.Fatalf("expected %d discounts, found %d", len(r.DiscountCodes), len(test.registration.DiscountCodes))
@@ -357,10 +357,10 @@ func TestAdd(t *testing.T) {
 						t.Fatalf("expected registration discount codes  %#q, found %#q", []string{expectedDiscountCode}, r.DiscountCodes)
 					}
 					if test.makeOrder {
-						if len(r.OrderIds) != 1 || r.OrderIds[0] != expectedOrderID {
-							t.Fatalf("expected registration order id %#q, found %#q", []string{expectedOrderID}, r.OrderIds)
+						if len(r.OrderIDs) != 1 || r.OrderIDs[0] != expectedOrderID {
+							t.Fatalf("expected registration order id %#q, found %#q", []string{expectedOrderID}, r.OrderIDs)
 						}
-					} else if len(r.OrderIds) != 0 {
+					} else if len(r.OrderIDs) != 0 {
 						t.Fatalf("expected no order, found one")
 					}
 					return "some key", nil
@@ -571,7 +571,7 @@ func TestAddCostNothing(t *testing.T) {
 	idx := 0
 	for _, id := range co.WeekendPassID {
 		inventoryCounts[idx] = &square.InventoryCount{
-			CatalogObjectId: id,
+			CatalogObjectID: id,
 			Quantity:        "25",
 		}
 		idx++
@@ -581,9 +581,9 @@ func TestAddCostNothing(t *testing.T) {
 		ListCatalogFunc:                  commontest.ListCatalogFuncFromSlice(co.Catalog()),
 		BatchRetrieveInventoryCountsFunc: commontest.InventoryCountsFromSlice(inventoryCounts),
 		ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
-			return []*square.Location{{Id: "7"}}, nil
+			return []*square.Location{{ID: "7"}}, nil
 		},
-		CreateCheckoutFunc: func(ctx context.Context, locationId, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error) {
+		CreateCheckoutFunc: func(ctx context.Context, locationID, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error) {
 			return nil, &square.ErrorList{
 				Errors: []*square.Error{
 					{
@@ -599,7 +599,7 @@ func TestAddCostNothing(t *testing.T) {
 	authorizer := &commontest.MockAuthorizer{
 		UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
 			return &authorizer.Userinfo{
-				UserId: "1235",
+				UserID: "1235",
 			}, nil
 		},
 	}
