@@ -99,6 +99,44 @@ jobs:
             #      docker tag project_backend registry.heroku.com/dayton-swing-smackdown-testing/web
             #      docker push registry.heroku.com/dayton-swing-smackdown-testing/web
             #      heroku container:release -a dayton-swing-smackdown-testing web
+  deploy-prod:
+    docker:
+      - image: circleci/golang:1.14-node
+    steps: 
+      - heroku/install
+      - run:
+          working_directory: /tmp
+          command: npm install netlify-cli
+
+      - checkout
+      - run: git submodule sync --recursive && git submodule update --recursive --init
+
+      - setup_remote_docker
+      - run:
+          name: Build source
+          command: docker-compose -f docker-compose.circle-testdeploy.yml up --build --no-start
+
+            #- run:
+            #    name: Perform migrations
+            #    command: |
+            #      go get github.com/Houndie/toolbox@v0.3.0 
+            #      toolbox -v sync
+            #      toolbox do -- migrate -path=dynamic/storage/postgres/migrations -database $(heroku config:get -a dayton-swing-smackdown-testing DATABASE_URL) up
+
+      - run:
+          name: Deploy Frontend
+          working_directory: /tmp
+          command: |
+            docker cp project_frontend_1:/usr/share/nginx/html site/
+            npx netlify deploy --prod --dir site --site 797d149a-b1cf-4566-bb76-16629c5cb366
+
+            #- run:
+            #    name: Deploy Backend
+            #    command: |
+            #      heroku container:login
+            #      docker tag project_backend registry.heroku.com/dayton-swing-smackdown-testing/web
+            #      docker push registry.heroku.com/dayton-swing-smackdown-testing/web
+            #      heroku container:release -a dayton-swing-smackdown-testing web
 
 workflows:
   version: 2
@@ -116,6 +154,23 @@ workflows:
         #requires:
         #    - go-test
         #    - end-to-end
+          filters:
+            tags:
+              only: /^v[0-9]\.[0-9]\.[0-9]$/
+            branches:
+              ignore: /.*/
+      - approve:
+          type: approval
+          requires: 
+             - deploy
+          filters:
+            tags:
+              only: /^v[0-9]\.[0-9]\.[0-9]$/
+            branches:
+              ignore: /.*/
+      - deploy-prod:
+          requires: 
+             - approve
           filters:
             tags:
               only: /^v[0-9]\.[0-9]\.[0-9]$/
