@@ -6,16 +6,10 @@ weight = 50
 background = "dark" # can influence the text color
 particles = false
 
-title = "Dayton Swing Smackdown"
-subtitle = "FEBRUARY 28 - MARCH 1, 2020"
+minHeight = "500px"
 
 [header]
-  image = "ViktorJump.jpg"
-
-[asset]
-  image = "logo_white.png"
-  width = "500px" # optional - will default to image width
-  #height = "150px" # optional - will default to image height
+  image = "Title.png"
 
 #[[buttons]]
 #  text = "Button"

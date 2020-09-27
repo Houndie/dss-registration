@@ -122,20 +122,6 @@ i                 href="{{ .URL }}" class="nav-link anchor {{- if $hasChildren }
         {{- end -}}
       {{- end }}
   {{/*Adding custom code here for login button*/}}
-      <div class="login button">
-        <ul class="navbar-nav">
-          <li class="nav-item dropdown">
-            <a href="#" class="nav-link anchor dropdown-toggle">
-              My Account
-            </a>
-            <div class="dropdown-menu">
-              <input class="downdown-item anchor" type="image" src="/images/btn_google_signin_dark_normal_web.png" id="authorize_button"/>
-				  <a href="/my_registrations" class="dropdown-item anchor" id="my_registrations_button">My Registrations</a>
-				  <a href="#" class="dropdown-item anchor" id="signout_button">Sign Out</a>
-            </div>
-          </li>
-        </ul>
-      </div>
     </div>
   </div>
   {{- with .Params.repo_button }}

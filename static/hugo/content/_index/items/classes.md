@@ -7,4 +7,4 @@ weight = 10
   url = "/classes"
 +++
 
-Smackdown offers three levels of classes to provide the best instruction for you!
+Three free classes taught digitally!

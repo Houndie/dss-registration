@@ -21,7 +21,7 @@ googleAnalytics = ""
   description = "Home of the Battle of the Swing Cities Team Competition"
 
   [params.style]
-    #background = "secondary"
+    background = "dark"
 
   # Theme customizations
   # Assets relative to 'static/'
@@ -46,10 +46,10 @@ googleAnalytics = ""
     pro = false
 
   [params.colors]
-    primary = "#ab0000"
-    secondary = "#c8b99c"
+    primary = "#d52ce0"
+    secondary = "#f8f9fa"
     success = "#008f54"
-    info = "#00c9dc"
+    info = "#919191"
     warning = "#fdf314"
     danger = "#dc1200"
     light = "#f8f9fa"
@@ -59,40 +59,40 @@ googleAnalytics = ""
 # Keep an eye out for updates. These will be moved out to make navbar more
 # configurable.
 
-[[menu.main]]
-  url = "#"
-  name = "Registration"
-  identifier = "registration"
-  weight = 10
-
-[[menu.main]]
-  url = "/registration"
-  name = "Register Now"
-  parent = "registration"
-  weight = 10
-
-[[menu.main]]
-  url = "/pricing_and_tshirts"
-  name = "Pricing & T-Shirts"
-  parent = "registration"
-  weight = 20
-
-[[menu.main]]
-  url = "/housing"
-  name = "Housing"
-  parent = "registration"
-  weight = 30
-
-[[menu.main]]
-  url = "/volunteer"
-  name = "Volunteer"
-  parent = "registration"
-  weight = 40
-
-[[menu.main]]
-  url = "/classes"
-  name = "Classes"
-  weight = 20
+#[[menu.main]]
+#  url = "#"
+#  name = "Registration"
+#  identifier = "registration"
+#  weight = 10
+#
+#[[menu.main]]
+#  url = "/registration"
+#  name = "Register Now"
+#  parent = "registration"
+#  weight = 10
+#
+#[[menu.main]]
+#  url = "/pricing_and_tshirts"
+#  name = "Pricing & T-Shirts"
+#  parent = "registration"
+#  weight = 20
+#
+#[[menu.main]]
+#  url = "/housing"
+#  name = "Housing"
+#  parent = "registration"
+#  weight = 30
+#
+#[[menu.main]]
+#  url = "/volunteer"
+#  name = "Volunteer"
+#  parent = "registration"
+#  weight = 40
+#
+#[[menu.main]]
+#  url = "/classes"
+#  name = "Classes"
+#  weight = 20
 
 [[menu.main]]
   url = "/instructors"
@@ -165,38 +165,38 @@ googleAnalytics = ""
   parent = "Competitions"
   weight = 100
 
-[[menu.main]]
-  url = "#"
-  name = "Venues"
-  identitifer = "Venues"
-  weight = 50
-
-[[menu.main]]
-  url = "/event_venues"
-  name = "Event Venues"
-  parent = "Venues"
-  weight = 10
-
-[[menu.main]]
-  url = "/local_faire"
-  name = "Local Faire"
-  parent = "Venues"
-  weight = 20
-
-[[menu.main]]
-  url = "/music"
-  name = "Music"
-  weight = 60
+#[[menu.main]]
+#  url = "#"
+#  name = "Venues"
+#  identitifer = "Venues"
+#  weight = 50
+#
+#[[menu.main]]
+#  url = "/event_venues"
+#  name = "Event Venues"
+#  parent = "Venues"
+#  weight = 10
+#
+#[[menu.main]]
+#  url = "/local_faire"
+#  name = "Local Faire"
+#  parent = "Venues"
+#  weight = 20
+#
+#[[menu.main]]
+#  url = "/music"
+#  name = "Music"
+#  weight = 60
 
 [[menu.main]]
   url = "/schedule"
   name = "Schedule"
   weight = 70
 
-[[menu.main]]
-  url = "/safety"
-  name = "Safety"
-  weight = 80
+#[[menu.main]]
+#  url = "/safety"
+#  name = "Safety"
+#  weight = 80
 
 [[menu.footer_social]]
   weight = 20

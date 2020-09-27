@@ -1,17 +1,21 @@
 {{- $fragment := .self.Params -}}
+{{- $self := .self -}}
 {{- $name := strings.TrimSuffix ".md" (replace .self.Name "/index.md" "") -}}
 {{- $bg := $fragment.background | default "secondary" }}
 
-<section id="contact" class="fragment %!s(&lt;nil&gt;)">
-    <div class="container-fluid bg-light %!s(&lt;nil&gt;)">
-    <div class="container py-5 %!s(&lt;nil&gt;)">
+{{- partial "helpers/container.html" (dict "start" true "in_slot" .in_slot "bg" $bg "Name" .Name "Params" .Params "section_class" "my_contact" "container_class" "overlay") -}}
+    <div class="container-fluid %!s(&lt;nil&gt;)">
+    <div class="container py-5 %!s(&lt;nil&gt;)" {{- partial "helpers/text-color.html" (dict "self" $self) -}}>
+          <div class="mb-0
+            {{- partial "helpers/text-color.html" (dict "self" $self "light" "secondary") -}}
+          ">
 
   <div class="row mx-0">
-    <div class="col px-0 text-center text-body">
+    <div class="col px-0 text-center">
       <h2>Have questions?</h2>
     </div>
   </div><div class="row mx-0">
-    <div class="col pt-4 pb-0 px-0 text-center text-body">
+    <div class="col pt-4 pb-0 px-0 text-center">
       <h5><em>Contact us!</em></h5>
     </div>
   </div>
@@ -86,6 +90,7 @@
       </form>
     </div>
   </div>
+			 </div>
     </div>
     </div>
-</section>
+{{- partial "helpers/container.html" (dict "end" true "in_slot" .in_slot) -}}

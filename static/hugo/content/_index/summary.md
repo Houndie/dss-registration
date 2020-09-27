@@ -3,7 +3,7 @@ fragment = "item"
 #disabled = true
 date = "2017-10-05"
 weight = 100
-#background = ""
+background = "dark"
 
 align = "right"
 
@@ -11,8 +11,10 @@ align = "right"
 image = "tri_city.jpg"
 +++
 
-## About Smackdown
+## We're doing an intermission year!
 
-**DAYTON SMACKDOWN IS FEBRUARY 28 – MARCH 1, 2020!**
+**Spend some time online with us on February 27!**
 
-Dayton Swing Smackdown is a swing dancing event held every year on the last full weekend of February. It features over 9 hours of dancing, 13 hours of instruction, Solo Jazz Competition, Mix n Match Competition, and The Battle of the Swing Cities Team Routine Competition.  Smackdown is now on it’s 12th  year, and getting better with age.  In addition to a dedication to providing a quality weekend, it is one of Smackdown’s core goals to be accessible to everyone, from the experienced dance community, to brand new dancers.  Come and join us in February!
+Due to the covid-19 pandemic, we obviously don't feel comfortable having an in-person event, but that doesn't mean we can't still have a grand time digitally!  We're putting on a one day event with 3 classes, a discussion talk, a DJ party, and THE BATTLE OF THE SWING CITIES TEAM *VIDEO* COMPETITION!  Mark down your calendars now, you don't want to miss this!
+
+Because of the reduced nature of this event, we're offering the intermission *completely free* so you have no reason not to be there!

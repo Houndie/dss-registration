@@ -9,5 +9,9 @@ particles = false
 title = "SCHEDULE"
 
 [header]
-  image = "page_header.png"
+  image = "SmackdownPageTitle.png"
+
+[asset]
+  image = "ScheduleTitle.png"
+  text = "Schedule"
 +++
