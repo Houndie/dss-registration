@@ -1,0 +1,16 @@
+@import "../../node_modules/bootstrap/scss/bootstrap.scss";
+
+.HeroText {
+	color: white;
+	text-align: center;
+}
+
+.vertical-center {
+	display: flex;
+	align-items: center;
+}
+
+.horizontal-center {
+	justify-content: center;
+}
+
