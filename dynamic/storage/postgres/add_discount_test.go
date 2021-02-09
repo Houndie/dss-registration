@@ -11,7 +11,7 @@ import (
 )
 
 func TestAddGetDiscount(t *testing.T) {
-	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DSS_PG_URL"))
+	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DSS_TEST_POSTGRESURL"))
 	if err != nil {
 		t.Fatalf("error connecting to database for test: %v", err)
 	}
@@ -89,7 +89,7 @@ func TestAddGetDiscount(t *testing.T) {
 }
 
 func TestAddDiscountDuplicate(t *testing.T) {
-	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DSS_PG_URL"))
+	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DSS_TEST_POSTGRESURL"))
 	if err != nil {
 		t.Fatalf("error connecting to database for test: %v", err)
 	}

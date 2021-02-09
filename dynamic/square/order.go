@@ -36,4 +36,8 @@ type Order struct {
 	TotalDiscountMoney      *Money                   `json:"total_discount_money,omitempty"`
 	TotalServiceChargeMoney *Money                   `json:"total_service_charge_money,omitempty"`
 	Version                 int                      `json:"version,omitempty"`
+	Metadata                map[string]string        `json:"metadata,omitempty"`
+	PricingOptions          *OrderPricingOptions     `json:"pricing_options,omitempty"`
+	Rewards                 []*OrderReward           `json:"rewards,omitempty"`
+	TotalTipMoney           *Money                   `json:"total_tip_money,omitempty"`
 }

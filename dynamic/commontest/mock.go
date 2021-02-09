@@ -3,17 +3,16 @@ package commontest
 import (
 	"context"
 
+	"github.com/Houndie/dss-registration/dynamic/sendinblue"
 	"github.com/Houndie/dss-registration/dynamic/storage"
-	"github.com/sendgrid/rest"
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
 type MockMailClient struct {
-	SendFunc func(*mail.SGMailV3) (*rest.Response, error)
+	SendSMTPEmailFunc func(ctx context.Context, params *sendinblue.SMTPEmailParams) (string, error)
 }
 
-func (m *MockMailClient) Send(email *mail.SGMailV3) (*rest.Response, error) {
-	return m.SendFunc(email)
+func (m *MockMailClient) SendSMTPEmail(ctx context.Context, params *sendinblue.SMTPEmailParams) (string, error) {
+	return m.SendSMTPEmailFunc(ctx, params)
 }
 
 type MockStore struct {

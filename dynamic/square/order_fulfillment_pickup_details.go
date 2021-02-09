@@ -2,6 +2,7 @@ package square
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/peterhellberg/duration"
@@ -60,13 +61,13 @@ func (o *OrderFulfillmentPickupDetails) MarshalJSON() ([]byte, error) {
 		CancelReason: o.CancelReason,
 	}
 	if o.AutoCompleteDuration != nil {
-		jsonType.AutoCompleteDuration = string(int(o.AutoCompleteDuration.Seconds())) + "S"
+		jsonType.AutoCompleteDuration = fmt.Sprintf("%vS", o.AutoCompleteDuration.Seconds())
 	}
 	if o.PickupWindowDuration != nil {
-		jsonType.PickupWindowDuration = string(int(o.PickupWindowDuration.Seconds())) + "S"
+		jsonType.PickupWindowDuration = fmt.Sprintf("%vS", o.PickupWindowDuration.Seconds())
 	}
 	if o.PrepTimeDuration != nil {
-		jsonType.PrepTimeDuration = string(int(o.PrepTimeDuration.Seconds())) + "S"
+		jsonType.PrepTimeDuration = fmt.Sprintf("%vS", o.PrepTimeDuration.Seconds())
 	}
 	return json.Marshal(&jsonType)
 }

@@ -6,14 +6,13 @@ import (
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/common"
+	"github.com/Houndie/dss-registration/dynamic/sendinblue"
 	"github.com/Houndie/dss-registration/dynamic/storage"
-	"github.com/sendgrid/rest"
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"github.com/sirupsen/logrus"
 )
 
 type MailClient interface {
-	Send(email *mail.SGMailV3) (*rest.Response, error)
+	SendSMTPEmail(ctx context.Context, params *sendinblue.SMTPEmailParams) (string, error)
 }
 
 type Store interface {

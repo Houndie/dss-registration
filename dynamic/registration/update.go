@@ -186,7 +186,7 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 			return "", err
 		}
 
-		lineItems, err := makeLineItems(registration, squareData, paymentData, discounts)
+		lineItems, lineDiscounts, err := makeLineItems(registration, squareData, paymentData, discounts)
 		if err != nil {
 			return "", err
 		}
@@ -197,6 +197,7 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 				ReferenceID: referenceID.String(),
 				LocationID:  locations[0].ID,
 				LineItems:   lineItems,
+				Discounts:   lineDiscounts,
 			},
 		}
 

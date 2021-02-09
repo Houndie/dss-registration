@@ -14,9 +14,9 @@ func (s *Service) Exists(ctx context.Context, token string) (bool, error) {
 		s.logger.WithError(err).Debug(msg)
 		return false, errors.Wrap(err, msg)
 	}
-	s.logger.Tracef("found user %s", userinfo.UserId)
+	s.logger.Tracef("found user %s", userinfo.UserID)
 
-	exists, err := s.store.VolunteerExists(ctx, userinfo.UserId)
+	exists, err := s.store.VolunteerExists(ctx, userinfo.UserID)
 	if err != nil {
 		s.logger.WithError(err).Error("error checking for volunteer existance")
 		return false, errors.Wrap(err, "error checking for volunteer existance")

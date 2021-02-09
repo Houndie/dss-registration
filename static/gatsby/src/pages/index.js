@@ -1,7 +1,8 @@
-import React from "react"
+import React, {useEffect, useState} from "react"
 import '../styles/style.scss'
-import Jumbotron from "react-bootstrap/Jumbotron"
 import Container from "react-bootstrap/Container"
+import Alert from "react-bootstrap/Alert"
+import Spinner from "react-bootstrap/Spinner"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 import Image from "react-bootstrap/Image"
@@ -9,16 +10,21 @@ import Form from "react-bootstrap/Form"
 import Button from "react-bootstrap/Button"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGraduationCap, faMedal, faMusic, faCircle } from '@fortawesome/free-solid-svg-icons'
-import { faFacebook } from '@fortawesome/free-brands-svg-icons'
 import {Formik} from 'formik'
-import FormText from '../components/FormText.js'
-import FormTextArea from '../components/FormTextArea.js'
+import FormField from '../components/FormField.js'
 import Menu from '../components/Menu.js'
+import Footer from '../components/Footer.js'
+import Hero from '../components/Hero.js'
 import * as Yup from 'yup'
+import Recaptcha from 'react-recaptcha';
+import formsTwirp from "../rpc/forms_pb_twirp.js"
+import {ImportRecaptchaEffect} from '../components/recaptcha.js'
 
-const IconPanel = ({icon, title, children}) => (
+const IconPanel = ({link, icon, title, children}) => (
 	<div className="text-center">
-		<FontAwesomeIcon icon={icon} mask={faCircle} size="6x" transform="shrink-7"/>
+		<a href={link} className="no-special-color">
+			<FontAwesomeIcon icon={icon} mask={faCircle} size="6x" transform="shrink-7"/>
+		</a>
 		<h2>{title}</h2>
 		<p>{children}</p>
 	</div>
@@ -36,86 +42,121 @@ const ContactSchema = Yup.object().shape({
 		.required('Required'),
 });
 
-const Home = () => (
-	<>
-		<Menu/>
-		<Jumbotron className="vertical-center horizontal-center" style={{backgroundImage: 'url(ViktorJump.jpg)', backgroundSize: 'cover', height: '450px'}} fluid>
-			<h1 className="HeroText">Dayton Swing Smackdown</h1>
-		</Jumbotron>
-		<Container className="my-5">
-			<Row><Col xs="5">
-				<Image src="tri_city.jpg" fluid/>
-			</Col><Col>
-				<h2>We’re doing an intermission year!</h2>
-				<p><strong>Spend some time online with us on February 27!</strong></p>
-				<p>Due to the covid-19 pandemic, we obviously don’t feel comfortable having an in-person event, but that doesn’t mean we can’t still have a grand time digitally! We’re putting on a one day event with 3 classes, a discussion talk, a DJ party, and THE BATTLE OF THE SWING CITIES TEAM VIDEO COMPETITION! Mark down your calendars now, you don’t want to miss this!</p>
-				<p>Because of the reduced nature of this event, we’re offering the intermission completely free so you have no reason not to be there!</p>
-			</Col></Row>
-		</Container>
-		<Container className="my-5">
-			<Row><Col>
-				<IconPanel icon={faGraduationCap} title="Classes">Three free classes taught digitally!</IconPanel>
-			</Col><Col>
-				<IconPanel icon={faMedal} title="Competition">Plan with your friends and participate in Smackdown’s first video team competition!!</IconPanel>
-			</Col><Col>
-				<IconPanel icon={faMusic} title="DJ">Listen and share music with everyone with our jwbx.fm DJ party!</IconPanel>
-			</Col></Row>
-		</Container>
-		<Container className="my-5">
-			<Row><Col className="text-center">
-				<h2>Have Questions?</h2>
-				<i>Contact Us!</i>
-				<Formik
-					initialValues={{name: '', email: '', message: ''}}
-					validationSchema={ContactSchema}
-					onSubmit={(values, {setSubmitting}) => {
-						var formData = new FormData();
+const Home = () => {
+	return (
+		<>
+			<Menu/>
+			<Hero image='ViktorJump.jpg' height='450px' title='Dayton Swing Smackdown' />
+			<Container className="my-5">
+				<Row><Col xs="5">
+					<Image src="tri_city.jpg" fluid/>
+				</Col><Col className="align-self-center">
+					<p>Dayton Swing Smackdown is a swing dancing event held every year on the last full weekend of February. It features over 9 hours of dancing, 13 hours of instruction, Solo Jazz Competition, Mix n Match Competition, and The Battle of the Swing Cities Team Routine Competition.  Smackdown is now on it’s 12th  year, and getting better with age.  In addition to a dedication to providing a quality weekend, it is one of Smackdown’s core goals to be accessible to everyone, from the experienced dance community, to brand new dancers.  Come and join us in February!</p>
+				</Col></Row>
+			</Container>
+			<Container className="my-5">
+				<Row><Col>
+					<IconPanel link="/classes" icon={faGraduationCap} title="Classes">Smackdown offers three levels of classes to provide the best instruction for you!</IconPanel>
+				</Col><Col>
+					<IconPanel link="/competitions" icon={faMedal} title="Competition">Get your team together and compete in the Battle of the Swing Cities Team Competition!</IconPanel>
+				</Col><Col>
+					<IconPanel link="/music" icon={faMusic} title="Music">Dance to our live band on Friday, or to our collection of amazing DJs!</IconPanel>
+				</Col></Row>
+			</Container>
+			<Container className="my-5">
+				<Row><Col className="text-center">
+					<h2>Have Questions?</h2>
+					<i>Contact Us!</i>
+					<ContactUs />
+				</Col></Row>
+			</Container>
+			<Footer />
+		</>
+	)
+}
 
-						for (var k in values) {
-							formData.append(k, values[k]);
-						}
-						
-						fetch("https://formspree.io/xyyyrenq", {
-							method: "POST",
-							body: formData,
-						}).then(() => {
-							setSubmitting(false)
-						}).catch((e) => {
-							console.log(JSON.stringify(e))
-							setSubmitting(false)
-						})
-					}}
-				>
-				{({values, handleSubmit, isSubmitting}) => (
-					<Form onSubmit={handleSubmit}>
-						<Container>
-							<Row><Col>
-								<FormText label="Name" name="name" type="text"/>
-							</Col><Col>
-								<FormText label="Email" name="email" type="text"/>
-							</Col></Row><Row><Col>
-								<FormTextArea label="Message" name="message"/>
-							</Col></Row><Row><Col>
-								<Button type="submit" disabled={isSubmitting}>Submit</Button>
-							</Col></Row>
-						</Container>
-					</Form>
-				)}
-				</Formik>
-			</Col></Row>
-		</Container>
-		<Container className="my-5">
-			<Row><Col>
-				<a href="https://www.facebook.com/Dayton-Swing-Smackdown-120632558063863">
-					<FontAwesomeIcon icon={faFacebook} size="6x"/>
-				</a>
-				<p>Copyright 2021 by Dayton Swing Smackdown</p>
-			</Col><Col>
-				<h3>Dayton Swing Smackdown</h3>
-				<p>We are an event dedicated to creating an exciting and fun atmosphere for new and old dancers alike. See you on the dance floor!</p>
-			</Col></Row>
-		</Container>
-	</>
-)
+const ContactUs = () => {
+	const formsClient = formsTwirp.createFormsClient(`${process.env.GATSBY_BACKEND}`)
+	const [recaptchaLoaded, setRecaptchaLoaded] = useState(false)
+	const [formSubmitted, setFormSubmitted] = useState(false)
+	let recaptchaInstance
+	useEffect(ImportRecaptchaEffect)
+	if(formSubmitted){
+		return (
+			<Alert variant="success">
+				Thank you for submitting your message!  We will get back to you as soon as we can.
+			</Alert>
+		)
+	}
+	return (
+		<Formik
+			initialValues={{name: '', email: '', message: '', recaptchaResponse: ''}}
+			validationSchema={ContactSchema}
+			onSubmit={(values, {setSubmitting}) => {
+				if (values.recaptchaResponse === '') {
+					recaptchaInstance.execute()
+					return
+				}
+
+				const req = new formsTwirp.ContactUsReq()
+				req.setName(values.name)
+				req.setEmail(values.email)
+				req.setMsg(values.message)
+				req.setRecaptchaResponse(values.recaptchaResponse)
+
+				formsClient.contactUs(req).then(() => {
+					setFormSubmitted(true)
+					setSubmitting(false)
+				}).catch((e) => {
+					console.log(JSON.stringify(e))
+					setSubmitting(false)
+				})
+			}}
+		>
+		{({handleSubmit, submitForm, isSubmitting, setFieldValue}) => (
+			<Form onSubmit={handleSubmit}>
+				<Container>
+					<Form.Row>
+						<FormField label="Name" name="name" type="text"/>
+						<FormField label="Email" name="email" type="text"/>
+					</Form.Row><Form.Row>
+						<FormField label="Message" name="message" as="textarea"/>
+					</Form.Row><Form.Row>
+					</Form.Row>
+					<Form.Row><Col>
+					{ recaptchaLoaded ? (
+							<Button type="submit" disabled={isSubmitting}>Submit</Button>
+					) : (
+						<>
+							<Spinner animation="border" />
+							<p>Please wait while form loads</p>
+						</>
+					)}
+					</Col></Form.Row>
+					<Form.Row><Col>
+						<br/>
+						<center>
+							<Recaptcha
+								badge="inline"
+								ref={e => recaptchaInstance = e}
+								render="explicit"
+								sitekey="6LcZg0AaAAAAANPdf6dXHEmQLf0fD2DR-Es7ztVH"
+								size="invisible"
+								verifyCallback={(response) => {
+									setFieldValue('recaptchaResponse', response)
+									submitForm()
+								}}
+								onloadCallback={() => setRecaptchaLoaded(true) }
+								expiredCallback={() => setFieldValue('recaptchaResponse', '')}
+							/>
+						</center>
+					</Col></Form.Row>
+
+				</Container>
+			</Form>
+		)}
+		</Formik>
+	)
+}
 
 export default Home

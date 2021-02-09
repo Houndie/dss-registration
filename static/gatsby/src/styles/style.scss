@@ -14,3 +14,14 @@
 	justify-content: center;
 }
 
+@mixin no-special-color {
+	color: inherit;
+	text-decoration: none;
+}
+
+.no-special-color {
+	@include no-special-color
+	&:hover {
+		@include no-special-color
+	}
+}

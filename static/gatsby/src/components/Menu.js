@@ -11,9 +11,16 @@ const Menu = () => (
 			<Navbar.Toggle aria-controls="basic-navbar-nav"/>
 			<Navbar.Collapse className="justify-content-end">
 				<Nav>
+					<NavDropdown title="Registration">
+						<NavDropdown.Item href="/registration">Register Now</NavDropdown.Item>
+						<NavDropdown.Item href="/pricing-and-tshirts">Pricing & T-Shirts</NavDropdown.Item>
+						<NavDropdown.Item href="/housing">Housing</NavDropdown.Item>
+						<NavDropdown.Item href="/volunteer">Volunteer</NavDropdown.Item>
+					</NavDropdown>
+					<Nav.Link href="/classes">Classes</Nav.Link>
 					<Nav.Link href="/instructors">Instructors</Nav.Link>
 					<NavDropdown title="Competitions">
-						<NavDropdown.Item href="/competition-info">CompetitionInfo</NavDropdown.Item>
+						<NavDropdown.Item href="/competition-info">Competition Info</NavDropdown.Item>
 						<NavDropdown.Item href="/competition-results/2011">2011 Competition Results</NavDropdown.Item>
 						<NavDropdown.Item href="/competition-results/2012">2012 Competition Results</NavDropdown.Item>
 						<NavDropdown.Item href="/competition-results/2013">2013 Competition Results</NavDropdown.Item>
@@ -26,7 +33,13 @@ const Menu = () => (
 						<NavDropdown.Item href="/competition-results/2020">2020 Competition Results</NavDropdown.Item>
 						<NavDropdown.Item href="/competition-results/2021">2021 Competition Results</NavDropdown.Item>
 					</NavDropdown>
+					<NavDropdown title="Venues">
+						<NavDropdown.Item href="/event-venues">Event Venues</NavDropdown.Item>
+						<NavDropdown.Item href="/local-faire">Local Faire</NavDropdown.Item>
+					</NavDropdown>
+					<Nav.Link href="/music">Music</Nav.Link>
 					<Nav.Link href="/schedule">Schedule</Nav.Link>
+					<Nav.Link href="/safety">Safety</Nav.Link>
 				</Nav>
 			</Navbar.Collapse>
 		</Navbar>

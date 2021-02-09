@@ -3,13 +3,12 @@ package registration
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/Houndie/dss-registration/dynamic/common"
+	"github.com/Houndie/dss-registration/dynamic/sendinblue"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/gofrs/uuid"
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
 func containsPaidItems(r *Info) bool {
@@ -17,93 +16,122 @@ func containsPaidItems(r *Info) bool {
 	return !noPassOk || r.MixAndMatch != nil || r.TeamCompetition != nil || r.TShirt != nil || r.SoloJazz != nil
 }
 
-func makeLineItems(registration *Info, squareData *common.SquareData, paymentData *common.PaymentData, discounts map[storage.PurchaseItem][]string) ([]*square.OrderLineItem, error) {
+func makeLineItems(registration *Info, squareData *common.SquareData, paymentData *common.PaymentData, discounts map[storage.PurchaseItem][]string) ([]*square.OrderLineItem, []*square.OrderLineItemDiscount, error) {
 	lineItems := []*square.OrderLineItem{}
+	lineDiscounts := []*square.OrderLineItemDiscount{}
 	switch t := registration.PassType.(type) {
 	case *WeekendPass:
 		if !paymentData.WeekendPassPaid {
-			li, err := makeLineItem(squareData.FullWeekend[t.Tier].VariationID, discounts[storage.FullWeekendPurchaseItem], squareData.Discounts)
+			li, ld, err := makeLineItem(squareData.FullWeekend[t.Tier].VariationID, discounts[storage.FullWeekendPurchaseItem], squareData.Discounts)
 			if err != nil {
-				return nil, fmt.Errorf("error making full weekend line item: %w", err)
+				return nil, nil, fmt.Errorf("error making full weekend line item: %w", err)
 			}
 
 			if registration.IsStudent {
+				uid, err := uuid.NewV4()
+				if err != nil {
+					return nil, nil, fmt.Errorf("error creating new uuid for student discount uid: %w", err)
+				}
 				studentDiscount := &square.OrderLineItemDiscount{
 					CatalogObjectID: squareData.StudentDiscount.ID,
+					Scope:           square.OrderLineItemDiscountScopeLineItem,
+					UID:             uid.String(),
+				}
+				studentAppliedDiscount := &square.OrderLineItemAppliedDiscount{
+					DiscountUID: uid.String(),
 				}
 
-				if li.Discounts == nil {
-					li.Discounts = []*square.OrderLineItemDiscount{studentDiscount}
+				if li.AppliedDiscounts == nil {
+					li.AppliedDiscounts = []*square.OrderLineItemAppliedDiscount{studentAppliedDiscount}
 				} else {
-					li.Discounts = append(li.Discounts, studentDiscount)
+					li.AppliedDiscounts = append(li.AppliedDiscounts, studentAppliedDiscount)
 				}
+				lineDiscounts = append(lineDiscounts, studentDiscount)
 			}
 			lineItems = append(lineItems, li)
+			lineDiscounts = append(lineDiscounts, ld...)
 		}
 	case *DanceOnlyPass:
 		if !paymentData.DanceOnlyPaid {
-			li, err := makeLineItem(squareData.DanceOnly.VariationID, discounts[storage.DanceOnlyPurchaseItem], squareData.Discounts)
+			li, ld, err := makeLineItem(squareData.DanceOnly.VariationID, discounts[storage.DanceOnlyPurchaseItem], squareData.Discounts)
 			if err != nil {
-				return nil, fmt.Errorf("error making dance only item: %w", err)
+				return nil, nil, fmt.Errorf("error making dance only item: %w", err)
 			}
 			lineItems = append(lineItems, li)
+			lineDiscounts = append(lineDiscounts, ld...)
 		}
 	}
 
 	if registration.MixAndMatch != nil && !paymentData.MixAndMatchPaid {
-		li, err := makeLineItem(squareData.MixAndMatch.VariationID, discounts[storage.MixAndMatchPurchaseItem], squareData.Discounts)
+		li, ld, err := makeLineItem(squareData.MixAndMatch.VariationID, discounts[storage.MixAndMatchPurchaseItem], squareData.Discounts)
 		if err != nil {
-			return nil, fmt.Errorf("error making mix and match line item: %w", err)
+			return nil, nil, fmt.Errorf("error making mix and match line item: %w", err)
 		}
 		lineItems = append(lineItems, li)
+		lineDiscounts = append(lineDiscounts, ld...)
 	}
 
 	if registration.SoloJazz != nil && !paymentData.SoloJazzPaid {
-		li, err := makeLineItem(squareData.SoloJazz.VariationID, discounts[storage.SoloJazzPurchaseItem], squareData.Discounts)
+		li, ld, err := makeLineItem(squareData.SoloJazz.VariationID, discounts[storage.SoloJazzPurchaseItem], squareData.Discounts)
 		if err != nil {
-			return nil, fmt.Errorf("error making solo jazz line item: %w", err)
+			return nil, nil, fmt.Errorf("error making solo jazz line item: %w", err)
 		}
 		lineItems = append(lineItems, li)
+		lineDiscounts = append(lineDiscounts, ld...)
 	}
 
 	if registration.TeamCompetition != nil && !paymentData.TeamCompetitionPaid {
-		li, err := makeLineItem(squareData.TeamCompetition.VariationID, discounts[storage.TeamCompetitionPurchaseItem], squareData.Discounts)
+		li, ld, err := makeLineItem(squareData.TeamCompetition.VariationID, discounts[storage.TeamCompetitionPurchaseItem], squareData.Discounts)
 		if err != nil {
-			return nil, fmt.Errorf("error making team competition line item: %w", err)
+			return nil, nil, fmt.Errorf("error making team competition line item: %w", err)
 		}
 		lineItems = append(lineItems, li)
+		lineDiscounts = append(lineDiscounts, ld...)
 	}
 
 	if registration.TShirt != nil && !paymentData.TShirtPaid {
-		li, err := makeLineItem(squareData.TShirt.VariationID, discounts[storage.TShirtPurchaseItem], squareData.Discounts)
+		li, ld, err := makeLineItem(squareData.TShirt.VariationID, discounts[storage.TShirtPurchaseItem], squareData.Discounts)
 		if err != nil {
-			return nil, fmt.Errorf("error making t-shirt line item: %w", err)
+			return nil, nil, fmt.Errorf("error making t-shirt line item: %w", err)
 		}
 		lineItems = append(lineItems, li)
+		lineDiscounts = append(lineDiscounts, ld...)
 	}
-	return lineItems, nil
+	return lineItems, lineDiscounts, nil
 }
 
-func makeLineItem(catalogID string, discountNames []string, discounts map[string]*common.Discount) (*square.OrderLineItem, error) {
+func makeLineItem(catalogID string, discountNames []string, discounts map[string]*common.Discount) (*square.OrderLineItem, []*square.OrderLineItemDiscount, error) {
 	var orderDiscounts []*square.OrderLineItemDiscount
+	var appliedDiscounts []*square.OrderLineItemAppliedDiscount
 	if len(discountNames) != 0 {
 		orderDiscounts = make([]*square.OrderLineItemDiscount, len(discountNames))
+		appliedDiscounts = make([]*square.OrderLineItemAppliedDiscount, len(discountNames))
 		for i, name := range discountNames {
 			d, ok := discounts[name]
 			if !ok {
-				return nil, fmt.Errorf("discount name %v not found in square data", name)
+				return nil, nil, fmt.Errorf("discount name %v not found in square data", name)
+			}
+
+			uid, err := uuid.NewV4()
+			if err != nil {
+				return nil, nil, fmt.Errorf("error creating uid for line item discount: %w", err)
 			}
 
 			orderDiscounts[i] = &square.OrderLineItemDiscount{
 				CatalogObjectID: d.ID,
+				UID:             uid.String(),
+			}
+
+			appliedDiscounts[i] = &square.OrderLineItemAppliedDiscount{
+				DiscountUID: uid.String(),
 			}
 		}
 	}
 	return &square.OrderLineItem{
-		Quantity:        "1",
-		CatalogObjectID: catalogID,
-		Discounts:       orderDiscounts,
-	}, nil
+		Quantity:         "1",
+		CatalogObjectID:  catalogID,
+		AppliedDiscounts: appliedDiscounts,
+	}, orderDiscounts, nil
 }
 
 func discountCodeMap(ctx context.Context, store Store, discountCodes []string) (map[storage.PurchaseItem][]string, error) {
@@ -124,6 +152,7 @@ func discountCodeMap(ctx context.Context, store Store, discountCodes []string) (
 }
 
 func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idempotencyKey, accessToken string) (string, error) {
+	fmt.Println(redirectUrl)
 	s.logger.Trace("in add registration service")
 	if !s.active {
 		return "", ErrRegistrationDisabled
@@ -173,7 +202,7 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 			}
 		}
 
-		lineItems, err := makeLineItems(registration, squareData, &common.PaymentData{}, discounts)
+		lineItems, lineDiscounts, err := makeLineItems(registration, squareData, &common.PaymentData{}, discounts)
 		if err != nil {
 			return "", err
 		}
@@ -184,6 +213,7 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 				ReferenceID: referenceID.String(),
 				LocationID:  locations[0].ID,
 				LineItems:   lineItems,
+				Discounts:   lineDiscounts,
 			},
 		}
 
@@ -230,94 +260,34 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 		DiscountCodes:   registration.DiscountCodes,
 		OrderIDs:        orderIDs,
 	}
-	registrationID, err := s.store.AddRegistration(ctx, storeRegistration)
+	_, err := s.store.AddRegistration(ctx, storeRegistration)
 	if err != nil {
 		return "", fmt.Errorf("error adding registration to database: %w", err)
 	}
 
 	s.logger.Trace("sending registration email")
-	from := mail.NewEmail("Dayton Swing Smackdown", "info@daytonswingsmackdown.com")
-	to := mail.NewEmail(registration.FirstName+" "+registration.LastName, registration.Email)
-	personalization := &mail.Personalization{
-		DynamicTemplateData: map[string]interface{}{
-			mailFirstNameKey:      registration.FirstName,
-			mailLastNameKey:       registration.LastName,
-			mailStreetAddressKey:  registration.StreetAddress,
-			mailCityKey:           registration.City,
-			mailStateKey:          registration.State,
-			mailZipCodeKey:        registration.ZipCode,
-			mailEmailKey:          registration.Email,
-			mailHomeSceneKey:      registration.HomeScene,
-			mailStudentKey:        registration.IsStudent,
-			mailRegistrationIDKey: registrationID,
-			mailMixAndMatchKey:    registration.MixAndMatch != nil,
-			mailSoloJazzKey:       registration.SoloJazz,
-			mailTeamCompKey:       registration.TeamCompetition != nil,
-			mailTShirtKey:         registration.TShirt != nil,
+	mailParams, err := toMailParams(registration)
+	if err != nil {
+		return "", fmt.Errorf("error generating mail parameters")
+	}
+	_, err = s.mailClient.SendSMTPEmail(ctx, &sendinblue.SMTPEmailParams{
+		To: []*sendinblue.EmailPerson{
+			{
+				Name:  fmt.Sprintf("%s %s", registration.FirstName, registration.LastName),
+				Email: registration.Email,
+			},
 		},
-		To: []*mail.Email{to},
-	}
-
-	if registration.MixAndMatch != nil {
-		personalization.SetDynamicTemplateData(mailMixAndMatchRoleKey, registration.MixAndMatch.Role)
-	}
-	if registration.TeamCompetition != nil {
-		personalization.SetDynamicTemplateData(mailTeamCompNameKey, registration.TeamCompetition.Name)
-	}
-	if registration.TShirt != nil {
-		personalization.SetDynamicTemplateData(mailTShirtStyleKey, registration.TShirt.Style)
-	}
-	switch p := registration.PassType.(type) {
-	case *WeekendPass:
-		personalization.SetDynamicTemplateData(mailWeekendPassKey, mailFullWeekendValue)
-		personalization.SetDynamicTemplateData(mailWorkshopLevelKey, p.Level)
-	case *DanceOnlyPass:
-		personalization.SetDynamicTemplateData(mailWeekendPassKey, mailDanceOnlyValue)
-	default:
-		personalization.SetDynamicTemplateData(mailWeekendPassKey, mailNoPassValue)
-	}
-
-	switch h := registration.Housing.(type) {
-	case *storage.ProvideHousing:
-		personalization.SetDynamicTemplateData(mailHousingKey, mailProvideHousingValue)
-		personalization.SetDynamicTemplateData(mailProvideHousingKey, map[string]interface{}{
-			mailProvideHousingGuestsKey:  h.Quantity,
-			mailProvideHousingPetsKey:    h.Pets,
-			mailProvideHousingDetailsKey: h.Details,
-		})
-	case *storage.RequireHousing:
-		personalization.SetDynamicTemplateData(mailHousingKey, mailRequireHousingValue)
-		personalization.SetDynamicTemplateData(mailRequireHousingKey, map[string]interface{}{
-			mailRequireHousingAllergiesKey: h.PetAllergies,
-			mailRequireHousingDetailsKey:   h.Details,
-		})
-	default:
-		personalization.SetDynamicTemplateData(mailHousingKey, mailNoHousingValue)
-	}
-
-	var mailSettings *mail.MailSettings
-	if s.useMailSandbox {
-		mailSettings = &mail.MailSettings{
-			SandboxMode: mail.NewSetting(true),
-		}
-
-	}
-	message := &mail.SGMailV3{
-		From:             from,
-		Personalizations: []*mail.Personalization{personalization},
-		TemplateID:       "d-15759d9e2e3d4dfa9602dc7ec6512e8c",
-		MailSettings:     mailSettings,
-	}
-	mailResp, err := s.mailClient.Send(message)
+		BCC: []*sendinblue.EmailPerson{
+			{
+				Name:  "Dayton Swing Smackdown",
+				Email: "info@daytonswingsmackdown.com",
+			},
+		},
+		Params:     mailParams,
+		TemplateID: 3,
+	})
 	if err != nil {
 		return "", fmt.Errorf("error sending registration email: %w", err)
-	}
-	okCode := http.StatusAccepted
-	if s.useMailSandbox {
-		okCode = http.StatusOK
-	}
-	if mailResp.StatusCode != okCode {
-		return "", fmt.Errorf("received bad status code from mailserver %v", mailResp.StatusCode)
 	}
 	return returnerURL, nil
 }

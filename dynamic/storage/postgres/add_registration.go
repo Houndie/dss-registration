@@ -34,7 +34,7 @@ func (s *Store) AddRegistration(ctx context.Context, registration *storage.Regis
 
 	tshirt := false
 	var tshirtStyle *string
-	if registration.MixAndMatch != nil {
+	if registration.TShirt != nil {
 		tshirt = true
 		tshirtStyleStr, ok := styleToEnum[registration.TShirt.Style]
 		if !ok {

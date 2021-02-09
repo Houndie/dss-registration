@@ -4,8 +4,10 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -19,10 +21,47 @@ func Tools() error {
 func GenerateProtoc() error {
 	mg.Deps(Tools)
 	fmt.Println("generating protocs")
-	cmd := exec.Command("toolbox", "do", "--", "protoc", "--proto_path", "rpc/dss", "--twirp_out=dynamic/", "--go_out=dynamic/", "--twirp_js_out=static/rpc", "--js_out=import_style=commonjs,binary:static/rpc", "registration.proto", "discount.proto")
+	cmd := exec.Command("toolbox", "do", "--", "protoc", "--proto_path", "rpc/dss", "--twirp_out=dynamic/", "--go_out=dynamic/", "--twirp_js_out=static/gatsby/src/rpc", "--js_out=import_style=commonjs,binary:static/gatsby/src/rpc", "registration.proto", "discount.proto", "forms.proto")
 	cmd.Stderr = os.Stderr
 	//cmd.Dir = "dynamic"
-	return cmd.Run()
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+
+	// Prepend /* eslint-disable */ to files
+	files, err := filepath.Glob("static/gatsby/src/rpc/*_pb.js")
+	if err != nil {
+		return fmt.Errorf("error globbing pb files: %w", err)
+	}
+	for _, file := range files {
+		f, err := os.OpenFile(file, os.O_RDWR, 0755)
+		if err != nil {
+			return fmt.Errorf("error opening file %v: %w", file, err)
+		}
+		defer f.Close()
+
+		fileText, err := ioutil.ReadAll(f)
+		if err != nil {
+			return fmt.Errorf("error reading file %v: %w", file, err)
+		}
+
+		if _, err := f.Seek(0, 0); err != nil {
+			return fmt.Errorf("error resetting seek back to start of file %v: %w", file, err)
+		}
+
+		if _, err = f.WriteString("/* eslint-disable */\n"); err != nil {
+			return fmt.Errorf("error prepending disable string file %v: %w", file, err)
+		}
+		if _, err = f.Write(fileText); err != nil {
+			return fmt.Errorf("error rewriting file %v: %w", file, err)
+		}
+		if err := f.Close(); err != nil {
+			return fmt.Errorf("error closing file %v: %w", file, err)
+		}
+	}
+
+	return nil
 }
 
 func CompileReact() error {

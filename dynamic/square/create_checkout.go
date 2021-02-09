@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -36,6 +37,7 @@ func (c *Client) CreateCheckout(ctx context.Context, locationID, idempotencyKey 
 	if err != nil {
 		return nil, errors.Wrap(err, "Error mashaling request body")
 	}
+	fmt.Println(string(jsonBody))
 
 	bodyBuf := bytes.NewBuffer(jsonBody)
 

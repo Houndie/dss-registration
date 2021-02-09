@@ -1,18 +1,9 @@
-FROM golang:1.14.3-alpine3.11 as builder
+FROM golang:1.15.7
 
-ARG FRONTEND
-
+RUN apt update && apt install -y netcat
+RUN wget https://github.com/cortesi/modd/releases/download/v0.8/modd-0.8-linux64.tgz && tar xzf modd-0.8-linux64.tgz && cp modd-0.8-linux64/modd /go/bin/ && rm -rf modd-0.8-linux64.tgz modd-0.8-linux64
+RUN mkdir /app
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
-COPY . .
-
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo ./cmd/server/
-
-FROM alpine:3.11
-RUN apk add --no-cache netcat-openbsd
-
-WORKDIR /root/
-COPY --from=builder /app/server .
-COPY docker/startup.sh .
-CMD ./startup.sh
+CMD modd

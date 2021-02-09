@@ -20,7 +20,7 @@ func (m *mockRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
 func TestUserinfo(t *testing.T) {
 	testAccessToken := "some.access.token"
 	testUserinfoEndpoint := "https://getuserinfo"
-	testUserId := "12345"
+	testUserID := "12345"
 	discoveryDocumentCount := 0
 
 	client := &http.Client{
@@ -61,7 +61,7 @@ func TestUserinfo(t *testing.T) {
 					body := struct {
 						Sub string `json:"sub"`
 					}{
-						Sub: testUserId,
+						Sub: testUserID,
 					}
 
 					bodyBytes, err := json.Marshal(&body)
@@ -91,8 +91,8 @@ func TestUserinfo(t *testing.T) {
 		t.Fatalf("found unexpected error when fetching user info: %v", err)
 	}
 
-	if userinfo.UserId != testUserId {
-		t.Fatalf("found user id %s, expected %s", userinfo.UserId, testUserId)
+	if userinfo.UserID != testUserID {
+		t.Fatalf("found user id %s, expected %s", userinfo.UserID, testUserID)
 	}
 
 	if discoveryDocumentCount != 1 {

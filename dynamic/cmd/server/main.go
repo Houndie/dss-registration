@@ -9,16 +9,19 @@ import (
 
 	"github.com/Houndie/dss-registration/dynamic/api"
 	api_discount "github.com/Houndie/dss-registration/dynamic/api/discount"
+	api_forms "github.com/Houndie/dss-registration/dynamic/api/forms"
 	api_registration "github.com/Houndie/dss-registration/dynamic/api/registration"
 	"github.com/Houndie/dss-registration/dynamic/authorizer/google"
 	"github.com/Houndie/dss-registration/dynamic/discount"
+	"github.com/Houndie/dss-registration/dynamic/forms"
+	"github.com/Houndie/dss-registration/dynamic/recaptcha"
 	"github.com/Houndie/dss-registration/dynamic/registration"
 	pb "github.com/Houndie/dss-registration/dynamic/rpc/dss"
+	"github.com/Houndie/dss-registration/dynamic/sendinblue"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage/postgres"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/rs/cors"
-	"github.com/sendgrid/sendgrid-go"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/twitchtv/twirp"
@@ -68,7 +71,15 @@ func run() error {
 		return fmt.Errorf("error making postgres connection")
 	}
 	store := postgres.NewStore(pool)
-	mailClient := sendgrid.NewSendClient(viper.GetString("mailkey"))
+	sendInBlueClient, err := sendinblue.NewClient(viper.GetString("mailkey"), &http.Client{})
+	if err != nil {
+		return fmt.Errorf("error making new send in blue client: %w", err)
+	}
+
+	recaptchaClient, err := recaptcha.NewClient(&http.Client{}, viper.GetString("recaptchakey"))
+	if err != nil {
+		return fmt.Errorf("error creating recaptcha client: %w", err)
+	}
 
 	errorHook := &twirp.ServerHooks{
 		Error: func(ctx context.Context, e twirp.Error) context.Context {
@@ -94,7 +105,7 @@ func run() error {
 
 	mux := http.NewServeMux()
 
-	registrationService := registration.NewService(true, viper.GetString("environment") != "production", logger, squareClient, authorizer, store, mailClient)
+	registrationService := registration.NewService(true, viper.GetString("environment") != "production", logger, squareClient, authorizer, store, sendInBlueClient)
 	registrationServer := api_registration.NewServer(registrationService)
 	registrationHandler := pb.NewRegistrationServer(registrationServer, errorHook)
 	mux.Handle(pb.RegistrationPathPrefix, registrationHandler)
@@ -103,6 +114,14 @@ func run() error {
 	discountServer := api_discount.NewServer(discountService)
 	discountHandler := pb.NewDiscountServer(discountServer, errorHook)
 	mux.Handle(pb.DiscountPathPrefix, discountHandler)
+
+	formsService, err := forms.NewService(sendInBlueClient, recaptchaClient)
+	if err != nil {
+		return fmt.Errorf("error starting forms service: %w", err)
+	}
+	formsServer := api_forms.NewServer(formsService)
+	formsHandler := pb.NewFormsServer(formsServer, errorHook)
+	mux.Handle(pb.FormsPathPrefix, formsHandler)
 
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins: viper.GetStringSlice("frontend"),
