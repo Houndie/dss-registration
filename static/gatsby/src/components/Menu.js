@@ -3,8 +3,9 @@ import Navbar from "react-bootstrap/Navbar"
 import NavDropdown from "react-bootstrap/NavDropdown"
 import Nav from "react-bootstrap/Nav"
 import Container from "react-bootstrap/Container"
+import { GoogleLogin, GoogleLogout } from "react-google-login"
 
-const Menu = () => (
+const Menu = ({gAuth, setGAuth}) => (
 	<Container>
 		<Navbar expand="lg">
 			<Navbar.Brand href="/">Dayton Swing Smackdown</Navbar.Brand>
@@ -40,6 +41,22 @@ const Menu = () => (
 					<Nav.Link href="/music">Music</Nav.Link>
 					<Nav.Link href="/schedule">Schedule</Nav.Link>
 					<Nav.Link href="/safety">Safety</Nav.Link>
+					{ gAuth ? (
+						<GoogleLogout
+							clientId={`${process.env.GATSBY_CLIENT_ID}`}
+							buttonText="Logout"
+							onLogoutSuccess={() => {setGAuth(null)}}
+						/>
+					) : (
+						<GoogleLogin
+							clientId={`${process.env.GATSBY_CLIENT_ID}`}
+							buttonText="Login"
+							onSuccess={(newAuth) => setGAuth(newAuth)}
+							onFailure={() => console.log(`NO ${process.env.GATSBY_CLIENT_ID}`)}
+							cookiePolicy={'single_host_origin'}
+							isSignedIn={true}
+						/>
+					)}
 				</Nav>
 			</Navbar.Collapse>
 		</Navbar>

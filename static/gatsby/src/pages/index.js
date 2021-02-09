@@ -43,9 +43,10 @@ const ContactSchema = Yup.object().shape({
 });
 
 const Home = () => {
+	const [gAuth, setGAuth] = useState(null)
 	return (
 		<>
-			<Menu/>
+			<Menu gAuth={gAuth} setGAuth={setGAuth} />
 			<Hero image='ViktorJump.jpg' height='450px' title='Dayton Swing Smackdown' />
 			<Container className="my-5">
 				<Row><Col xs="5">

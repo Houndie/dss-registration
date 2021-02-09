@@ -42,6 +42,7 @@ services:
     environment:
       - GATSBY_BACKEND=http://localhost:8080/
       - GATSBY_FRONTEND=http://localhost:8081/
+      - GATSBY_CLIENT_ID=166144116294-c115t8bqllktva4qp6tvjjeqe7mdggu3.apps.googleusercontent.com
     volumes:
       - "./static/gatsby/src:/app/src:ro"
       - "./static/gatsby/static:/app/static:ro"

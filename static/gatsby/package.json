@@ -27,6 +27,7 @@
     "react": "^16.12.0",
     "react-bootstrap": "^1.3.0",
     "react-dom": "^16.12.0",
+    "react-google-login": "^5.2.2",
     "react-recaptcha": "^2.3.10",
     "twirp": "0.0.7",
     "yup": "^0.29.3"
