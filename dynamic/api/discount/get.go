@@ -16,6 +16,7 @@ func (s *Server) Get(ctx context.Context, req *pb.DiscountGetReq) (*pb.DiscountG
 		if errors.As(err, &e) {
 			return nil, twirp.NewError(twirp.NotFound, e.Error()).WithMeta("code", e.Code)
 		}
+		return nil, err
 	}
 
 	b, err := bundleToProto(bundle)

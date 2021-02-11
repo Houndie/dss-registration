@@ -15,7 +15,8 @@ module.exports.createDiscountClient = function(baseurl, extraHeaders, useJSON) {
     var rpc = createClient(baseurl, "dss.Discount", "v5.0.0",  useJSON, extraHeaders === undefined ? {} : extraHeaders);
     return {
         add: function(data) { return rpc("Add", data, pb.DiscountAddRes); },
-        get: function(data) { return rpc("Get", data, pb.DiscountGetRes); }
+        get: function(data) { return rpc("Get", data, pb.DiscountGetRes); },
+        list: function(data) { return rpc("List", data, pb.DiscountListRes); }
     }
 }
 

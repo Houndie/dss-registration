@@ -51,6 +51,10 @@ func TestAddGetDiscount(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error cleaning up after test: %v", err)
 		}
+		_, err = pool.Exec(context.Background(), "DELETE FROM "+discountTable)
+		if err != nil {
+			t.Fatalf("error cleaning up after test: %v", err)
+		}
 	}()
 	err = store.AddDiscount(context.Background(), discount)
 	if err != nil {
@@ -125,6 +129,10 @@ func TestAddDiscountDuplicate(t *testing.T) {
 	store := NewStore(pool)
 	defer func() {
 		_, err := pool.Exec(context.Background(), "DELETE FROM "+discountBundleTable)
+		if err != nil {
+			t.Fatalf("error cleaning up after test: %v", err)
+		}
+		_, err = pool.Exec(context.Background(), "DELETE FROM "+discountTable)
 		if err != nil {
 			t.Fatalf("error cleaning up after test: %v", err)
 		}

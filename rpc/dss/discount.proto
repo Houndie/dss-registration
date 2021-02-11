@@ -6,6 +6,7 @@ option go_package = "rpc/dss";
 service Discount {
 	rpc Add(DiscountAddReq) returns (DiscountAddRes);
 	rpc Get(DiscountGetReq) returns (DiscountGetRes);
+	rpc List(DiscountListReq) returns (DiscountListRes);
 }
 
 message DiscountAmount {
@@ -37,4 +38,10 @@ message DiscountGetReq {
 
 message DiscountGetRes {
 	DiscountBundle bundle = 1;
+}
+
+message DiscountListReq {}
+
+message DiscountListRes {
+	repeated DiscountBundle bundles = 1;
 }

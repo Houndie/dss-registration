@@ -3,6 +3,7 @@ package discount
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/common"
@@ -14,6 +15,7 @@ type Store interface {
 	GetDiscount(context.Context, string) (*storage.Discount, error)
 	AddDiscount(context.Context, *storage.Discount) error
 	IsAdmin(context.Context, string) (bool, error)
+	ListDiscounts(context.Context) ([]*storage.Discount, error)
 }
 
 type Authorizer interface {
@@ -48,3 +50,24 @@ type Bundle struct {
 }
 
 var ErrUnauthorized = errors.New("User is not authorized for this operation")
+
+func fromStore(b *storage.Discount, squareData *common.SquareData) (*Bundle, error) {
+	singleDiscounts := make([]*Single, len(b.Discounts))
+	for i, singleDiscount := range b.Discounts {
+		squareDiscount, ok := squareData.Discounts[singleDiscount.Name]
+		if !ok {
+			return nil, fmt.Errorf("discount %s does not exist on square", singleDiscount.Name)
+		}
+		singleDiscounts[i] = &Single{
+			Amount:    squareDiscount.Amount,
+			Name:      singleDiscount.Name,
+			AppliedTo: singleDiscount.AppliedTo,
+		}
+	}
+
+	return &Bundle{
+		Code:      b.Code,
+		Discounts: singleDiscounts,
+	}, nil
+
+}
