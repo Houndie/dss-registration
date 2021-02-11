@@ -33,6 +33,7 @@ services:
       - DSS_MAILKEY
       - DSS_RECAPTCHAKEY
       - DSS_PORT=80
+      - DSS_ADMINS
     volumes:
       - "./dynamic/:/app:ro"
   frontend:

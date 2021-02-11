@@ -18,6 +18,7 @@ require (
 	github.com/sendgrid/rest v2.4.1+incompatible
 	github.com/sendgrid/sendgrid-go v3.5.0+incompatible
 	github.com/sirupsen/logrus v1.4.2
+	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.0
 	github.com/thechriswalker/protoc-gen-twirp_js v0.0.0-20190627152235-0fe8731d4d8f // indirect
 	github.com/twitchtv/twirp v5.10.2+incompatible

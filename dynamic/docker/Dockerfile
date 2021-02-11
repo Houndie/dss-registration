@@ -6,4 +6,4 @@ RUN mkdir /app
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
-CMD modd
+CMD docker/startup.sh
