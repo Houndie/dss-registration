@@ -3,7 +3,7 @@ import Page from '../components/Page.js'
 
 const Instructors = () => (
 	<Page title="Instructors">
-		No instructor information is available yet.  Stay tuned!
+		{() => "No instructor information is available yet.  Stay tuned!"}
 	</Page>
 )
 

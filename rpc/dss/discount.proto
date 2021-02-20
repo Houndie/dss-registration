@@ -9,6 +9,15 @@ service Discount {
 	rpc List(DiscountListReq) returns (DiscountListRes);
 }
 
+enum PurchaseItem {
+	FullWeekendPassPurchaseItem = 0;
+	DanceOnlyPassPurchaseItem = 1;
+	MixAndMatchPurchaseItem = 2;
+	SoloJazzPurchaseItem = 3;
+	TeamCompetitionPurchaseItem = 4;
+	TShirtPurchaseItem = 5;
+}
+
 message DiscountAmount {
 	oneof amount {
 		int64 dollar = 8;

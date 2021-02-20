@@ -12,7 +12,7 @@ const Page = ({title, children}) => {
 			<Menu gAuth={gAuth} setGAuth={setGAuth} />
 			<Hero image='/page_header.png' height='250px' title={title} />
 			<Container>
-				{children}
+				{children(gAuth)}
 			</Container>
 			<Footer />
 		</>

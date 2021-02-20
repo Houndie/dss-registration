@@ -3,6 +3,6 @@ import Page from '../components/Page.js'
 
 export default () => (
 	<Page title="Schedule">
-		<p>We have no information on the schedule at this time!  Stay tuned for more information</p>
+		{ () => <p>We have no information on the schedule at this time!  Stay tuned for more information</p> }
 	</Page>
 )
