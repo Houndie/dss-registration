@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
+	"github.com/Houndie/dss-registration/dynamic/discount"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
@@ -88,7 +88,7 @@ func TestPopulate(t *testing.T) {
 				t.Errorf("found unexpected team competition cost %d, expected %d", formData.TShirtCost, co.TShirtCost)
 			}
 
-			dd, ok := formData.StudentDiscount.(common.DollarDiscount)
+			dd, ok := formData.StudentDiscount.(discount.DollarDiscount)
 			if !ok {
 				t.Fatalf("student disocunt is not of dollar discount type")
 			}

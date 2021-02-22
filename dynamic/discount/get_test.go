@@ -6,7 +6,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
@@ -20,7 +19,7 @@ func compareSingleDiscount(t *testing.T, sd *Single, appliedTo storage.PurchaseI
 		t.Fatalf("found unexpected appliedTo %v, expected %v", sd.AppliedTo, appliedTo)
 	}
 
-	amt, ok := sd.Amount.(common.DollarDiscount)
+	amt, ok := sd.Amount.(DollarDiscount)
 	if !ok {
 		t.Fatalf("expected dollar discount, did not find it")
 	}

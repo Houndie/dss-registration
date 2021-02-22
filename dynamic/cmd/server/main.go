@@ -138,7 +138,7 @@ var rootCmd = &cobra.Command{
 		corsHandler := cors.New(cors.Options{
 			AllowedOrigins: viper.GetStringSlice("frontend"),
 			AllowedMethods: []string{"POST"},
-			AllowedHeaders: []string{"Content-Type", "Twirp-Version"},
+			AllowedHeaders: []string{"Content-Type", "Twirp-Version", "Authorization"},
 		})
 		corsHandler.Log = logger
 

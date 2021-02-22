@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
-	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
@@ -99,7 +98,7 @@ func TestList(t *testing.T) {
 					if d.AppliedTo != storage.FullWeekendPurchaseItem {
 						t.Fatalf("expected applied to %v, found %v", storage.FullWeekendPurchaseItem, d.AppliedTo)
 					}
-					amt, ok := d.Amount.(common.DollarDiscount)
+					amt, ok := d.Amount.(DollarDiscount)
 					if !ok {
 						t.Fatalf("discount is not a dollar discount")
 					}
@@ -111,7 +110,7 @@ func TestList(t *testing.T) {
 					if d.AppliedTo != storage.MixAndMatchPurchaseItem {
 						t.Fatalf("expected applied to %v, found %v", storage.MixAndMatchPurchaseItem, d.AppliedTo)
 					}
-					amt, ok := d.Amount.(common.DollarDiscount)
+					amt, ok := d.Amount.(DollarDiscount)
 					if !ok {
 						t.Fatalf("discount is not a dollar discount")
 					}
@@ -139,7 +138,7 @@ func TestList(t *testing.T) {
 			if bundle.Discounts[0].Name != co.MixAndMatchDiscountName {
 				t.Fatalf("expected name %v, found %v", co.MixAndMatchDiscountName, bundle.Discounts[0].Name)
 			}
-			amt, ok := bundle.Discounts[0].Amount.(common.DollarDiscount)
+			amt, ok := bundle.Discounts[0].Amount.(DollarDiscount)
 			if !ok {
 				t.Fatalf("discount is not a dollar discount")
 			}

@@ -3,7 +3,6 @@ package discount
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/common"
@@ -39,7 +38,7 @@ type Service struct {
 }
 
 type Single struct {
-	Amount    common.DiscountAmount
+	Amount    DiscountAmount
 	Name      string
 	AppliedTo storage.PurchaseItem
 }
@@ -49,17 +48,47 @@ type Bundle struct {
 	Discounts []*Single
 }
 
+type DollarDiscount int
+
+type PercentDiscount string
+
+type SquareNotFound struct{}
+
+type DiscountAmount interface {
+	isDiscountAmount()
+}
+
+func (DollarDiscount) isDiscountAmount()  {}
+func (PercentDiscount) isDiscountAmount() {}
+func (SquareNotFound) isDiscountAmount()  {}
+
 var ErrUnauthorized = errors.New("User is not authorized for this operation")
+
+func amountFromSquare(name string, squareData *common.SquareData) (DiscountAmount, error) {
+	squareDiscount, ok := squareData.Discounts[name]
+	if !ok {
+		return SquareNotFound{}, nil
+	}
+
+	switch sd := squareDiscount.Amount.(type) {
+	case common.DollarDiscount:
+		return DollarDiscount(int(sd)), nil
+	case common.PercentDiscount:
+		return PercentDiscount(string(sd)), nil
+	default:
+		return nil, errors.New("unknown discount type from square data")
+	}
+}
 
 func fromStore(b *storage.Discount, squareData *common.SquareData) (*Bundle, error) {
 	singleDiscounts := make([]*Single, len(b.Discounts))
 	for i, singleDiscount := range b.Discounts {
-		squareDiscount, ok := squareData.Discounts[singleDiscount.Name]
-		if !ok {
-			return nil, fmt.Errorf("discount %s does not exist on square", singleDiscount.Name)
+		amount, err := amountFromSquare(singleDiscount.Name, squareData)
+		if err != nil {
+			return nil, err
 		}
 		singleDiscounts[i] = &Single{
-			Amount:    squareDiscount.Amount,
+			Amount:    amount,
 			Name:      singleDiscount.Name,
 			AppliedTo: singleDiscount.AppliedTo,
 		}

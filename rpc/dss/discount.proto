@@ -3,6 +3,8 @@ syntax = "proto3";
 package dss;
 option go_package = "rpc/dss";
 
+import "google/protobuf/empty.proto";
+
 service Discount {
 	rpc Add(DiscountAddReq) returns (DiscountAddRes);
 	rpc Get(DiscountGetReq) returns (DiscountGetRes);
@@ -20,14 +22,16 @@ enum PurchaseItem {
 
 message DiscountAmount {
 	oneof amount {
-		int64 dollar = 8;
-		string percent = 9;
+		int64 dollar = 1;
+		string percent = 2;
+		google.protobuf.Empty squareNotFound = 3;
 	}
 }
 
 message SingleDiscount {
 	string name = 1;
 	DiscountAmount amount = 2;
+	PurchaseItem applied_to = 3;
 }
 
 message DiscountBundle {

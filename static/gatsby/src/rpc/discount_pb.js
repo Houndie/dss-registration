@@ -13,6 +13,8 @@ var jspb = require('google-protobuf');
 var goog = jspb;
 var global = Function('return this')();
 
+var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb.js');
+goog.object.extend(proto, google_protobuf_empty_pb);
 goog.exportSymbol('proto.dss.DiscountAddReq', null, global);
 goog.exportSymbol('proto.dss.DiscountAddRes', null, global);
 goog.exportSymbol('proto.dss.DiscountAmount', null, global);
@@ -222,15 +224,16 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.dss.DiscountAmount.oneofGroups_ = [[8,9]];
+proto.dss.DiscountAmount.oneofGroups_ = [[1,2,3]];
 
 /**
  * @enum {number}
  */
 proto.dss.DiscountAmount.AmountCase = {
   AMOUNT_NOT_SET: 0,
-  DOLLAR: 8,
-  PERCENT: 9
+  DOLLAR: 1,
+  PERCENT: 2,
+  SQUARENOTFOUND: 3
 };
 
 /**
@@ -271,8 +274,9 @@ proto.dss.DiscountAmount.prototype.toObject = function(opt_includeInstance) {
  */
 proto.dss.DiscountAmount.toObject = function(includeInstance, msg) {
   var f, obj = {
-    dollar: jspb.Message.getFieldWithDefault(msg, 8, 0),
-    percent: jspb.Message.getFieldWithDefault(msg, 9, "")
+    dollar: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    percent: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    squarenotfound: (f = msg.getSquarenotfound()) && google_protobuf_empty_pb.Empty.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -309,13 +313,18 @@ proto.dss.DiscountAmount.deserializeBinaryFromReader = function(msg, reader) {
     }
     var field = reader.getFieldNumber();
     switch (field) {
-    case 8:
+    case 1:
       var value = /** @type {number} */ (reader.readInt64());
       msg.setDollar(value);
       break;
-    case 9:
+    case 2:
       var value = /** @type {string} */ (reader.readString());
       msg.setPercent(value);
+      break;
+    case 3:
+      var value = new google_protobuf_empty_pb.Empty;
+      reader.readMessage(value,google_protobuf_empty_pb.Empty.deserializeBinaryFromReader);
+      msg.setSquarenotfound(value);
       break;
     default:
       reader.skipField();
@@ -346,29 +355,37 @@ proto.dss.DiscountAmount.prototype.serializeBinary = function() {
  */
 proto.dss.DiscountAmount.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = /** @type {number} */ (jspb.Message.getField(message, 8));
+  f = /** @type {number} */ (jspb.Message.getField(message, 1));
   if (f != null) {
     writer.writeInt64(
-      8,
+      1,
       f
     );
   }
-  f = /** @type {string} */ (jspb.Message.getField(message, 9));
+  f = /** @type {string} */ (jspb.Message.getField(message, 2));
   if (f != null) {
     writer.writeString(
-      9,
+      2,
       f
+    );
+  }
+  f = message.getSquarenotfound();
+  if (f != null) {
+    writer.writeMessage(
+      3,
+      f,
+      google_protobuf_empty_pb.Empty.serializeBinaryToWriter
     );
   }
 };
 
 
 /**
- * optional int64 dollar = 8;
+ * optional int64 dollar = 1;
  * @return {number}
  */
 proto.dss.DiscountAmount.prototype.getDollar = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
@@ -377,7 +394,7 @@ proto.dss.DiscountAmount.prototype.getDollar = function() {
  * @return {!proto.dss.DiscountAmount} returns this
  */
 proto.dss.DiscountAmount.prototype.setDollar = function(value) {
-  return jspb.Message.setOneofField(this, 8, proto.dss.DiscountAmount.oneofGroups_[0], value);
+  return jspb.Message.setOneofField(this, 1, proto.dss.DiscountAmount.oneofGroups_[0], value);
 };
 
 
@@ -386,7 +403,7 @@ proto.dss.DiscountAmount.prototype.setDollar = function(value) {
  * @return {!proto.dss.DiscountAmount} returns this
  */
 proto.dss.DiscountAmount.prototype.clearDollar = function() {
-  return jspb.Message.setOneofField(this, 8, proto.dss.DiscountAmount.oneofGroups_[0], undefined);
+  return jspb.Message.setOneofField(this, 1, proto.dss.DiscountAmount.oneofGroups_[0], undefined);
 };
 
 
@@ -395,16 +412,16 @@ proto.dss.DiscountAmount.prototype.clearDollar = function() {
  * @return {boolean}
  */
 proto.dss.DiscountAmount.prototype.hasDollar = function() {
-  return jspb.Message.getField(this, 8) != null;
+  return jspb.Message.getField(this, 1) != null;
 };
 
 
 /**
- * optional string percent = 9;
+ * optional string percent = 2;
  * @return {string}
  */
 proto.dss.DiscountAmount.prototype.getPercent = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
@@ -413,7 +430,7 @@ proto.dss.DiscountAmount.prototype.getPercent = function() {
  * @return {!proto.dss.DiscountAmount} returns this
  */
 proto.dss.DiscountAmount.prototype.setPercent = function(value) {
-  return jspb.Message.setOneofField(this, 9, proto.dss.DiscountAmount.oneofGroups_[0], value);
+  return jspb.Message.setOneofField(this, 2, proto.dss.DiscountAmount.oneofGroups_[0], value);
 };
 
 
@@ -422,7 +439,7 @@ proto.dss.DiscountAmount.prototype.setPercent = function(value) {
  * @return {!proto.dss.DiscountAmount} returns this
  */
 proto.dss.DiscountAmount.prototype.clearPercent = function() {
-  return jspb.Message.setOneofField(this, 9, proto.dss.DiscountAmount.oneofGroups_[0], undefined);
+  return jspb.Message.setOneofField(this, 2, proto.dss.DiscountAmount.oneofGroups_[0], undefined);
 };
 
 
@@ -431,7 +448,44 @@ proto.dss.DiscountAmount.prototype.clearPercent = function() {
  * @return {boolean}
  */
 proto.dss.DiscountAmount.prototype.hasPercent = function() {
-  return jspb.Message.getField(this, 9) != null;
+  return jspb.Message.getField(this, 2) != null;
+};
+
+
+/**
+ * optional google.protobuf.Empty squareNotFound = 3;
+ * @return {?proto.google.protobuf.Empty}
+ */
+proto.dss.DiscountAmount.prototype.getSquarenotfound = function() {
+  return /** @type{?proto.google.protobuf.Empty} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_empty_pb.Empty, 3));
+};
+
+
+/**
+ * @param {?proto.google.protobuf.Empty|undefined} value
+ * @return {!proto.dss.DiscountAmount} returns this
+*/
+proto.dss.DiscountAmount.prototype.setSquarenotfound = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 3, proto.dss.DiscountAmount.oneofGroups_[0], value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.dss.DiscountAmount} returns this
+ */
+proto.dss.DiscountAmount.prototype.clearSquarenotfound = function() {
+  return this.setSquarenotfound(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.dss.DiscountAmount.prototype.hasSquarenotfound = function() {
+  return jspb.Message.getField(this, 3) != null;
 };
 
 
@@ -468,7 +522,8 @@ proto.dss.SingleDiscount.prototype.toObject = function(opt_includeInstance) {
 proto.dss.SingleDiscount.toObject = function(includeInstance, msg) {
   var f, obj = {
     name: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    amount: (f = msg.getAmount()) && proto.dss.DiscountAmount.toObject(includeInstance, f)
+    amount: (f = msg.getAmount()) && proto.dss.DiscountAmount.toObject(includeInstance, f),
+    appliedTo: jspb.Message.getFieldWithDefault(msg, 3, 0)
   };
 
   if (includeInstance) {
@@ -514,6 +569,10 @@ proto.dss.SingleDiscount.deserializeBinaryFromReader = function(msg, reader) {
       reader.readMessage(value,proto.dss.DiscountAmount.deserializeBinaryFromReader);
       msg.setAmount(value);
       break;
+    case 3:
+      var value = /** @type {!proto.dss.PurchaseItem} */ (reader.readEnum());
+      msg.setAppliedTo(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -556,6 +615,13 @@ proto.dss.SingleDiscount.serializeBinaryToWriter = function(message, writer) {
       2,
       f,
       proto.dss.DiscountAmount.serializeBinaryToWriter
+    );
+  }
+  f = message.getAppliedTo();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      3,
+      f
     );
   }
 };
@@ -613,6 +679,24 @@ proto.dss.SingleDiscount.prototype.clearAmount = function() {
  */
 proto.dss.SingleDiscount.prototype.hasAmount = function() {
   return jspb.Message.getField(this, 2) != null;
+};
+
+
+/**
+ * optional PurchaseItem applied_to = 3;
+ * @return {!proto.dss.PurchaseItem}
+ */
+proto.dss.SingleDiscount.prototype.getAppliedTo = function() {
+  return /** @type {!proto.dss.PurchaseItem} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+};
+
+
+/**
+ * @param {!proto.dss.PurchaseItem} value
+ * @return {!proto.dss.SingleDiscount} returns this
+ */
+proto.dss.SingleDiscount.prototype.setAppliedTo = function(value) {
+  return jspb.Message.setProto3EnumField(this, 3, value);
 };
 
 
