@@ -29,8 +29,8 @@ export default () => (
 					onSubmit={(values, {setSubmitting}) => {
 						const sds = values.singleDiscounts.map( singleDiscount => {
 							const sd = new discountTwirp.SingleDiscount()
-							sd.setName(singleDiscount.Name)
-							sd.setAppliedTo(singleDiscount.AppliedTo)
+							sd.setName(singleDiscount.name)
+							sd.setAppliedTo(singleDiscount.appliedTo)
 							return sd
 						})
 
@@ -65,12 +65,12 @@ export default () => (
 												<FormField label="Name" name={`singleDiscounts[${idx}].name`} />
 											</Col><Col>
 												<FormField label="Applied To" name={`singleDiscounts[${idx}].appliedTo`} as="select">
-													<option value={discountTwirp.PurchaseItem.FullWeekendPassPurchaseItem}>Full Weekend Pass</option>
-													<option value={discountTwirp.PurchaseItem.DanceOnlyPassPurchaseItem}>Dance Only Pass</option>
-													<option value={discountTwirp.PurchaseItem.MixAndMatchPurchaseItem}>Mix and Match</option>
-													<option value={discountTwirp.PurchaseItem.SoloJazzPurchaseItem}>Solo Jazz</option>
-													<option value={discountTwirp.PurchaseItem.TeamCompetitionPurchaseItem}>Team Competition</option>
-													<option value={discountTwirp.PurchaseItem.TShirtPurchaseItem}>T-Shirt</option>
+													<option value={discountTwirp.PurchaseItem.FULLWEEKENDPASSPURCHASEITEM}>Full Weekend Pass</option>
+													<option value={discountTwirp.PurchaseItem.DANCEONLYPASSPURCHASEITEM}>Dance Only Pass</option>
+													<option value={discountTwirp.PurchaseItem.MIXANDMATCHPURCHASEITEM}>Mix and Match</option>
+													<option value={discountTwirp.PurchaseItem.SOLOJAZZPURCHASEITEM}>Solo Jazz</option>
+													<option value={discountTwirp.PurchaseItem.TEAMCOMPETITIONPURCHASEITEM}>Team Competition</option>
+													<option value={discountTwirp.PurchaseItem.TSHIRTPURCHASEITEM}>T-Shirt</option>
 												</FormField>
 											</Col></Form.Row>
 										</ListGroup.Item>

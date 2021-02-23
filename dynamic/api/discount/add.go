@@ -28,6 +28,17 @@ func (s *Server) Add(ctx context.Context, req *pb.DiscountAddReq) (*pb.DiscountA
 		}
 		return nil, err
 	}
+	if d.Code == "" {
+		return nil, twirp.InvalidArgumentError("bundle.code", "value should be non-empty")
+	}
+	for _, discount := range d.Discounts {
+		if discount.Name == "" {
+			return nil, twirp.InvalidArgumentError("bundle.discounts.name", "value should be non-empty")
+		}
+		if discount.Amount != nil {
+			return nil, twirp.InvalidArgumentError("bundle.discounts.amount", "value should not be provided")
+		}
+	}
 	err = s.service.Add(ctx, auth, d)
 	if err != nil {
 		if errors.Is(err, discount.ErrUnauthorized) {

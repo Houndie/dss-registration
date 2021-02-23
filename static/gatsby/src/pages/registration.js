@@ -9,6 +9,7 @@ import {Formik} from 'formik'
 import registrationTwirp from "../rpc/registration_pb_twirp.js"
 import discountTwirp from "../rpc/discount_pb_twirp.js"
 import { v4 as uuidv4 } from 'uuid';
+import parseDollar from "../components/parseDollar.js"
 
 const fullWeekendPassOption = "Full";
 const danceOnlyPassOption = "Dance";
@@ -17,14 +18,6 @@ const noPassOption = "None";
 const provideOption = "Provide";
 const requireOption = "Require";
 const noHousingOption = "None";
-
-const parseDollar = (intCost) => {
-	let dollar = intCost.toString()
-	while(dollar.length < 3) {
-		dollar = "0" + dollar;
-	}
-	return "$" + dollar.slice(0, -2) + "." + dollar.slice(-2)
-}
 
 const tierToString = (tier) => {
 	switch (tier) {
