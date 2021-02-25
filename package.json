@@ -1,0 +1,28 @@
+{
+  "name": "dss-registration",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Houndie/dss-registration.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Houndie/dss-registration/issues"
+  },
+  "homepage": "https://github.com/Houndie/dss-registration#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "pbjs-twirp": "^1.1.0",
+    "protobufjs": "^6.10.2",
+    "typescript": "^4.1.5"
+  }
+}

@@ -15,6 +15,7 @@ require (
 	github.com/thechriswalker/protoc-gen-twirp_js v0.0.0-20190627152235-0fe8731d4d8f
 	github.com/tidwall/pretty v0.0.0-20190325153808-1166b9ac2b65 // indirect
 	github.com/twitchtv/twirp v5.10.3-0.20200514000016-2bffe5f9b8c3+incompatible
+	go.larrymyers.com/protoc-gen-twirp_typescript v0.0.0-20210107230451-97fd63e543be // indirect
 	golang.org/x/sys v0.0.0-20200413165638-669c56c373c4 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )

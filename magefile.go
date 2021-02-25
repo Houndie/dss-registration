@@ -18,10 +18,26 @@ func Tools() error {
 	return sh.Run("toolbox", "sync")
 }
 
+const eslint = "eslint-disable block-scoped-var, id-length, no-control-regex, no-magic-numbers, no-prototype-builtins, no-redeclare, no-shadow, no-var, sort-vars, strict, no-lone-blocks, default-case"
+
 func GenerateProtoc() error {
 	mg.Deps(Tools)
 	fmt.Println("generating protocs")
-	cmd := exec.Command("toolbox", "do", "--", "protoc", "--proto_path", "rpc/dss", "--twirp_out=dynamic/", "--go_out=dynamic/", "--twirp_js_out=static/gatsby/src/rpc", "--js_out=import_style=commonjs,binary:static/gatsby/src/rpc", "registration.proto", "discount.proto", "forms.proto")
+	for _, file := range []string{"registration", "discount", "forms"} {
+		pbjs := exec.Command("npx", "pbjs", "-t", "static-module", "-w", "commonjs", "-l", eslint, "-r", file, "-o", "static/gatsby/src/rpc/"+file+".pb.js", "rpc/dss/"+file+".proto")
+		pbjs.Stderr = os.Stderr
+		err := pbjs.Run()
+		if err != nil {
+			return err
+		}
+		pbts := exec.Command("npx", "pbts", "--no-comments", "-o", "static/gatsby/src/rpc/"+file+".pb.d.ts", "static/gatsby/src/rpc/"+file+".pb.js")
+		pbts.Stderr = os.Stderr
+		err = pbts.Run()
+		if err != nil {
+			return err
+		}
+	}
+	cmd := exec.Command("toolbox", "do", "--", "protoc", "--proto_path", "rpc/dss", "--twirp_out=dynamic/", "--go_out=dynamic/", "--twirp_typescript_out=library=pbjs:static/gatsby/src/rpc", "registration.proto", "discount.proto", "forms.proto")
 	cmd.Stderr = os.Stderr
 	//cmd.Dir = "dynamic"
 	err := cmd.Run()
