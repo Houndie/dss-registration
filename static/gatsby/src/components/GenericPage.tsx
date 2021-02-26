@@ -31,9 +31,9 @@ export default ({title, menu, requireAuth}: GenericPageProps) => {
 			<Container>
 				{ requireAuth.required ? (
 					<AuthGuard gAuth={gAuth}>
-						{(gAuth) => requireAuth.callback(gAuth)}
+						{(gAuth2) => {return requireAuth.callback(gAuth2)}}
 					</AuthGuard>
-				) : requireAuth.callback(gAuth)}
+				) : (() => { console.log("HERE"); console.log(requireAuth); return requireAuth.callback(gAuth)})()}
 			</Container>
 			<Footer />
 		</>

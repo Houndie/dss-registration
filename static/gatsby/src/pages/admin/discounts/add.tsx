@@ -7,16 +7,14 @@ import ListGroup from 'react-bootstrap/ListGroup'
 import FormField from '../../../components/FormField'
 import WindowClose from '../../../components/WindowClose'
 import {Formik} from 'formik'
-import {createDiscount} from '../../../rpc/discount.twirp'
+import {createDiscount} from '../../../components/twirp'
 import {dss} from '../../../rpc/discount.pb'
 
 
 export default () => (
 	<AdminPage title="Add Discount">
 		{(gAuth) => {
-			const discountClient = createDiscount(`${process.env.GATSBY_BACKEND}`, {
-				Authorization: `Bearer ${gAuth.accessToken}`
-			})
+			const discountClient = createDiscount(gAuth)
 
 			return (
 				<Formik

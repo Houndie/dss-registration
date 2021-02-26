@@ -12,6 +12,9 @@ export default ({title, children}: AdminPageProps) => (
 	<GenericPage 
 		title={title} 
 		menu={(gAuth, setGAuth) => <AdminMenu gAuth={gAuth} setGAuth={setGAuth} />} 
-		requireAuth={{ callback: children } as RequireAuth}
+		requireAuth={{ 
+			required: true,
+			callback: children 
+		} as RequireAuth}
 	/>
 )
