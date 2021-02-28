@@ -4,17 +4,17 @@ import NavDropdown from "react-bootstrap/NavDropdown"
 import Nav from "react-bootstrap/Nav"
 import Container from "react-bootstrap/Container"
 import { GoogleLogin, GoogleLogout, GoogleLoginResponse } from "react-google-login"
+import {AuthResult, AuthStatus} from './auth'
 
 const isGoogleLoginResponse = (res: any): res is GoogleLoginResponse => {
 	return (res as GoogleLoginResponse).accessToken !== undefined
 }
 
 interface AdminMenuProps {
-	gAuth: GoogleLoginResponse | null
-	setGAuth: (gauth: GoogleLoginResponse | null) => void
+	auth: AuthResult
 }
 
-export default ({gAuth, setGAuth}: AdminMenuProps) => (
+export default ({auth}: AdminMenuProps) => (
 	<Container>
 		<Navbar expand="lg">
 			<Navbar.Brand href="/">Dayton Swing Smackdown</Navbar.Brand>
@@ -25,27 +25,10 @@ export default ({gAuth, setGAuth}: AdminMenuProps) => (
 						<NavDropdown.Item href="/admin/discounts">List</NavDropdown.Item>
 						<NavDropdown.Item href="/admin/discounts/add">Add</NavDropdown.Item>
 					</NavDropdown>
-					{ gAuth ? (
-						<GoogleLogout
-							clientId={`${process.env.GATSBY_CLIENT_ID}`}
-							buttonText="Logout"
-							onLogoutSuccess={() => {setGAuth(null)}}
-						/>
+					{ auth.clients.status== AuthStatus.SignedIn ? (
+						<Nav.Link href="#" onClick={auth.signOut}>Log Out</Nav.Link>
 					) : (
-						<GoogleLogin
-							clientId={`${process.env.GATSBY_CLIENT_ID}`}
-							buttonText="Login"
-							onSuccess={(newAuth) => {
-								if(isGoogleLoginResponse(newAuth)) {
-									setGAuth(newAuth)
-								} else {
-									console.error("got offline auth somehow")
-								}
-							}}
-							onFailure={() => console.log(`NO ${process.env.GATSBY_CLIENT_ID}`)}
-							cookiePolicy={'single_host_origin'}
-							isSignedIn={true}
-						/>
+						<Nav.Link href="#" onClick={auth.signIn}>Log In</Nav.Link>
 					)}
 				</Nav>
 			</Navbar.Collapse>

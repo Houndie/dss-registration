@@ -6,12 +6,12 @@ import {createForms as twirpCreateForms} from "../rpc/forms.twirp"
 import {dss as dssForms} from "../rpc/forms.pb"
 import { GoogleLoginResponse } from "react-google-login"
 
-type BackendFunc = (baseURL: string, options: any) => dssDiscount.Discount | dssRegistration.Registration | dssForms.Forms
+type BackendFunc<T> = (baseURL: string, options: any) => T
 
-const create = (backend: BackendFunc, gAuth: GoogleLoginResponse | null = null, options = {}) => {
-	const opts = (gAuth ? {
+const create = <T>(backend: BackendFunc<T>, accessToken?: string, options = {}) => {
+	const opts = (accessToken ? {
 		headers: {
-			"Authorization": `Bearer ${gAuth.accessToken}`
+			"Authorization": `Bearer ${accessToken}`
 		},
 		...options
 	} : options)
@@ -19,14 +19,14 @@ const create = (backend: BackendFunc, gAuth: GoogleLoginResponse | null = null, 
 	return backend(`${process.env.GATSBY_BACKEND}`, opts)
 }
 
-export const createDiscount = (gAuth: GoogleLoginResponse | null = null, options = {}): dssDiscount.Discount => {
-	return create(twirpCreateDiscount, gAuth, options) as dssDiscount.Discount
+export const createDiscount = (accessToken?: string, options = {}): dssDiscount.Discount => {
+	return create(twirpCreateDiscount, accessToken, options)
 }
 
-export const createRegistration = (gAuth: GoogleLoginResponse | null = null, options = {}): dssRegistration.Registration => {
-	return create(twirpCreateRegistration, gAuth, options) as dssRegistration.Registration
+export const createRegistration = (accessToken?: string, options = {}): dssRegistration.Registration => {
+	return create(twirpCreateRegistration, accessToken, options)
 }
 
-export const createForms = (gAuth: GoogleLoginResponse | null = null, options = {}): dssForms.Forms => {
-	return create(twirpCreateForms, gAuth, options) as dssForms.Forms
+export const createForms = (accessToken?: string, options = {}): dssForms.Forms => {
+	return create(twirpCreateForms, accessToken, options)
 }

@@ -13,9 +13,7 @@ import {dss} from '../../../rpc/discount.pb'
 
 export default () => (
 	<AdminPage title="Add Discount">
-		{(gAuth) => {
-			const discountClient = createDiscount(gAuth)
-
+		{(clients) => {
 			return (
 				<Formik
 					initialValues={{
@@ -23,12 +21,12 @@ export default () => (
 						singleDiscounts: []
 					}}
 					onSubmit={(values, {setSubmitting}) => {
-						return discountClient.add({
+						return clients.discount.add({
 							bundle: {
 								code: values.code,
 								discounts: values.singleDiscounts
 							}
-						}).then(req => {
+						}).then(res => {
 							console.log("success")
 						}).catch(err => {
 							console.error(err)

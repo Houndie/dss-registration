@@ -1,39 +1,40 @@
-import React, {useState} from 'react'
+import React from 'react'
 import '../styles/style.scss'
 import Container from 'react-bootstrap/Container'
 import Footer from './Footer'
 import Hero from './Hero'
 import AuthGuard from './AuthGuard'
 import {GoogleLoginResponse} from "react-google-login"
+import {useAuth, AuthResult, AuthedClients, Clients} from './auth'
 
 export type RequireAuth = {
 	required: true
-	callback: (gAuth: GoogleLoginResponse) => React.ReactNode
+	callback: (clients: AuthedClients) => React.ReactNode
 }
 
 export type OptionalAuth = {
 	required: false
-	callback: (gAuth: GoogleLoginResponse | null) => React.ReactNode
+	callback: (clients: Clients) => React.ReactNode
 }
 
 interface GenericPageProps {
 	title: string;
-	menu: (gAuth: GoogleLoginResponse | null, setGAuth: (arg0: GoogleLoginResponse | null) => void) => React.ReactNode
+	menu: (auth: AuthResult) => React.ReactNode
 	requireAuth: RequireAuth | OptionalAuth
 }
 
 export default ({title, menu, requireAuth}: GenericPageProps) => {
-	const [gAuth, setGAuth] = useState<GoogleLoginResponse | null>(null)
+	const auth = useAuth(`${process.env.GATSBY_CLIENT_ID}`)
 	return (
 		<>
-			{menu(gAuth, setGAuth)}
+			{menu(auth)}
 			<Hero image='/page_header.png' height='250px' title={title} />
 			<Container>
 				{ requireAuth.required ? (
-					<AuthGuard gAuth={gAuth}>
-						{(gAuth2) => {return requireAuth.callback(gAuth2)}}
+					<AuthGuard clients={auth.clients}>
+						{(clients) => {return requireAuth.callback(clients)}}
 					</AuthGuard>
-				) : (() => { console.log("HERE"); console.log(requireAuth); return requireAuth.callback(gAuth)})()}
+				) : (() => { return requireAuth.callback(auth.clients)})()}
 			</Container>
 			<Footer />
 		</>

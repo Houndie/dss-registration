@@ -8,26 +8,34 @@ import Accordion from 'react-bootstrap/Accordion'
 import ListGroup from 'react-bootstrap/ListGroup'
 import parseDollar from '../../components/parseDollar'
 
+/*interface Discount {
+	name: string
+	amount: 
+}
+
+interface Bundle {
+	code: string
+	discounts: Discount
+}*/
+
 export default () => (
 	<AdminPage title="Add Discount">
-		{(gAuth) => {
+		{(clients) => {
 			const [bundles, setBundles] = useState<dss.IDiscountBundle[]>([])
-			const [discountClient, setDiscountClient] = useState<dss.Discount | null>(null)
 			useEffect(() => {
-				const dc = createDiscount(gAuth)
-
-				dc.list({}).then(res => {
-					setDiscountClient(dc)
+				clients.discount.list({}).then(res => {
 					setBundles(res.bundles)
 				}).catch( err => {
 					console.error(err)
 				})
-			}, [gAuth])
+			}, [clients.discount])
 			return (
 				<Row>
 					<Accordion style={{width: "100%"}}>
 						{bundles && bundles.map((bundle, idx) => (
-							<Card key={idx}>
+							<Card key={idx} bg={((bundle.discounts && bundle.discounts.find((discount) => {
+								return !discount.amount || discount.amount.squareNotFound
+							})) ? 'warning' : 'light')} >
 								<Accordion.Toggle as={Card.Header} eventKey={idx.toString()}>Code: {bundle.code}</Accordion.Toggle>
 								<Accordion.Collapse eventKey={idx.toString()}><Card.Body>
 									<ListGroup>

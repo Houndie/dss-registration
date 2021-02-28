@@ -20,7 +20,7 @@ import * as Yup from 'yup'
 import Recaptcha from 'react-recaptcha';
 import {createForms} from "../rpc/forms.twirp"
 import {ImportRecaptchaEffect} from '../components/recaptcha'
-import { GoogleLoginResponse } from "react-google-login"
+import {useAuth, Clients} from '../components/auth'
 
 interface IconPanelProps {
 	link: string
@@ -51,10 +51,10 @@ const ContactSchema = Yup.object().shape({
 });
 
 const Home = () => {
-	const [gAuth, setGAuth] = useState<GoogleLoginResponse | null>(null)
+	const auth = useAuth(`${process.env.GATSBY_CLIENT_ID}`)
 	return (
 		<>
-			<Menu gAuth={gAuth} setGAuth={setGAuth} />
+			<Menu auth={auth} />
 			<Hero image='ViktorJump.jpg' height='450px' title='Dayton Swing Smackdown' />
 			<Container className="my-5">
 				<Row><Col xs="5">
@@ -76,7 +76,7 @@ const Home = () => {
 				<Row><Col className="text-center">
 					<h2>Have Questions?</h2>
 					<i>Contact Us!</i>
-					<ContactUs />
+					<ContactUs clients={auth.clients} />
 				</Col></Row>
 			</Container>
 			<Footer />
@@ -84,8 +84,11 @@ const Home = () => {
 	)
 }
 
-const ContactUs = () => {
-	const formsClient = createForms(`${process.env.GATSBY_BACKEND}`)
+interface ContactUsProps {
+	clients: Clients
+}
+
+const ContactUs = ({clients}: ContactUsProps) => {
 	const [recaptchaLoaded, setRecaptchaLoaded] = useState(false)
 	const [formSubmitted, setFormSubmitted] = useState(false)
 	let recaptchaInstance: Recaptcha | null
@@ -111,7 +114,7 @@ const ContactUs = () => {
 					return
 				}
 
-				formsClient.contactUs({
+				clients.forms.contactUs({
 					name: values.name,
 					email: values.email,
 					msg: values.message,
@@ -145,8 +148,8 @@ const ContactUs = () => {
 						</>
 					)}
 					</Col></Form.Row>
-					<Form.Row><Col className="justify-content-center">
-						<br/>
+					<br/>
+					<Form.Row><Col className="justify-content-center d-flex">
 							<Recaptcha
 								badge="inline"
 								ref={e => recaptchaInstance = e}

@@ -29,7 +29,7 @@ export default () => {
 	let recaptchaInstance: Recaptcha | null
 	return (
 		<Page title="Safety Report">
-			{() => {
+			{(clients) => {
 				if(submitted){
 					return <p>Thank you for submitting your report. We will take action as soon as we are able.</p>
 				}
@@ -59,8 +59,7 @@ export default () => {
 								recaptchaInstance.execute()
 								return
 							}
-
-							formsClient.safetyReport({
+							clients.forms.safetyReport({
 								occurredOn: {
 									seconds: new Date(values.occurredOnDate + ' ' + values.occurredOnTime).valueOf()/1000
 								},
@@ -74,9 +73,9 @@ export default () => {
 								recaptchaResponse: values.recaptchaResponse
 							}).then(() => {
 								setSubmitted(true)
-								setSubmitting(false)
-							}).catch((e) => {
+							}, e => {
 								console.log(JSON.stringify(e))
+							}).then(() => {
 								setSubmitting(false)
 							})
 							
