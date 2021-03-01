@@ -1,30 +1,28 @@
 import React, {useEffect, useState} from 'react'
 import AdminPage from '../../components/AdminPage'
-import {createDiscount} from "../../components/twirp"
 import {dss} from "../../rpc/discount.pb"
 import Row from 'react-bootstrap/Row'
 import Card from 'react-bootstrap/Card'
 import Accordion from 'react-bootstrap/Accordion'
 import ListGroup from 'react-bootstrap/ListGroup'
 import parseDollar from '../../components/parseDollar'
+import {Formik} from 'formik'
+import Form from 'react-bootstrap/Form'
+import DiscountForm from '../../components/DiscountForm'
+import Col from 'react-bootstrap/Col'
+import Button from 'react-bootstrap/Button'
 
-/*interface Discount {
-	name: string
-	amount: 
-}
-
-interface Bundle {
-	code: string
-	discounts: Discount
-}*/
+type ListItem = {
+	isForm: boolean
+} & dss.IDiscountBundle
 
 export default () => (
 	<AdminPage title="Add Discount">
 		{(clients) => {
-			const [bundles, setBundles] = useState<dss.IDiscountBundle[]>([])
+			const [bundles, setBundles] = useState<ListItem[]>([])
 			useEffect(() => {
 				clients.discount.list({}).then(res => {
-					setBundles(res.bundles)
+					setBundles(res.bundles.map(bundle => { return {...bundle, isForm: false}}))
 				}).catch( err => {
 					console.error(err)
 				})
@@ -38,47 +36,100 @@ export default () => (
 							})) ? 'warning' : 'light')} >
 								<Accordion.Toggle as={Card.Header} eventKey={idx.toString()}>Code: {bundle.code}</Accordion.Toggle>
 								<Accordion.Collapse eventKey={idx.toString()}><Card.Body>
-									<ListGroup>
-										{bundle.discounts && bundle.discounts.map((discount, discountIdx) => (
-											<ListGroup.Item key={discountIdx}>
-												Name: {discount.name}<br/>
-												Applied To: {(() => {
-													switch(discount.appliedTo) {
-														case dss.PurchaseItem.FullWeekendPassPurchaseItem:
-															return "Full Weekend Pass"
-														case dss.PurchaseItem.DanceOnlyPassPurchaseItem:
-															return "Dance Only Pass"
-														case dss.PurchaseItem.MixAndMatchPurchaseItem:
-															return "Mix and Match"
-														case dss.PurchaseItem.SoloJazzPurchaseItem:
-															return "Solo Jazz"
-														case dss.PurchaseItem.TeamCompetitionPurchaseItem:
-															return "Team Competition"
-														case dss.PurchaseItem.TShirtPurchaseItem:
-															return "T-Shirt"
-														default:
-															return ""
-													}
-												})()}<br/>
-												Amount: {(() => {
-													if(!discount.amount) {
-														console.error("no amount found")
-														return ""
-													}
-													if(discount.amount.dollar) {
-														return parseDollar(discount.amount.dollar)
-													} else if (discount.amount.percent) {
-														return "%" + discount.amount.percent
-													} else if (discount.amount.squareNotFound) {
-														return "discount not found in square"
-													} else {
-														console.error("unknown amount found")
-														return ""
-													}
-												})()}
-											</ListGroup.Item>
-										))}
-									</ListGroup>
+									{ bundle.isForm ? (
+										<Formik
+											initialValues={{
+												code: (bundle.code ? bundle.code : ''),
+												discounts: (bundle.discounts ? bundle.discounts.map(({amount, ...tail}) => tail) : [])
+											}}
+											onSubmit={(values, {setSubmitting}) => {
+												return clients.discount.update({
+													oldCode: bundle.code,
+													bundle: values
+												}).then(res => {
+													return clients.discount.get({
+														code: values.code
+													})
+												}).then(res => {
+													setBundles([...bundles.slice(0, idx), {
+														...res.bundle,
+														isForm: false
+													}, ...bundles.slice(idx+1)])
+												}).catch(err => {
+													console.error(err)
+													setSubmitting(false)
+												})
+											}}
+										>
+											{({values, isSubmitting, handleSubmit, setFieldValue}) => 
+												<Form onSubmit={handleSubmit}>
+													<DiscountForm values={values} setFieldValue={setFieldValue} />
+													<Form.Row><Col>
+														<Button type="submit" disabled={isSubmitting}>Update Discount</Button>
+													</Col><Col>
+														<Button onClick={ () => {
+															setBundles([...bundles.slice(0, idx), {
+																...bundle,
+																isForm: false
+															}, ...bundles.slice(idx+1)])
+														}}>Cancel</Button>
+													</Col></Form.Row>
+												</Form>
+											}
+										</Formik>
+									):(
+										<>
+											<ListGroup>
+												{bundle.discounts && bundle.discounts.map((discount, discountIdx) => (
+													<ListGroup.Item key={discountIdx}>
+														Name: {discount.name}<br/>
+														Applied To: {(() => {
+															switch(discount.appliedTo) {
+																case dss.PurchaseItem.FullWeekendPassPurchaseItem:
+																	return "Full Weekend Pass"
+																case dss.PurchaseItem.DanceOnlyPassPurchaseItem:
+																	return "Dance Only Pass"
+																case dss.PurchaseItem.MixAndMatchPurchaseItem:
+																	return "Mix and Match"
+																case dss.PurchaseItem.SoloJazzPurchaseItem:
+																	return "Solo Jazz"
+																case dss.PurchaseItem.TeamCompetitionPurchaseItem:
+																	return "Team Competition"
+																case dss.PurchaseItem.TShirtPurchaseItem:
+																	return "T-Shirt"
+																default:
+																	return ""
+															}
+														})()}<br/>
+														Amount: {(() => {
+															if(!discount.amount) {
+																console.error("no amount found")
+																return ""
+															}
+															if(discount.amount.dollar) {
+																return parseDollar(discount.amount.dollar)
+															} else if (discount.amount.percent) {
+																return "%" + discount.amount.percent
+															} else if (discount.amount.squareNotFound) {
+																return "discount not found in square"
+															} else {
+																console.error("unknown amount found")
+																return ""
+															}
+														})()}
+													</ListGroup.Item>
+												))}
+											</ListGroup>
+											<Row><Col>
+												<Button onClick={() => {
+													setBundles([...bundles.slice(0, idx), {
+														...bundle,
+														isForm: true
+													}, ...bundles.slice(idx+1)])
+												}}>Edit</Button>
+											</Col></Row>
+										</>
+									)}
 								</Card.Body></Accordion.Collapse>
 							</Card>
 						))}

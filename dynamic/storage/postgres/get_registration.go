@@ -1,14 +1,67 @@
 package postgres
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"text/template"
 
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx/v4"
 )
+
+var getRegistrationStmt string
+
+func init() {
+	tmplStmt := `SELECT
+			{{.CreatedAtCol}},
+			{{.FirstNameCol}},
+			{{.LastNameCol}},
+			{{.StreetAddressCol}},
+			{{.CityCol}},
+			{{.StateCol}},
+			{{.ZipCodeCol}},
+			{{.EmailCol}},
+			{{.HomeSceneCol}},
+			{{.IsStudentCol}},
+			{{.PassTypeCol}},
+			{{.FullWeekendLevelCol}},
+			{{.FullWeekendTierCol}},
+			{{.MixAndMatchCol}},
+			{{.MixAndMatchRoleCol}},
+			{{.SoloJazzCol}},
+			{{.TeamCompetitionCol}},
+			{{.TeamCompetitionNameCol}},
+			{{.TShirtCol}},
+			{{.TShirtStyleCol}},
+			{{.HousingCol}},
+			{{.ProvideHousingPetsCol}},
+			{{.ProvideHousingQuantityCol}},
+			{{.ProvideHousingDetailsCol}},
+			{{.RequireHousingPetAllergiesCol}},
+			{{.RequireHousingDetailsCol}},
+			{{.UserIDCol}},
+			{{.OrderIDsCol}},
+			{{.DiscountCodesCol}},
+			{{.EnabledCol}}
+		FROM {{.Table}}
+		WHERE {{.IDCol}} = $1
+		LIMIT 1;`
+	tmpl, err := template.New("tmpl").Parse(tmplStmt)
+	if err != nil {
+		panic(fmt.Sprintf("error parsing get registration template: %v", err))
+	}
+
+	stmt := &bytes.Buffer{}
+	err = tmpl.Execute(stmt, registrationConsts)
+	if err != nil {
+		panic(fmt.Sprintf("error executing get registration template: %v", err))
+	}
+
+	getRegistrationStmt = stmt.String()
+}
 
 func (s *Store) GetRegistration(ctx context.Context, id string) (*storage.Registration, error) {
 	uuidID, err := uuid.FromString(id)
@@ -33,40 +86,7 @@ func (s *Store) GetRegistration(ctx context.Context, id string) (*storage.Regist
 	var provideHousingDetails string
 	var requireHousingPetAllergies string
 	var requireHousingDetails string
-	err = s.pool.QueryRow(ctx, fmt.Sprintf("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s FROM %s WHERE %s = $1 LIMIT 1;",
-		registrationCreatedAtCol,
-		registrationFirstNameCol,
-		registrationLastNameCol,
-		registrationStreetAddressCol,
-		registrationCityCol,
-		registrationStateCol,
-		registrationZipCodeCol,
-		registrationEmailCol,
-		registrationHomeSceneCol,
-		registrationIsStudentCol,
-		registrationPassTypeCol,
-		registrationFullWeekendLevelCol,
-		registrationFullWeekendTierCol,
-		registrationMixAndMatchCol,
-		registrationMixAndMatchRoleCol,
-		registrationSoloJazzCol,
-		registrationTeamCompetitionCol,
-		registrationTeamCompetitionNameCol,
-		registrationTShirtCol,
-		registrationTShirtStyleCol,
-		registrationHousingCol,
-		registrationProvideHousingPetsCol,
-		registrationProvideHousingQuantityCol,
-		registrationProvideHousingDetailsCol,
-		registrationRequireHousingPetAllergiesCol,
-		registrationRequireHousingDetailsCol,
-		registrationUserIDCol,
-		registrationOrderIDsCol,
-		registrationDiscountCodesCol,
-		registrationEnabledCol,
-		registrationTable,
-		registrationIDCol),
-		uuidID).Scan(
+	err = s.pool.QueryRow(ctx, getRegistrationStmt, uuidID).Scan(
 		&r.CreatedAt,
 		&r.FirstName,
 		&r.LastName,

@@ -24,6 +24,7 @@ type MockStore struct {
 	IsAdminFunc                func(context.Context, string) (bool, error)
 	UpdateRegistrationFunc     func(ctx context.Context, r *storage.Registration) error
 	ListDiscountsFunc          func(context.Context) ([]*storage.Discount, error)
+	UpdateDiscountFunc         func(ctx context.Context, oldCode string, newDiscount *storage.Discount) error
 }
 
 func (m *MockStore) AddRegistration(ctx context.Context, registration *storage.Registration) (string, error) {
@@ -56,4 +57,8 @@ func (m *MockStore) UpdateRegistration(ctx context.Context, r *storage.Registrat
 
 func (m *MockStore) ListDiscounts(ctx context.Context) ([]*storage.Discount, error) {
 	return m.ListDiscountsFunc(ctx)
+}
+
+func (m *MockStore) UpdateDiscount(ctx context.Context, oldCode string, newDiscount *storage.Discount) error {
+	return m.UpdateDiscountFunc(ctx, oldCode, newDiscount)
 }

@@ -9,6 +9,7 @@ service Discount {
 	rpc Add(DiscountAddReq) returns (DiscountAddRes);
 	rpc Get(DiscountGetReq) returns (DiscountGetRes);
 	rpc List(DiscountListReq) returns (DiscountListRes);
+	rpc Update(DiscountUpdateReq) returns (DiscountUpdateRes);
 }
 
 enum PurchaseItem {
@@ -58,3 +59,10 @@ message DiscountListReq {}
 message DiscountListRes {
 	repeated DiscountBundle bundles = 1;
 }
+
+message DiscountUpdateReq {
+	string oldCode = 1;
+	DiscountBundle bundle = 2;
+}
+
+message DiscountUpdateRes {}

@@ -10,6 +10,8 @@ export namespace dss {
         public get(request: dss.IDiscountGetReq): Promise<dss.DiscountGetRes>;
         public list(request: dss.IDiscountListReq, callback: dss.Discount.ListCallback): void;
         public list(request: dss.IDiscountListReq): Promise<dss.DiscountListRes>;
+        public update(request: dss.IDiscountUpdateReq, callback: dss.Discount.UpdateCallback): void;
+        public update(request: dss.IDiscountUpdateReq): Promise<dss.DiscountUpdateRes>;
     }
 
     namespace Discount {
@@ -19,6 +21,8 @@ export namespace dss {
         type GetCallback = (error: (Error|null), response?: dss.DiscountGetRes) => void;
 
         type ListCallback = (error: (Error|null), response?: dss.DiscountListRes) => void;
+
+        type UpdateCallback = (error: (Error|null), response?: dss.DiscountUpdateRes) => void;
     }
 
     enum PurchaseItem {
@@ -196,6 +200,42 @@ export namespace dss {
         public static verify(message: { [k: string]: any }): (string|null);
         public static fromObject(object: { [k: string]: any }): dss.DiscountListRes;
         public static toObject(message: dss.DiscountListRes, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+    }
+
+    interface IDiscountUpdateReq {
+        oldCode?: (string|null);
+        bundle?: (dss.IDiscountBundle|null);
+    }
+
+    class DiscountUpdateReq implements IDiscountUpdateReq {
+        constructor(properties?: dss.IDiscountUpdateReq);
+        public oldCode: string;
+        public bundle?: (dss.IDiscountBundle|null);
+        public static create(properties?: dss.IDiscountUpdateReq): dss.DiscountUpdateReq;
+        public static encode(message: dss.IDiscountUpdateReq, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: dss.IDiscountUpdateReq, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): dss.DiscountUpdateReq;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): dss.DiscountUpdateReq;
+        public static verify(message: { [k: string]: any }): (string|null);
+        public static fromObject(object: { [k: string]: any }): dss.DiscountUpdateReq;
+        public static toObject(message: dss.DiscountUpdateReq, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+    }
+
+    interface IDiscountUpdateRes {
+    }
+
+    class DiscountUpdateRes implements IDiscountUpdateRes {
+        constructor(properties?: dss.IDiscountUpdateRes);
+        public static create(properties?: dss.IDiscountUpdateRes): dss.DiscountUpdateRes;
+        public static encode(message: dss.IDiscountUpdateRes, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: dss.IDiscountUpdateRes, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): dss.DiscountUpdateRes;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): dss.DiscountUpdateRes;
+        public static verify(message: { [k: string]: any }): (string|null);
+        public static fromObject(object: { [k: string]: any }): dss.DiscountUpdateRes;
+        public static toObject(message: dss.DiscountUpdateRes, options?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
     }
 }

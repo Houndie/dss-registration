@@ -149,6 +149,39 @@ $root.dss = (function() {
          * @variation 2
          */
 
+        /**
+         * Callback as used by {@link dss.Discount#update}.
+         * @memberof dss.Discount
+         * @typedef UpdateCallback
+         * @type {function}
+         * @param {Error|null} error Error, if any
+         * @param {dss.DiscountUpdateRes} [response] DiscountUpdateRes
+         */
+
+        /**
+         * Calls Update.
+         * @function update
+         * @memberof dss.Discount
+         * @instance
+         * @param {dss.IDiscountUpdateReq} request DiscountUpdateReq message or plain object
+         * @param {dss.Discount.UpdateCallback} callback Node-style callback called with the error, if any, and DiscountUpdateRes
+         * @returns {undefined}
+         * @variation 1
+         */
+        Object.defineProperty(Discount.prototype.update = function update(request, callback) {
+            return this.rpcCall(update, $root.dss.DiscountUpdateReq, $root.dss.DiscountUpdateRes, request, callback);
+        }, "name", { value: "Update" });
+
+        /**
+         * Calls Update.
+         * @function update
+         * @memberof dss.Discount
+         * @instance
+         * @param {dss.IDiscountUpdateReq} request DiscountUpdateReq message or plain object
+         * @returns {Promise<dss.DiscountUpdateRes>} Promise
+         * @variation 2
+         */
+
         return Discount;
     })();
 
@@ -2049,6 +2082,381 @@ $root.dss = (function() {
         };
 
         return DiscountListRes;
+    })();
+
+    dss.DiscountUpdateReq = (function() {
+
+        /**
+         * Properties of a DiscountUpdateReq.
+         * @memberof dss
+         * @interface IDiscountUpdateReq
+         * @property {string|null} [oldCode] DiscountUpdateReq oldCode
+         * @property {dss.IDiscountBundle|null} [bundle] DiscountUpdateReq bundle
+         */
+
+        /**
+         * Constructs a new DiscountUpdateReq.
+         * @memberof dss
+         * @classdesc Represents a DiscountUpdateReq.
+         * @implements IDiscountUpdateReq
+         * @constructor
+         * @param {dss.IDiscountUpdateReq=} [properties] Properties to set
+         */
+        function DiscountUpdateReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * DiscountUpdateReq oldCode.
+         * @member {string} oldCode
+         * @memberof dss.DiscountUpdateReq
+         * @instance
+         */
+        DiscountUpdateReq.prototype.oldCode = "";
+
+        /**
+         * DiscountUpdateReq bundle.
+         * @member {dss.IDiscountBundle|null|undefined} bundle
+         * @memberof dss.DiscountUpdateReq
+         * @instance
+         */
+        DiscountUpdateReq.prototype.bundle = null;
+
+        /**
+         * Creates a new DiscountUpdateReq instance using the specified properties.
+         * @function create
+         * @memberof dss.DiscountUpdateReq
+         * @static
+         * @param {dss.IDiscountUpdateReq=} [properties] Properties to set
+         * @returns {dss.DiscountUpdateReq} DiscountUpdateReq instance
+         */
+        DiscountUpdateReq.create = function create(properties) {
+            return new DiscountUpdateReq(properties);
+        };
+
+        /**
+         * Encodes the specified DiscountUpdateReq message. Does not implicitly {@link dss.DiscountUpdateReq.verify|verify} messages.
+         * @function encode
+         * @memberof dss.DiscountUpdateReq
+         * @static
+         * @param {dss.IDiscountUpdateReq} message DiscountUpdateReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        DiscountUpdateReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.oldCode != null && Object.hasOwnProperty.call(message, "oldCode"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.oldCode);
+            if (message.bundle != null && Object.hasOwnProperty.call(message, "bundle"))
+                $root.dss.DiscountBundle.encode(message.bundle, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified DiscountUpdateReq message, length delimited. Does not implicitly {@link dss.DiscountUpdateReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof dss.DiscountUpdateReq
+         * @static
+         * @param {dss.IDiscountUpdateReq} message DiscountUpdateReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        DiscountUpdateReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a DiscountUpdateReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof dss.DiscountUpdateReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {dss.DiscountUpdateReq} DiscountUpdateReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        DiscountUpdateReq.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.dss.DiscountUpdateReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.oldCode = reader.string();
+                    break;
+                case 2:
+                    message.bundle = $root.dss.DiscountBundle.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a DiscountUpdateReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof dss.DiscountUpdateReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {dss.DiscountUpdateReq} DiscountUpdateReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        DiscountUpdateReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a DiscountUpdateReq message.
+         * @function verify
+         * @memberof dss.DiscountUpdateReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        DiscountUpdateReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.oldCode != null && message.hasOwnProperty("oldCode"))
+                if (!$util.isString(message.oldCode))
+                    return "oldCode: string expected";
+            if (message.bundle != null && message.hasOwnProperty("bundle")) {
+                var error = $root.dss.DiscountBundle.verify(message.bundle);
+                if (error)
+                    return "bundle." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates a DiscountUpdateReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof dss.DiscountUpdateReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {dss.DiscountUpdateReq} DiscountUpdateReq
+         */
+        DiscountUpdateReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.dss.DiscountUpdateReq)
+                return object;
+            var message = new $root.dss.DiscountUpdateReq();
+            if (object.oldCode != null)
+                message.oldCode = String(object.oldCode);
+            if (object.bundle != null) {
+                if (typeof object.bundle !== "object")
+                    throw TypeError(".dss.DiscountUpdateReq.bundle: object expected");
+                message.bundle = $root.dss.DiscountBundle.fromObject(object.bundle);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a DiscountUpdateReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof dss.DiscountUpdateReq
+         * @static
+         * @param {dss.DiscountUpdateReq} message DiscountUpdateReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        DiscountUpdateReq.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.oldCode = "";
+                object.bundle = null;
+            }
+            if (message.oldCode != null && message.hasOwnProperty("oldCode"))
+                object.oldCode = message.oldCode;
+            if (message.bundle != null && message.hasOwnProperty("bundle"))
+                object.bundle = $root.dss.DiscountBundle.toObject(message.bundle, options);
+            return object;
+        };
+
+        /**
+         * Converts this DiscountUpdateReq to JSON.
+         * @function toJSON
+         * @memberof dss.DiscountUpdateReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        DiscountUpdateReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return DiscountUpdateReq;
+    })();
+
+    dss.DiscountUpdateRes = (function() {
+
+        /**
+         * Properties of a DiscountUpdateRes.
+         * @memberof dss
+         * @interface IDiscountUpdateRes
+         */
+
+        /**
+         * Constructs a new DiscountUpdateRes.
+         * @memberof dss
+         * @classdesc Represents a DiscountUpdateRes.
+         * @implements IDiscountUpdateRes
+         * @constructor
+         * @param {dss.IDiscountUpdateRes=} [properties] Properties to set
+         */
+        function DiscountUpdateRes(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Creates a new DiscountUpdateRes instance using the specified properties.
+         * @function create
+         * @memberof dss.DiscountUpdateRes
+         * @static
+         * @param {dss.IDiscountUpdateRes=} [properties] Properties to set
+         * @returns {dss.DiscountUpdateRes} DiscountUpdateRes instance
+         */
+        DiscountUpdateRes.create = function create(properties) {
+            return new DiscountUpdateRes(properties);
+        };
+
+        /**
+         * Encodes the specified DiscountUpdateRes message. Does not implicitly {@link dss.DiscountUpdateRes.verify|verify} messages.
+         * @function encode
+         * @memberof dss.DiscountUpdateRes
+         * @static
+         * @param {dss.IDiscountUpdateRes} message DiscountUpdateRes message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        DiscountUpdateRes.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified DiscountUpdateRes message, length delimited. Does not implicitly {@link dss.DiscountUpdateRes.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof dss.DiscountUpdateRes
+         * @static
+         * @param {dss.IDiscountUpdateRes} message DiscountUpdateRes message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        DiscountUpdateRes.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a DiscountUpdateRes message from the specified reader or buffer.
+         * @function decode
+         * @memberof dss.DiscountUpdateRes
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {dss.DiscountUpdateRes} DiscountUpdateRes
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        DiscountUpdateRes.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.dss.DiscountUpdateRes();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a DiscountUpdateRes message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof dss.DiscountUpdateRes
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {dss.DiscountUpdateRes} DiscountUpdateRes
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        DiscountUpdateRes.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a DiscountUpdateRes message.
+         * @function verify
+         * @memberof dss.DiscountUpdateRes
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        DiscountUpdateRes.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            return null;
+        };
+
+        /**
+         * Creates a DiscountUpdateRes message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof dss.DiscountUpdateRes
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {dss.DiscountUpdateRes} DiscountUpdateRes
+         */
+        DiscountUpdateRes.fromObject = function fromObject(object) {
+            if (object instanceof $root.dss.DiscountUpdateRes)
+                return object;
+            return new $root.dss.DiscountUpdateRes();
+        };
+
+        /**
+         * Creates a plain object from a DiscountUpdateRes message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof dss.DiscountUpdateRes
+         * @static
+         * @param {dss.DiscountUpdateRes} message DiscountUpdateRes
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        DiscountUpdateRes.toObject = function toObject() {
+            return {};
+        };
+
+        /**
+         * Converts this DiscountUpdateRes to JSON.
+         * @function toJSON
+         * @memberof dss.DiscountUpdateRes
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        DiscountUpdateRes.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return DiscountUpdateRes;
     })();
 
     return dss;

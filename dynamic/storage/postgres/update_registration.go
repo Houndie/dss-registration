@@ -1,12 +1,63 @@
 package postgres
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"text/template"
 
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/gofrs/uuid"
 )
+
+var updateRegistrationStmt string
+
+func init() {
+	tmplStmt := `UPDATE {{.Table}}
+		SET 
+			{{.FirstNameCol}} = $1,
+			{{.LastNameCol}} = $2,
+			{{.StreetAddressCol}} = $3,
+			{{.CityCol}} = $4,
+			{{.StateCol}} = $5,
+			{{.ZipCodeCol}} = $6,
+			{{.EmailCol}} = $7,
+			{{.HomeSceneCol}} = $8,
+			{{.IsStudentCol}} = $9,
+			{{.PassTypeCol}} = $10,
+			{{.FullWeekendLevelCol}} = $11,
+			{{.FullWeekendTierCol}} = $12,
+			{{.MixAndMatchCol}} = $13,
+			{{.MixAndMatchRoleCol}} = $14,
+			{{.SoloJazzCol}} = $15,
+			{{.TeamCompetitionCol}} = $16,
+			{{.TeamCompetitionNameCol}} = $17,
+			{{.TShirtCol}} = $18,
+			{{.TShirtStyleCol}} = $19,
+			{{.HousingCol}} = $20,
+			{{.ProvideHousingPetsCol}} = $21,
+			{{.ProvideHousingQuantityCol}} = $22,
+			{{.ProvideHousingDetailsCol}} = $23,
+			{{.RequireHousingPetAllergiesCol}} = $24,
+			{{.RequireHousingDetailsCol}} = $25,
+			{{.UserIDCol}} = $26,
+			{{.OrderIDsCol}} = $27,
+			{{.DiscountCodesCol}} = $28
+		WHERE {{.IDCol}} = $29;`
+
+	tmpl, err := template.New("tmpl").Parse(tmplStmt)
+	if err != nil {
+		panic(fmt.Sprintf("error parsing add admin template: %v", err))
+	}
+
+	stmt := &bytes.Buffer{}
+	err = tmpl.Execute(stmt, registrationConsts)
+	if err != nil {
+		panic(fmt.Sprintf("error executing add admin template: %v", err))
+	}
+
+	updateRegistrationStmt = stmt.String()
+}
 
 func (s *Store) UpdateRegistration(ctx context.Context, registration *storage.Registration) error {
 	id, err := uuid.FromString(registration.ID)
@@ -62,37 +113,7 @@ func (s *Store) UpdateRegistration(ctx context.Context, registration *storage.Re
 		discountCodes = registration.DiscountCodes
 	}
 
-	ct, err := s.pool.Exec(ctx, fmt.Sprintf("UPDATE %s SET %s = $1, %s = $2, %s = $3, %s = $4, %s = $5, %s = $6, %s = $7, %s = $8, %s = $9, %s = $10, %s = $11, %s = $12, %s = $13, %s = $14, %s = $15, %s = $16, %s = $17, %s = $18, %s = $19, %s = $20, %s = $21, %s = $22, %s = $23, %s = $24, %s = $25, %s = $26, %s = $27, %s = $28 WHERE %s = $29",
-		registrationTable,
-		registrationFirstNameCol,
-		registrationLastNameCol,
-		registrationStreetAddressCol,
-		registrationCityCol,
-		registrationStateCol,
-		registrationZipCodeCol,
-		registrationEmailCol,
-		registrationHomeSceneCol,
-		registrationIsStudentCol,
-		registrationPassTypeCol,
-		registrationFullWeekendLevelCol,
-		registrationFullWeekendTierCol,
-		registrationMixAndMatchCol,
-		registrationMixAndMatchRoleCol,
-		registrationSoloJazzCol,
-		registrationTeamCompetitionCol,
-		registrationTeamCompetitionNameCol,
-		registrationTShirtCol,
-		registrationTShirtStyleCol,
-		registrationHousingCol,
-		registrationProvideHousingPetsCol,
-		registrationProvideHousingQuantityCol,
-		registrationProvideHousingDetailsCol,
-		registrationRequireHousingPetAllergiesCol,
-		registrationRequireHousingDetailsCol,
-		registrationUserIDCol,
-		registrationOrderIDsCol,
-		registrationDiscountCodesCol,
-		registrationIDCol),
+	ct, err := s.pool.Exec(ctx, updateRegistrationStmt,
 		registration.FirstName,
 		registration.LastName,
 		registration.StreetAddress,

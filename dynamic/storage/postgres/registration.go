@@ -49,6 +49,76 @@ const (
 	noHousingEnum      = "No Housing"
 )
 
+type registrationConstsType struct {
+	Table                         string
+	CreatedAtCol                  string
+	EnabledCol                    string
+	FirstNameCol                  string
+	LastNameCol                   string
+	StreetAddressCol              string
+	CityCol                       string
+	StateCol                      string
+	ZipCodeCol                    string
+	EmailCol                      string
+	HomeSceneCol                  string
+	IsStudentCol                  string
+	PassTypeCol                   string
+	FullWeekendLevelCol           string
+	FullWeekendTierCol            string
+	MixAndMatchCol                string
+	MixAndMatchRoleCol            string
+	SoloJazzCol                   string
+	TeamCompetitionCol            string
+	TeamCompetitionNameCol        string
+	TShirtCol                     string
+	TShirtStyleCol                string
+	HousingCol                    string
+	ProvideHousingPetsCol         string
+	ProvideHousingQuantityCol     string
+	ProvideHousingDetailsCol      string
+	RequireHousingPetAllergiesCol string
+	RequireHousingDetailsCol      string
+	UserIDCol                     string
+	OrderIDsCol                   string
+	DiscountCodesCol              string
+	IDCol                         string
+}
+
+var registrationConsts = &registrationConstsType{
+	Table:                         "registrations",
+	CreatedAtCol:                  "created_at",
+	EnabledCol:                    "enabled",
+	FirstNameCol:                  "first_name",
+	LastNameCol:                   "last_name",
+	StreetAddressCol:              "street_address",
+	CityCol:                       "city",
+	StateCol:                      "state",
+	ZipCodeCol:                    "zip_code",
+	EmailCol:                      "email",
+	HomeSceneCol:                  "home_scene",
+	IsStudentCol:                  "is_student",
+	PassTypeCol:                   "pass_type",
+	FullWeekendLevelCol:           "full_weekend_level",
+	FullWeekendTierCol:            "full_weekend_tier",
+	MixAndMatchCol:                "mix_and_match",
+	MixAndMatchRoleCol:            "mix_and_match_role",
+	SoloJazzCol:                   "solo_jazz",
+	TeamCompetitionCol:            "team_competition",
+	TeamCompetitionNameCol:        "team_competition_name",
+	TShirtCol:                     "tshirt",
+	TShirtStyleCol:                "tshirt_style",
+	HousingCol:                    "housing",
+	ProvideHousingPetsCol:         "provide_housing_pets",
+	ProvideHousingQuantityCol:     "provide_housing_quantity",
+	ProvideHousingDetailsCol:      "provide_housing_details",
+	RequireHousingPetAllergiesCol: "require_housing_pet_allergies",
+	RequireHousingDetailsCol:      "require_housing_details",
+	UserIDCol:                     "user_id",
+	OrderIDsCol:                   "order_ids",
+	DiscountCodesCol:              "discount_codes",
+	IDCol:                         "id",
+}
+
 var (
 	levelToEnum = map[storage.WeekendPassLevel]string{
 		storage.Level1: "Level 1",
