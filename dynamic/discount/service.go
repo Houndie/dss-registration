@@ -64,8 +64,6 @@ func (DollarDiscount) isDiscountAmount()  {}
 func (PercentDiscount) isDiscountAmount() {}
 func (SquareNotFound) isDiscountAmount()  {}
 
-var ErrUnauthorized = errors.New("User is not authorized for this operation")
-
 func amountFromSquare(name string, squareData *common.SquareData) (DiscountAmount, error) {
 	squareDiscount, ok := squareData.Discounts[name]
 	if !ok {
@@ -100,5 +98,18 @@ func fromStore(b *storage.Discount, squareData *common.SquareData) (*Bundle, err
 		Code:      b.Code,
 		Discounts: singleDiscounts,
 	}, nil
+}
 
+func toStore(b *Bundle) *storage.Discount {
+	singleDiscounts := make([]*storage.SingleDiscount, len(b.Discounts))
+	for i, sd := range b.Discounts {
+		singleDiscounts[i] = &storage.SingleDiscount{
+			Name:      sd.Name,
+			AppliedTo: sd.AppliedTo,
+		}
+	}
+	return &storage.Discount{
+		Code:      b.Code,
+		Discounts: singleDiscounts,
+	}
 }

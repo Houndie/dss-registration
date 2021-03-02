@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
+	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
@@ -222,7 +223,7 @@ func TestListUnauthorized(t *testing.T) {
 	if err == nil {
 		t.Fatalf("expected error from list, found none")
 	}
-	if !errors.Is(err, ErrUnauthorized) {
+	if !errors.Is(err, common.ErrUnauthorized) {
 		t.Fatalf("expected unauthorized error, found: %v", err)
 	}
 }

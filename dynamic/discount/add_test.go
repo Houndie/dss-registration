@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
@@ -119,7 +120,7 @@ func TestAddDiscountNotAuthorized(t *testing.T) {
 	if err == nil {
 		t.Fatalf("unexpected error, found none")
 	}
-	if !errors.Is(err, ErrUnauthorized) {
+	if !errors.Is(err, common.ErrUnauthorized) {
 		t.Fatalf("expected unauthorzed error, found: %v", err)
 	}
 }

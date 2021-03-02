@@ -4,38 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Houndie/dss-registration/dynamic/storage"
+	"github.com/Houndie/dss-registration/dynamic/common"
 )
 
 func (s *Service) Add(ctx context.Context, token string, discount *Bundle) error {
 	s.logger.Trace("add discount service")
-	s.logger.Tracef("fetching user-info for token %s", token)
-	userinfo, err := s.authorizer.Userinfo(ctx, token)
-	if err != nil {
-		return fmt.Errorf("could not authorize user: %w", err)
+	if err := common.IsAdmin(ctx, s.store, s.authorizer, s.logger, token); err != nil {
+		return fmt.Errorf("error checking for admin: %w", err)
 	}
-	s.logger.Tracef("found user %s", userinfo.UserID)
-	isAdmin, err := s.store.IsAdmin(ctx, userinfo.UserID)
-	if err != nil {
-		return fmt.Errorf("could not fetch admin status from store: %w", err)
-	}
-
-	if !isAdmin {
-		return ErrUnauthorized
-	}
-
-	singleDiscounts := make([]*storage.SingleDiscount, len(discount.Discounts))
-	for i, sd := range discount.Discounts {
-		singleDiscounts[i] = &storage.SingleDiscount{
-			Name:      sd.Name,
-			AppliedTo: sd.AppliedTo,
-		}
-	}
-	err = s.store.AddDiscount(ctx, &storage.Discount{
-		Code:      discount.Code,
-		Discounts: singleDiscounts,
-	})
-	if err != nil {
+	if err := s.store.AddDiscount(ctx, toStore(discount)); err != nil {
 		return fmt.Errorf("could not add discount to store: %w", err)
 	}
 

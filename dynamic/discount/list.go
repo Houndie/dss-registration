@@ -7,28 +7,22 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/common"
 )
 
-func (s *Service) List(ctx context.Context, accessToken string) ([]*Bundle, error) {
-	userinfo, err := s.authorizer.Userinfo(ctx, accessToken)
-	if err != nil {
-		return nil, fmt.Errorf("error authenticating user: %w", err)
+func (s *Service) List(ctx context.Context, token string) ([]*Bundle, error) {
+	s.logger.Trace("list discount service")
+	if err := common.IsAdmin(ctx, s.store, s.authorizer, s.logger, token); err != nil {
+		return nil, fmt.Errorf("error checking for admin: %w", err)
 	}
 
-	isAdmin, err := s.store.IsAdmin(ctx, userinfo.UserID)
-	if err != nil {
-		return nil, fmt.Errorf("error authorizing user: %w", err)
-	}
-
-	if !isAdmin {
-		return nil, ErrUnauthorized
-	}
-
+	s.logger.Trace("fetching all discounts from store")
 	bundles, err := s.store.ListDiscounts(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error listing discounts from store: %w", err)
 	}
+	s.logger.Tracef("found %d discounts", len(bundles))
 
 	// Early return to avoid square call
 	if len(bundles) == 0 {
+		s.logger.Trace("fetching all discounts from store")
 		return []*Bundle{}, nil
 	}
 

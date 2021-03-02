@@ -6,7 +6,7 @@ import (
 
 	"github.com/Houndie/dss-registration/dynamic/api"
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
-	"github.com/Houndie/dss-registration/dynamic/discount"
+	"github.com/Houndie/dss-registration/dynamic/common"
 	pb "github.com/Houndie/dss-registration/dynamic/rpc/dss"
 	"github.com/twitchtv/twirp"
 )
@@ -18,7 +18,7 @@ func (s *Server) List(ctx context.Context, req *pb.DiscountListReq) (*pb.Discoun
 	}
 	bundles, err := s.service.List(ctx, auth)
 	if err != nil {
-		if errors.Is(err, discount.ErrUnauthorized) {
+		if errors.Is(err, common.ErrUnauthorized) {
 			return nil, twirp.NewError(twirp.PermissionDenied, err.Error())
 		} else if errors.Is(err, authorizer.Unauthenticated) {
 			return nil, twirp.NewError(twirp.Unauthenticated, authorizer.Unauthenticated.Error())

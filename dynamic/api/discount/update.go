@@ -5,7 +5,8 @@ import (
 	"errors"
 
 	"github.com/Houndie/dss-registration/dynamic/api"
-	"github.com/Houndie/dss-registration/dynamic/discount"
+	"github.com/Houndie/dss-registration/dynamic/authorizer"
+	"github.com/Houndie/dss-registration/dynamic/common"
 	pb "github.com/Houndie/dss-registration/dynamic/rpc/dss"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/twitchtv/twirp"
@@ -42,8 +43,10 @@ func (s *Server) Update(ctx context.Context, req *pb.DiscountUpdateReq) (*pb.Dis
 	}
 	err = s.service.Update(ctx, auth, req.OldCode, d)
 	if err != nil {
-		if errors.Is(err, discount.ErrUnauthorized) {
+		if errors.Is(err, common.ErrUnauthorized) {
 			return nil, twirp.NewError(twirp.PermissionDenied, err.Error())
+		} else if errors.Is(err, authorizer.Unauthenticated) {
+			return nil, twirp.NewError(twirp.Unauthenticated, authorizer.Unauthenticated.Error())
 		}
 		e := storage.ErrDiscountNotFound{}
 		if errors.As(err, &e) {
