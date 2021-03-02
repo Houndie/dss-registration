@@ -182,6 +182,39 @@ $root.dss = (function() {
          * @variation 2
          */
 
+        /**
+         * Callback as used by {@link dss.Discount#delete_}.
+         * @memberof dss.Discount
+         * @typedef DeleteCallback
+         * @type {function}
+         * @param {Error|null} error Error, if any
+         * @param {dss.DiscountDeleteRes} [response] DiscountDeleteRes
+         */
+
+        /**
+         * Calls Delete.
+         * @function delete
+         * @memberof dss.Discount
+         * @instance
+         * @param {dss.IDiscountDeleteReq} request DiscountDeleteReq message or plain object
+         * @param {dss.Discount.DeleteCallback} callback Node-style callback called with the error, if any, and DiscountDeleteRes
+         * @returns {undefined}
+         * @variation 1
+         */
+        Object.defineProperty(Discount.prototype["delete"] = function delete_(request, callback) {
+            return this.rpcCall(delete_, $root.dss.DiscountDeleteReq, $root.dss.DiscountDeleteRes, request, callback);
+        }, "name", { value: "Delete" });
+
+        /**
+         * Calls Delete.
+         * @function delete
+         * @memberof dss.Discount
+         * @instance
+         * @param {dss.IDiscountDeleteReq} request DiscountDeleteReq message or plain object
+         * @returns {Promise<dss.DiscountDeleteRes>} Promise
+         * @variation 2
+         */
+
         return Discount;
     })();
 
@@ -2457,6 +2490,353 @@ $root.dss = (function() {
         };
 
         return DiscountUpdateRes;
+    })();
+
+    dss.DiscountDeleteReq = (function() {
+
+        /**
+         * Properties of a DiscountDeleteReq.
+         * @memberof dss
+         * @interface IDiscountDeleteReq
+         * @property {string|null} [code] DiscountDeleteReq code
+         */
+
+        /**
+         * Constructs a new DiscountDeleteReq.
+         * @memberof dss
+         * @classdesc Represents a DiscountDeleteReq.
+         * @implements IDiscountDeleteReq
+         * @constructor
+         * @param {dss.IDiscountDeleteReq=} [properties] Properties to set
+         */
+        function DiscountDeleteReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * DiscountDeleteReq code.
+         * @member {string} code
+         * @memberof dss.DiscountDeleteReq
+         * @instance
+         */
+        DiscountDeleteReq.prototype.code = "";
+
+        /**
+         * Creates a new DiscountDeleteReq instance using the specified properties.
+         * @function create
+         * @memberof dss.DiscountDeleteReq
+         * @static
+         * @param {dss.IDiscountDeleteReq=} [properties] Properties to set
+         * @returns {dss.DiscountDeleteReq} DiscountDeleteReq instance
+         */
+        DiscountDeleteReq.create = function create(properties) {
+            return new DiscountDeleteReq(properties);
+        };
+
+        /**
+         * Encodes the specified DiscountDeleteReq message. Does not implicitly {@link dss.DiscountDeleteReq.verify|verify} messages.
+         * @function encode
+         * @memberof dss.DiscountDeleteReq
+         * @static
+         * @param {dss.IDiscountDeleteReq} message DiscountDeleteReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        DiscountDeleteReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.code);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified DiscountDeleteReq message, length delimited. Does not implicitly {@link dss.DiscountDeleteReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof dss.DiscountDeleteReq
+         * @static
+         * @param {dss.IDiscountDeleteReq} message DiscountDeleteReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        DiscountDeleteReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a DiscountDeleteReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof dss.DiscountDeleteReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {dss.DiscountDeleteReq} DiscountDeleteReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        DiscountDeleteReq.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.dss.DiscountDeleteReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.code = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a DiscountDeleteReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof dss.DiscountDeleteReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {dss.DiscountDeleteReq} DiscountDeleteReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        DiscountDeleteReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a DiscountDeleteReq message.
+         * @function verify
+         * @memberof dss.DiscountDeleteReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        DiscountDeleteReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.code != null && message.hasOwnProperty("code"))
+                if (!$util.isString(message.code))
+                    return "code: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a DiscountDeleteReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof dss.DiscountDeleteReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {dss.DiscountDeleteReq} DiscountDeleteReq
+         */
+        DiscountDeleteReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.dss.DiscountDeleteReq)
+                return object;
+            var message = new $root.dss.DiscountDeleteReq();
+            if (object.code != null)
+                message.code = String(object.code);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a DiscountDeleteReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof dss.DiscountDeleteReq
+         * @static
+         * @param {dss.DiscountDeleteReq} message DiscountDeleteReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        DiscountDeleteReq.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                object.code = "";
+            if (message.code != null && message.hasOwnProperty("code"))
+                object.code = message.code;
+            return object;
+        };
+
+        /**
+         * Converts this DiscountDeleteReq to JSON.
+         * @function toJSON
+         * @memberof dss.DiscountDeleteReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        DiscountDeleteReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return DiscountDeleteReq;
+    })();
+
+    dss.DiscountDeleteRes = (function() {
+
+        /**
+         * Properties of a DiscountDeleteRes.
+         * @memberof dss
+         * @interface IDiscountDeleteRes
+         */
+
+        /**
+         * Constructs a new DiscountDeleteRes.
+         * @memberof dss
+         * @classdesc Represents a DiscountDeleteRes.
+         * @implements IDiscountDeleteRes
+         * @constructor
+         * @param {dss.IDiscountDeleteRes=} [properties] Properties to set
+         */
+        function DiscountDeleteRes(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Creates a new DiscountDeleteRes instance using the specified properties.
+         * @function create
+         * @memberof dss.DiscountDeleteRes
+         * @static
+         * @param {dss.IDiscountDeleteRes=} [properties] Properties to set
+         * @returns {dss.DiscountDeleteRes} DiscountDeleteRes instance
+         */
+        DiscountDeleteRes.create = function create(properties) {
+            return new DiscountDeleteRes(properties);
+        };
+
+        /**
+         * Encodes the specified DiscountDeleteRes message. Does not implicitly {@link dss.DiscountDeleteRes.verify|verify} messages.
+         * @function encode
+         * @memberof dss.DiscountDeleteRes
+         * @static
+         * @param {dss.IDiscountDeleteRes} message DiscountDeleteRes message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        DiscountDeleteRes.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified DiscountDeleteRes message, length delimited. Does not implicitly {@link dss.DiscountDeleteRes.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof dss.DiscountDeleteRes
+         * @static
+         * @param {dss.IDiscountDeleteRes} message DiscountDeleteRes message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        DiscountDeleteRes.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a DiscountDeleteRes message from the specified reader or buffer.
+         * @function decode
+         * @memberof dss.DiscountDeleteRes
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {dss.DiscountDeleteRes} DiscountDeleteRes
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        DiscountDeleteRes.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.dss.DiscountDeleteRes();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a DiscountDeleteRes message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof dss.DiscountDeleteRes
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {dss.DiscountDeleteRes} DiscountDeleteRes
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        DiscountDeleteRes.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a DiscountDeleteRes message.
+         * @function verify
+         * @memberof dss.DiscountDeleteRes
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        DiscountDeleteRes.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            return null;
+        };
+
+        /**
+         * Creates a DiscountDeleteRes message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof dss.DiscountDeleteRes
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {dss.DiscountDeleteRes} DiscountDeleteRes
+         */
+        DiscountDeleteRes.fromObject = function fromObject(object) {
+            if (object instanceof $root.dss.DiscountDeleteRes)
+                return object;
+            return new $root.dss.DiscountDeleteRes();
+        };
+
+        /**
+         * Creates a plain object from a DiscountDeleteRes message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof dss.DiscountDeleteRes
+         * @static
+         * @param {dss.DiscountDeleteRes} message DiscountDeleteRes
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        DiscountDeleteRes.toObject = function toObject() {
+            return {};
+        };
+
+        /**
+         * Converts this DiscountDeleteRes to JSON.
+         * @function toJSON
+         * @memberof dss.DiscountDeleteRes
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        DiscountDeleteRes.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return DiscountDeleteRes;
     })();
 
     return dss;

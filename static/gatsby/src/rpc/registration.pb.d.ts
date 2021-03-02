@@ -559,6 +559,8 @@ export namespace dss {
         public list(request: dss.IDiscountListReq): Promise<dss.DiscountListRes>;
         public update(request: dss.IDiscountUpdateReq, callback: dss.Discount.UpdateCallback): void;
         public update(request: dss.IDiscountUpdateReq): Promise<dss.DiscountUpdateRes>;
+        public delete(request: dss.IDiscountDeleteReq, callback: dss.Discount.DeleteCallback): void;
+        public delete(request: dss.IDiscountDeleteReq): Promise<dss.DiscountDeleteRes>;
     }
 
     namespace Discount {
@@ -570,6 +572,8 @@ export namespace dss {
         type ListCallback = (error: (Error|null), response?: dss.DiscountListRes) => void;
 
         type UpdateCallback = (error: (Error|null), response?: dss.DiscountUpdateRes) => void;
+
+        type DeleteCallback = (error: (Error|null), response?: dss.DiscountDeleteRes) => void;
     }
 
     enum PurchaseItem {
@@ -783,6 +787,40 @@ export namespace dss {
         public static verify(message: { [k: string]: any }): (string|null);
         public static fromObject(object: { [k: string]: any }): dss.DiscountUpdateRes;
         public static toObject(message: dss.DiscountUpdateRes, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+    }
+
+    interface IDiscountDeleteReq {
+        code?: (string|null);
+    }
+
+    class DiscountDeleteReq implements IDiscountDeleteReq {
+        constructor(properties?: dss.IDiscountDeleteReq);
+        public code: string;
+        public static create(properties?: dss.IDiscountDeleteReq): dss.DiscountDeleteReq;
+        public static encode(message: dss.IDiscountDeleteReq, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: dss.IDiscountDeleteReq, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): dss.DiscountDeleteReq;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): dss.DiscountDeleteReq;
+        public static verify(message: { [k: string]: any }): (string|null);
+        public static fromObject(object: { [k: string]: any }): dss.DiscountDeleteReq;
+        public static toObject(message: dss.DiscountDeleteReq, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+    }
+
+    interface IDiscountDeleteRes {
+    }
+
+    class DiscountDeleteRes implements IDiscountDeleteRes {
+        constructor(properties?: dss.IDiscountDeleteRes);
+        public static create(properties?: dss.IDiscountDeleteRes): dss.DiscountDeleteRes;
+        public static encode(message: dss.IDiscountDeleteRes, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: dss.IDiscountDeleteRes, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): dss.DiscountDeleteRes;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): dss.DiscountDeleteRes;
+        public static verify(message: { [k: string]: any }): (string|null);
+        public static fromObject(object: { [k: string]: any }): dss.DiscountDeleteRes;
+        public static toObject(message: dss.DiscountDeleteRes, options?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
     }
 }

@@ -16,6 +16,7 @@ type Store interface {
 	IsAdmin(context.Context, string) (bool, error)
 	ListDiscounts(context.Context) ([]*storage.Discount, error)
 	UpdateDiscount(ctx context.Context, oldCode string, newDiscount *storage.Discount) error
+	DeleteDiscount(ctx context.Context, code string) error
 }
 
 type Authorizer interface {

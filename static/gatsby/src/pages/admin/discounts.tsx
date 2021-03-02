@@ -5,6 +5,7 @@ import Row from 'react-bootstrap/Row'
 import Card from 'react-bootstrap/Card'
 import Accordion from 'react-bootstrap/Accordion'
 import ListGroup from 'react-bootstrap/ListGroup'
+import Modal from 'react-bootstrap/Modal'
 import parseDollar from '../../components/parseDollar'
 import {Formik} from 'formik'
 import Form from 'react-bootstrap/Form'
@@ -17,9 +18,10 @@ type ListItem = {
 } & dss.IDiscountBundle
 
 export default () => (
-	<AdminPage title="Add Discount">
+	<AdminPage title="List Discounts">
 		{(clients) => {
 			const [bundles, setBundles] = useState<ListItem[]>([])
+			const [deleting, setDeleting] = useState<boolean>(false)
 			useEffect(() => {
 				clients.discount.list({}).then(res => {
 					setBundles(res.bundles.map(bundle => { return {...bundle, isForm: false}}))
@@ -127,7 +129,27 @@ export default () => (
 														isForm: true
 													}, ...bundles.slice(idx+1)])
 												}}>Edit</Button>
+											</Col><Col>
+												<Button variant="danger" onClick={() => setDeleting(true)}>Delete</Button>
 											</Col></Row>
+											<Modal show={deleting} size="lg" onHide={() => setDeleting(false)} centered>
+												<Modal.Body>
+													<p>Are you sure you want to delete this?</p>
+												</Modal.Body>
+												<Modal.Footer>
+													<Button variant="secondary" onClick={() => setDeleting(false)}>Cancel</Button>
+													<Button variant="danger" onClick={() => {
+														clients.discount.delete({
+															code: bundle.code
+														}).then(res => {
+															setBundles([...bundles.slice(0, idx), ...bundles.slice(idx+1)])
+															setDeleting(false)
+														}).catch(e => {
+															console.error(e)
+														})
+													}}>Delete</Button>
+												</Modal.Footer>
+											</Modal>
 										</>
 									)}
 								</Card.Body></Accordion.Collapse>

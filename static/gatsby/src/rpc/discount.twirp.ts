@@ -16,6 +16,9 @@ const getServiceMethodName = (fn: any): string => {
 	if (fn === dss.Discount.prototype.update) {
 		return 'Update';
     }
+	if (fn === dss.Discount.prototype.delete) {
+		return 'Delete';
+    }
 
     throw new Error('Unknown Method');
 };
