@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import AdminPage from '../../components/AdminPage'
 import {dss} from "../../rpc/discount.pb"
 import Row from 'react-bootstrap/Row'
+import Container from 'react-bootstrap/Container'
 import Card from 'react-bootstrap/Card'
 import Accordion from 'react-bootstrap/Accordion'
 import ListGroup from 'react-bootstrap/ListGroup'
@@ -12,76 +13,88 @@ import Form from 'react-bootstrap/Form'
 import DiscountForm from '../../components/DiscountForm'
 import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
+import WithAlert, {ResponseKind, FormResponse} from '../../components/WithAlert'
 
 type ListItem = {
 	isForm: boolean
 } & dss.IDiscountBundle
 
 export default () => (
-	<AdminPage title="List Discounts">
-		{(clients) => {
+	<AdminPage title="List Discounts">{(clients) => (
+		<WithAlert>{(setResponse) => {
 			const [bundles, setBundles] = useState<ListItem[]>([])
 			const [deleting, setDeleting] = useState<boolean>(false)
 			useEffect(() => {
 				clients.discount.list({}).then(res => {
 					setBundles(res.bundles.map(bundle => { return {...bundle, isForm: false}}))
 				}).catch( err => {
-					console.error(err)
+					setResponse({
+						kind: ResponseKind.Bad,
+						message: "Error fetching discounts: "+err
+					})
 				})
 			}, [clients.discount])
 			return (
-				<Row>
-					<Accordion style={{width: "100%"}}>
-						{bundles && bundles.map((bundle, idx) => (
-							<Card key={idx} bg={((bundle.discounts && bundle.discounts.find((discount) => {
-								return !discount.amount || discount.amount.squareNotFound
-							})) ? 'warning' : 'light')} >
-								<Accordion.Toggle as={Card.Header} eventKey={idx.toString()}>Code: {bundle.code}</Accordion.Toggle>
-								<Accordion.Collapse eventKey={idx.toString()}><Card.Body>
-									{ bundle.isForm ? (
-										<Formik
-											initialValues={{
-												code: (bundle.code ? bundle.code : ''),
-												discounts: (bundle.discounts ? bundle.discounts.map(({amount, ...tail}) => tail) : [])
-											}}
-											onSubmit={(values, {setSubmitting}) => {
-												return clients.discount.update({
-													oldCode: bundle.code,
-													bundle: values
-												}).then(res => {
-													return clients.discount.get({
-														code: values.code
-													})
-												}).then(res => {
-													setBundles([...bundles.slice(0, idx), {
-														...res.bundle,
-														isForm: false
-													}, ...bundles.slice(idx+1)])
-												}).catch(err => {
-													console.error(err)
-													setSubmitting(false)
+				<Accordion style={{width: "100%"}}>
+					{bundles && bundles.map((bundle, idx) => (
+						<Card key={idx} bg={((bundle.discounts && bundle.discounts.find((discount) => {
+							return !discount.amount || discount.amount.squareNotFound
+						})) ? 'warning' : 'light')} >
+							<Accordion.Toggle as={Card.Header} eventKey={idx.toString()}>Code: {bundle.code}</Accordion.Toggle>
+							<Accordion.Collapse eventKey={idx.toString()}><Card.Body>
+								{ bundle.isForm ? (
+									<Formik
+										initialValues={{
+											code: (bundle.code ? bundle.code : ''),
+											discounts: (bundle.discounts ? bundle.discounts.map(({amount, ...tail}) => tail) : [])
+										}}
+										onSubmit={(values, {setSubmitting}) => {
+											return clients.discount.update({
+												oldCode: bundle.code,
+												bundle: values
+											}).then(res => {
+												setResponse({
+													kind: ResponseKind.Good,
+													message: "Discount successfully updated"
 												})
-											}}
-										>
-											{({values, isSubmitting, handleSubmit, setFieldValue}) => 
-												<Form onSubmit={handleSubmit}>
-													<DiscountForm values={values} setFieldValue={setFieldValue} />
-													<Form.Row><Col>
-														<Button type="submit" disabled={isSubmitting}>Update Discount</Button>
-													</Col><Col>
-														<Button onClick={ () => {
-															setBundles([...bundles.slice(0, idx), {
-																...bundle,
-																isForm: false
-															}, ...bundles.slice(idx+1)])
-														}}>Cancel</Button>
-													</Col></Form.Row>
-												</Form>
-											}
-										</Formik>
-									):(
-										<>
-											<ListGroup>
+												return clients.discount.get({
+													code: values.code
+												})
+											}).then(res => {
+												setBundles([...bundles.slice(0, idx), {
+													...res.bundle,
+													isForm: false
+												}, ...bundles.slice(idx+1)])
+											}).catch(err => {
+												setResponse({
+													kind: ResponseKind.Bad,
+													message: "Error updating/refetching discount: "+err
+												})
+											}).finally(() => {
+												setSubmitting(false)
+											})
+										}}
+									>
+										{({values, isSubmitting, handleSubmit, setFieldValue}) => 
+											<Form onSubmit={handleSubmit}>
+												<DiscountForm values={values} setFieldValue={setFieldValue} />
+												<Form.Row className="mt-3"><Col>
+													<Button type="submit" disabled={isSubmitting}>Update Discount</Button>
+												</Col><Col>
+													<Button onClick={ () => {
+														setBundles([...bundles.slice(0, idx), {
+															...bundle,
+															isForm: false
+														}, ...bundles.slice(idx+1)])
+													}}>Cancel</Button>
+												</Col></Form.Row>
+											</Form>
+										}
+									</Formik>
+								):(
+									<>
+										<Row className="mb-3"><Col>
+											<ListGroup style={{width: "100%"}}>
 												{bundle.discounts && bundle.discounts.map((discount, discountIdx) => (
 													<ListGroup.Item key={discountIdx}>
 														Name: {discount.name}<br/>
@@ -105,7 +118,10 @@ export default () => (
 														})()}<br/>
 														Amount: {(() => {
 															if(!discount.amount) {
-																console.error("no amount found")
+																setResponse({
+																	kind: ResponseKind.Bad,
+																	message: "No discount amount found"
+																})
 																return ""
 															}
 															if(discount.amount.dollar) {
@@ -115,49 +131,68 @@ export default () => (
 															} else if (discount.amount.squareNotFound) {
 																return "discount not found in square"
 															} else {
-																console.error("unknown amount found")
+																setResponse({
+																	kind: ResponseKind.Bad,
+																	message: "Unknown discount amount found"
+																})
 																return ""
 															}
 														})()}
 													</ListGroup.Item>
 												))}
 											</ListGroup>
-											<Row><Col>
-												<Button onClick={() => {
-													setBundles([...bundles.slice(0, idx), {
-														...bundle,
-														isForm: true
-													}, ...bundles.slice(idx+1)])
-												}}>Edit</Button>
-											</Col><Col>
-												<Button variant="danger" onClick={() => setDeleting(true)}>Delete</Button>
-											</Col></Row>
-											<Modal show={deleting} size="lg" onHide={() => setDeleting(false)} centered>
-												<Modal.Body>
-													<p>Are you sure you want to delete this?</p>
-												</Modal.Body>
-												<Modal.Footer>
-													<Button variant="secondary" onClick={() => setDeleting(false)}>Cancel</Button>
-													<Button variant="danger" onClick={() => {
-														clients.discount.delete({
-															code: bundle.code
-														}).then(res => {
-															setBundles([...bundles.slice(0, idx), ...bundles.slice(idx+1)])
-															setDeleting(false)
-														}).catch(e => {
-															console.error(e)
+										</Col></Row><Row><Col>
+											<Button onClick={() => {
+												setBundles([...bundles.slice(0, idx), {
+													...bundle,
+													isForm: true
+												}, ...bundles.slice(idx+1)])
+											}}>Edit</Button>
+										</Col><Col>
+											<Button variant="danger" onClick={() => setDeleting(true)}>Delete</Button>
+										</Col></Row>
+										<Modal show={deleting} size="lg" onHide={() => setDeleting(false)} centered>
+											<Formik
+												initialValues={{}}
+												onSubmit={() => {
+													clients.discount.delete({
+														code: bundle.code
+													}).then(res => {
+														setBundles([...bundles.slice(0, idx), ...bundles.slice(idx+1)])
+														setResponse({
+															kind: ResponseKind.Good,
+															message: "Discount deleted successfully!"
 														})
-													}}>Delete</Button>
-												</Modal.Footer>
-											</Modal>
-										</>
-									)}
-								</Card.Body></Accordion.Collapse>
-							</Card>
-						))}
-					</Accordion>
-				</Row>
+													}).catch(err => {
+														setResponse({
+															kind: ResponseKind.Bad,
+															message: "Error deleting discount: "+err
+														})
+													}).finally(() => {
+														setDeleting(false)
+													})
+												}}
+											>
+												{({handleSubmit}) => (
+													<Form onSubmit={handleSubmit}>
+														<Modal.Body>
+															<p>Are you sure you want to delete this?</p>
+														</Modal.Body>
+														<Modal.Footer>
+															<Button variant="secondary" onClick={() => setDeleting(false)}>Cancel</Button>
+															<Button variant="danger" type="submit">Delete</Button>
+														</Modal.Footer>
+													</Form>
+												)}
+											</Formik>
+										</Modal>
+									</>
+								)}
+							</Card.Body></Accordion.Collapse>
+						</Card>
+					))}
+				</Accordion>
 			)
-		}}
-	</AdminPage>
+		}}</WithAlert>
+	)}</AdminPage>
 )
