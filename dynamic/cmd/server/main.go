@@ -55,6 +55,14 @@ func init() {
 	rootCmd.AddCommand(initCommand)
 }
 
+type corsLogger struct {
+	logger *logrus.Logger
+}
+
+func (l *corsLogger) Printf(arg0 string, arg1 ...interface{}) {
+	l.logger.Debugf(arg0, arg1...)
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "server",
 	Short: "DSS backend server",
@@ -143,7 +151,7 @@ var rootCmd = &cobra.Command{
 			AllowedMethods: []string{"POST"},
 			AllowedHeaders: []string{"Content-Type", "Twirp-Version", "Authorization"},
 		})
-		corsHandler.Log = logger
+		corsHandler.Log = &corsLogger{logger: logger}
 
 		err = http.ListenAndServe(":"+viper.GetString("port"),
 			api.WithLogRequest(logger,
