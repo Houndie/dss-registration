@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/storage"
@@ -26,7 +27,7 @@ func TestUpdateDiscount(t *testing.T) {
 	thisUserID := "123456"
 
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: commontest.UserinfoFromIDCheck(t, token, thisUserID),
+		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, token, []authorizer.Permission{authorizer.EditDiscountPermission}, thisUserID, []authorizer.Permission{authorizer.EditDiscountPermission}),
 	}
 
 	inDiscount := &Bundle{
@@ -69,12 +70,6 @@ func TestUpdateDiscount(t *testing.T) {
 			}
 			return nil
 		},
-		IsAdminFunc: func(ctx context.Context, userID string) (bool, error) {
-			if userID != thisUserID {
-				t.Fatalf("expected user id %s, got %s", thisUserID, userID)
-			}
-			return true, nil
-		},
 	}
 
 	service := NewService(store, &commontest.MockSquareClient{}, logger, authorizer)
@@ -97,7 +92,7 @@ func TestUpdateDiscountNotAuthorized(t *testing.T) {
 	thisUserID := "123456"
 
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: commontest.UserinfoFromID(thisUserID),
+		GetUserinfoFunc: commontest.UserinfoFromID(thisUserID, []authorizer.Permission{}),
 	}
 
 	inDiscount := &Bundle{
@@ -112,11 +107,7 @@ func TestUpdateDiscountNotAuthorized(t *testing.T) {
 
 	inCode := "some old code"
 
-	store := &commontest.MockStore{
-		IsAdminFunc: func(ctx context.Context, userID string) (bool, error) {
-			return false, nil
-		},
-	}
+	store := &commontest.MockStore{}
 
 	service := NewService(store, &commontest.MockSquareClient{}, logger, authorizer)
 	err = service.Update(context.Background(), token, inCode, inDiscount)

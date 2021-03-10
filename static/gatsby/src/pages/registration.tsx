@@ -116,7 +116,7 @@ const Registration = () => {
 
 	return (
 		<Page title="Registration">
-			{(gAuth) => 
+			{() => 
 				<Formik
 					initialValues={{
 						firstName: '', 

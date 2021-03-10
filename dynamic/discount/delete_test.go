@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
@@ -25,7 +26,7 @@ func TestDeleteDiscount(t *testing.T) {
 	thisUserID := "123456"
 
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: commontest.UserinfoFromIDCheck(t, token, thisUserID),
+		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, token, []authorizer.Permission{authorizer.DeleteDiscountPermission}, thisUserID, []authorizer.Permission{authorizer.DeleteDiscountPermission}),
 	}
 
 	inCode := "some code"
@@ -36,12 +37,6 @@ func TestDeleteDiscount(t *testing.T) {
 				t.Fatalf("expected code %s, found %s", inCode, code)
 			}
 			return nil
-		},
-		IsAdminFunc: func(ctx context.Context, userID string) (bool, error) {
-			if userID != thisUserID {
-				t.Fatalf("expected user id %s, got %s", thisUserID, userID)
-			}
-			return true, nil
 		},
 	}
 
@@ -65,16 +60,12 @@ func TestDeleteDiscountNotAuthorized(t *testing.T) {
 	thisUserID := "123456"
 
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: commontest.UserinfoFromID(thisUserID),
+		GetUserinfoFunc: commontest.UserinfoFromID(thisUserID, []authorizer.Permission{}),
 	}
 
 	inCode := "some code"
 
-	store := &commontest.MockStore{
-		IsAdminFunc: func(ctx context.Context, userID string) (bool, error) {
-			return false, nil
-		},
-	}
+	store := &commontest.MockStore{}
 
 	service := NewService(store, &commontest.MockSquareClient{}, logger, authorizer)
 	err = service.Delete(context.Background(), token, inCode)

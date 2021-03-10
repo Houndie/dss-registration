@@ -153,7 +153,7 @@ func TestAdd(t *testing.T) {
 	}
 
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedAccessToken, expectedUserID),
+		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedAccessToken, []authorizer.Permission{}, expectedUserID, []authorizer.Permission{}),
 	}
 
 	for _, test := range tests {
@@ -649,11 +649,7 @@ func TestAddCostNothing(t *testing.T) {
 	}
 
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
-			return &authorizer.Userinfo{
-				UserID: "1235",
-			}, nil
-		},
+		GetUserinfoFunc: commontest.UserinfoFromID("12345", []authorizer.Permission{}),
 	}
 
 	registration := &Info{

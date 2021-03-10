@@ -14,18 +14,22 @@ import DiscountForm from '../../components/DiscountForm'
 import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
 import WithAlert, {ResponseKind, FormResponse} from '../../components/WithAlert'
+import useTwirp from '../../components/useTwirp'
 
 type ListItem = {
 	isForm: boolean
 } & dss.IDiscountBundle
 
 export default () => (
-	<AdminPage title="List Discounts">{(clients) => (
+	<AdminPage title="List Discounts">{() => (
 		<WithAlert>{(setResponse) => {
 			const [bundles, setBundles] = useState<ListItem[]>([])
 			const [deleting, setDeleting] = useState<boolean>(false)
+			const {discount} = useTwirp()
 			useEffect(() => {
-				clients.discount.list({}).then(res => {
+				discount().then(client => {
+					return client.list({})
+				}).then(res => {
 					setBundles(res.bundles.map(bundle => { return {...bundle, isForm: false}}))
 				}).catch( err => {
 					setResponse({
@@ -33,7 +37,7 @@ export default () => (
 						message: "Error fetching discounts: "+err
 					})
 				})
-			}, [clients.discount])
+			}, [])
 			return (
 				<Accordion style={{width: "100%"}}>
 					{bundles && bundles.map((bundle, idx) => (
@@ -49,22 +53,24 @@ export default () => (
 											discounts: (bundle.discounts ? bundle.discounts.map(({amount, ...tail}) => tail) : [])
 										}}
 										onSubmit={(values, {setSubmitting}) => {
-											return clients.discount.update({
-												oldCode: bundle.code,
-												bundle: values
-											}).then(res => {
-												setResponse({
-													kind: ResponseKind.Good,
-													message: "Discount successfully updated"
+											return discount().then(client => {
+												return client.update({
+													oldCode: bundle.code,
+													bundle: values
+												}).then(res => {
+													setResponse({
+														kind: ResponseKind.Good,
+														message: "Discount successfully updated"
+													})
+													return client.get({
+														code: values.code
+													})
+												}).then(res => {
+													setBundles([...bundles.slice(0, idx), {
+														...res.bundle,
+														isForm: false
+													}, ...bundles.slice(idx+1)])
 												})
-												return clients.discount.get({
-													code: values.code
-												})
-											}).then(res => {
-												setBundles([...bundles.slice(0, idx), {
-													...res.bundle,
-													isForm: false
-												}, ...bundles.slice(idx+1)])
 											}).catch(err => {
 												setResponse({
 													kind: ResponseKind.Bad,
@@ -155,8 +161,10 @@ export default () => (
 											<Formik
 												initialValues={{}}
 												onSubmit={() => {
-													clients.discount.delete({
-														code: bundle.code
+													discount().then(client => {
+														return client.delete({
+															code: bundle.code
+														})
 													}).then(res => {
 														setBundles([...bundles.slice(0, idx), ...bundles.slice(idx+1)])
 														setResponse({

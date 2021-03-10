@@ -47,7 +47,7 @@ func NewService(active, useMailSandbox bool, logger *logrus.Logger, client commo
 }
 
 type Authorizer interface {
-	Userinfo(ctx context.Context, accessToken string) (*authorizer.Userinfo, error)
+	GetUserinfo(ctx context.Context, accessToken string) (authorizer.Userinfo, error)
 }
 
 type Summary struct {

@@ -11,7 +11,7 @@ import (
 	api_discount "github.com/Houndie/dss-registration/dynamic/api/discount"
 	api_forms "github.com/Houndie/dss-registration/dynamic/api/forms"
 	api_registration "github.com/Houndie/dss-registration/dynamic/api/registration"
-	"github.com/Houndie/dss-registration/dynamic/authorizer/google"
+	"github.com/Houndie/dss-registration/dynamic/authorizer/auth0"
 	"github.com/Houndie/dss-registration/dynamic/discount"
 	"github.com/Houndie/dss-registration/dynamic/forms"
 	"github.com/Houndie/dss-registration/dynamic/recaptcha"
@@ -76,7 +76,10 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("error creating square client: %w", err)
 		}
-		authorizer := google.NewAuthorizer(&http.Client{})
+		authorizer, err := auth0.NewAuthorizer(viper.GetString("auth0endpoint"), &http.Client{}, logger)
+		if err != nil {
+			return fmt.Errorf("error creating auth0 authorizer: %w", err)
+		}
 
 		pool, err := pgxpool.Connect(context.Background(), viper.GetString("postgresurl"))
 		if err != nil {

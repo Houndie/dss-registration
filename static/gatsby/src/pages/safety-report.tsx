@@ -13,7 +13,7 @@ import {Formik} from 'formik'
 import * as Yup from 'yup'
 import Recaptcha from 'react-recaptcha'
 import google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb.js'
-import {createForms} from "../rpc/forms.twirp"
+import useTwirp from "../components/useTwirp"
 import {ImportRecaptchaEffect} from "../components/recaptcha"
 
 const ValidateSchema = Yup.object().shape({
@@ -24,12 +24,12 @@ const ValidateSchema = Yup.object().shape({
 export default () => {
 	const [submitted, setSubmitted] = useState(false)
 	const [recaptchaLoaded, setRecaptchaLoaded] = useState(false)
-	const formsClient = createForms(`${process.env.GATSBY_BACKEND}`)
+	const {forms} = useTwirp()
 	useEffect(ImportRecaptchaEffect)
 	let recaptchaInstance: Recaptcha | null
 	return (
 		<Page title="Safety Report">
-			{(clients) => {
+			{() => {
 				if(submitted){
 					return <p>Thank you for submitting your report. We will take action as soon as we are able.</p>
 				}
@@ -59,18 +59,20 @@ export default () => {
 								recaptchaInstance.execute()
 								return
 							}
-							clients.forms.safetyReport({
-								occurredOn: {
-									seconds: new Date(values.occurredOnDate + ' ' + values.occurredOnTime).valueOf()/1000
-								},
-								description: values.description,
-								severity: values.severity,
-								issuesBefore: values.issuesBefore,
-								resolution: values.resolution,
-								name: values.name,
-								email: values.email,
-								phoneNumber: values.phoneNumber,
-								recaptchaResponse: values.recaptchaResponse
+							forms().then(client => {
+								return client.safetyReport({
+									occurredOn: {
+										seconds: new Date(values.occurredOnDate + ' ' + values.occurredOnTime).valueOf()/1000
+									},
+									description: values.description,
+									severity: values.severity,
+									issuesBefore: values.issuesBefore,
+									resolution: values.resolution,
+									name: values.name,
+									email: values.email,
+									phoneNumber: values.phoneNumber,
+									recaptchaResponse: values.recaptchaResponse
+								})
 							}).then(() => {
 								setSubmitted(true)
 							}, e => {

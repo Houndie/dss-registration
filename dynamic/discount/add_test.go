@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/storage"
@@ -26,7 +27,7 @@ func TestAddDiscount(t *testing.T) {
 	thisUserID := "123456"
 
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: commontest.UserinfoFromIDCheck(t, token, thisUserID),
+		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, token, []authorizer.Permission{authorizer.AddDiscountPermission}, thisUserID, []authorizer.Permission{authorizer.AddDiscountPermission}),
 	}
 
 	inDiscount := &Bundle{
@@ -64,12 +65,6 @@ func TestAddDiscount(t *testing.T) {
 			}
 			return nil
 		},
-		IsAdminFunc: func(ctx context.Context, userID string) (bool, error) {
-			if userID != thisUserID {
-				t.Fatalf("expected user id %s, got %s", thisUserID, userID)
-			}
-			return true, nil
-		},
 	}
 
 	service := NewService(store, &commontest.MockSquareClient{}, logger, authorizer)
@@ -92,7 +87,7 @@ func TestAddDiscountNotAuthorized(t *testing.T) {
 	thisUserID := "123456"
 
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: commontest.UserinfoFromID(thisUserID),
+		GetUserinfoFunc: commontest.UserinfoFromID(thisUserID, []authorizer.Permission{}),
 	}
 
 	inDiscount := &Bundle{
@@ -109,9 +104,6 @@ func TestAddDiscountNotAuthorized(t *testing.T) {
 		AddDiscountFunc: func(ctx context.Context, discount *storage.Discount) error {
 			t.Fatalf("Discount added when non admin user given")
 			return nil
-		},
-		IsAdminFunc: func(ctx context.Context, userID string) (bool, error) {
-			return false, nil
 		},
 	}
 

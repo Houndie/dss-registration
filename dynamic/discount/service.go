@@ -20,7 +20,7 @@ type Store interface {
 }
 
 type Authorizer interface {
-	Userinfo(ctx context.Context, accessToken string) (*authorizer.Userinfo, error)
+	GetUserinfo(ctx context.Context, accessToken string) (authorizer.Userinfo, error)
 }
 
 func NewService(store Store, client common.SquareClient, logger *logrus.Logger, authorizer Authorizer) *Service {

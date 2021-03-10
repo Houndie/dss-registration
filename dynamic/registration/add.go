@@ -227,12 +227,12 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 	s.logger.Trace("Adding registration to database")
 	userid := ""
 	if accessToken != "" {
-		s.logger.Trace("found access token, calling userinfo endpoint")
-		userinfo, err := s.authorizer.Userinfo(ctx, accessToken)
+		s.logger.Trace("found access token")
+		userinfo, err := s.authorizer.GetUserinfo(ctx, accessToken)
 		if err != nil {
 			return "", fmt.Errorf("error fetching userinfo: %w", err)
 		}
-		userid = userinfo.UserID
+		userid = userinfo.UserID()
 	}
 
 	var orderIDs []string

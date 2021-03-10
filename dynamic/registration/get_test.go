@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
@@ -31,7 +32,7 @@ func TestGet(t *testing.T) {
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, expectedUserID),
+		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, []authorizer.Permission{}, expectedUserID, []authorizer.Permission{}),
 	}
 	co := commontest.CommonCatalogObjects()
 	expectedOrders := []*square.Order{
@@ -149,7 +150,7 @@ func TestGetWrongUser(t *testing.T) {
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, expectedUserID),
+		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, []authorizer.Permission{}, expectedUserID, []authorizer.Permission{}),
 	}
 	co := commontest.CommonCatalogObjects()
 	expectedOrders := []*square.Order{

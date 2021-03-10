@@ -4,13 +4,15 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/common"
 )
 
 func (s *Service) List(ctx context.Context, token string) ([]*Bundle, error) {
 	s.logger.Trace("list discount service")
-	if err := common.IsAdmin(ctx, s.store, s.authorizer, s.logger, token); err != nil {
-		return nil, fmt.Errorf("error checking for admin: %w", err)
+	err := common.IsAllowed(ctx, s.authorizer, token, authorizer.ListDiscountsPermission)
+	if err != nil {
+		return nil, fmt.Errorf("error checking authorization: %w", err)
 	}
 
 	s.logger.Trace("fetching all discounts from store")

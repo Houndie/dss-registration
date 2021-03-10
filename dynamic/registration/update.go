@@ -111,15 +111,15 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 	}
 
 	s.logger.Tracef("fetching user-info for token %s", token)
-	userinfo, err := s.authorizer.Userinfo(ctx, token)
+	userinfo, err := s.authorizer.GetUserinfo(ctx, token)
 	if err != nil {
 		return "", fmt.Errorf("could not authorize user: %w", err)
 	}
-	s.logger.Tracef("found user %s", userinfo.UserID)
+	s.logger.Tracef("found user %s", userinfo.UserID())
 
-	if oldRegistration.UserID != userinfo.UserID {
+	if oldRegistration.UserID != userinfo.UserID() {
 		s.logger.WithError(err).Debug("user id does not match that of found registration")
-		s.logger.WithError(err).Tracef("registration provided user id %s, user provided %s", oldRegistration.UserID, userinfo.UserID)
+		s.logger.WithError(err).Tracef("registration provided user id %s, user provided %s", oldRegistration.UserID, userinfo.UserID())
 		return "", storage.ErrNoRegistrationForID{ID: registration.ID}
 	}
 
@@ -229,7 +229,7 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 		TeamCompetition: toStorageTeamCompetition(registration.TeamCompetition),
 		TShirt:          toStorageTShirt(registration.TShirt),
 		Housing:         registration.Housing,
-		UserID:          userinfo.UserID,
+		UserID:          userinfo.UserID(),
 		DiscountCodes:   registration.DiscountCodes,
 		OrderIDs:        orderIDs,
 	}

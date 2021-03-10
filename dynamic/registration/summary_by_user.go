@@ -10,14 +10,14 @@ import (
 func (s *Service) SummaryByUser(ctx context.Context, token string) ([]*Summary, error) {
 	s.logger.Trace("In list by user service")
 	s.logger.Tracef("fetching user-info for token %s", token)
-	userinfo, err := s.authorizer.Userinfo(ctx, token)
+	userinfo, err := s.authorizer.GetUserinfo(ctx, token)
 	if err != nil {
 		return nil, fmt.Errorf("could not authorize user: %w", err)
 	}
-	s.logger.Tracef("found user %s", userinfo.UserID)
+	s.logger.Tracef("found user %s", userinfo.UserID())
 
-	s.logger.Tracef("fetching registrations for user %s", userinfo.UserID)
-	r, err := s.store.GetRegistrationsByUser(ctx, userinfo.UserID)
+	s.logger.Tracef("fetching registrations for user %s", userinfo.UserID())
+	r, err := s.store.GetRegistrationsByUser(ctx, userinfo.UserID())
 	if err != nil {
 		return nil, fmt.Errorf("error fetching registrations from store: %w", err)
 	}

@@ -28,6 +28,7 @@ services:
       - DSS_FRONTEND=http://localhost:8081
       - DSS_POSTGRESURL=postgres://dbuser:dbpass@db:5432/dbuser?sslmode=disable
       - DSS_TEST_POSTGRESURL=postgres://dbuser:dbpass@test_db:5432/dbuser?sslmode=disable
+      - DSS_AUTH0ENDPOINT=https://daytonswingsmackdown-test.us.auth0.com
       - DSS_ENVIRONMENT=development
       - DSS_SQUAREKEY
       - DSS_MAILKEY
@@ -43,7 +44,9 @@ services:
     environment:
       - GATSBY_BACKEND=http://localhost:8080
       - GATSBY_FRONTEND=http://localhost:8081
-      - GATSBY_CLIENT_ID=166144116294-c115t8bqllktva4qp6tvjjeqe7mdggu3.apps.googleusercontent.com
+      - GATSBY_CLIENT_ID=t3FWpgTRr9ESBPhQbnQ3r3j9C0v4ZGAE
+      - GATSBY_AUTH0_DOMAIN=daytonswingsmackdown-test.us.auth0.com
+      - GATSBY_AUTH0_AUDIENCE=https://dayton-swing-smackdown-testing.herokuapp.com
     volumes:
       - "./static/gatsby/src:/app/src:ro"
       - "./static/gatsby/static:/app/static:ro"

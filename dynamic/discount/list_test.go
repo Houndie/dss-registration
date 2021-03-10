@@ -31,17 +31,11 @@ func TestList(t *testing.T) {
 	token := "some auth token"
 	thisUserID := "123456"
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: commontest.UserinfoFromIDCheck(t, token, thisUserID),
+		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, token, []authorizer.Permission{authorizer.ListDiscountsPermission}, thisUserID, []authorizer.Permission{authorizer.ListDiscountsPermission}),
 	}
 	code1 := "code1"
 	code2 := "code2"
 	store := &commontest.MockStore{
-		IsAdminFunc: func(ctx context.Context, userID string) (bool, error) {
-			if userID != thisUserID {
-				t.Fatalf("expected user id %s, got %s", thisUserID, userID)
-			}
-			return true, nil
-		},
 		ListDiscountsFunc: func(ctx context.Context) ([]*storage.Discount, error) {
 			return []*storage.Discount{
 				{
@@ -170,15 +164,9 @@ func TestListNone(t *testing.T) {
 	token := "some auth token"
 	thisUserID := "123456"
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: commontest.UserinfoFromIDCheck(t, token, thisUserID),
+		GetUserinfoFunc: commontest.UserinfoFromID(thisUserID, []authorizer.Permission{authorizer.ListDiscountsPermission}),
 	}
 	store := &commontest.MockStore{
-		IsAdminFunc: func(ctx context.Context, userID string) (bool, error) {
-			if userID != thisUserID {
-				t.Fatalf("expected user id %s, got %s", thisUserID, userID)
-			}
-			return true, nil
-		},
 		ListDiscountsFunc: func(ctx context.Context) ([]*storage.Discount, error) {
 			return []*storage.Discount{}, nil
 
@@ -210,13 +198,9 @@ func TestListUnauthorized(t *testing.T) {
 	token := "some auth token"
 	thisUserID := "123456"
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: commontest.UserinfoFromIDCheck(t, token, thisUserID),
+		GetUserinfoFunc: commontest.UserinfoFromID(thisUserID, []authorizer.Permission{}),
 	}
-	store := &commontest.MockStore{
-		IsAdminFunc: func(ctx context.Context, userID string) (bool, error) {
-			return false, nil
-		},
-	}
+	store := &commontest.MockStore{}
 
 	service := NewService(store, client, logger, authorizer)
 	_, err = service.List(context.Background(), token)
@@ -240,7 +224,7 @@ func TestListUnauthenticated(t *testing.T) {
 	client := &commontest.MockSquareClient{} // No square calls needed
 
 	a := &commontest.MockAuthorizer{
-		UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
+		GetUserinfoFunc: func(ctx context.Context, accessToken string) (authorizer.Userinfo, error) {
 			return nil, authorizer.Unauthenticated
 		},
 	}

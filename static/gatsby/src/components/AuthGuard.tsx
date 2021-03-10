@@ -1,22 +1,17 @@
 import React from 'react'
-import {Clients, AuthedClients, AuthStatus} from './auth'
+import { useAuth0 } from '@auth0/auth0-react';
 
 interface AuthGuardProps {
-	clients: Clients
-	children: (arg0: AuthedClients) => React.ReactNode
+	children: () => React.ReactNode
 }
 
-export default ({clients, children}: AuthGuardProps) => {
-	switch(clients.status) {
-		case AuthStatus.SignedIn:
-			return <>{children({
-				status: AuthStatus.SignedIn,
-				discount: clients.discount,
-				registration: clients.registration,
-				forms: clients.forms
-			})}</>
-		case AuthStatus.SignedOut:
-			return <p>You must be logged in to view this page!</p>
+export default ({children}: AuthGuardProps) => {
+	const { isLoading, isAuthenticated } = useAuth0()
+	if(isLoading) {
+		return <></>
 	}
-	return <></>
+	if( isAuthenticated ){
+		return <>{children()}</>
+	}
+	return <p>You must be logged in to view this page!</p>
 }

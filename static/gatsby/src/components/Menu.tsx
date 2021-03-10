@@ -3,18 +3,9 @@ import Navbar from "react-bootstrap/Navbar"
 import NavDropdown from "react-bootstrap/NavDropdown"
 import Nav from "react-bootstrap/Nav"
 import Container from "react-bootstrap/Container"
-import { GoogleLogin, GoogleLogout, GoogleLoginResponse } from "react-google-login"
-import {AuthResult, AuthStatus} from './auth'
+import LoginLogout from './LoginLogout'
 
-const isGoogleLoginResponse = (res: any): res is GoogleLoginResponse => {
-	return (res as GoogleLoginResponse).accessToken !== undefined
-}
-
-interface MenuProps {
-	auth: AuthResult
-}
-
-const Menu = ({auth}: MenuProps) => (
+export default () => (
 	<Container>
 		<Navbar expand="lg">
 			<Navbar.Brand href="/">Dayton Swing Smackdown</Navbar.Brand>
@@ -50,15 +41,9 @@ const Menu = ({auth}: MenuProps) => (
 					<Nav.Link href="/music">Music</Nav.Link>
 					<Nav.Link href="/schedule">Schedule</Nav.Link>
 					<Nav.Link href="/safety">Safety</Nav.Link>
-					{ auth.clients.status== AuthStatus.SignedIn ? (
-						<Nav.Link href="#" onClick={auth.signOut}>Logout</Nav.Link>
-					) : (
-						<Nav.Link href="#" onClick={auth.signIn}>Login</Nav.Link>
-					)}
+					<LoginLogout/>
 				</Nav>
 			</Navbar.Collapse>
 		</Navbar>
 	</Container>
 )
-
-export default Menu
