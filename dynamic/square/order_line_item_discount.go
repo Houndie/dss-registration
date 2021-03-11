@@ -3,7 +3,7 @@ package square
 import (
 	"encoding/json"
 
-	"github.com/pkg/errors"
+	"errors"
 )
 
 type OrderLineItemDiscountScope string

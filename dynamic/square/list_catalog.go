@@ -3,11 +3,10 @@ package square
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 type ListCatalogIterator interface {
@@ -68,20 +67,20 @@ func (i *listCatalogIterator) Next() bool {
 		Cursor: i.cursor,
 	}, q)
 	if err != nil {
-		return i.setError(errors.Wrap(err, "error populating url paramters"))
+		return i.setError(fmt.Errorf("error populating url paramters: %w", err))
 	}
 	baseurl.RawQuery = q.Encode()
 
 	req, err := http.NewRequest("GET", baseurl.String(), nil)
 	if err != nil {
-		return i.setError(errors.Wrap(err, "error generating new request"))
+		return i.setError(fmt.Errorf("error generating new request: %w", err))
 	}
 
 	req = req.WithContext(i.ctx)
 
 	resp, err := i.c.httpClient.Do(req)
 	if err != nil {
-		return i.setError(errors.Wrap(err, "Error with square http request"))
+		return i.setError(fmt.Errorf("Error with square http request: %w", err))
 	}
 	defer resp.Body.Close()
 
@@ -95,7 +94,7 @@ func (i *listCatalogIterator) Next() bool {
 		if errMsg != nil {
 			return i.setError(errMsg)
 		}
-		return i.setError(errors.Wrap(err, "Error reading response body"))
+		return i.setError(fmt.Errorf("Error reading response body: %w", err))
 	}
 	respJson := struct {
 		Errors  []*Error         `json:"errors,omitempty"`
@@ -107,7 +106,7 @@ func (i *listCatalogIterator) Next() bool {
 		if errMsg != nil {
 			return i.setError(errMsg)
 		}
-		return i.setError(errors.Wrap(err, "Error unmarshalling json response"))
+		return i.setError(fmt.Errorf("Error unmarshalling json response: %w", err))
 	}
 	if len(respJson.Errors) != 0 {
 		return i.setError(&ErrorList{respJson.Errors})

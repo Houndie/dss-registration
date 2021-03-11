@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
-	"github.com/pkg/errors"
 )
 
 func (c *Client) CreateCheckout(ctx context.Context, locationID, idempotencyKey string, order *CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail string, prePopulateBuyerEmail string, prePopulateShippingAddress *Address, redirectUrl string, additionalRecipients []*ChargeRequestAdditionalRecipient, note string) (*Checkout, error) {
@@ -35,7 +33,7 @@ func (c *Client) CreateCheckout(ctx context.Context, locationID, idempotencyKey 
 	}
 	jsonBody, err := json.Marshal(&body)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error mashaling request body")
+		return nil, fmt.Errorf("Error mashaling request body: %w", err)
 	}
 	fmt.Println(string(jsonBody))
 
@@ -43,14 +41,14 @@ func (c *Client) CreateCheckout(ctx context.Context, locationID, idempotencyKey 
 
 	req, err := http.NewRequest("POST", c.endpoint("locations/"+locationID+"/checkouts").String(), bodyBuf)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error creating request")
+		return nil, fmt.Errorf("Error creating request: %w", err)
 	}
 
 	req = req.WithContext(ctx)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error with http request")
+		return nil, fmt.Errorf("Error with http request: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -63,7 +61,7 @@ func (c *Client) CreateCheckout(ctx context.Context, locationID, idempotencyKey 
 		if codeErr != nil {
 			return nil, codeErr
 		}
-		return nil, errors.Wrap(err, "Error reading response body")
+		return nil, fmt.Errorf("Error reading response body: %w", err)
 	}
 
 	respJson := struct {
@@ -75,7 +73,7 @@ func (c *Client) CreateCheckout(ctx context.Context, locationID, idempotencyKey 
 		if codeErr != nil {
 			return nil, codeErr
 		}
-		return nil, errors.Wrap(err, "Error unmarshalling json response")
+		return nil, fmt.Errorf("Error unmarshalling json response: %w", err)
 	}
 	if len(respJson.Errors) != 0 {
 		return nil, &ErrorList{respJson.Errors}

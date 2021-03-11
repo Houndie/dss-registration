@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
+	"errors"
 )
 
 func TestBatchRetrieveInventoryCounts(t *testing.T) {
@@ -322,8 +322,8 @@ func TestBatchRetrieveInventoryCountsErrorMessage(t *testing.T) {
 	if inventoryCounts.Error() == nil {
 		t.Fatalf("expected error, found none")
 	}
-	serr, ok := errors.Cause(inventoryCounts.Error()).(*ErrorList)
-	if !ok {
+	serr := &ErrorList{}
+	if !errors.As(inventoryCounts.Error(), &serr) {
 		t.Fatalf("error not of type square.Error")
 	}
 	if len(serr.Errors) != 1 {

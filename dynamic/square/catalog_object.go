@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
+	"errors"
 )
 
 type CatalogObjectType string
@@ -105,14 +105,17 @@ func (c *CatalogObject) MarshalJSON() ([]byte, error) {
 		return nil, errors.New("Found unknown catalog object data type")
 	}
 	json, err := json.Marshal(&cJson)
-	return json, errors.Wrap(err, "Error marshaling json catalog object")
+	if err != nil {
+		return nil, fmt.Errorf("Error marshaling json catalog object: %w", err)
+	}
+	return json, nil
 }
 
 func (c *CatalogObject) UnmarshalJSON(data []byte) error {
 	cJson := &catalogObject{}
 	err := json.Unmarshal(data, &cJson)
 	if err != nil {
-		return errors.Wrap(err, "Error unmarshaling catalog object")
+		return fmt.Errorf("Error unmarshaling catalog object: %w", err)
 	}
 	c.ID = cJson.ID
 	c.UpdatedAt = cJson.UpdatedAt

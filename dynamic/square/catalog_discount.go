@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/pkg/errors"
+	"errors"
 )
 
 type CatalogDiscountType interface {
@@ -84,7 +84,7 @@ func (c *CatalogDiscount) MarshalJSON() ([]byte, error) {
 
 	b, err := json.Marshal(&jsonType)
 	if err != nil {
-		return nil, errors.Wrap(err, "error marshing catalog discount")
+		return nil, fmt.Errorf("error marshing catalog discount: %w", err)
 	}
 	return b, nil
 }
@@ -93,7 +93,7 @@ func (c *CatalogDiscount) UnmarshalJSON(b []byte) error {
 	jsonType := catalogDiscount{}
 	err := json.Unmarshal(b, &jsonType)
 	if err != nil {
-		return errors.Wrap(err, "error unmarshaling catalog discount")
+		return fmt.Errorf("error unmarshaling catalog discount: %w", err)
 	}
 
 	c.Name = jsonType.Name

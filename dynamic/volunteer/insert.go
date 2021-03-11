@@ -2,9 +2,9 @@ package volunteer
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Houndie/dss-registration/dynamic/storage"
-	"github.com/pkg/errors"
 )
 
 func (s *Service) Insert(ctx context.Context, token string, submission *VolunteerSubmission) error {
@@ -13,7 +13,7 @@ func (s *Service) Insert(ctx context.Context, token string, submission *Voluntee
 	if err != nil {
 		msg := "could not authorize user"
 		s.logger.WithError(err).Debug(msg)
-		return errors.Wrap(err, msg)
+		return fmt.Errorf("%s: %w", msg, err)
 	}
 	s.logger.Tracef("found user %s", userinfo.UserID)
 
@@ -30,7 +30,7 @@ func (s *Service) Insert(ctx context.Context, token string, submission *Voluntee
 		default:
 			s.logger.WithError(err).Error("error inserting volunteer submission into store")
 		}
-		return errors.Wrapf(err, "error inserting volunteer submission into store")
+		return fmt.Errorf("error inserting volunteer submission into store: %w", err)
 	}
 
 	return nil

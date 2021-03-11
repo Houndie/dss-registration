@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/peterhellberg/duration"
-	"github.com/pkg/errors"
 )
 
 type orderFulfillmentPickupDetails struct {
@@ -76,7 +75,7 @@ func (o *OrderFulfillmentPickupDetails) UnmarshalJSON(b []byte) error {
 	jsonType := orderFulfillmentPickupDetails{}
 	err := json.Unmarshal(b, &jsonType)
 	if err != nil {
-		return errors.Wrap(err, "Error unmarshaling OrderFulfillmentPickupDetails")
+		return fmt.Errorf("Error unmarshaling OrderFulfillmentPickupDetails: %w", err)
 	}
 
 	o.Recipient = jsonType.Recipient
@@ -95,7 +94,7 @@ func (o *OrderFulfillmentPickupDetails) UnmarshalJSON(b []byte) error {
 	if jsonType.AutoCompleteDuration != "" {
 		d, err := duration.Parse(jsonType.AutoCompleteDuration)
 		if err != nil {
-			return errors.Wrap(err, "Error unmarshaling OrderFulfillmentPickupDetails.AutoCompleteDuration")
+			return fmt.Errorf("Error unmarshaling OrderFulfillmentPickupDetails.AutoCompleteDuration: %w", err)
 		}
 		o.AutoCompleteDuration = &d
 	}
@@ -103,7 +102,7 @@ func (o *OrderFulfillmentPickupDetails) UnmarshalJSON(b []byte) error {
 	if jsonType.PickupWindowDuration != "" {
 		d, err := duration.Parse(jsonType.PickupWindowDuration)
 		if err != nil {
-			return errors.Wrap(err, "Error unmarshaling OrderFulfillmentPickupDetails.PickupWindowDuration")
+			return fmt.Errorf("Error unmarshaling OrderFulfillmentPickupDetails.PickupWindowDuration: %w", err)
 		}
 		o.PickupWindowDuration = &d
 	}
@@ -111,7 +110,7 @@ func (o *OrderFulfillmentPickupDetails) UnmarshalJSON(b []byte) error {
 	if jsonType.PrepTimeDuration != "" {
 		d, err := duration.Parse(jsonType.PrepTimeDuration)
 		if err != nil {
-			return errors.Wrap(err, "Error unmarshaling OrderFulfillmentPickupDetails.PrepTimeDuration")
+			return fmt.Errorf("Error unmarshaling OrderFulfillmentPickupDetails.PrepTimeDuration: %w", err)
 		}
 		o.PrepTimeDuration = &d
 	}

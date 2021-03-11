@@ -2,8 +2,9 @@ package square
 
 import (
 	"encoding/json"
+	"fmt"
 
-	"github.com/pkg/errors"
+	"errors"
 )
 
 type MeasurementUnit struct {
@@ -65,13 +66,16 @@ func (m *MeasurementUnit) MarshalJSON() ([]byte, error) {
 	}
 
 	b, err := json.Marshal(mJson)
-	return b, errors.Wrap(err, "error marshaling json measurement unit")
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling json measurement unit: %w", err)
+	}
+	return b, nil
 }
 
 func (m *MeasurementUnit) UnmarshalJSON(b []byte) error {
 	mJson := measurementUnit{}
 	if err := json.Unmarshal(b, &mJson); err != nil {
-		return errors.Wrap(err, "error unmarshaling json measurement unit")
+		return fmt.Errorf("error unmarshaling json measurement unit: %w", err)
 	}
 
 	switch {

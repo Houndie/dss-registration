@@ -9,10 +9,11 @@ import (
 	"testing"
 	"time"
 
+	"errors"
+
 	"github.com/davecgh/go-spew/spew"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/pkg/errors"
 )
 
 func TestRetrieveTransaction(t *testing.T) {

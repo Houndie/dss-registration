@@ -4,10 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
-
-	"github.com/pkg/errors"
 )
 
 func (c *Client) BatchRetrieveOrders(ctx context.Context, locationID string, orderIDs []string) ([]*Order, error) {
@@ -19,21 +18,21 @@ func (c *Client) BatchRetrieveOrders(ctx context.Context, locationID string, ord
 
 	reqBodyBytes, err := json.Marshal(&reqBody)
 	if err != nil {
-		return nil, errors.Wrap(err, "error marshaling request body")
+		return nil, fmt.Errorf("error marshaling request body: %w", err)
 	}
 
 	bodyBuf := bytes.NewBuffer(reqBodyBytes)
 
 	req, err := http.NewRequest("POST", c.endpoint("locations/"+locationID+"/orders/batch-retrieve").String(), bodyBuf)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating request")
+		return nil, fmt.Errorf("error creating request: %w", err)
 	}
 
 	req = req.WithContext(ctx)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, "error with http request")
+		return nil, fmt.Errorf("error with http request: %w", err)
 	}
 	defer resp.Body.Close()
 	var codeErr error
@@ -45,7 +44,7 @@ func (c *Client) BatchRetrieveOrders(ctx context.Context, locationID string, ord
 		if codeErr != nil {
 			return nil, codeErr
 		}
-		return nil, errors.Wrap(err, "error reading response body")
+		return nil, fmt.Errorf("error reading response body: %w", err)
 	}
 
 	respJson := struct {
@@ -57,7 +56,7 @@ func (c *Client) BatchRetrieveOrders(ctx context.Context, locationID string, ord
 		if codeErr != nil {
 			return nil, codeErr
 		}
-		return nil, errors.Wrap(err, "error unmarshalling json response")
+		return nil, fmt.Errorf("error unmarshalling json response: %w", err)
 	}
 	if len(respJson.Errors) != 0 {
 		return nil, &ErrorList{respJson.Errors}

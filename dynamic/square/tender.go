@@ -2,9 +2,10 @@ package square
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
+	"errors"
 )
 
 type tender struct {
@@ -102,7 +103,7 @@ func (t *Tender) UnmarshalJSON(b []byte) error {
 	tJson := tender{}
 	err := json.Unmarshal(b, &tJson)
 	if err != nil {
-		return errors.Wrap(err, "Error unmarshaling Tender json")
+		return fmt.Errorf("Error unmarshaling Tender json: %w", err)
 	}
 
 	t.ID = tJson.ID

@@ -9,10 +9,11 @@ import (
 	"testing"
 	"time"
 
+	"errors"
+
 	"github.com/davecgh/go-spew/spew"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/pkg/errors"
 )
 
 func TestCreateCheckout(t *testing.T) {
@@ -379,8 +380,8 @@ func TestCreateCheckoutErrorCode(t *testing.T) {
 		t.Fatal("found no error when client returned one?")
 	}
 
-	uerr, ok := err.(unexpectedCodeError)
-	if !ok {
+	var uerr unexpectedCodeError
+	if !errors.As(err, &uerr) {
 		t.Fatalf("error was not of type unexpectedCodeError")
 	}
 

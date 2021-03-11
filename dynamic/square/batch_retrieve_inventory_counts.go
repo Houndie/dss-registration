@@ -4,11 +4,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 type BatchRetrieveInventoryCountsIterator interface {
@@ -69,19 +68,19 @@ func (i *batchRetrieveInventoryCountsIterator) Next() bool {
 
 	jsonBody, err := json.Marshal(&body)
 	if err != nil {
-		return i.setError(errors.Wrap(err, "error marshaling request body"))
+		return i.setError(fmt.Errorf("error marshaling request body: %w", err))
 	}
 	buf := bytes.NewBuffer(jsonBody)
 
 	req, err := http.NewRequest("POST", i.c.endpoint("inventory/batch-retrieve-counts").String(), buf)
 	if err != nil {
-		return i.setError(errors.Wrap(err, "error generating new request"))
+		return i.setError(fmt.Errorf("error generating new request: %w", err))
 	}
 	req = req.WithContext(i.ctx)
 
 	resp, err := i.c.httpClient.Do(req)
 	if err != nil {
-		return i.setError(errors.Wrap(err, "Error with square http request"))
+		return i.setError(fmt.Errorf("Error with square http request: %w", err))
 	}
 	defer resp.Body.Close()
 
@@ -98,7 +97,7 @@ func (i *batchRetrieveInventoryCountsIterator) Next() bool {
 		if badStatusErr != nil {
 			return i.setError(badStatusErr)
 		}
-		return i.setError(errors.Wrap(err, "Error reading response body"))
+		return i.setError(fmt.Errorf("Error reading response body: %w", err))
 	}
 	respJson := struct {
 		Errors []*Error          `json:"errors"`
@@ -110,7 +109,7 @@ func (i *batchRetrieveInventoryCountsIterator) Next() bool {
 		if badStatusErr != nil {
 			return i.setError(badStatusErr)
 		}
-		return i.setError(errors.Wrap(err, "Error unmarshalling json response"))
+		return i.setError(fmt.Errorf("Error unmarshalling json response: %w", err))
 	}
 	if len(respJson.Errors) != 0 {
 		return i.setError(&ErrorList{respJson.Errors})

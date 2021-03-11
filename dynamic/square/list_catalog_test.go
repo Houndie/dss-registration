@@ -10,10 +10,11 @@ import (
 	"testing"
 	"time"
 
+	"errors"
+
 	"github.com/davecgh/go-spew/spew"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/pkg/errors"
 )
 
 func TestListCatalog(t *testing.T) {
@@ -299,8 +300,8 @@ func TestListCatalogErrorMessage(t *testing.T) {
 		t.Fatal("Expected error, found none")
 	}
 
-	serr, ok := errors.Cause(catalogObjects.Error()).(*ErrorList)
-	if !ok {
+	serr := &ErrorList{}
+	if !errors.As(catalogObjects.Error(), &serr) {
 		t.Fatalf("error not of type square.ErrorList")
 	}
 
