@@ -11,6 +11,7 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
+	"github.com/Houndie/square-go"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,8 +25,10 @@ func TestList(t *testing.T) {
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
 	co := commontest.CommonCatalogObjects()
-	client := &commontest.MockSquareClient{
-		ListCatalogFunc: commontest.ListCatalogFuncFromSlice(co.Catalog()),
+	client := &square.Client{
+		Catalog: &commontest.MockSquareCatalogClient{
+			ListFunc: commontest.ListCatalogFuncFromSlice(co.Catalog()),
+		},
 	}
 
 	token := "some auth token"
@@ -159,7 +162,7 @@ func TestListNone(t *testing.T) {
 	logger.SetOutput(devnull)
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
-	client := &commontest.MockSquareClient{} // No square calls needed
+	client := &square.Client{} // No square calls needed
 
 	token := "some auth token"
 	thisUserID := "123456"
@@ -193,7 +196,7 @@ func TestListUnauthorized(t *testing.T) {
 	logger.SetOutput(devnull)
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
-	client := &commontest.MockSquareClient{} // No square calls needed
+	client := &square.Client{} // No square calls needed
 
 	token := "some auth token"
 	thisUserID := "123456"
@@ -221,7 +224,7 @@ func TestListUnauthenticated(t *testing.T) {
 	logger.SetOutput(devnull)
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
-	client := &commontest.MockSquareClient{} // No square calls needed
+	client := &square.Client{} // No square calls needed
 
 	a := &commontest.MockAuthorizer{
 		GetUserinfoFunc: func(ctx context.Context, accessToken string) (authorizer.Userinfo, error) {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/Houndie/dss-registration/dynamic/common"
-	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
+	"github.com/Houndie/square-go/objects"
 	"github.com/gofrs/uuid"
 )
 
@@ -136,7 +136,7 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 			return "", fmt.Errorf("error generating reference id: %w", err)
 		}
 
-		locations, err := s.client.ListLocations(ctx)
+		locations, err := s.client.Locations.List(ctx)
 		if err != nil {
 			return "", fmt.Errorf("error listing locations from square: %w", err)
 		}
@@ -191,9 +191,9 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 			return "", err
 		}
 
-		order := &square.CreateOrderRequest{
+		order := &objects.CreateOrderRequest{
 			IdempotencyKey: idempotencyKey,
-			Order: &square.Order{
+			Order: &objects.Order{
 				ReferenceID: referenceID.String(),
 				LocationID:  locations[0].ID,
 				LineItems:   lineItems,

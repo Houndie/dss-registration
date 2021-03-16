@@ -10,9 +10,10 @@ import (
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
-	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
+	"github.com/Houndie/square-go"
+	"github.com/Houndie/square-go/objects"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
 )
@@ -35,11 +36,11 @@ func TestGet(t *testing.T) {
 		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, []authorizer.Permission{}, expectedUserID, []authorizer.Permission{}),
 	}
 	co := commontest.CommonCatalogObjects()
-	expectedOrders := []*square.Order{
+	expectedOrders := []*objects.Order{
 		{
 			ID:    "order1",
-			State: square.OrderStateCompleted,
-			LineItems: []*square.OrderLineItem{
+			State: objects.OrderStateCompleted,
+			LineItems: []*objects.OrderLineItem{
 				{CatalogObjectID: co.WeekendPassID[storage.Tier2]},
 				{CatalogObjectID: co.SoloJazzID},
 				{CatalogObjectID: co.TShirtID},
@@ -117,12 +118,18 @@ func TestGet(t *testing.T) {
 		},
 	}
 
-	client := &commontest.MockSquareClient{
-		ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
-			return []*square.Location{{ID: expectedLocationID}}, nil
+	client := &square.Client{
+		Locations: &commontest.MockSquareLocationsClient{
+			ListFunc: func(context.Context) ([]*objects.Location, error) {
+				return []*objects.Location{{ID: expectedLocationID}}, nil
+			},
 		},
-		ListCatalogFunc:         commontest.ListCatalogFuncFromSlice(co.Catalog()),
-		BatchRetrieveOrdersFunc: commontest.OrdersFromSliceCheck(t, expectedLocationID, expectedOrders),
+		Catalog: &commontest.MockSquareCatalogClient{
+			ListFunc: commontest.ListCatalogFuncFromSlice(co.Catalog()),
+		},
+		Orders: &commontest.MockSquareOrdersClient{
+			BatchRetrieveFunc: commontest.OrdersFromSliceCheck(t, expectedLocationID, expectedOrders),
+		},
 	}
 
 	service := NewService(true, false, logger, client, authorizer, store, &commontest.MockMailClient{})
@@ -153,11 +160,11 @@ func TestGetWrongUser(t *testing.T) {
 		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, []authorizer.Permission{}, expectedUserID, []authorizer.Permission{}),
 	}
 	co := commontest.CommonCatalogObjects()
-	expectedOrders := []*square.Order{
+	expectedOrders := []*objects.Order{
 		{
 			ID:    "order1",
-			State: square.OrderStateCompleted,
-			LineItems: []*square.OrderLineItem{
+			State: objects.OrderStateCompleted,
+			LineItems: []*objects.OrderLineItem{
 				{CatalogObjectID: co.WeekendPassID[storage.Tier2]},
 				{CatalogObjectID: co.SoloJazzID},
 				{CatalogObjectID: co.TShirtID},
@@ -204,12 +211,18 @@ func TestGetWrongUser(t *testing.T) {
 		CreatedAt: time.Now(),
 	}
 
-	client := &commontest.MockSquareClient{
-		ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
-			return []*square.Location{{ID: expectedLocationID}}, nil
+	client := &square.Client{
+		Locations: &commontest.MockSquareLocationsClient{
+			ListFunc: func(context.Context) ([]*objects.Location, error) {
+				return []*objects.Location{{ID: expectedLocationID}}, nil
+			},
 		},
-		ListCatalogFunc:         commontest.ListCatalogFuncFromSlice(co.Catalog()),
-		BatchRetrieveOrdersFunc: commontest.OrdersFromSliceCheck(t, expectedLocationID, expectedOrders),
+		Catalog: &commontest.MockSquareCatalogClient{
+			ListFunc: commontest.ListCatalogFuncFromSlice(co.Catalog()),
+		},
+		Orders: &commontest.MockSquareOrdersClient{
+			BatchRetrieveFunc: commontest.OrdersFromSliceCheck(t, expectedLocationID, expectedOrders),
+		},
 	}
 
 	for _, test := range []struct {

@@ -8,9 +8,10 @@ import (
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
-	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
+	"github.com/Houndie/square-go"
+	"github.com/Houndie/square-go/objects"
 	"github.com/sirupsen/logrus"
 )
 
@@ -44,18 +45,18 @@ func TestSummaryByUser(t *testing.T) {
 	expectedUserID := "userid"
 	expectedLocationID := "here"
 
-	expectedOrders := []*square.Order{
+	expectedOrders := []*objects.Order{
 		{
 			ID:    "order1",
-			State: square.OrderStateCompleted,
+			State: objects.OrderStateCompleted,
 		},
 		{
 			ID:    "order2",
-			State: square.OrderStateCompleted,
+			State: objects.OrderStateCompleted,
 		},
 		{
 			ID:    "order3",
-			State: square.OrderStateOpen,
+			State: objects.OrderStateOpen,
 		},
 	}
 
@@ -76,15 +77,19 @@ func TestSummaryByUser(t *testing.T) {
 		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, []authorizer.Permission{}, expectedUserID, []authorizer.Permission{}),
 	}
 
-	squareClient := &commontest.MockSquareClient{
-		ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
-			return []*square.Location{
-				{
-					ID: expectedLocationID,
-				},
-			}, nil
+	squareClient := &square.Client{
+		Locations: &commontest.MockSquareLocationsClient{
+			ListFunc: func(context.Context) ([]*objects.Location, error) {
+				return []*objects.Location{
+					{
+						ID: expectedLocationID,
+					},
+				}, nil
+			},
 		},
-		BatchRetrieveOrdersFunc: commontest.OrdersFromSliceCheck(t, expectedLocationID, expectedOrders),
+		Orders: &commontest.MockSquareOrdersClient{
+			BatchRetrieveFunc: commontest.OrdersFromSliceCheck(t, expectedLocationID, expectedOrders),
+		},
 	}
 
 	store := &commontest.MockStore{

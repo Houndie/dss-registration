@@ -1,9 +1,9 @@
 package commontest
 
 import (
-	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/utility"
+	"github.com/Houndie/square-go/objects"
 )
 
 type CatalogObjects struct {
@@ -32,8 +32,8 @@ type CatalogObjects struct {
 	MixAndMatchDiscountName string
 }
 
-func (o *CatalogObjects) Catalog() []*square.CatalogObject {
-	return []*square.CatalogObject{
+func (o *CatalogObjects) Catalog() []*objects.CatalogObject {
+	return []*objects.CatalogObject{
 		soloJazzItem(o.SoloJazzID, o.SoloJazzCost),
 		mixAndMatchItem(o.MixAndMatchID, o.MixAndMatchCost),
 		teamCompItem(o.TeamCompetitionID, o.TeamCompCost),
@@ -86,13 +86,13 @@ func CommonCatalogObjects() *CatalogObjects {
 	}
 }
 
-func discountItem(name string, amt int, id string) *square.CatalogObject {
-	return &square.CatalogObject{
+func discountItem(name string, amt int, id string) *objects.CatalogObject {
+	return &objects.CatalogObject{
 		ID: id,
-		CatalogObjectType: &square.CatalogDiscount{
+		CatalogObjectType: &objects.CatalogDiscount{
 			Name: name,
-			DiscountType: &square.CatalogDiscountFixedAmount{
-				AmountMoney: &square.Money{
+			DiscountType: &objects.CatalogDiscountFixedAmount{
+				AmountMoney: &objects.Money{
 					Amount: amt,
 				},
 			},
@@ -100,15 +100,15 @@ func discountItem(name string, amt int, id string) *square.CatalogObject {
 	}
 }
 
-func soloJazzItem(id string, cost int) *square.CatalogObject {
-	return &square.CatalogObject{
-		CatalogObjectType: &square.CatalogItem{
+func soloJazzItem(id string, cost int) *objects.CatalogObject {
+	return &objects.CatalogObject{
+		CatalogObjectType: &objects.CatalogItem{
 			Name: utility.SoloJazzItem,
-			Variations: []*square.CatalogObject{
-				&square.CatalogObject{
+			Variations: []*objects.CatalogObject{
+				&objects.CatalogObject{
 					ID: id,
-					CatalogObjectType: &square.CatalogItemVariation{
-						PriceMoney: &square.Money{
+					CatalogObjectType: &objects.CatalogItemVariation{
+						PriceMoney: &objects.Money{
 							Amount: cost,
 						},
 					},
@@ -118,15 +118,15 @@ func soloJazzItem(id string, cost int) *square.CatalogObject {
 	}
 }
 
-func mixAndMatchItem(id string, cost int) *square.CatalogObject {
-	return &square.CatalogObject{
-		CatalogObjectType: &square.CatalogItem{
+func mixAndMatchItem(id string, cost int) *objects.CatalogObject {
+	return &objects.CatalogObject{
+		CatalogObjectType: &objects.CatalogItem{
 			Name: utility.MixAndMatchItem,
-			Variations: []*square.CatalogObject{
-				&square.CatalogObject{
+			Variations: []*objects.CatalogObject{
+				&objects.CatalogObject{
 					ID: id,
-					CatalogObjectType: &square.CatalogItemVariation{
-						PriceMoney: &square.Money{
+					CatalogObjectType: &objects.CatalogItemVariation{
+						PriceMoney: &objects.Money{
 							Amount: cost,
 						},
 					},
@@ -136,15 +136,15 @@ func mixAndMatchItem(id string, cost int) *square.CatalogObject {
 	}
 }
 
-func teamCompItem(id string, cost int) *square.CatalogObject {
-	return &square.CatalogObject{
-		CatalogObjectType: &square.CatalogItem{
+func teamCompItem(id string, cost int) *objects.CatalogObject {
+	return &objects.CatalogObject{
+		CatalogObjectType: &objects.CatalogItem{
 			Name: utility.TeamCompItem,
-			Variations: []*square.CatalogObject{
-				&square.CatalogObject{
+			Variations: []*objects.CatalogObject{
+				&objects.CatalogObject{
 					ID: id,
-					CatalogObjectType: &square.CatalogItemVariation{
-						PriceMoney: &square.Money{
+					CatalogObjectType: &objects.CatalogItemVariation{
+						PriceMoney: &objects.Money{
 							Amount: cost,
 						},
 					},
@@ -154,15 +154,15 @@ func teamCompItem(id string, cost int) *square.CatalogObject {
 	}
 }
 
-func tShirtItem(id string, cost int) *square.CatalogObject {
-	return &square.CatalogObject{
-		CatalogObjectType: &square.CatalogItem{
+func tShirtItem(id string, cost int) *objects.CatalogObject {
+	return &objects.CatalogObject{
+		CatalogObjectType: &objects.CatalogItem{
 			Name: utility.TShirtItem,
-			Variations: []*square.CatalogObject{
-				&square.CatalogObject{
+			Variations: []*objects.CatalogObject{
+				&objects.CatalogObject{
 					ID: id,
-					CatalogObjectType: &square.CatalogItemVariation{
-						PriceMoney: &square.Money{
+					CatalogObjectType: &objects.CatalogItemVariation{
+						PriceMoney: &objects.Money{
 							Amount: cost,
 						},
 					},
@@ -172,16 +172,16 @@ func tShirtItem(id string, cost int) *square.CatalogObject {
 	}
 }
 
-func dancePassItem(id string, cost int) *square.CatalogObject {
-	return &square.CatalogObject{
-		CatalogObjectType: &square.CatalogItem{
+func dancePassItem(id string, cost int) *objects.CatalogObject {
+	return &objects.CatalogObject{
+		CatalogObjectType: &objects.CatalogItem{
 			Name: utility.DancePassItem,
-			Variations: []*square.CatalogObject{
-				&square.CatalogObject{
+			Variations: []*objects.CatalogObject{
+				&objects.CatalogObject{
 					ID: id,
-					CatalogObjectType: &square.CatalogItemVariation{
+					CatalogObjectType: &objects.CatalogItemVariation{
 						Name: utility.DancePassPresaleName,
-						PriceMoney: &square.Money{
+						PriceMoney: &objects.Money{
 							Amount: cost,
 						},
 					},
@@ -191,23 +191,23 @@ func dancePassItem(id string, cost int) *square.CatalogObject {
 	}
 }
 
-func weekendPassItem(weekendPassIDs map[storage.WeekendPassTier]string, weekendPassCosts map[storage.WeekendPassTier]int) *square.CatalogObject {
-	variations := make([]*square.CatalogObject, len(weekendPassIDs))
+func weekendPassItem(weekendPassIDs map[storage.WeekendPassTier]string, weekendPassCosts map[storage.WeekendPassTier]int) *objects.CatalogObject {
+	variations := make([]*objects.CatalogObject, len(weekendPassIDs))
 	idx := 0
 	for tier, id := range weekendPassIDs {
-		variations[idx] = &square.CatalogObject{
+		variations[idx] = &objects.CatalogObject{
 			ID: id,
-			CatalogObjectType: &square.CatalogItemVariation{
+			CatalogObjectType: &objects.CatalogItemVariation{
 				Name: utility.WeekendPassName[tier],
-				PriceMoney: &square.Money{
+				PriceMoney: &objects.Money{
 					Amount: weekendPassCosts[tier],
 				},
 			},
 		}
 		idx++
 	}
-	return &square.CatalogObject{
-		CatalogObjectType: &square.CatalogItem{
+	return &objects.CatalogObject{
+		CatalogObjectType: &objects.CatalogItem{
 			Name:       utility.WeekendPassItem,
 			Variations: variations,
 		},

@@ -15,10 +15,10 @@ func (s *Service) Insert(ctx context.Context, token string, submission *Voluntee
 		s.logger.WithError(err).Debug(msg)
 		return fmt.Errorf("%s: %w", msg, err)
 	}
-	s.logger.Tracef("found user %s", userinfo.UserID)
+	s.logger.Tracef("found user %s", userinfo.UserID())
 
 	err = s.store.InsertVolunteer(ctx, &storage.Volunteer{
-		UserID: userinfo.UserID,
+		UserID: userinfo.UserID(),
 		Name:   submission.Name,
 		Email:  submission.Email,
 	})

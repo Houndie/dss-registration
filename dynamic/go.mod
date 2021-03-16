@@ -1,19 +1,20 @@
 module github.com/Houndie/dss-registration/dynamic
 
-go 1.14
+go 1.16
 
 require (
+	github.com/Houndie/square-go v0.0.0-20210316172726-d8ead2f70af0 // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/doug-martin/goqu/v9 v9.10.0
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/golang/protobuf v1.4.0
-	github.com/google/go-cmp v0.4.0
-	github.com/gorilla/schema v1.1.0
+	github.com/google/go-cmp v0.5.5
+	github.com/gorilla/schema v1.2.0
 	github.com/jackc/pgconn v1.5.0
 	github.com/jackc/pgerrcode v0.0.0-20190803225404-afa3381909a6
 	github.com/jackc/pgx/v4 v4.6.0
 	github.com/lestrrat-go/jwx v1.1.4
-	github.com/peterhellberg/duration v0.0.0-20190124114432-484232d632c1
+	github.com/peterhellberg/duration v0.0.0-20191119133758-ec6baeebcd10
 	github.com/rs/cors v1.7.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v1.1.1

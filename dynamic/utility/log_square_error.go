@@ -3,13 +3,13 @@ package utility
 import (
 	"errors"
 
-	"github.com/Houndie/dss-registration/dynamic/square"
+	"github.com/Houndie/square-go/objects"
 	"github.com/sirupsen/logrus"
 )
 
 func LogSquareError(logger *logrus.Logger, err error, message string) {
-	serr := &square.Error{}
-	slerr := &square.ErrorList{}
+	serr := &objects.Error{}
+	slerr := &objects.ErrorList{}
 	if errors.As(err, &serr) {
 		logger.WithFields(logrus.Fields{
 			"Category": serr.Category,

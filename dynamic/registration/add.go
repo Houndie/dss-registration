@@ -6,8 +6,8 @@ import (
 
 	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/sendinblue"
-	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
+	"github.com/Houndie/square-go/objects"
 	"github.com/gofrs/uuid"
 )
 
@@ -16,9 +16,9 @@ func containsPaidItems(r *Info) bool {
 	return !noPassOk || r.MixAndMatch != nil || r.TeamCompetition != nil || r.TShirt != nil || r.SoloJazz != nil
 }
 
-func makeLineItems(registration *Info, squareData *common.SquareData, paymentData *common.PaymentData, discounts map[storage.PurchaseItem][]string) ([]*square.OrderLineItem, []*square.OrderLineItemDiscount, error) {
-	lineItems := []*square.OrderLineItem{}
-	lineDiscounts := []*square.OrderLineItemDiscount{}
+func makeLineItems(registration *Info, squareData *common.SquareData, paymentData *common.PaymentData, discounts map[storage.PurchaseItem][]string) ([]*objects.OrderLineItem, []*objects.OrderLineItemDiscount, error) {
+	lineItems := []*objects.OrderLineItem{}
+	lineDiscounts := []*objects.OrderLineItemDiscount{}
 	switch t := registration.PassType.(type) {
 	case *WeekendPass:
 		if !paymentData.WeekendPassPaid {
@@ -32,17 +32,17 @@ func makeLineItems(registration *Info, squareData *common.SquareData, paymentDat
 				if err != nil {
 					return nil, nil, fmt.Errorf("error creating new uuid for student discount uid: %w", err)
 				}
-				studentDiscount := &square.OrderLineItemDiscount{
+				studentDiscount := &objects.OrderLineItemDiscount{
 					CatalogObjectID: squareData.StudentDiscount.ID,
-					Scope:           square.OrderLineItemDiscountScopeLineItem,
+					Scope:           objects.OrderLineItemDiscountScopeLineItem,
 					UID:             uid.String(),
 				}
-				studentAppliedDiscount := &square.OrderLineItemAppliedDiscount{
+				studentAppliedDiscount := &objects.OrderLineItemAppliedDiscount{
 					DiscountUID: uid.String(),
 				}
 
 				if li.AppliedDiscounts == nil {
-					li.AppliedDiscounts = []*square.OrderLineItemAppliedDiscount{studentAppliedDiscount}
+					li.AppliedDiscounts = []*objects.OrderLineItemAppliedDiscount{studentAppliedDiscount}
 				} else {
 					li.AppliedDiscounts = append(li.AppliedDiscounts, studentAppliedDiscount)
 				}
@@ -100,12 +100,12 @@ func makeLineItems(registration *Info, squareData *common.SquareData, paymentDat
 	return lineItems, lineDiscounts, nil
 }
 
-func makeLineItem(catalogID string, discountNames []string, discounts map[string]*common.Discount) (*square.OrderLineItem, []*square.OrderLineItemDiscount, error) {
-	var orderDiscounts []*square.OrderLineItemDiscount
-	var appliedDiscounts []*square.OrderLineItemAppliedDiscount
+func makeLineItem(catalogID string, discountNames []string, discounts map[string]*common.Discount) (*objects.OrderLineItem, []*objects.OrderLineItemDiscount, error) {
+	var orderDiscounts []*objects.OrderLineItemDiscount
+	var appliedDiscounts []*objects.OrderLineItemAppliedDiscount
 	if len(discountNames) != 0 {
-		orderDiscounts = make([]*square.OrderLineItemDiscount, len(discountNames))
-		appliedDiscounts = make([]*square.OrderLineItemAppliedDiscount, len(discountNames))
+		orderDiscounts = make([]*objects.OrderLineItemDiscount, len(discountNames))
+		appliedDiscounts = make([]*objects.OrderLineItemAppliedDiscount, len(discountNames))
 		for i, name := range discountNames {
 			d, ok := discounts[name]
 			if !ok {
@@ -117,17 +117,17 @@ func makeLineItem(catalogID string, discountNames []string, discounts map[string
 				return nil, nil, fmt.Errorf("error creating uid for line item discount: %w", err)
 			}
 
-			orderDiscounts[i] = &square.OrderLineItemDiscount{
+			orderDiscounts[i] = &objects.OrderLineItemDiscount{
 				CatalogObjectID: d.ID,
 				UID:             uid.String(),
 			}
 
-			appliedDiscounts[i] = &square.OrderLineItemAppliedDiscount{
+			appliedDiscounts[i] = &objects.OrderLineItemAppliedDiscount{
 				DiscountUID: uid.String(),
 			}
 		}
 	}
-	return &square.OrderLineItem{
+	return &objects.OrderLineItem{
 		Quantity:         "1",
 		CatalogObjectID:  catalogID,
 		AppliedDiscounts: appliedDiscounts,
@@ -174,7 +174,7 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 		}
 
 		s.logger.Trace("Fetching all locations from square")
-		locations, err := s.client.ListLocations(ctx)
+		locations, err := s.client.Locations.List(ctx)
 		if err != nil {
 			return "", fmt.Errorf("error listing locations from square: %w", err)
 		}
@@ -207,9 +207,9 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 			return "", err
 		}
 
-		order := &square.CreateOrderRequest{
+		order := &objects.CreateOrderRequest{
 			IdempotencyKey: idempotencyKey,
-			Order: &square.Order{
+			Order: &objects.Order{
 				ReferenceID: referenceID.String(),
 				LocationID:  locations[0].ID,
 				LineItems:   lineItems,

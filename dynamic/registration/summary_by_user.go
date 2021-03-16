@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Houndie/dss-registration/dynamic/square"
+	"github.com/Houndie/square-go/objects"
 )
 
 func (s *Service) SummaryByUser(ctx context.Context, token string) ([]*Summary, error) {
@@ -27,7 +27,7 @@ func (s *Service) SummaryByUser(ctx context.Context, token string) ([]*Summary, 
 	}
 
 	s.logger.Trace("fetching locations from square")
-	locations, err := s.client.ListLocations(ctx)
+	locations, err := s.client.Locations.List(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error listing locations from square: %w", err)
 	}
@@ -44,10 +44,10 @@ func (s *Service) SummaryByUser(ctx context.Context, token string) ([]*Summary, 
 	}
 	s.logger.Tracef("found %d total orders between all locations", len(orderIDs))
 
-	orderMap := map[string]*square.Order{}
+	orderMap := map[string]*objects.Order{}
 	if len(orderIDs) > 0 {
 		s.logger.Trace("retrieving orders from square")
-		orders, err := s.client.BatchRetrieveOrders(ctx, locations[0].ID, orderIDs)
+		orders, err := s.client.Orders.BatchRetrieve(ctx, locations[0].ID, orderIDs)
 		if err != nil {
 			return nil, fmt.Errorf("error retrieving orders matching ids: %w", err)
 		}
@@ -62,7 +62,7 @@ func (s *Service) SummaryByUser(ctx context.Context, token string) ([]*Summary, 
 	for i, reg := range r {
 		paid := true
 		for _, id := range reg.OrderIDs {
-			if orderMap[id].State != square.OrderStateCompleted {
+			if orderMap[id].State != objects.OrderStateCompleted {
 				paid = false
 				break
 			}

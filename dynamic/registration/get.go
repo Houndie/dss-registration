@@ -31,7 +31,7 @@ func (s *Service) Get(ctx context.Context, token, registrationID string) (*Info,
 	pd := &common.PaymentData{}
 	if len(r.OrderIDs) > 0 {
 		s.logger.Trace("fetching locations from square")
-		locations, err := s.client.ListLocations(ctx)
+		locations, err := s.client.Locations.List(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("error listing locations from square: %w", err)
 		}

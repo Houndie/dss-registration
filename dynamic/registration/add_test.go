@@ -10,10 +10,13 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/sendinblue"
-	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
 	"github.com/Houndie/dss-registration/dynamic/utility"
+	"github.com/Houndie/square-go"
+	"github.com/Houndie/square-go/catalog"
+	"github.com/Houndie/square-go/inventory"
+	"github.com/Houndie/square-go/objects"
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 )
@@ -23,7 +26,7 @@ type itemCheck struct {
 	id    string
 }
 
-func discountCheck(t *testing.T, discountArray []*square.OrderLineItemDiscount, appliedDiscounts []*square.OrderLineItemAppliedDiscount, discountID string) {
+func discountCheck(t *testing.T, discountArray []*objects.OrderLineItemDiscount, appliedDiscounts []*objects.OrderLineItemAppliedDiscount, discountID string) {
 	found := false
 	for _, d := range discountArray {
 		if d.CatalogObjectID == discountID {
@@ -71,10 +74,10 @@ func TestAdd(t *testing.T) {
 
 	co := commontest.CommonCatalogObjects()
 
-	inventoryCounts := make([]*square.InventoryCount, len(co.WeekendPassID))
+	inventoryCounts := make([]*objects.InventoryCount, len(co.WeekendPassID))
 	idx := 0
 	for _, id := range co.WeekendPassID {
-		inventoryCounts[idx] = &square.InventoryCount{
+		inventoryCounts[idx] = &objects.InventoryCount{
 			CatalogObjectID: id,
 			Quantity:        "25",
 		}
@@ -159,107 +162,115 @@ func TestAdd(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			client := &commontest.MockSquareClient{
-				ListCatalogFunc: func(ctx context.Context, types []square.CatalogObjectType) square.ListCatalogIterator {
-					if !test.makeOrder {
-						t.Fatalf("no orderable items found, square should not be called")
-					}
-					return commontest.ListCatalogFuncFromSlice(co.Catalog())(ctx, types)
-				},
-				BatchRetrieveInventoryCountsFunc: func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) square.BatchRetrieveInventoryCountsIterator {
-					if !test.makeOrder {
-						t.Fatalf("no orderable items found, square should not be called")
-					}
-					return commontest.InventoryCountsFromSliceCheck(t, co.WeekendPassID, inventoryCounts)(ctx, catalogObjectIDs, locationIDs, updatedAfter)
-				},
-				ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
-					if !test.makeOrder {
-						t.Fatalf("no orderable items found, square should not be called")
-					}
-					return []*square.Location{{ID: expectedLocationID}}, nil
-				},
-				CreateCheckoutFunc: func(ctx context.Context, locationID, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error) {
-					if !test.makeOrder {
-						t.Fatalf("no orderable items found, square should not be called")
-					}
-					if locationID != expectedLocationID {
-						t.Fatalf("expected location ID %s, found %s", expectedLocationID, locationID)
-					}
-					if idempotencyKey != expectedIdempotencyKey.String() {
-						t.Fatalf("expected idempotencyKey %v, found %s", expectedIdempotencyKey, idempotencyKey)
-					}
-					if merchantSupportEmail != utility.SmackdownEmail {
-						t.Fatalf("expected merchant email %s, found %s", utility.SmackdownEmail, merchantSupportEmail)
-					}
-					if prePopulateBuyerEmail != test.registration.Email {
-						t.Fatalf("expected user email %s, found %s", test.registration.Email, prePopulateBuyerEmail)
-					}
-					if redirectUrl != expectedRedirectUrl {
-						t.Fatalf("expected redirectUrl %s, found %s", expectedRedirectUrl, redirectUrl)
-					}
-
-					itemChecks := []*itemCheck{}
-					switch p := test.registration.PassType.(type) {
-					case *WeekendPass:
-						itemChecks = append(itemChecks, &itemCheck{id: co.WeekendPassID[p.Tier]})
-					case *DanceOnlyPass:
-						itemChecks = append(itemChecks, &itemCheck{id: co.DancePassID})
-						// default, do nothing
-					}
-					if test.registration.MixAndMatch != nil {
-						itemChecks = append(itemChecks, &itemCheck{id: co.MixAndMatchID})
-					}
-					if test.registration.TeamCompetition != nil {
-						itemChecks = append(itemChecks, &itemCheck{id: co.TeamCompetitionID})
-					}
-					if test.registration.TShirt != nil {
-						itemChecks = append(itemChecks, &itemCheck{id: co.TShirtID})
-					}
-					if test.registration.SoloJazz != nil {
-						itemChecks = append(itemChecks, &itemCheck{id: co.SoloJazzID})
-					}
-					for _, lineItem := range order.Order.LineItems {
-						if lineItem.Quantity != "1" {
-							t.Fatalf("found unknown quantity of items %s, expected \"1\"", lineItem.Quantity)
+			client := &square.Client{
+				Catalog: &commontest.MockSquareCatalogClient{
+					ListFunc: func(ctx context.Context, types []objects.CatalogObjectType) catalog.ListIterator {
+						if !test.makeOrder {
+							t.Fatalf("no orderable items found, square should not be called")
 						}
-						found := false
-						for _, itemCheck := range itemChecks {
-							if itemCheck.id == lineItem.CatalogObjectID {
-								if itemCheck.found {
-									t.Fatalf("order item with id %q found twice", itemCheck.id)
-								}
-								itemCheck.found = true
-								found = true
+						return commontest.ListCatalogFuncFromSlice(co.Catalog())(ctx, types)
+					},
+				},
+				Inventory: &commontest.MockSquareInventoryClient{
+					BatchRetrieveCountsFunc: func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) inventory.BatchRetrieveCountsIterator {
+						if !test.makeOrder {
+							t.Fatalf("no orderable items found, square should not be called")
+						}
+						return commontest.InventoryCountsFromSliceCheck(t, co.WeekendPassID, inventoryCounts)(ctx, catalogObjectIDs, locationIDs, updatedAfter)
+					},
+				},
+				Locations: &commontest.MockSquareLocationsClient{
+					ListFunc: func(context.Context) ([]*objects.Location, error) {
+						if !test.makeOrder {
+							t.Fatalf("no orderable items found, square should not be called")
+						}
+						return []*objects.Location{{ID: expectedLocationID}}, nil
+					},
+				},
+				Checkout: &commontest.MockSquareCheckoutClient{
+					CreateFunc: func(ctx context.Context, locationID, idempotencyKey string, order *objects.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *objects.Address, redirectUrl string, additionalRecipients []*objects.ChargeRequestAdditionalRecipient, note string) (*objects.Checkout, error) {
+						if !test.makeOrder {
+							t.Fatalf("no orderable items found, square should not be called")
+						}
+						if locationID != expectedLocationID {
+							t.Fatalf("expected location ID %s, found %s", expectedLocationID, locationID)
+						}
+						if idempotencyKey != expectedIdempotencyKey.String() {
+							t.Fatalf("expected idempotencyKey %v, found %s", expectedIdempotencyKey, idempotencyKey)
+						}
+						if merchantSupportEmail != utility.SmackdownEmail {
+							t.Fatalf("expected merchant email %s, found %s", utility.SmackdownEmail, merchantSupportEmail)
+						}
+						if prePopulateBuyerEmail != test.registration.Email {
+							t.Fatalf("expected user email %s, found %s", test.registration.Email, prePopulateBuyerEmail)
+						}
+						if redirectUrl != expectedRedirectUrl {
+							t.Fatalf("expected redirectUrl %s, found %s", expectedRedirectUrl, redirectUrl)
+						}
 
-								if p, ok := test.registration.PassType.(*WeekendPass); ok && lineItem.CatalogObjectID == co.WeekendPassID[p.Tier] {
-									if len(test.registration.DiscountCodes) > 0 {
-										discountCheck(t, order.Order.Discounts, lineItem.AppliedDiscounts, co.FullWeekendDiscountID)
+						itemChecks := []*itemCheck{}
+						switch p := test.registration.PassType.(type) {
+						case *WeekendPass:
+							itemChecks = append(itemChecks, &itemCheck{id: co.WeekendPassID[p.Tier]})
+						case *DanceOnlyPass:
+							itemChecks = append(itemChecks, &itemCheck{id: co.DancePassID})
+							// default, do nothing
+						}
+						if test.registration.MixAndMatch != nil {
+							itemChecks = append(itemChecks, &itemCheck{id: co.MixAndMatchID})
+						}
+						if test.registration.TeamCompetition != nil {
+							itemChecks = append(itemChecks, &itemCheck{id: co.TeamCompetitionID})
+						}
+						if test.registration.TShirt != nil {
+							itemChecks = append(itemChecks, &itemCheck{id: co.TShirtID})
+						}
+						if test.registration.SoloJazz != nil {
+							itemChecks = append(itemChecks, &itemCheck{id: co.SoloJazzID})
+						}
+						for _, lineItem := range order.Order.LineItems {
+							if lineItem.Quantity != "1" {
+								t.Fatalf("found unknown quantity of items %s, expected \"1\"", lineItem.Quantity)
+							}
+							found := false
+							for _, itemCheck := range itemChecks {
+								if itemCheck.id == lineItem.CatalogObjectID {
+									if itemCheck.found {
+										t.Fatalf("order item with id %q found twice", itemCheck.id)
 									}
-									if test.registration.IsStudent {
-										discountCheck(t, order.Order.Discounts, lineItem.AppliedDiscounts, co.StudentDiscountID)
+									itemCheck.found = true
+									found = true
+
+									if p, ok := test.registration.PassType.(*WeekendPass); ok && lineItem.CatalogObjectID == co.WeekendPassID[p.Tier] {
+										if len(test.registration.DiscountCodes) > 0 {
+											discountCheck(t, order.Order.Discounts, lineItem.AppliedDiscounts, co.FullWeekendDiscountID)
+										}
+										if test.registration.IsStudent {
+											discountCheck(t, order.Order.Discounts, lineItem.AppliedDiscounts, co.StudentDiscountID)
+										}
+									} else if test.registration.MixAndMatch != nil && lineItem.CatalogObjectID == co.MixAndMatchID && len(test.registration.DiscountCodes) > 0 {
+										discountCheck(t, order.Order.Discounts, lineItem.AppliedDiscounts, co.MixAndMatchDiscountID)
 									}
-								} else if test.registration.MixAndMatch != nil && lineItem.CatalogObjectID == co.MixAndMatchID && len(test.registration.DiscountCodes) > 0 {
-									discountCheck(t, order.Order.Discounts, lineItem.AppliedDiscounts, co.MixAndMatchDiscountID)
+									break
 								}
-								break
+							}
+							if !found {
+								t.Fatalf("found order for unexpected item id %q", lineItem.CatalogObjectID)
+							}
+
+						}
+						for _, itemCheck := range itemChecks {
+							if !itemCheck.found {
+								t.Fatalf("item with id %q not found", itemCheck.id)
 							}
 						}
-						if !found {
-							t.Fatalf("found order for unexpected item id %q", lineItem.CatalogObjectID)
-						}
-
-					}
-					for _, itemCheck := range itemChecks {
-						if !itemCheck.found {
-							t.Fatalf("item with id %q not found", itemCheck.id)
-						}
-					}
-					return &square.Checkout{
-						CheckoutPageUrl: expectedCheckoutUrl,
-						Order: &square.Order{
-							ID: expectedOrderID,
-						},
-					}, nil
+						return &objects.Checkout{
+							CheckoutPageURL: expectedCheckoutUrl,
+							Order: &objects.Order{
+								ID: expectedOrderID,
+							},
+						}, nil
+					},
 				},
 			}
 
@@ -592,7 +603,7 @@ func TestAddNotActive(t *testing.T) {
 	}
 	logger.SetOutput(devnull)
 
-	service := NewService(active, false, logger, &commontest.MockSquareClient{}, &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{})
+	service := NewService(active, false, logger, &square.Client{}, &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{})
 
 	registration := &Info{
 		FirstName: "John",
@@ -619,32 +630,40 @@ func TestAddCostNothing(t *testing.T) {
 
 	co := commontest.CommonCatalogObjects()
 
-	inventoryCounts := make([]*square.InventoryCount, len(co.WeekendPassID))
+	inventoryCounts := make([]*objects.InventoryCount, len(co.WeekendPassID))
 	idx := 0
 	for _, id := range co.WeekendPassID {
-		inventoryCounts[idx] = &square.InventoryCount{
+		inventoryCounts[idx] = &objects.InventoryCount{
 			CatalogObjectID: id,
 			Quantity:        "25",
 		}
 		idx++
 	}
 
-	client := &commontest.MockSquareClient{
-		ListCatalogFunc:                  commontest.ListCatalogFuncFromSlice(co.Catalog()),
-		BatchRetrieveInventoryCountsFunc: commontest.InventoryCountsFromSlice(inventoryCounts),
-		ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
-			return []*square.Location{{ID: "7"}}, nil
+	client := &square.Client{
+		Catalog: &commontest.MockSquareCatalogClient{
+			ListFunc: commontest.ListCatalogFuncFromSlice(co.Catalog()),
 		},
-		CreateCheckoutFunc: func(ctx context.Context, locationID, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error) {
-			return nil, &square.ErrorList{
-				Errors: []*square.Error{
-					{
-						Category: square.ErrorCategoryInvalidRequestError,
-						Code:     square.ErrorCodeValueTooLow,
-						Field:    "order.total_money.amount",
+		Inventory: &commontest.MockSquareInventoryClient{
+			BatchRetrieveCountsFunc: commontest.InventoryCountsFromSlice(inventoryCounts),
+		},
+		Locations: &commontest.MockSquareLocationsClient{
+			ListFunc: func(context.Context) ([]*objects.Location, error) {
+				return []*objects.Location{{ID: "7"}}, nil
+			},
+		},
+		Checkout: &commontest.MockSquareCheckoutClient{
+			CreateFunc: func(ctx context.Context, locationID, idempotencyKey string, order *objects.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *objects.Address, redirectUrl string, additionalRecipients []*objects.ChargeRequestAdditionalRecipient, note string) (*objects.Checkout, error) {
+				return nil, &objects.ErrorList{
+					Errors: []*objects.Error{
+						{
+							Category: objects.ErrorCategoryInvalidRequestError,
+							Code:     objects.ErrorCodeValueTooLow,
+							Field:    "order.total_money.amount",
+						},
 					},
-				},
-			}
+				}
+			},
 		},
 	}
 

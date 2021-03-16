@@ -18,8 +18,9 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/registration"
 	pb "github.com/Houndie/dss-registration/dynamic/rpc/dss"
 	"github.com/Houndie/dss-registration/dynamic/sendinblue"
-	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage/postgres"
+	"github.com/Houndie/square-go"
+	"github.com/Houndie/square-go/objects"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
@@ -71,12 +72,12 @@ var rootCmd = &cobra.Command{
 		logger := logrus.New()
 		logger.SetLevel(logrus.TraceLevel)
 
-		var squareEnvironment square.Environment
+		var squareEnvironment objects.Environment
 		switch viper.GetString("environment") {
 		case "production":
-			squareEnvironment = square.Production
+			squareEnvironment = objects.Production
 		case "development":
-			squareEnvironment = square.Sandbox
+			squareEnvironment = objects.Sandbox
 		default:
 			return fmt.Errorf("unknown environment: %s", viper.GetString("environment"))
 		}

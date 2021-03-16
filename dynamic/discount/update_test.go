@@ -11,6 +11,7 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
+	"github.com/Houndie/square-go"
 	"github.com/sirupsen/logrus"
 )
 
@@ -72,7 +73,7 @@ func TestUpdateDiscount(t *testing.T) {
 		},
 	}
 
-	service := NewService(store, &commontest.MockSquareClient{}, logger, authorizer)
+	service := NewService(store, &square.Client{}, logger, authorizer)
 	err = service.Update(context.Background(), token, inCode, inDiscount)
 	if err != nil {
 		t.Fatalf("unexpected error found in call to Add Discount: %v", err)
@@ -109,7 +110,7 @@ func TestUpdateDiscountNotAuthorized(t *testing.T) {
 
 	store := &commontest.MockStore{}
 
-	service := NewService(store, &commontest.MockSquareClient{}, logger, authorizer)
+	service := NewService(store, &square.Client{}, logger, authorizer)
 	err = service.Update(context.Background(), token, inCode, inDiscount)
 	if err == nil {
 		t.Fatalf("unexpected error, found none")

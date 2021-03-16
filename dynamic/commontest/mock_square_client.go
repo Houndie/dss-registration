@@ -5,41 +5,63 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
+	"github.com/Houndie/square-go/catalog"
+	"github.com/Houndie/square-go/checkout"
+	"github.com/Houndie/square-go/inventory"
+	"github.com/Houndie/square-go/locations"
+	"github.com/Houndie/square-go/objects"
+	"github.com/Houndie/square-go/orders"
 )
 
-type MockSquareClient struct {
-	ListCatalogFunc                  func(ctx context.Context, types []square.CatalogObjectType) square.ListCatalogIterator
-	BatchRetrieveInventoryCountsFunc func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) square.BatchRetrieveInventoryCountsIterator
-	ListLocationsFunc                func(ctx context.Context) ([]*square.Location, error)
-	CreateCheckoutFunc               func(ctx context.Context, locationID, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error)
-	BatchRetrieveOrdersFunc          func(ctx context.Context, locationID string, orderIDs []string) ([]*square.Order, error)
+type MockSquareCatalogClient struct {
+	catalog.Client
+	ListFunc func(ctx context.Context, types []objects.CatalogObjectType) catalog.ListIterator
 }
 
-func (m *MockSquareClient) ListCatalog(ctx context.Context, types []square.CatalogObjectType) square.ListCatalogIterator {
-	return m.ListCatalogFunc(ctx, types)
+type MockSquareInventoryClient struct {
+	inventory.Client
+	BatchRetrieveCountsFunc func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) inventory.BatchRetrieveCountsIterator
 }
 
-func (m *MockSquareClient) BatchRetrieveInventoryCounts(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) square.BatchRetrieveInventoryCountsIterator {
-	return m.BatchRetrieveInventoryCountsFunc(ctx, catalogObjectIDs, locationIDs, updatedAfter)
+type MockSquareLocationsClient struct {
+	locations.Client
+	ListFunc func(ctx context.Context) ([]*objects.Location, error)
 }
 
-func (m *MockSquareClient) ListLocations(ctx context.Context) ([]*square.Location, error) {
-	return m.ListLocationsFunc(ctx)
+type MockSquareCheckoutClient struct {
+	checkout.Client
+	CreateFunc func(ctx context.Context, locationID, idempotencyKey string, order *objects.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *objects.Address, redirectUrl string, additionalRecipients []*objects.ChargeRequestAdditionalRecipient, note string) (*objects.Checkout, error)
 }
 
-func (m *MockSquareClient) CreateCheckout(ctx context.Context, locationID, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error) {
-	return m.CreateCheckoutFunc(ctx, locationID, idempotencyKey, order, askForShippingAddress, merchantSupportEmail, prePopulateBuyerEmail, prePopulateShippingAddress, redirectUrl, additionalRecipients, note)
+type MockSquareOrdersClient struct {
+	orders.Client
+	BatchRetrieveFunc func(ctx context.Context, locationID string, orderIDs []string) ([]*objects.Order, error)
+}
+
+func (m *MockSquareCatalogClient) List(ctx context.Context, types []objects.CatalogObjectType) catalog.ListIterator {
+	return m.ListFunc(ctx, types)
+}
+
+func (m *MockSquareInventoryClient) BatchRetrieveCounts(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) inventory.BatchRetrieveCountsIterator {
+	return m.BatchRetrieveCountsFunc(ctx, catalogObjectIDs, locationIDs, updatedAfter)
+}
+
+func (m *MockSquareLocationsClient) List(ctx context.Context) ([]*objects.Location, error) {
+	return m.ListFunc(ctx)
+}
+
+func (m *MockSquareCheckoutClient) Create(ctx context.Context, locationID, idempotencyKey string, order *objects.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *objects.Address, redirectUrl string, additionalRecipients []*objects.ChargeRequestAdditionalRecipient, note string) (*objects.Checkout, error) {
+	return m.CreateFunc(ctx, locationID, idempotencyKey, order, askForShippingAddress, merchantSupportEmail, prePopulateBuyerEmail, prePopulateShippingAddress, redirectUrl, additionalRecipients, note)
 }
 
 type MockListCatalogIterator struct {
-	ValueFunc func() *square.CatalogObject
+	ValueFunc func() *objects.CatalogObject
 	ErrorFunc func() error
 	NextFunc  func() bool
 }
 
-func (m *MockListCatalogIterator) Value() *square.CatalogObject {
+func (m *MockListCatalogIterator) Value() *objects.CatalogObject {
 	return m.ValueFunc()
 }
 
@@ -52,12 +74,12 @@ func (m *MockListCatalogIterator) Next() bool {
 }
 
 type MockBatchRetrieveInventoryCountsIterator struct {
-	ValueFunc func() *square.InventoryCount
+	ValueFunc func() *objects.InventoryCount
 	ErrorFunc func() error
 	NextFunc  func() bool
 }
 
-func (m *MockBatchRetrieveInventoryCountsIterator) Value() *square.InventoryCount {
+func (m *MockBatchRetrieveInventoryCountsIterator) Value() *objects.InventoryCount {
 	return m.ValueFunc()
 }
 
@@ -69,17 +91,17 @@ func (m *MockBatchRetrieveInventoryCountsIterator) Next() bool {
 	return m.NextFunc()
 }
 
-func (m *MockSquareClient) BatchRetrieveOrders(ctx context.Context, locationID string, orderIDs []string) ([]*square.Order, error) {
-	return m.BatchRetrieveOrdersFunc(ctx, locationID, orderIDs)
+func (m *MockSquareOrdersClient) BatchRetrieve(ctx context.Context, locationID string, orderIDs []string) ([]*objects.Order, error) {
+	return m.BatchRetrieveFunc(ctx, locationID, orderIDs)
 }
 
 /** Some common func implementations */
 
-func ListCatalogFuncFromSlice(catalogObjects []*square.CatalogObject) func(ctx context.Context, types []square.CatalogObjectType) square.ListCatalogIterator {
+func ListCatalogFuncFromSlice(catalogObjects []*objects.CatalogObject) func(ctx context.Context, types []objects.CatalogObjectType) catalog.ListIterator {
 	catalogObjectsIdx := -1
-	return func(ctx context.Context, types []square.CatalogObjectType) square.ListCatalogIterator {
+	return func(ctx context.Context, types []objects.CatalogObjectType) catalog.ListIterator {
 		return &MockListCatalogIterator{
-			ValueFunc: func() *square.CatalogObject {
+			ValueFunc: func() *objects.CatalogObject {
 				return catalogObjects[catalogObjectsIdx]
 			},
 			ErrorFunc: func() error {
@@ -93,9 +115,9 @@ func ListCatalogFuncFromSlice(catalogObjects []*square.CatalogObject) func(ctx c
 	}
 }
 
-func InventoryCountsFromSliceCheck(t *testing.T, expectedObjectIDs map[storage.WeekendPassTier]string, inventoryCounts []*square.InventoryCount) func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) square.BatchRetrieveInventoryCountsIterator {
+func InventoryCountsFromSliceCheck(t *testing.T, expectedObjectIDs map[storage.WeekendPassTier]string, inventoryCounts []*objects.InventoryCount) func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) inventory.BatchRetrieveCountsIterator {
 	inventoryCountsIdx := -1
-	return func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) square.BatchRetrieveInventoryCountsIterator {
+	return func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) inventory.BatchRetrieveCountsIterator {
 
 		for _, expectedID := range expectedObjectIDs {
 			found := false
@@ -123,7 +145,7 @@ func InventoryCountsFromSliceCheck(t *testing.T, expectedObjectIDs map[storage.W
 			}
 		}
 		return &MockBatchRetrieveInventoryCountsIterator{
-			ValueFunc: func() *square.InventoryCount {
+			ValueFunc: func() *objects.InventoryCount {
 				return inventoryCounts[inventoryCountsIdx]
 			},
 			ErrorFunc: func() error {
@@ -137,11 +159,11 @@ func InventoryCountsFromSliceCheck(t *testing.T, expectedObjectIDs map[storage.W
 	}
 }
 
-func InventoryCountsFromSlice(inventoryCounts []*square.InventoryCount) func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) square.BatchRetrieveInventoryCountsIterator {
+func InventoryCountsFromSlice(inventoryCounts []*objects.InventoryCount) func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) inventory.BatchRetrieveCountsIterator {
 	inventoryCountsIdx := -1
-	return func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) square.BatchRetrieveInventoryCountsIterator {
+	return func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) inventory.BatchRetrieveCountsIterator {
 		return &MockBatchRetrieveInventoryCountsIterator{
-			ValueFunc: func() *square.InventoryCount {
+			ValueFunc: func() *objects.InventoryCount {
 				return inventoryCounts[inventoryCountsIdx]
 			},
 			ErrorFunc: func() error {
@@ -155,13 +177,13 @@ func InventoryCountsFromSlice(inventoryCounts []*square.InventoryCount) func(ctx
 	}
 }
 
-func OrdersFromSliceCheck(t *testing.T, expectedLocationID string, orders []*square.Order) func(ctx context.Context, locationID string, orderIDs []string) ([]*square.Order, error) {
-	return func(ctx context.Context, locationID string, orderIDs []string) ([]*square.Order, error) {
+func OrdersFromSliceCheck(t *testing.T, expectedLocationID string, orders []*objects.Order) func(ctx context.Context, locationID string, orderIDs []string) ([]*objects.Order, error) {
+	return func(ctx context.Context, locationID string, orderIDs []string) ([]*objects.Order, error) {
 		if locationID != expectedLocationID {
 			t.Fatalf("found unexpected location id %s, expected %s", locationID, expectedLocationID)
 		}
 
-		retOrders := make([]*square.Order, len(orderIDs))
+		retOrders := make([]*objects.Order, len(orderIDs))
 		for i, orderID := range orderIDs {
 			found := false
 			for _, order := range orders {

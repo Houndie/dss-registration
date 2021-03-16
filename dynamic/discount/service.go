@@ -7,6 +7,7 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/storage"
+	"github.com/Houndie/square-go"
 	"github.com/sirupsen/logrus"
 )
 
@@ -23,7 +24,7 @@ type Authorizer interface {
 	GetUserinfo(ctx context.Context, accessToken string) (authorizer.Userinfo, error)
 }
 
-func NewService(store Store, client common.SquareClient, logger *logrus.Logger, authorizer Authorizer) *Service {
+func NewService(store Store, client *square.Client, logger *logrus.Logger, authorizer Authorizer) *Service {
 	return &Service{
 		store:      store,
 		client:     client,
@@ -34,7 +35,7 @@ func NewService(store Store, client common.SquareClient, logger *logrus.Logger, 
 
 type Service struct {
 	store      Store
-	client     common.SquareClient
+	client     *square.Client
 	logger     *logrus.Logger
 	authorizer Authorizer
 }

@@ -14,7 +14,7 @@ type Store interface {
 }
 
 type Authorizer interface {
-	Userinfo(ctx context.Context, accessToken string) (*authorizer.Userinfo, error)
+	Userinfo(ctx context.Context, accessToken string) (authorizer.Userinfo, error)
 }
 
 type Service struct {
