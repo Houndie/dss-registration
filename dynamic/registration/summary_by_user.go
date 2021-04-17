@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Houndie/square-go/objects"
+	"github.com/Houndie/square-go/orders"
 )
 
 func (s *Service) SummaryByUser(ctx context.Context, token string) ([]*Summary, error) {
@@ -26,33 +27,36 @@ func (s *Service) SummaryByUser(ctx context.Context, token string) ([]*Summary, 
 		return nil, nil
 	}
 
-	s.logger.Trace("fetching locations from square")
-	locations, err := s.client.Locations.List(ctx)
+	s.logger.Trace("fetching locationsListRes.Locations from square")
+	locationsListRes, err := s.client.Locations.List(ctx, nil)
 	if err != nil {
-		return nil, fmt.Errorf("error listing locations from square: %w", err)
+		return nil, fmt.Errorf("error listing locationsListRes.Locations from square: %w", err)
 	}
-	s.logger.Tracef("found %d locations", len(locations))
+	s.logger.Tracef("found %d locationsListRes.Locations", len(locationsListRes.Locations))
 
-	if len(locations) != 1 {
-		return nil, fmt.Errorf("found unexpected number of locations %d", len(locations))
+	if len(locationsListRes.Locations) != 1 {
+		return nil, fmt.Errorf("found unexpected number of locationsListRes.Locations %d", len(locationsListRes.Locations))
 	}
-	s.logger.Tracef("found location %s", locations[0].ID)
+	s.logger.Tracef("found location %s", locationsListRes.Locations[0].ID)
 
 	orderIDs := []string{}
 	for _, reg := range r {
 		orderIDs = append(orderIDs, reg.OrderIDs...)
 	}
-	s.logger.Tracef("found %d total orders between all locations", len(orderIDs))
+	s.logger.Tracef("found %d total orders between all locationsListRes.Locations", len(orderIDs))
 
 	orderMap := map[string]*objects.Order{}
 	if len(orderIDs) > 0 {
 		s.logger.Trace("retrieving orders from square")
-		orders, err := s.client.Orders.BatchRetrieve(ctx, locations[0].ID, orderIDs)
+		ordersRes, err := s.client.Orders.BatchRetrieve(ctx, &orders.BatchRetrieveRequest{
+			LocationID: locationsListRes.Locations[0].ID,
+			OrderIDs:   orderIDs,
+		})
 		if err != nil {
 			return nil, fmt.Errorf("error retrieving orders matching ids: %w", err)
 		}
 
-		for _, order := range orders {
+		for _, order := range ordersRes.Orders {
 			orderMap[order.ID] = order
 		}
 	}

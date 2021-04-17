@@ -9,7 +9,11 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/utility"
 	"github.com/Houndie/square-go"
+	"github.com/Houndie/square-go/catalog"
+	"github.com/Houndie/square-go/checkout"
+	"github.com/Houndie/square-go/inventory"
 	"github.com/Houndie/square-go/objects"
+	"github.com/Houndie/square-go/orders"
 )
 
 type PurchaseItem struct {
@@ -49,7 +53,7 @@ func singleVariationItem(o *objects.CatalogItem) (*PurchaseItem, error) {
 	if len(o.Variations) != 1 {
 		return nil, fmt.Errorf("expected 1 variation, found %d", len(o.Variations))
 	}
-	variation, ok := o.Variations[0].CatalogObjectType.(*objects.CatalogItemVariation)
+	variation, ok := o.Variations[0].Type.(*objects.CatalogItemVariation)
 	if !ok {
 		return nil, errors.New("item variation isn't variation")
 	}
@@ -63,11 +67,15 @@ func GetSquareCatalog(ctx context.Context, client *square.Client) (*SquareData, 
 	result := &SquareData{}
 	result.FullWeekend = map[storage.WeekendPassTier]*PurchaseItem{}
 	result.Discounts = map[string]*Discount{}
-	catalogObjects := client.Catalog.List(ctx, []objects.CatalogObjectType{objects.CatalogObjectTypeItem, objects.CatalogObjectTypeDiscount})
+	res, err := client.Catalog.List(ctx, &catalog.ListRequest{
+		Types: []objects.CatalogObjectEnumType{objects.CatalogObjectEnumTypeItem, objects.CatalogObjectEnumTypeDiscount},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error listing catalog objects: %w", err)
+	}
 
-	var err error
-	for catalogObjects.Next() {
-		switch o := catalogObjects.Value().CatalogObjectType.(type) {
+	for res.Objects.Next() {
+		switch o := res.Objects.Value().Object.Type.(type) {
 		case *objects.CatalogItem:
 			switch o.Name {
 			case utility.MixAndMatchItem:
@@ -92,7 +100,7 @@ func GetSquareCatalog(ctx context.Context, client *square.Client) (*SquareData, 
 				}
 			case utility.DancePassItem:
 				for _, variation := range o.Variations {
-					v, ok := variation.CatalogObjectType.(*objects.CatalogItemVariation)
+					v, ok := variation.Type.(*objects.CatalogItemVariation)
 					if !ok {
 						// Should never happen, but just move on
 						continue
@@ -111,7 +119,7 @@ func GetSquareCatalog(ctx context.Context, client *square.Client) (*SquareData, 
 				}
 			case utility.WeekendPassItem:
 				for _, variation := range o.Variations {
-					v, ok := variation.CatalogObjectType.(*objects.CatalogItemVariation)
+					v, ok := variation.Type.(*objects.CatalogItemVariation)
 					if !ok {
 						// Should never happen, but just move on
 						continue
@@ -146,20 +154,20 @@ func GetSquareCatalog(ctx context.Context, client *square.Client) (*SquareData, 
 			}
 			if o.Name == utility.StudentDiscountItem {
 				result.StudentDiscount = &Discount{
-					ID:     catalogObjects.Value().ID,
+					ID:     res.Objects.Value().Object.ID,
 					Amount: amount,
 				}
 				continue
 			}
 
 			result.Discounts[o.Name] = &Discount{
-				ID:     catalogObjects.Value().ID,
+				ID:     res.Objects.Value().Object.ID,
 				Amount: amount,
 			}
 		}
 	}
-	if catalogObjects.Error() != nil {
-		return nil, fmt.Errorf("error fetching all items from square: %w", catalogObjects.Error())
+	if res.Objects.Error() != nil {
+		return nil, fmt.Errorf("error fetching all items from square: %w", res.Objects.Error())
 	}
 
 	if result.FullWeekend[storage.Tier1] == nil {
@@ -217,22 +225,30 @@ func LowestInStockTier(ctx context.Context, s *SquareData, squareClient *square.
 	}
 
 	bestTier, bestCost := storage.Tier5, s.FullWeekend[storage.Tier5].Cost
-	counts := squareClient.Inventory.BatchRetrieveCounts(ctx, weekendPassIDs, nil, nil)
-	for counts.Next() {
-		quantity, err := strconv.ParseFloat(counts.Value().Quantity, 64)
+	res, err := squareClient.Inventory.BatchRetrieveCounts(ctx, &inventory.BatchRetrieveCountsRequest{
+		CatalogObjectIDs: weekendPassIDs,
+	})
+	if err != nil {
+		return 0, 0, fmt.Errorf("error fetching inventory counts from square: %w", err)
+	}
+
+	for res.Counts.Next() {
+		count := res.Counts.Value().Count
+
+		quantity, err := strconv.ParseFloat(count.Quantity, 64)
 		if err != nil {
-			return 0, 0, fmt.Errorf("could not convert quantity %s to float: %w", counts.Value().Quantity, err)
+			return 0, 0, fmt.Errorf("could not convert quantity %s to float: %w", count.Quantity, err)
 		}
 		if quantity > 0 {
-			thisTier := tierMap[counts.Value().CatalogObjectID]
+			thisTier := tierMap[count.CatalogObjectID]
 			if thisTier.tier < bestTier {
 				bestTier = thisTier.tier
 				bestCost = thisTier.cost
 			}
 		}
 	}
-	if counts.Error() != nil {
-		return 0, 0, fmt.Errorf("error retrieving inventory counts from square: %w", counts.Error())
+	if res.Counts.Error() != nil {
+		return 0, 0, fmt.Errorf("error retrieving inventory counts from square: %w", res.Counts.Error())
 	}
 
 	return bestTier, bestCost, nil
@@ -249,13 +265,16 @@ type PaymentData struct {
 }
 
 func GetSquarePayments(ctx context.Context, client *square.Client, squareData *SquareData, locationID string, orderIDs []string) (*PaymentData, error) {
-	orders, err := client.Orders.BatchRetrieve(ctx, locationID, orderIDs)
+	res, err := client.Orders.BatchRetrieve(ctx, &orders.BatchRetrieveRequest{
+		LocationID: locationID,
+		OrderIDs:   orderIDs,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("error fetching orders from square")
 	}
 
 	pd := &PaymentData{}
-	for _, order := range orders {
+	for _, order := range res.Orders {
 		if order.State != objects.OrderStateCompleted {
 			continue
 		}
@@ -284,7 +303,14 @@ func GetSquarePayments(ctx context.Context, client *square.Client, squareData *S
 }
 
 func CreateCheckout(ctx context.Context, client *square.Client, locationID, idempotencyKey string, order *objects.CreateOrderRequest, userEmail string, redirectUrl string) (string, string, error) {
-	checkout, err := client.Checkout.Create(ctx, locationID, idempotencyKey, order, false, utility.SmackdownEmail, userEmail, nil, redirectUrl, nil, "")
+	res, err := client.Checkout.Create(ctx, &checkout.CreateRequest{
+		LocationID:            locationID,
+		IdempotencyKey:        idempotencyKey,
+		Order:                 order,
+		MerchantSupportEmail:  utility.SmackdownEmail,
+		PrePopulateBuyerEmail: userEmail,
+		RedirectURL:           redirectUrl,
+	})
 	if err != nil {
 		errorList, ok := err.(*objects.ErrorList)
 
@@ -294,5 +320,5 @@ func CreateCheckout(ctx context.Context, client *square.Client, locationID, idem
 		}
 		return redirectUrl, "", nil
 	}
-	return checkout.CheckoutPageURL, checkout.Order.ID, nil
+	return res.Checkout.CheckoutPageURL, res.Checkout.Order.ID, nil
 }

@@ -11,7 +11,6 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
 	"github.com/Houndie/square-go"
 	"github.com/Houndie/square-go/catalog"
-	"github.com/Houndie/square-go/objects"
 	"github.com/sirupsen/logrus"
 )
 
@@ -113,9 +112,9 @@ func TestGetNotExists(t *testing.T) {
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
 	client := &commontest.MockSquareCatalogClient{
-		ListFunc: func(context.Context, []objects.CatalogObjectType) catalog.ListIterator {
+		ListFunc: func(context.Context, *catalog.ListRequest) (*catalog.ListResponse, error) {
 			t.Fatalf("no need for square calls if discount does not exist")
-			return nil
+			return nil, nil
 		},
 	}
 

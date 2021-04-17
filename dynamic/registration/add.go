@@ -174,12 +174,12 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 		}
 
 		s.logger.Trace("Fetching all locations from square")
-		locations, err := s.client.Locations.List(ctx)
+		locationListRes, err := s.client.Locations.List(ctx, nil)
 		if err != nil {
 			return "", fmt.Errorf("error listing locations from square: %w", err)
 		}
-		if len(locations) != 1 {
-			return "", fmt.Errorf("found wrong number of locations %v", len(locations))
+		if len(locationListRes.Locations) != 1 {
+			return "", fmt.Errorf("found wrong number of locations %v", len(locationListRes.Locations))
 		}
 
 		s.logger.Trace("Fetching all items from square")
@@ -211,14 +211,14 @@ func (s *Service) Add(ctx context.Context, registration *Info, redirectUrl, idem
 			IdempotencyKey: idempotencyKey,
 			Order: &objects.Order{
 				ReferenceID: referenceID.String(),
-				LocationID:  locations[0].ID,
+				LocationID:  locationListRes.Locations[0].ID,
 				LineItems:   lineItems,
 				Discounts:   lineDiscounts,
 			},
 		}
 
 		s.logger.Trace("creating checkout with square")
-		returnerURL, orderID, err = common.CreateCheckout(ctx, s.client, locations[0].ID, idempotencyKey, order, registration.Email, redirectUrl)
+		returnerURL, orderID, err = common.CreateCheckout(ctx, s.client, locationListRes.Locations[0].ID, idempotencyKey, order, registration.Email, redirectUrl)
 		if err != nil {
 			return "", err
 		}

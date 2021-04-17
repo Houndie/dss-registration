@@ -136,12 +136,12 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 			return "", fmt.Errorf("error generating reference id: %w", err)
 		}
 
-		locations, err := s.client.Locations.List(ctx)
+		locationsListRes, err := s.client.Locations.List(ctx, nil)
 		if err != nil {
-			return "", fmt.Errorf("error listing locations from square: %w", err)
+			return "", fmt.Errorf("error listing locationsListRes.Locations from square: %w", err)
 		}
-		if len(locations) != 1 {
-			return "", fmt.Errorf("found wrong number of locations %v", len(locations))
+		if len(locationsListRes.Locations) != 1 {
+			return "", fmt.Errorf("found wrong number of locationsListRes.Locations %v", len(locationsListRes.Locations))
 		}
 
 		squareData, err := common.GetSquareCatalog(ctx, s.client)
@@ -151,7 +151,7 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 
 		paymentData := &common.PaymentData{}
 		if len(oldRegistration.OrderIDs) > 0 {
-			paymentData, err = common.GetSquarePayments(ctx, s.client, squareData, locations[0].ID, oldRegistration.OrderIDs)
+			paymentData, err = common.GetSquarePayments(ctx, s.client, squareData, locationsListRes.Locations[0].ID, oldRegistration.OrderIDs)
 			if err != nil {
 				return "", err
 			}
@@ -195,14 +195,14 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 			IdempotencyKey: idempotencyKey,
 			Order: &objects.Order{
 				ReferenceID: referenceID.String(),
-				LocationID:  locations[0].ID,
+				LocationID:  locationsListRes.Locations[0].ID,
 				LineItems:   lineItems,
 				Discounts:   lineDiscounts,
 			},
 		}
 
 		s.logger.Trace("creating checkout with square")
-		returnerURL, orderID, err = common.CreateCheckout(ctx, s.client, locations[0].ID, idempotencyKey, order, registration.Email, redirectUrl)
+		returnerURL, orderID, err = common.CreateCheckout(ctx, s.client, locationsListRes.Locations[0].ID, idempotencyKey, order, registration.Email, redirectUrl)
 	}
 
 	s.logger.Trace("Updating registration in database")

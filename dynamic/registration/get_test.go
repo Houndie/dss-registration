@@ -13,6 +13,7 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
 	"github.com/Houndie/square-go"
+	"github.com/Houndie/square-go/locations"
 	"github.com/Houndie/square-go/objects"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
@@ -120,8 +121,10 @@ func TestGet(t *testing.T) {
 
 	client := &square.Client{
 		Locations: &commontest.MockSquareLocationsClient{
-			ListFunc: func(context.Context) ([]*objects.Location, error) {
-				return []*objects.Location{{ID: expectedLocationID}}, nil
+			ListFunc: func(context.Context, *locations.ListRequest) (*locations.ListResponse, error) {
+				return &locations.ListResponse{
+					Locations: []*objects.Location{{ID: expectedLocationID}},
+				}, nil
 			},
 		},
 		Catalog: &commontest.MockSquareCatalogClient{
@@ -213,8 +216,10 @@ func TestGetWrongUser(t *testing.T) {
 
 	client := &square.Client{
 		Locations: &commontest.MockSquareLocationsClient{
-			ListFunc: func(context.Context) ([]*objects.Location, error) {
-				return []*objects.Location{{ID: expectedLocationID}}, nil
+			ListFunc: func(context.Context, *locations.ListRequest) (*locations.ListResponse, error) {
+				return &locations.ListResponse{
+					[]*objects.Location{{ID: expectedLocationID}},
+				}, nil
 			},
 		},
 		Catalog: &commontest.MockSquareCatalogClient{

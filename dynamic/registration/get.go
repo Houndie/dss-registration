@@ -31,23 +31,23 @@ func (s *Service) Get(ctx context.Context, token, registrationID string) (*Info,
 	pd := &common.PaymentData{}
 	if len(r.OrderIDs) > 0 {
 		s.logger.Trace("fetching locations from square")
-		locations, err := s.client.Locations.List(ctx)
+		locationsListRes, err := s.client.Locations.List(ctx, nil)
 		if err != nil {
 			return nil, fmt.Errorf("error listing locations from square: %w", err)
 		}
-		s.logger.Tracef("found %d locations", len(locations))
+		s.logger.Tracef("found %d locations", len(locationsListRes.Locations))
 
-		if len(locations) != 1 {
-			return nil, fmt.Errorf("found unexpected number of locations %d", len(locations))
+		if len(locationsListRes.Locations) != 1 {
+			return nil, fmt.Errorf("found unexpected number of locations %d", len(locationsListRes.Locations))
 		}
-		s.logger.Tracef("found location %s", locations[0].ID)
+		s.logger.Tracef("found location %s", locationsListRes.Locations[0].ID)
 
 		squareData, err := common.GetSquareCatalog(ctx, s.client)
 		if err != nil {
 			return nil, err
 		}
 
-		pd, err = common.GetSquarePayments(ctx, s.client, squareData, locations[0].ID, r.OrderIDs)
+		pd, err = common.GetSquarePayments(ctx, s.client, squareData, locationsListRes.Locations[0].ID, r.OrderIDs)
 		if err != nil {
 			return nil, err
 		}

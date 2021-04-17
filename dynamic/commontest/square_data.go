@@ -89,7 +89,7 @@ func CommonCatalogObjects() *CatalogObjects {
 func discountItem(name string, amt int, id string) *objects.CatalogObject {
 	return &objects.CatalogObject{
 		ID: id,
-		CatalogObjectType: &objects.CatalogDiscount{
+		Type: &objects.CatalogDiscount{
 			Name: name,
 			DiscountType: &objects.CatalogDiscountFixedAmount{
 				AmountMoney: &objects.Money{
@@ -102,12 +102,12 @@ func discountItem(name string, amt int, id string) *objects.CatalogObject {
 
 func soloJazzItem(id string, cost int) *objects.CatalogObject {
 	return &objects.CatalogObject{
-		CatalogObjectType: &objects.CatalogItem{
+		Type: &objects.CatalogItem{
 			Name: utility.SoloJazzItem,
 			Variations: []*objects.CatalogObject{
 				&objects.CatalogObject{
 					ID: id,
-					CatalogObjectType: &objects.CatalogItemVariation{
+					Type: &objects.CatalogItemVariation{
 						PriceMoney: &objects.Money{
 							Amount: cost,
 						},
@@ -120,12 +120,12 @@ func soloJazzItem(id string, cost int) *objects.CatalogObject {
 
 func mixAndMatchItem(id string, cost int) *objects.CatalogObject {
 	return &objects.CatalogObject{
-		CatalogObjectType: &objects.CatalogItem{
+		Type: &objects.CatalogItem{
 			Name: utility.MixAndMatchItem,
 			Variations: []*objects.CatalogObject{
 				&objects.CatalogObject{
 					ID: id,
-					CatalogObjectType: &objects.CatalogItemVariation{
+					Type: &objects.CatalogItemVariation{
 						PriceMoney: &objects.Money{
 							Amount: cost,
 						},
@@ -138,12 +138,12 @@ func mixAndMatchItem(id string, cost int) *objects.CatalogObject {
 
 func teamCompItem(id string, cost int) *objects.CatalogObject {
 	return &objects.CatalogObject{
-		CatalogObjectType: &objects.CatalogItem{
+		Type: &objects.CatalogItem{
 			Name: utility.TeamCompItem,
 			Variations: []*objects.CatalogObject{
 				&objects.CatalogObject{
 					ID: id,
-					CatalogObjectType: &objects.CatalogItemVariation{
+					Type: &objects.CatalogItemVariation{
 						PriceMoney: &objects.Money{
 							Amount: cost,
 						},
@@ -156,12 +156,12 @@ func teamCompItem(id string, cost int) *objects.CatalogObject {
 
 func tShirtItem(id string, cost int) *objects.CatalogObject {
 	return &objects.CatalogObject{
-		CatalogObjectType: &objects.CatalogItem{
+		Type: &objects.CatalogItem{
 			Name: utility.TShirtItem,
 			Variations: []*objects.CatalogObject{
 				&objects.CatalogObject{
 					ID: id,
-					CatalogObjectType: &objects.CatalogItemVariation{
+					Type: &objects.CatalogItemVariation{
 						PriceMoney: &objects.Money{
 							Amount: cost,
 						},
@@ -174,12 +174,12 @@ func tShirtItem(id string, cost int) *objects.CatalogObject {
 
 func dancePassItem(id string, cost int) *objects.CatalogObject {
 	return &objects.CatalogObject{
-		CatalogObjectType: &objects.CatalogItem{
+		Type: &objects.CatalogItem{
 			Name: utility.DancePassItem,
 			Variations: []*objects.CatalogObject{
 				&objects.CatalogObject{
 					ID: id,
-					CatalogObjectType: &objects.CatalogItemVariation{
+					Type: &objects.CatalogItemVariation{
 						Name: utility.DancePassPresaleName,
 						PriceMoney: &objects.Money{
 							Amount: cost,
@@ -197,7 +197,7 @@ func weekendPassItem(weekendPassIDs map[storage.WeekendPassTier]string, weekendP
 	for tier, id := range weekendPassIDs {
 		variations[idx] = &objects.CatalogObject{
 			ID: id,
-			CatalogObjectType: &objects.CatalogItemVariation{
+			Type: &objects.CatalogItemVariation{
 				Name: utility.WeekendPassName[tier],
 				PriceMoney: &objects.Money{
 					Amount: weekendPassCosts[tier],
@@ -207,7 +207,7 @@ func weekendPassItem(weekendPassIDs map[storage.WeekendPassTier]string, weekendP
 		idx++
 	}
 	return &objects.CatalogObject{
-		CatalogObjectType: &objects.CatalogItem{
+		Type: &objects.CatalogItem{
 			Name:       utility.WeekendPassItem,
 			Variations: variations,
 		},

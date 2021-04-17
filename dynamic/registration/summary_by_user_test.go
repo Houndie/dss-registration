@@ -11,6 +11,7 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
 	"github.com/Houndie/square-go"
+	"github.com/Houndie/square-go/locations"
 	"github.com/Houndie/square-go/objects"
 	"github.com/sirupsen/logrus"
 )
@@ -79,10 +80,12 @@ func TestSummaryByUser(t *testing.T) {
 
 	squareClient := &square.Client{
 		Locations: &commontest.MockSquareLocationsClient{
-			ListFunc: func(context.Context) ([]*objects.Location, error) {
-				return []*objects.Location{
-					{
-						ID: expectedLocationID,
+			ListFunc: func(context.Context, *locations.ListRequest) (*locations.ListResponse, error) {
+				return &locations.ListResponse{
+					Locations: []*objects.Location{
+						{
+							ID: expectedLocationID,
+						},
 					},
 				}, nil
 			},

@@ -3,7 +3,6 @@ package commontest
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/square-go/catalog"
@@ -16,52 +15,52 @@ import (
 
 type MockSquareCatalogClient struct {
 	catalog.Client
-	ListFunc func(ctx context.Context, types []objects.CatalogObjectType) catalog.ListIterator
+	ListFunc func(ctx context.Context, req *catalog.ListRequest) (*catalog.ListResponse, error)
 }
 
 type MockSquareInventoryClient struct {
 	inventory.Client
-	BatchRetrieveCountsFunc func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) inventory.BatchRetrieveCountsIterator
+	BatchRetrieveCountsFunc func(ctx context.Context, req *inventory.BatchRetrieveCountsRequest) (*inventory.BatchRetrieveCountsResponse, error)
 }
 
 type MockSquareLocationsClient struct {
 	locations.Client
-	ListFunc func(ctx context.Context) ([]*objects.Location, error)
+	ListFunc func(ctx context.Context, req *locations.ListRequest) (*locations.ListResponse, error)
 }
 
 type MockSquareCheckoutClient struct {
 	checkout.Client
-	CreateFunc func(ctx context.Context, locationID, idempotencyKey string, order *objects.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *objects.Address, redirectUrl string, additionalRecipients []*objects.ChargeRequestAdditionalRecipient, note string) (*objects.Checkout, error)
+	CreateFunc func(ctx context.Context, req *checkout.CreateRequest) (*checkout.CreateResponse, error)
 }
 
 type MockSquareOrdersClient struct {
 	orders.Client
-	BatchRetrieveFunc func(ctx context.Context, locationID string, orderIDs []string) ([]*objects.Order, error)
+	BatchRetrieveFunc func(ctx context.Context, req *orders.BatchRetrieveRequest) (*orders.BatchRetrieveResponse, error)
 }
 
-func (m *MockSquareCatalogClient) List(ctx context.Context, types []objects.CatalogObjectType) catalog.ListIterator {
-	return m.ListFunc(ctx, types)
+func (m *MockSquareCatalogClient) List(ctx context.Context, req *catalog.ListRequest) (*catalog.ListResponse, error) {
+	return m.ListFunc(ctx, req)
 }
 
-func (m *MockSquareInventoryClient) BatchRetrieveCounts(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) inventory.BatchRetrieveCountsIterator {
-	return m.BatchRetrieveCountsFunc(ctx, catalogObjectIDs, locationIDs, updatedAfter)
+func (m *MockSquareInventoryClient) BatchRetrieveCounts(ctx context.Context, req *inventory.BatchRetrieveCountsRequest) (*inventory.BatchRetrieveCountsResponse, error) {
+	return m.BatchRetrieveCountsFunc(ctx, req)
 }
 
-func (m *MockSquareLocationsClient) List(ctx context.Context) ([]*objects.Location, error) {
-	return m.ListFunc(ctx)
+func (m *MockSquareLocationsClient) List(ctx context.Context, req *locations.ListRequest) (*locations.ListResponse, error) {
+	return m.ListFunc(ctx, req)
 }
 
-func (m *MockSquareCheckoutClient) Create(ctx context.Context, locationID, idempotencyKey string, order *objects.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *objects.Address, redirectUrl string, additionalRecipients []*objects.ChargeRequestAdditionalRecipient, note string) (*objects.Checkout, error) {
-	return m.CreateFunc(ctx, locationID, idempotencyKey, order, askForShippingAddress, merchantSupportEmail, prePopulateBuyerEmail, prePopulateShippingAddress, redirectUrl, additionalRecipients, note)
+func (m *MockSquareCheckoutClient) Create(ctx context.Context, req *checkout.CreateRequest) (*checkout.CreateResponse, error) {
+	return m.CreateFunc(ctx, req)
 }
 
 type MockListCatalogIterator struct {
-	ValueFunc func() *objects.CatalogObject
+	ValueFunc func() *catalog.ListIteratorValue
 	ErrorFunc func() error
 	NextFunc  func() bool
 }
 
-func (m *MockListCatalogIterator) Value() *objects.CatalogObject {
+func (m *MockListCatalogIterator) Value() *catalog.ListIteratorValue {
 	return m.ValueFunc()
 }
 
@@ -74,12 +73,12 @@ func (m *MockListCatalogIterator) Next() bool {
 }
 
 type MockBatchRetrieveInventoryCountsIterator struct {
-	ValueFunc func() *objects.InventoryCount
+	ValueFunc func() *inventory.BatchRetrieveCountsIteratorValue
 	ErrorFunc func() error
 	NextFunc  func() bool
 }
 
-func (m *MockBatchRetrieveInventoryCountsIterator) Value() *objects.InventoryCount {
+func (m *MockBatchRetrieveInventoryCountsIterator) Value() *inventory.BatchRetrieveCountsIteratorValue {
 	return m.ValueFunc()
 }
 
@@ -91,37 +90,41 @@ func (m *MockBatchRetrieveInventoryCountsIterator) Next() bool {
 	return m.NextFunc()
 }
 
-func (m *MockSquareOrdersClient) BatchRetrieve(ctx context.Context, locationID string, orderIDs []string) ([]*objects.Order, error) {
-	return m.BatchRetrieveFunc(ctx, locationID, orderIDs)
+func (m *MockSquareOrdersClient) BatchRetrieve(ctx context.Context, req *orders.BatchRetrieveRequest) (*orders.BatchRetrieveResponse, error) {
+	return m.BatchRetrieveFunc(ctx, req)
 }
 
 /** Some common func implementations */
 
-func ListCatalogFuncFromSlice(catalogObjects []*objects.CatalogObject) func(ctx context.Context, types []objects.CatalogObjectType) catalog.ListIterator {
+func ListCatalogFuncFromSlice(catalogObjects []*objects.CatalogObject) func(ctx context.Context, req *catalog.ListRequest) (*catalog.ListResponse, error) {
 	catalogObjectsIdx := -1
-	return func(ctx context.Context, types []objects.CatalogObjectType) catalog.ListIterator {
-		return &MockListCatalogIterator{
-			ValueFunc: func() *objects.CatalogObject {
-				return catalogObjects[catalogObjectsIdx]
+	return func(ctx context.Context, req *catalog.ListRequest) (*catalog.ListResponse, error) {
+		return &catalog.ListResponse{
+			Objects: &MockListCatalogIterator{
+				ValueFunc: func() *catalog.ListIteratorValue {
+					return &catalog.ListIteratorValue{
+						Object: catalogObjects[catalogObjectsIdx],
+					}
+				},
+				ErrorFunc: func() error {
+					return nil
+				},
+				NextFunc: func() bool {
+					catalogObjectsIdx++
+					return catalogObjectsIdx < len(catalogObjects)
+				},
 			},
-			ErrorFunc: func() error {
-				return nil
-			},
-			NextFunc: func() bool {
-				catalogObjectsIdx++
-				return catalogObjectsIdx < len(catalogObjects)
-			},
-		}
+		}, nil
 	}
 }
 
-func InventoryCountsFromSliceCheck(t *testing.T, expectedObjectIDs map[storage.WeekendPassTier]string, inventoryCounts []*objects.InventoryCount) func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) inventory.BatchRetrieveCountsIterator {
+func InventoryCountsFromSliceCheck(t *testing.T, expectedObjectIDs map[storage.WeekendPassTier]string, inventoryCounts []*objects.InventoryCount) func(ctx context.Context, req *inventory.BatchRetrieveCountsRequest) (*inventory.BatchRetrieveCountsResponse, error) {
 	inventoryCountsIdx := -1
-	return func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) inventory.BatchRetrieveCountsIterator {
+	return func(ctx context.Context, req *inventory.BatchRetrieveCountsRequest) (*inventory.BatchRetrieveCountsResponse, error) {
 
 		for _, expectedID := range expectedObjectIDs {
 			found := false
-			for _, passedID := range catalogObjectIDs {
+			for _, passedID := range req.CatalogObjectIDs {
 				if passedID == expectedID {
 					found = true
 					break
@@ -132,7 +135,7 @@ func InventoryCountsFromSliceCheck(t *testing.T, expectedObjectIDs map[storage.W
 			}
 		}
 
-		for _, foundID := range catalogObjectIDs {
+		for _, foundID := range req.CatalogObjectIDs {
 			found := false
 			for _, allowedID := range expectedObjectIDs {
 				if foundID == allowedID {
@@ -144,49 +147,57 @@ func InventoryCountsFromSliceCheck(t *testing.T, expectedObjectIDs map[storage.W
 				t.Fatalf("found unexpected catalog object id %s", foundID)
 			}
 		}
-		return &MockBatchRetrieveInventoryCountsIterator{
-			ValueFunc: func() *objects.InventoryCount {
-				return inventoryCounts[inventoryCountsIdx]
+		return &inventory.BatchRetrieveCountsResponse{
+			Counts: &MockBatchRetrieveInventoryCountsIterator{
+				ValueFunc: func() *inventory.BatchRetrieveCountsIteratorValue {
+					return &inventory.BatchRetrieveCountsIteratorValue{
+						Count: inventoryCounts[inventoryCountsIdx],
+					}
+				},
+				ErrorFunc: func() error {
+					return nil
+				},
+				NextFunc: func() bool {
+					inventoryCountsIdx++
+					return inventoryCountsIdx < len(inventoryCounts)
+				},
 			},
-			ErrorFunc: func() error {
-				return nil
-			},
-			NextFunc: func() bool {
-				inventoryCountsIdx++
-				return inventoryCountsIdx < len(inventoryCounts)
-			},
-		}
+		}, nil
 	}
 }
 
-func InventoryCountsFromSlice(inventoryCounts []*objects.InventoryCount) func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) inventory.BatchRetrieveCountsIterator {
+func InventoryCountsFromSlice(inventoryCounts []*objects.InventoryCount) func(ctx context.Context, req *inventory.BatchRetrieveCountsRequest) (*inventory.BatchRetrieveCountsResponse, error) {
 	inventoryCountsIdx := -1
-	return func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) inventory.BatchRetrieveCountsIterator {
-		return &MockBatchRetrieveInventoryCountsIterator{
-			ValueFunc: func() *objects.InventoryCount {
-				return inventoryCounts[inventoryCountsIdx]
+	return func(ctx context.Context, req *inventory.BatchRetrieveCountsRequest) (*inventory.BatchRetrieveCountsResponse, error) {
+		return &inventory.BatchRetrieveCountsResponse{
+			Counts: &MockBatchRetrieveInventoryCountsIterator{
+				ValueFunc: func() *inventory.BatchRetrieveCountsIteratorValue {
+					return &inventory.BatchRetrieveCountsIteratorValue{
+						Count: inventoryCounts[inventoryCountsIdx],
+					}
+				},
+				ErrorFunc: func() error {
+					return nil
+				},
+				NextFunc: func() bool {
+					inventoryCountsIdx++
+					return inventoryCountsIdx < len(inventoryCounts)
+				},
 			},
-			ErrorFunc: func() error {
-				return nil
-			},
-			NextFunc: func() bool {
-				inventoryCountsIdx++
-				return inventoryCountsIdx < len(inventoryCounts)
-			},
-		}
+		}, nil
 	}
 }
 
-func OrdersFromSliceCheck(t *testing.T, expectedLocationID string, orders []*objects.Order) func(ctx context.Context, locationID string, orderIDs []string) ([]*objects.Order, error) {
-	return func(ctx context.Context, locationID string, orderIDs []string) ([]*objects.Order, error) {
-		if locationID != expectedLocationID {
-			t.Fatalf("found unexpected location id %s, expected %s", locationID, expectedLocationID)
+func OrdersFromSliceCheck(t *testing.T, expectedLocationID string, orderObjects []*objects.Order) func(ctx context.Context, req *orders.BatchRetrieveRequest) (*orders.BatchRetrieveResponse, error) {
+	return func(ctx context.Context, req *orders.BatchRetrieveRequest) (*orders.BatchRetrieveResponse, error) {
+		if req.LocationID != expectedLocationID {
+			t.Fatalf("found unexpected location id %s, expected %s", req.LocationID, expectedLocationID)
 		}
 
-		retOrders := make([]*objects.Order, len(orderIDs))
-		for i, orderID := range orderIDs {
+		retOrders := make([]*objects.Order, len(req.OrderIDs))
+		for i, orderID := range req.OrderIDs {
 			found := false
-			for _, order := range orders {
+			for _, order := range orderObjects {
 				if orderID != order.ID {
 					continue
 				}
@@ -198,6 +209,8 @@ func OrdersFromSliceCheck(t *testing.T, expectedLocationID string, orders []*obj
 				t.Fatalf("unable to find order id %s in order id list", orderID)
 			}
 		}
-		return orders, nil
+		return &orders.BatchRetrieveResponse{
+			Orders: orderObjects,
+		}, nil
 	}
 }
