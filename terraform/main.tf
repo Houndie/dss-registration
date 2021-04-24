@@ -1,12 +1,25 @@
 variable "auth0_domain" {}
 variable "auth0_client_id" {}
 variable "auth0_client_secret" {}
+variable "square_access_token" {}
 
 terraform {
 	required_providers {
 		auth0 = {
 			source  = "alexkappa/auth0"
 			version = "~> 0.19.0"
+		}
+		square = {
+			source = "houndie/square"
+			version = "0.1.1"
+		}
+		heroku = {
+			source = "heroku/heroku"
+			version = "4.2.0"
+		}
+		herokux = {
+			source = "davidji99/herokux"
+			version = "0.22.1"
 		}
 	}
 	backend "remote" {
