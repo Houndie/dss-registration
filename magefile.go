@@ -3,19 +3,24 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 
+	"github.com/Houndie/dss-registration/mage"
+	"github.com/Houndie/toolbox/pkg/toolbox"
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 )
 
 func Tools() error {
 	fmt.Println("syncing tools")
-	return sh.Run("toolbox", "sync")
+	return toolbox.Sync()
 }
 
 const eslint = "eslint-disable block-scoped-var, id-length, no-control-regex, no-magic-numbers, no-prototype-builtins, no-redeclare, no-shadow, no-var, sort-vars, strict, no-lone-blocks, default-case"
@@ -37,10 +42,14 @@ func GenerateProtoc() error {
 			return err
 		}
 	}
-	cmd := exec.Command("toolbox", "do", "--", "protoc", "--proto_path", "rpc/dss", "--twirp_out=dynamic/", "--go_out=dynamic/", "--twirp_typescript_out=library=pbjs:static/gatsby/src/rpc", "registration.proto", "discount.proto", "forms.proto")
+	cmd, err := toolbox.Command("protoc", "--proto_path", "rpc/dss", "--twirp_out=dynamic/", "--go_out=dynamic/", "--twirp_typescript_out=library=pbjs:static/gatsby/src/rpc", "registration.proto", "discount.proto", "forms.proto")
+	if err != nil {
+		return err
+	}
+
 	cmd.Stderr = os.Stderr
 	//cmd.Dir = "dynamic"
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		return err
 	}
@@ -80,38 +89,43 @@ func GenerateProtoc() error {
 	return nil
 }
 
-func CompileReact() error {
-	fmt.Println("Compiling react components")
-
-	cmd := exec.Command("npx", "webpack", "--mode", "development")
-	cmd.Dir = "static"
-	if mg.Verbose() {
-		cmd.Stdout = os.Stdout
+func SetTerraformDeployVersion(ctx context.Context) error {
+	fmt.Println("setting terraform deploy version")
+	workspaceName, ok := os.LookupEnv("TERRAFORM_WORKSPACE")
+	if !ok {
+		return errors.New("environment variable TERRAFORM_WORKSPACE must not be empty")
 	}
-	cmd.Stderr = os.Stderr
-	err := cmd.Run()
+
+	apiKey, ok := os.LookupEnv("TERRAFORM_API_KEY")
+	if !ok {
+		return errors.New("environment variable TERRAFORM_API_KEY must not be empty")
+	}
+
+	deployVersion, ok := os.LookupEnv("DEPLOY_VERSION")
+	if !ok {
+		return errors.New("environment variable DEPLOY_VERSION not set")
+	}
+
+	client := &http.Client{
+		Transport: &mage.TerraformTransport{
+			ApiKey: apiKey,
+		},
+		Timeout: 10 * time.Second,
+	}
+
+	workspaceID, err := mage.TerraformWorkspaceID(ctx, client, workspaceName)
 	if err != nil {
-		return fmt.Errorf("error generating react component: %w", err)
+		return err
 	}
-	return nil
-}
 
-func BuildStatic() error {
-	mg.Deps(CompileReact)
-	fmt.Println("Building static site")
-	sitename := "http://localhost:8081"
-	dynamicsite := "https://us-central1-dayton-smackdown-test.cloudfunctions.net"
-	clientId, apiKey := "166144116294-c115t8bqllktva4qp6tvjjeqe7mdggu3.apps.googleusercontent.com", "AIzaSyAJaUR7I6ADbch4OX-WdkjlYsnOrhBx3xU"
-	cmd := exec.Command("toolbox", "do", "--", "hugo")
-	cmd.Env = os.Environ()
-	cmd.Env = append(cmd.Env, "HUGO_BASEURL="+sitename)
-	cmd.Env = append(cmd.Env, "HUGO_DYNAMIC="+dynamicsite)
-	cmd.Env = append(cmd.Env, "HUGO_CLIENT_ID="+clientId)
-	cmd.Env = append(cmd.Env, "HUGO_API_KEY="+apiKey)
-	cmd.Dir = "static"
-	if mg.Verbose() {
-		cmd.Stdout = os.Stdout
+	varID, err := mage.TerraformDeployVersionID(ctx, client, workspaceID)
+	if err != nil {
+		return err
 	}
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
+
+	if err := mage.SetTerraformDeployVersionID(ctx, client, workspaceID, varID, deployVersion); err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -3,6 +3,7 @@ module github.com/Houndie/dss-registration
 go 1.14
 
 require (
+	github.com/Houndie/toolbox v0.4.0
 	github.com/gobuffalo/envy v1.9.0 // indirect
 	github.com/gohugoio/hugo v0.71.0
 	github.com/golang-migrate/migrate/v4 v4.11.0
