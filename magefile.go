@@ -4,10 +4,8 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -15,6 +13,8 @@ import (
 
 	"github.com/Houndie/dss-registration/mage"
 	"github.com/Houndie/toolbox/pkg/toolbox"
+	"github.com/docker/docker/client"
+	"github.com/hashicorp/go-tfe"
 	"github.com/magefile/mage/mg"
 )
 
@@ -90,41 +90,90 @@ func GenerateProtoc() error {
 }
 
 func SetTerraformDeployVersion(ctx context.Context) error {
+	mg.Deps(mage.InitWorkspace, mage.InitDeployVersion, mage.InitTerraformClient)
 	fmt.Println("setting terraform deploy version")
-	workspaceName, ok := os.LookupEnv("TERRAFORM_WORKSPACE")
-	if !ok {
-		return errors.New("environment variable TERRAFORM_WORKSPACE must not be empty")
+
+	deployVersion := mage.DeployVersion()
+	_, err := mage.TerraformClient().Variables.Update(ctx, mage.TerraformWorkspace[mage.Workspace()], mage.TerraformDeployVar[mage.Workspace()], tfe.VariableUpdateOptions{
+		Value: &deployVersion,
+	})
+	if err != nil {
+		return fmt.Errorf("error updating terraform deploy version: %w", err)
 	}
 
-	apiKey, ok := os.LookupEnv("TERRAFORM_API_KEY")
-	if !ok {
-		return errors.New("environment variable TERRAFORM_API_KEY must not be empty")
+	return nil
+}
+
+func DeployHeroku(ctx context.Context) error {
+	mg.Deps(mage.InitHerokuAPIKey, mage.InitDeployVersion, mage.InitWorkspace)
+
+	client, err := client.NewClientWithOpts(client.WithTimeout(10 * time.Second))
+	if err != nil {
+		return fmt.Errorf("error creating new client: %w", err)
 	}
 
-	deployVersion, ok := os.LookupEnv("DEPLOY_VERSION")
-	if !ok {
-		return errors.New("environment variable DEPLOY_VERSION not set")
+	if err := mage.DockerBuild(ctx, client, mage.HerokuProject[mage.Workspace()], mage.DeployVersion()); err != nil {
+		return err
 	}
 
-	client := &http.Client{
-		Transport: &mage.TerraformTransport{
-			ApiKey: apiKey,
+	if err := mage.DockerPush(ctx, client, mage.HerokuAPIKey(), mage.HerokuProject[mage.Workspace()], mage.DeployVersion()); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func TerraformApply(ctx context.Context) error {
+	mg.Deps(mage.InitTerraformClient, mage.InitWorkspace)
+
+	configurationVersion, err := mage.TerraformClient().ConfigurationVersions.Create(
+		ctx,
+		mage.TerraformWorkspace[mage.Workspace()],
+		tfe.ConfigurationVersionCreateOptions{},
+	)
+	if err != nil {
+		return fmt.Errorf("error creating terraform configuration version: %w", err)
+	}
+
+	if err := mage.TerraformClient().ConfigurationVersions.Upload(ctx, configurationVersion.UploadURL, "terraform"); err != nil {
+		return fmt.Errorf("error uploading terraform files: %w", err)
+	}
+
+	run, err := mage.TerraformClient().Runs.Create(ctx, tfe.RunCreateOptions{
+		ConfigurationVersion: configurationVersion,
+		Workspace: &tfe.Workspace{
+			ID: mage.TerraformWorkspace[mage.Workspace()],
 		},
-		Timeout: 10 * time.Second,
-	}
-
-	workspaceID, err := mage.TerraformWorkspaceID(ctx, client, workspaceName)
+	})
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating terraform run: %w", err)
 	}
 
-	varID, err := mage.TerraformDeployVersionID(ctx, client, workspaceID)
-	if err != nil {
-		return err
-	}
+	timeoutCtx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+	defer cancel()
+	for {
+		if mg.Verbose() {
+			fmt.Fprintln(os.Stderr, "polling to see if terraform run is complete")
+		}
 
-	if err := mage.SetTerraformDeployVersionID(ctx, client, workspaceID, varID, deployVersion); err != nil {
-		return err
+		updatedRun, err := mage.TerraformClient().Runs.Read(timeoutCtx, run.ID)
+		if timeoutCtx.Err() != nil {
+			return fmt.Errorf("terraform run did not finish applying before poll timeout")
+		}
+
+		if err != nil {
+			return fmt.Errorf("error polling for terraform run: %w", err)
+		}
+
+		if updatedRun.Status == tfe.RunPlannedAndFinished || updatedRun.Status == tfe.RunApplied {
+			break
+		}
+
+		if mg.Verbose() {
+			fmt.Fprintf(os.Stderr, "found status %v\n", updatedRun.Status)
+		}
+
+		time.Sleep(5 * time.Second)
 	}
 
 	return nil
