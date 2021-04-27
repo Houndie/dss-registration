@@ -1,22 +1,24 @@
 package utility
 
 import (
-	"github.com/Houndie/dss-registration/dynamic/square"
-	"github.com/pkg/errors"
+	"errors"
+
+	"github.com/Houndie/square-go/objects"
 	"github.com/sirupsen/logrus"
 )
 
 func LogSquareError(logger *logrus.Logger, err error, message string) {
-	switch e := errors.Cause(err).(type) {
-	case *square.Error:
+	serr := &objects.Error{}
+	slerr := &objects.ErrorList{}
+	if errors.As(err, &serr) {
 		logger.WithFields(logrus.Fields{
-			"Category": e.Category,
-			"Code":     e.Code,
-			"Detail":   e.Detail,
-			"Field":    e.Field,
+			"Category": serr.Category,
+			"Code":     serr.Code,
+			"Detail":   serr.Detail,
+			"Field":    serr.Field,
 		}).Error(message)
-	case *square.ErrorList:
-		for _, squareError := range e.Errors {
+	} else if errors.As(err, &slerr) {
+		for _, squareError := range slerr.Errors {
 			logger.WithFields(logrus.Fields{
 				"Category": squareError.Category,
 				"Code":     squareError.Code,
@@ -24,7 +26,7 @@ func LogSquareError(logger *logrus.Logger, err error, message string) {
 				"Field":    squareError.Field,
 			}).Error(message)
 		}
-	default:
+	} else {
 		logger.WithError(err).Error(message)
 	}
 }

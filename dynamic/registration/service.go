@@ -5,15 +5,14 @@ import (
 	"time"
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
-	"github.com/Houndie/dss-registration/dynamic/common"
+	"github.com/Houndie/dss-registration/dynamic/sendinblue"
 	"github.com/Houndie/dss-registration/dynamic/storage"
-	"github.com/sendgrid/rest"
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
+	"github.com/Houndie/square-go"
 	"github.com/sirupsen/logrus"
 )
 
 type MailClient interface {
-	Send(email *mail.SGMailV3) (*rest.Response, error)
+	SendSMTPEmail(ctx context.Context, params *sendinblue.SMTPEmailParams) (string, error)
 }
 
 type Store interface {
@@ -26,7 +25,7 @@ type Store interface {
 }
 
 type Service struct {
-	client         common.SquareClient
+	client         *square.Client
 	logger         *logrus.Logger
 	active         bool
 	useMailSandbox bool
@@ -35,7 +34,7 @@ type Service struct {
 	mailClient     MailClient
 }
 
-func NewService(active, useMailSandbox bool, logger *logrus.Logger, client common.SquareClient, authorizer Authorizer, store Store, mailClient MailClient) *Service {
+func NewService(active, useMailSandbox bool, logger *logrus.Logger, client *square.Client, authorizer Authorizer, store Store, mailClient MailClient) *Service {
 	return &Service{
 		active:         active,
 		useMailSandbox: useMailSandbox,
@@ -48,7 +47,7 @@ func NewService(active, useMailSandbox bool, logger *logrus.Logger, client commo
 }
 
 type Authorizer interface {
-	Userinfo(ctx context.Context, accessToken string) (*authorizer.Userinfo, error)
+	GetUserinfo(ctx context.Context, accessToken string) (authorizer.Userinfo, error)
 }
 
 type Summary struct {

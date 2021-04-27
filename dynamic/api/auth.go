@@ -23,8 +23,8 @@ func WithAuthHandler(base http.Handler) http.Handler {
 			return
 		}
 
-		r.WithContext(WithAuth(r.Context(), authFields[1]))
-		base.ServeHTTP(w, r)
+		rctx := r.WithContext(WithAuth(r.Context(), authFields[1]))
+		base.ServeHTTP(w, rctx)
 	})
 }
 

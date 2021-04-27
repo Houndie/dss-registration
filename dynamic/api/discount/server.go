@@ -10,6 +10,9 @@ import (
 type DiscountService interface {
 	Add(ctx context.Context, token string, discount *discount.Bundle) error
 	Get(ctx context.Context, code string) (*discount.Bundle, error)
+	List(ctx context.Context, accessToken string) ([]*discount.Bundle, error)
+	Update(ctx context.Context, token, oldCode string, newDiscount *discount.Bundle) error
+	Delete(ctx context.Context, token, code string) error
 }
 
 type Server struct {

@@ -1,14 +1,40 @@
 package postgres
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"text/template"
 
 	"github.com/Houndie/dss-registration/dynamic/storage"
 )
 
+var getDiscountStmt string
+
+func init() {
+	tmplStmt := `SELECT {{.SDAppliedToCol}}, {{.SDNameCol}} 
+		FROM {{.BundleTable}}, {{.SDTable}} 
+		WHERE 
+				{{.BundleTable}}.{{.BundleIDCol}} = {{.SDTable}}.{{.SDFkCol}} 
+			AND 
+				{{.BundleTable}}.{{.BundleCodeCol}} = $1`
+
+	tmpl, err := template.New("tmpl").Parse(tmplStmt)
+	if err != nil {
+		panic(fmt.Sprintf("error parsing get discount template: %v", err))
+	}
+
+	stmt := &bytes.Buffer{}
+	err = tmpl.Execute(stmt, discountConsts)
+	if err != nil {
+		panic(fmt.Sprintf("error executing get discount template: %v", err))
+	}
+
+	getDiscountStmt = stmt.String()
+}
+
 func (s *Store) GetDiscount(ctx context.Context, code string) (*storage.Discount, error) {
-	rows, err := s.pool.Query(ctx, fmt.Sprintf("SELECT %[1]s, %[2]s FROM %[3]s, %[4]s WHERE %[3]s.%[5]s = %[6]s AND %[7]s = $1", discountAppliedToCol, discountNameCol, discountBundleTable, discountTable, discountBundleIDCol, discountFkCol, discountBundleCodeCol), code)
+	rows, err := s.pool.Query(ctx, getDiscountStmt, code)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching discounts: %w", err)
 	}

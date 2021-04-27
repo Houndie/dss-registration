@@ -11,7 +11,7 @@ import (
 )
 
 func TestGetRegistrationsByUser(t *testing.T) {
-	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DSS_PG_URL"))
+	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DSS_TEST_POSTGRESURL"))
 	if err != nil {
 		t.Fatalf("error connecting to database for test: %v", err)
 	}
@@ -183,7 +183,7 @@ func TestGetRegistrationsByUser(t *testing.T) {
 }
 
 func TestGetRegistrationsByUserNone(t *testing.T) {
-	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DSS_PG_URL"))
+	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DSS_TEST_POSTGRESURL"))
 	if err != nil {
 		t.Fatalf("error connecting to database for test: %v", err)
 	}

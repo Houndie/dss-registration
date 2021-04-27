@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [[ -z "${DSS_POSTGRESURL}" ]]; then
 	if [[ -n "$DATABASE_URL" ]]; then
@@ -20,4 +20,13 @@ until nc -z $(echo $DSS_POSTGRESURL | sed "s%^.*@\(.*\):\(.*\)\/.*$%\1 \2%"); do
 	sleep 1; \
 done; \
 
-./server
+until nc -z $(echo $DSS_TEST_POSTGRESURL | sed "s%^.*@\(.*\):\(.*\)\/.*$%\1 \2%"); do
+	echo "Waiting for test database ..."; \
+	sleep 1; \
+done; \
+
+go build -o ../server ./cmd/server
+
+../server init
+
+modd

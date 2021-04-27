@@ -3,6 +3,7 @@ package registration
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/Houndie/dss-registration/dynamic/api"
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
@@ -54,7 +55,7 @@ func (s *Server) Update(ctx context.Context, req *pb.RegistrationUpdateReq) (*pb
 		} else if errors.Is(err, registration.ErrRegistrationDisabled) {
 			return nil, twirp.NewError(twirp.FailedPrecondition, "registration is disabled")
 		} else if errors.As(err, &outOfStockErr) {
-			return nil, twirp.NewError(twirp.FailedPrecondition, outOfStockErr.Error()).WithMeta("next_tier", string(outOfStockErr.NextTier)).WithMeta("next_cost", string(outOfStockErr.NextCost))
+			return nil, twirp.NewError(twirp.FailedPrecondition, outOfStockErr.Error()).WithMeta("next_tier", fmt.Sprintf("%v", outOfStockErr.NextTier)).WithMeta("next_cost", fmt.Sprintf("%v", outOfStockErr.NextCost))
 		} else if errors.Is(err, authorizer.Unauthenticated) {
 			return nil, twirp.NewError(twirp.Unauthenticated, "unauthenticated")
 		}

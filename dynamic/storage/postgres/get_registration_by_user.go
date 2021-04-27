@@ -1,47 +1,66 @@
 package postgres
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"text/template"
 
 	"github.com/Houndie/dss-registration/dynamic/storage"
 )
 
+var getRegistrationsByUserStmt string
+
+func init() {
+	tmplStmt := `SELECT
+			{{.IDCol}},
+			{{.CreatedAtCol}},
+			{{.FirstNameCol}},
+			{{.LastNameCol}},
+			{{.StreetAddressCol}},
+			{{.CityCol}},
+			{{.StateCol}},
+			{{.ZipCodeCol}},
+			{{.EmailCol}},
+			{{.HomeSceneCol}},
+			{{.IsStudentCol}},
+			{{.PassTypeCol}},
+			{{.FullWeekendLevelCol}},
+			{{.FullWeekendTierCol}},
+			{{.MixAndMatchCol}},
+			{{.MixAndMatchRoleCol}},
+			{{.SoloJazzCol}},
+			{{.TeamCompetitionCol}},
+			{{.TeamCompetitionNameCol}},
+			{{.TShirtCol}},
+			{{.TShirtStyleCol}},
+			{{.HousingCol}},
+			{{.ProvideHousingPetsCol}},
+			{{.ProvideHousingQuantityCol}},
+			{{.ProvideHousingDetailsCol}},
+			{{.RequireHousingPetAllergiesCol}},
+			{{.RequireHousingDetailsCol}},
+			{{.OrderIDsCol}},
+			{{.DiscountCodesCol}},
+			{{.EnabledCol}}
+		FROM {{.Table}}
+		WHERE {{.UserIDCol}} = $1;`
+	tmpl, err := template.New("tmpl").Parse(tmplStmt)
+	if err != nil {
+		panic(fmt.Sprintf("error parsing get registration by user template: %v", err))
+	}
+
+	stmt := &bytes.Buffer{}
+	err = tmpl.Execute(stmt, registrationConsts)
+	if err != nil {
+		panic(fmt.Sprintf("error executing get registration by user template: %v", err))
+	}
+
+	getRegistrationsByUserStmt = stmt.String()
+}
+
 func (s *Store) GetRegistrationsByUser(ctx context.Context, userID string) ([]*storage.Registration, error) {
-	rows, err := s.pool.Query(ctx, fmt.Sprintf("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s FROM %s WHERE %s = $1 LIMIT 1;",
-		registrationIDCol,
-		registrationCreatedAtCol,
-		registrationFirstNameCol,
-		registrationLastNameCol,
-		registrationStreetAddressCol,
-		registrationCityCol,
-		registrationStateCol,
-		registrationZipCodeCol,
-		registrationEmailCol,
-		registrationHomeSceneCol,
-		registrationIsStudentCol,
-		registrationPassTypeCol,
-		registrationFullWeekendLevelCol,
-		registrationFullWeekendTierCol,
-		registrationMixAndMatchCol,
-		registrationMixAndMatchRoleCol,
-		registrationSoloJazzCol,
-		registrationTeamCompetitionCol,
-		registrationTeamCompetitionNameCol,
-		registrationTShirtCol,
-		registrationTShirtStyleCol,
-		registrationHousingCol,
-		registrationProvideHousingPetsCol,
-		registrationProvideHousingQuantityCol,
-		registrationProvideHousingDetailsCol,
-		registrationRequireHousingPetAllergiesCol,
-		registrationRequireHousingDetailsCol,
-		registrationOrderIDsCol,
-		registrationDiscountCodesCol,
-		registrationEnabledCol,
-		registrationTable,
-		registrationUserIDCol),
-		userID)
+	rows, err := s.pool.Query(ctx, getRegistrationsByUserStmt, userID)
 	if err != nil {
 		return nil, fmt.Errorf("error querying for registrations by user id: %w", err)
 	}

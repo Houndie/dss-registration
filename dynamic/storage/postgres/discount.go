@@ -13,6 +13,28 @@ const (
 	discountAppliedToCol = "applied_to"
 )
 
+type discountConstsTypes struct {
+	BundleTable   string
+	BundleIDCol   string
+	BundleCodeCol string
+
+	SDTable        string
+	SDFkCol        string
+	SDNameCol      string
+	SDAppliedToCol string
+}
+
+var discountConsts = &discountConstsTypes{
+	BundleTable:   "discount_bundles",
+	BundleIDCol:   "id",
+	BundleCodeCol: "code",
+
+	SDTable:        "discounts",
+	SDFkCol:        "discount_bundle_id",
+	SDNameCol:      "name",
+	SDAppliedToCol: "applied_to",
+}
+
 var appliedToToEnum = map[storage.PurchaseItem]string{
 	storage.FullWeekendPurchaseItem:     "Full Weekend",
 	storage.DanceOnlyPurchaseItem:       "Dance Only",

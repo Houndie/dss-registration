@@ -6,9 +6,12 @@ import (
 	"os"
 	"testing"
 
+	"github.com/Houndie/dss-registration/dynamic/authorizer"
+	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
+	"github.com/Houndie/square-go"
 	"github.com/sirupsen/logrus"
 )
 
@@ -25,7 +28,7 @@ func TestAddDiscount(t *testing.T) {
 	thisUserID := "123456"
 
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: commontest.UserinfoFromIDCheck(t, token, thisUserID),
+		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, token, []authorizer.Permission{authorizer.AddDiscountPermission}, thisUserID, []authorizer.Permission{authorizer.AddDiscountPermission}),
 	}
 
 	inDiscount := &Bundle{
@@ -63,15 +66,9 @@ func TestAddDiscount(t *testing.T) {
 			}
 			return nil
 		},
-		IsAdminFunc: func(ctx context.Context, userID string) (bool, error) {
-			if userID != thisUserID {
-				t.Fatalf("expected user id %s, got %s", thisUserID, userID)
-			}
-			return true, nil
-		},
 	}
 
-	service := NewService(store, &commontest.MockSquareClient{}, logger, authorizer)
+	service := NewService(store, &square.Client{}, logger, authorizer)
 	err = service.Add(context.Background(), token, inDiscount)
 	if err != nil {
 		t.Fatalf("unexpected error found in call to Add Discount: %v", err)
@@ -91,7 +88,7 @@ func TestAddDiscountNotAuthorized(t *testing.T) {
 	thisUserID := "123456"
 
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: commontest.UserinfoFromID(thisUserID),
+		GetUserinfoFunc: commontest.UserinfoFromID(thisUserID, []authorizer.Permission{}),
 	}
 
 	inDiscount := &Bundle{
@@ -109,17 +106,14 @@ func TestAddDiscountNotAuthorized(t *testing.T) {
 			t.Fatalf("Discount added when non admin user given")
 			return nil
 		},
-		IsAdminFunc: func(ctx context.Context, userID string) (bool, error) {
-			return false, nil
-		},
 	}
 
-	service := NewService(store, &commontest.MockSquareClient{}, logger, authorizer)
+	service := NewService(store, &square.Client{}, logger, authorizer)
 	err = service.Add(context.Background(), token, inDiscount)
 	if err == nil {
 		t.Fatalf("unexpected error, found none")
 	}
-	if !errors.Is(err, ErrUnauthorized) {
+	if !errors.Is(err, common.ErrUnauthorized) {
 		t.Fatalf("expected unauthorzed error, found: %v", err)
 	}
 }

@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
-	"github.com/Houndie/dss-registration/dynamic/square"
+	"github.com/Houndie/dss-registration/dynamic/discount"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
+	"github.com/Houndie/square-go"
+	"github.com/Houndie/square-go/objects"
 	"github.com/sirupsen/logrus"
 )
 
@@ -40,19 +41,23 @@ func TestPopulate(t *testing.T) {
 
 			var expectedCost = co.WeekendPassCost[expectTier]
 
-			inventoryCounts := make([]*square.InventoryCount, len(counts))
+			inventoryCounts := make([]*objects.InventoryCount, len(counts))
 			idx := 0
 			for tier, count := range counts {
-				inventoryCounts[idx] = &square.InventoryCount{
+				inventoryCounts[idx] = &objects.InventoryCount{
 					CatalogObjectID: co.WeekendPassID[tier],
 					Quantity:        count,
 				}
 				idx++
 			}
 
-			client := &commontest.MockSquareClient{
-				ListCatalogFunc:                  commontest.ListCatalogFuncFromSlice(co.Catalog()),
-				BatchRetrieveInventoryCountsFunc: commontest.InventoryCountsFromSliceCheck(t, co.WeekendPassID, inventoryCounts),
+			client := &square.Client{
+				Catalog: &commontest.MockSquareCatalogClient{
+					ListFunc: commontest.ListCatalogFuncFromSlice(co.Catalog()),
+				},
+				Inventory: &commontest.MockSquareInventoryClient{
+					BatchRetrieveCountsFunc: commontest.InventoryCountsFromSliceCheck(t, co.WeekendPassID, inventoryCounts),
+				},
 			}
 
 			formData, err := NewService(true, false, logger, client, &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{}).Populate(context.Background())
@@ -88,7 +93,7 @@ func TestPopulate(t *testing.T) {
 				t.Errorf("found unexpected team competition cost %d, expected %d", formData.TShirtCost, co.TShirtCost)
 			}
 
-			dd, ok := formData.StudentDiscount.(common.DollarDiscount)
+			dd, ok := formData.StudentDiscount.(discount.DollarDiscount)
 			if !ok {
 				t.Fatalf("student disocunt is not of dollar discount type")
 			}

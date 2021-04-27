@@ -11,7 +11,7 @@ import (
 )
 
 func TestAddGetDiscount(t *testing.T) {
-	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DSS_PG_URL"))
+	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DSS_TEST_POSTGRESURL"))
 	if err != nil {
 		t.Fatalf("error connecting to database for test: %v", err)
 	}
@@ -48,6 +48,10 @@ func TestAddGetDiscount(t *testing.T) {
 	store := NewStore(pool)
 	defer func() {
 		_, err := pool.Exec(context.Background(), "DELETE FROM "+discountBundleTable)
+		if err != nil {
+			t.Fatalf("error cleaning up after test: %v", err)
+		}
+		_, err = pool.Exec(context.Background(), "DELETE FROM "+discountTable)
 		if err != nil {
 			t.Fatalf("error cleaning up after test: %v", err)
 		}
@@ -89,7 +93,7 @@ func TestAddGetDiscount(t *testing.T) {
 }
 
 func TestAddDiscountDuplicate(t *testing.T) {
-	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DSS_PG_URL"))
+	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DSS_TEST_POSTGRESURL"))
 	if err != nil {
 		t.Fatalf("error connecting to database for test: %v", err)
 	}
@@ -125,6 +129,10 @@ func TestAddDiscountDuplicate(t *testing.T) {
 	store := NewStore(pool)
 	defer func() {
 		_, err := pool.Exec(context.Background(), "DELETE FROM "+discountBundleTable)
+		if err != nil {
+			t.Fatalf("error cleaning up after test: %v", err)
+		}
+		_, err = pool.Exec(context.Background(), "DELETE FROM "+discountTable)
 		if err != nil {
 			t.Fatalf("error cleaning up after test: %v", err)
 		}

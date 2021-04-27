@@ -1,12 +1,63 @@
 package postgres
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"text/template"
 
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/gofrs/uuid"
 )
+
+var addRegistrationStmt string
+
+func init() {
+	tmplStmt := `INSERT INTO {{ .Table }}(
+			{{ .FirstNameCol }}, 
+			{{ .LastNameCol }},
+			{{ .StreetAddressCol }},
+			{{ .CityCol }},
+			{{ .StateCol }},
+			{{ .ZipCodeCol }},
+			{{ .EmailCol }},
+			{{ .HomeSceneCol }},
+			{{ .IsStudentCol }},
+			{{ .PassTypeCol }},
+			{{ .FullWeekendLevelCol }},
+			{{ .FullWeekendTierCol }},
+			{{ .MixAndMatchCol }},
+			{{ .MixAndMatchRoleCol }},
+			{{ .SoloJazzCol }},
+			{{ .TeamCompetitionCol }},
+			{{ .TeamCompetitionNameCol }},
+			{{ .TShirtCol }},
+			{{ .TShirtStyleCol }},
+			{{ .HousingCol }},
+			{{ .ProvideHousingPetsCol }},
+			{{ .ProvideHousingQuantityCol }},
+			{{ .ProvideHousingDetailsCol }},
+			{{ .RequireHousingPetAllergiesCol }},
+			{{ .RequireHousingDetailsCol }},
+			{{ .UserIDCol }},
+			{{ .OrderIDsCol }},
+			{{ .DiscountCodesCol }})
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28)
+		RETURNING {{ .IDCol }};`
+
+	tmpl, err := template.New("tmpl").Parse(tmplStmt)
+	if err != nil {
+		panic(fmt.Sprintf("error parsing add admin template: %v", err))
+	}
+
+	stmt := &bytes.Buffer{}
+	err = tmpl.Execute(stmt, registrationConsts)
+	if err != nil {
+		panic(fmt.Sprintf("error executing add admin template: %v", err))
+	}
+
+	addRegistrationStmt = stmt.String()
+}
 
 func (s *Store) AddRegistration(ctx context.Context, registration *storage.Registration) (string, error) {
 	passType, fullWeekendLevel, fullWeekendTier, err := toDBPassType(registration.PassType)
@@ -34,7 +85,7 @@ func (s *Store) AddRegistration(ctx context.Context, registration *storage.Regis
 
 	tshirt := false
 	var tshirtStyle *string
-	if registration.MixAndMatch != nil {
+	if registration.TShirt != nil {
 		tshirt = true
 		tshirtStyleStr, ok := styleToEnum[registration.TShirt.Style]
 		if !ok {
@@ -59,37 +110,7 @@ func (s *Store) AddRegistration(ctx context.Context, registration *storage.Regis
 	}
 
 	var id uuid.UUID
-	err = s.pool.QueryRow(ctx, fmt.Sprintf("INSERT INTO %s(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28) RETURNING %s",
-		registrationTable,
-		registrationFirstNameCol,
-		registrationLastNameCol,
-		registrationStreetAddressCol,
-		registrationCityCol,
-		registrationStateCol,
-		registrationZipCodeCol,
-		registrationEmailCol,
-		registrationHomeSceneCol,
-		registrationIsStudentCol,
-		registrationPassTypeCol,
-		registrationFullWeekendLevelCol,
-		registrationFullWeekendTierCol,
-		registrationMixAndMatchCol,
-		registrationMixAndMatchRoleCol,
-		registrationSoloJazzCol,
-		registrationTeamCompetitionCol,
-		registrationTeamCompetitionNameCol,
-		registrationTShirtCol,
-		registrationTShirtStyleCol,
-		registrationHousingCol,
-		registrationProvideHousingPetsCol,
-		registrationProvideHousingQuantityCol,
-		registrationProvideHousingDetailsCol,
-		registrationRequireHousingPetAllergiesCol,
-		registrationRequireHousingDetailsCol,
-		registrationUserIDCol,
-		registrationOrderIDsCol,
-		registrationDiscountCodesCol,
-		registrationIDCol),
+	err = s.pool.QueryRow(ctx, addRegistrationStmt,
 		registration.FirstName,
 		registration.LastName,
 		registration.StreetAddress,

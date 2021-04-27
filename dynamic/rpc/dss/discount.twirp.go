@@ -24,6 +24,12 @@ type Discount interface {
 	Add(context.Context, *DiscountAddReq) (*DiscountAddRes, error)
 
 	Get(context.Context, *DiscountGetReq) (*DiscountGetRes, error)
+
+	List(context.Context, *DiscountListReq) (*DiscountListRes, error)
+
+	Update(context.Context, *DiscountUpdateReq) (*DiscountUpdateRes, error)
+
+	Delete(context.Context, *DiscountDeleteReq) (*DiscountDeleteRes, error)
 }
 
 // ========================
@@ -32,7 +38,7 @@ type Discount interface {
 
 type discountProtobufClient struct {
 	client HTTPClient
-	urls   [2]string
+	urls   [5]string
 	opts   twirp.ClientOptions
 }
 
@@ -49,9 +55,12 @@ func NewDiscountProtobufClient(addr string, client HTTPClient, opts ...twirp.Cli
 	}
 
 	prefix := urlBase(addr) + DiscountPathPrefix
-	urls := [2]string{
+	urls := [5]string{
 		prefix + "Add",
 		prefix + "Get",
+		prefix + "List",
+		prefix + "Update",
+		prefix + "Delete",
 	}
 
 	return &discountProtobufClient{
@@ -101,13 +110,73 @@ func (c *discountProtobufClient) Get(ctx context.Context, in *DiscountGetReq) (*
 	return out, nil
 }
 
+func (c *discountProtobufClient) List(ctx context.Context, in *DiscountListReq) (*DiscountListRes, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "dss")
+	ctx = ctxsetters.WithServiceName(ctx, "Discount")
+	ctx = ctxsetters.WithMethodName(ctx, "List")
+	out := new(DiscountListRes)
+	err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *discountProtobufClient) Update(ctx context.Context, in *DiscountUpdateReq) (*DiscountUpdateRes, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "dss")
+	ctx = ctxsetters.WithServiceName(ctx, "Discount")
+	ctx = ctxsetters.WithMethodName(ctx, "Update")
+	out := new(DiscountUpdateRes)
+	err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *discountProtobufClient) Delete(ctx context.Context, in *DiscountDeleteReq) (*DiscountDeleteRes, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "dss")
+	ctx = ctxsetters.WithServiceName(ctx, "Discount")
+	ctx = ctxsetters.WithMethodName(ctx, "Delete")
+	out := new(DiscountDeleteRes)
+	err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
 // ====================
 // Discount JSON Client
 // ====================
 
 type discountJSONClient struct {
 	client HTTPClient
-	urls   [2]string
+	urls   [5]string
 	opts   twirp.ClientOptions
 }
 
@@ -124,9 +193,12 @@ func NewDiscountJSONClient(addr string, client HTTPClient, opts ...twirp.ClientO
 	}
 
 	prefix := urlBase(addr) + DiscountPathPrefix
-	urls := [2]string{
+	urls := [5]string{
 		prefix + "Add",
 		prefix + "Get",
+		prefix + "List",
+		prefix + "Update",
+		prefix + "Delete",
 	}
 
 	return &discountJSONClient{
@@ -162,6 +234,66 @@ func (c *discountJSONClient) Get(ctx context.Context, in *DiscountGetReq) (*Disc
 	ctx = ctxsetters.WithMethodName(ctx, "Get")
 	out := new(DiscountGetRes)
 	err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *discountJSONClient) List(ctx context.Context, in *DiscountListReq) (*DiscountListRes, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "dss")
+	ctx = ctxsetters.WithServiceName(ctx, "Discount")
+	ctx = ctxsetters.WithMethodName(ctx, "List")
+	out := new(DiscountListRes)
+	err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *discountJSONClient) Update(ctx context.Context, in *DiscountUpdateReq) (*DiscountUpdateRes, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "dss")
+	ctx = ctxsetters.WithServiceName(ctx, "Discount")
+	ctx = ctxsetters.WithMethodName(ctx, "Update")
+	out := new(DiscountUpdateRes)
+	err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *discountJSONClient) Delete(ctx context.Context, in *DiscountDeleteReq) (*DiscountDeleteRes, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "dss")
+	ctx = ctxsetters.WithServiceName(ctx, "Discount")
+	ctx = ctxsetters.WithMethodName(ctx, "Delete")
+	out := new(DiscountDeleteRes)
+	err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -229,6 +361,15 @@ func (s *discountServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) 
 		return
 	case "/twirp/dss.Discount/Get":
 		s.serveGet(ctx, resp, req)
+		return
+	case "/twirp/dss.Discount/List":
+		s.serveList(ctx, resp, req)
+		return
+	case "/twirp/dss.Discount/Update":
+		s.serveUpdate(ctx, resp, req)
+		return
+	case "/twirp/dss.Discount/Delete":
+		s.serveDelete(ctx, resp, req)
 		return
 	default:
 		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
@@ -496,6 +637,393 @@ func (s *discountServer) serveGetProtobuf(ctx context.Context, resp http.Respons
 	callResponseSent(ctx, s.hooks)
 }
 
+func (s *discountServer) serveList(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveListJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveListProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *discountServer) serveListJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "List")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	reqContent := new(DiscountListReq)
+	unmarshaler := jsonpb.Unmarshaler{AllowUnknownFields: true}
+	if err = unmarshaler.Unmarshal(req.Body, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the json request could not be decoded"))
+		return
+	}
+
+	// Call service method
+	var respContent *DiscountListRes
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = s.Discount.List(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *DiscountListRes and nil error while calling List. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	var buf bytes.Buffer
+	marshaler := &jsonpb.Marshaler{OrigName: true}
+	if err = marshaler.Marshal(&buf, respContent); err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	respBytes := buf.Bytes()
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *discountServer) serveListProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "List")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to read request body"))
+		return
+	}
+	reqContent := new(DiscountListReq)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	// Call service method
+	var respContent *DiscountListRes
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = s.Discount.List(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *DiscountListRes and nil error while calling List. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *discountServer) serveUpdate(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveUpdateJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveUpdateProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *discountServer) serveUpdateJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "Update")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	reqContent := new(DiscountUpdateReq)
+	unmarshaler := jsonpb.Unmarshaler{AllowUnknownFields: true}
+	if err = unmarshaler.Unmarshal(req.Body, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the json request could not be decoded"))
+		return
+	}
+
+	// Call service method
+	var respContent *DiscountUpdateRes
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = s.Discount.Update(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *DiscountUpdateRes and nil error while calling Update. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	var buf bytes.Buffer
+	marshaler := &jsonpb.Marshaler{OrigName: true}
+	if err = marshaler.Marshal(&buf, respContent); err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	respBytes := buf.Bytes()
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *discountServer) serveUpdateProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "Update")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to read request body"))
+		return
+	}
+	reqContent := new(DiscountUpdateReq)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	// Call service method
+	var respContent *DiscountUpdateRes
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = s.Discount.Update(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *DiscountUpdateRes and nil error while calling Update. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *discountServer) serveDelete(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveDeleteJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveDeleteProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *discountServer) serveDeleteJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "Delete")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	reqContent := new(DiscountDeleteReq)
+	unmarshaler := jsonpb.Unmarshaler{AllowUnknownFields: true}
+	if err = unmarshaler.Unmarshal(req.Body, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the json request could not be decoded"))
+		return
+	}
+
+	// Call service method
+	var respContent *DiscountDeleteRes
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = s.Discount.Delete(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *DiscountDeleteRes and nil error while calling Delete. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	var buf bytes.Buffer
+	marshaler := &jsonpb.Marshaler{OrigName: true}
+	if err = marshaler.Marshal(&buf, respContent); err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	respBytes := buf.Bytes()
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *discountServer) serveDeleteProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "Delete")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to read request body"))
+		return
+	}
+	reqContent := new(DiscountDeleteReq)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	// Call service method
+	var respContent *DiscountDeleteRes
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = s.Discount.Delete(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *DiscountDeleteRes and nil error while calling Delete. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
 func (s *discountServer) ServiceDescriptor() ([]byte, int) {
 	return twirpFileDescriptor1, 0
 }
@@ -509,23 +1037,42 @@ func (s *discountServer) PathPrefix() string {
 }
 
 var twirpFileDescriptor1 = []byte{
-	// 282 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x52, 0xcf, 0x6b, 0xab, 0x40,
-	0x10, 0x8e, 0xf1, 0x61, 0x74, 0x1e, 0x48, 0xd9, 0x5e, 0x16, 0x4f, 0x22, 0x3d, 0x08, 0x05, 0x43,
-	0xd3, 0x73, 0x0f, 0x91, 0x42, 0x72, 0x6c, 0xb7, 0x87, 0x42, 0x6f, 0xc6, 0x59, 0x4a, 0xc0, 0xa8,
-	0x75, 0x36, 0xff, 0x7f, 0xd9, 0x8d, 0xab, 0x89, 0x78, 0xe9, 0x45, 0xc6, 0x8f, 0xef, 0xd7, 0x0c,
-	0x0b, 0x21, 0x1e, 0xa9, 0x6c, 0xce, 0xb5, 0xca, 0xda, 0xae, 0x51, 0x0d, 0x73, 0x91, 0x28, 0x79,
-	0x83, 0xf0, 0xb5, 0x87, 0xb7, 0x27, 0xfd, 0x65, 0x1c, 0x3c, 0x6c, 0xaa, 0xaa, 0xe8, 0xb8, 0x1f,
-	0x3b, 0xa9, 0xbb, 0x5f, 0x88, 0xfe, 0x9f, 0x45, 0xb0, 0x6a, 0x65, 0x57, 0xca, 0x5a, 0xf1, 0x20,
-	0x76, 0xd2, 0x60, 0xbf, 0x10, 0x16, 0xc8, 0x7d, 0xf0, 0x0a, 0xa3, 0x4f, 0xde, 0x21, 0xfc, 0x38,
-	0xd6, 0xdf, 0x95, 0xb4, 0xbe, 0x8c, 0xc1, 0xbf, 0xba, 0x38, 0x49, 0xee, 0x68, 0x91, 0x30, 0x33,
-	0x7b, 0xb4, 0x7c, 0xbe, 0x8c, 0x9d, 0xf4, 0xff, 0xe6, 0x3e, 0x43, 0xa2, 0xec, 0xb6, 0x8a, 0xb0,
-	0x96, 0x9f, 0x63, 0xc9, 0xfc, 0x5c, 0x63, 0x25, 0xb5, 0x65, 0xd9, 0xe0, 0x60, 0xa9, 0x67, 0xf6,
-	0x04, 0x81, 0xdd, 0x90, 0xf8, 0x32, 0x76, 0x07, 0xd7, 0xdb, 0x3a, 0x62, 0x64, 0x25, 0x2f, 0x57,
-	0xdb, 0x23, 0x0a, 0xf9, 0xa3, 0x7b, 0x1d, 0x4c, 0x84, 0xb1, 0x9e, 0xf6, 0xba, 0xa4, 0x8b, 0x9e,
-	0x92, 0xdc, 0x4d, 0xe4, 0x94, 0x3c, 0x8c, 0xc8, 0x4e, 0x2a, 0x6d, 0x38, 0xd3, 0xf4, 0x3a, 0xd6,
-	0xb0, 0xe8, 0x4f, 0xb1, 0x9b, 0x0a, 0xfc, 0xe1, 0xb6, 0x6b, 0x70, 0xb7, 0x88, 0x6c, 0x72, 0x3e,
-	0xb3, 0x4b, 0x34, 0x03, 0x92, 0x16, 0xec, 0xa4, 0x9a, 0x08, 0x2e, 0x5d, 0xa3, 0x19, 0x90, 0xf2,
-	0xe0, 0x6b, 0xd5, 0xb5, 0xe5, 0x1a, 0x89, 0x0e, 0x9e, 0x79, 0x38, 0xcf, 0xbf, 0x01, 0x00, 0x00,
-	0xff, 0xff, 0x52, 0x7b, 0xd1, 0x48, 0x4a, 0x02, 0x00, 0x00,
+	// 592 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0x51, 0x6f, 0xd3, 0x3c,
+	0x14, 0x6d, 0x9a, 0x7d, 0xed, 0x7a, 0xf7, 0xa9, 0x6c, 0xde, 0x34, 0x42, 0x26, 0x44, 0x15, 0x21,
+	0x31, 0x81, 0x48, 0xa1, 0xbc, 0xf0, 0x82, 0xb4, 0x76, 0x65, 0x2b, 0x88, 0xc1, 0x94, 0x16, 0x4d,
+	0xda, 0x0b, 0x72, 0x63, 0xd3, 0x46, 0x38, 0x71, 0x16, 0x3b, 0x12, 0xdb, 0x2b, 0xff, 0x00, 0xf1,
+	0x7b, 0xf8, 0x6d, 0x28, 0x4e, 0xd2, 0x26, 0x69, 0x24, 0xc4, 0x4b, 0x95, 0x9c, 0x7b, 0x8e, 0xcf,
+	0xb9, 0xd7, 0x37, 0x85, 0x2e, 0xf1, 0x84, 0xcb, 0xe3, 0x40, 0xda, 0x61, 0xc4, 0x25, 0x47, 0x3a,
+	0x11, 0xc2, 0x3c, 0x5a, 0x70, 0xbe, 0x60, 0xb4, 0xaf, 0xa0, 0x79, 0xfc, 0xb5, 0x4f, 0xfd, 0x50,
+	0xde, 0xa6, 0x0c, 0xeb, 0xa7, 0x06, 0xdd, 0x71, 0x26, 0x1a, 0xfa, 0xc9, 0x2f, 0x32, 0xa0, 0x45,
+	0x38, 0x63, 0x38, 0x32, 0xb4, 0x9e, 0x76, 0xac, 0x4f, 0x1a, 0x4e, 0xf6, 0x8e, 0x4c, 0x68, 0x87,
+	0x34, 0x72, 0x69, 0x20, 0x8d, 0x66, 0x4f, 0x3b, 0xee, 0x4c, 0x1a, 0x4e, 0x0e, 0xa0, 0x13, 0xe8,
+	0x8a, 0x9b, 0x18, 0x47, 0xf4, 0x23, 0x97, 0x67, 0x3c, 0x0e, 0x88, 0xa1, 0xf7, 0xb4, 0xe3, 0x9d,
+	0xc1, 0xa1, 0x9d, 0xda, 0xdb, 0xb9, 0xbd, 0xfd, 0x36, 0xb1, 0x9f, 0x34, 0x9c, 0x0a, 0x7f, 0xb4,
+	0x0d, 0x2d, 0xac, 0x12, 0x58, 0x3f, 0x34, 0xe8, 0x4e, 0xbd, 0x60, 0xc1, 0x68, 0x1e, 0x0d, 0x21,
+	0xd8, 0x0a, 0xb0, 0x4f, 0x55, 0xa4, 0x8e, 0xa3, 0x9e, 0xd1, 0xb3, 0x5c, 0xa0, 0xd2, 0xec, 0x0c,
+	0xf6, 0x6d, 0x22, 0x84, 0x5d, 0xee, 0xc6, 0xc9, 0x28, 0xe8, 0x05, 0x00, 0x0e, 0x43, 0xe6, 0x51,
+	0xf2, 0x45, 0x72, 0x95, 0xad, 0x3b, 0xd8, 0x53, 0x82, 0xcb, 0x38, 0x72, 0x97, 0x58, 0xd0, 0x77,
+	0x92, 0xfa, 0x4e, 0x27, 0x23, 0xcd, 0xb8, 0x75, 0xb5, 0x9e, 0xcc, 0x28, 0x0e, 0x08, 0xa3, 0x49,
+	0x08, 0x97, 0x93, 0x55, 0x88, 0xe4, 0x19, 0xbd, 0x84, 0x4e, 0x3e, 0x74, 0x61, 0x34, 0x7b, 0xfa,
+	0x2a, 0x47, 0xb9, 0x01, 0x67, 0xcd, 0xb2, 0xde, 0x14, 0x46, 0x4e, 0x88, 0x43, 0x6f, 0x92, 0x4e,
+	0xe6, 0xca, 0x42, 0x1d, 0x5d, 0xed, 0x24, 0x75, 0x77, 0x32, 0x8a, 0xb5, 0x5b, 0x91, 0x0b, 0xeb,
+	0xf1, 0x1a, 0x39, 0xa7, 0x32, 0x39, 0xb0, 0x26, 0x69, 0xd1, 0x56, 0xb1, 0xc4, 0xbf, 0xd9, 0xee,
+	0xc1, 0xbd, 0xbc, 0xf2, 0xc1, 0x13, 0x89, 0x8b, 0x75, 0x52, 0x85, 0x04, 0x7a, 0x0e, 0xed, 0x94,
+	0x2f, 0x0c, 0xad, 0x30, 0x8c, 0xca, 0x99, 0x39, 0xc7, 0xba, 0x86, 0xbd, 0xbc, 0xf4, 0x39, 0x24,
+	0x58, 0xd2, 0x24, 0xbc, 0x01, 0x6d, 0xce, 0xc8, 0xe9, 0x3a, 0x7f, 0xfe, 0x5a, 0x08, 0xdc, 0xfc,
+	0x7b, 0xe0, 0xfd, 0xcd, 0xb3, 0x85, 0xf5, 0x64, 0x0d, 0x8e, 0x29, 0xa3, 0xa9, 0x61, 0xdd, 0xb4,
+	0xf6, 0x37, 0x89, 0xe2, 0xe9, 0x6f, 0x0d, 0xfe, 0x2f, 0xae, 0x0b, 0x7a, 0x04, 0x47, 0x67, 0x31,
+	0x63, 0x57, 0x94, 0x7e, 0xa3, 0x01, 0xb9, 0xc4, 0x42, 0x14, 0xcb, 0xbb, 0x0d, 0xf4, 0x10, 0x1e,
+	0x8c, 0x71, 0xe0, 0xd2, 0x4f, 0x01, 0xbb, 0xdd, 0x28, 0x6b, 0xe8, 0x08, 0xee, 0x5f, 0x78, 0xdf,
+	0x87, 0x01, 0xb9, 0xc0, 0xd2, 0x5d, 0x96, 0x8a, 0x4d, 0x64, 0xc0, 0xc1, 0x94, 0x33, 0xfe, 0x1e,
+	0xdf, 0xdd, 0x95, 0x2a, 0x7a, 0x62, 0x3b, 0xa3, 0xd8, 0x3f, 0xe5, 0x7e, 0x48, 0xa5, 0x27, 0x3d,
+	0x1e, 0x94, 0x08, 0x5b, 0xe8, 0x10, 0xd0, 0x6c, 0xba, 0xf4, 0x22, 0x59, 0xc2, 0xff, 0x1b, 0xfc,
+	0x6a, 0xc2, 0xf6, 0xea, 0x9b, 0xea, 0x83, 0x3e, 0x24, 0x04, 0x55, 0x3e, 0x1b, 0xb5, 0x91, 0x66,
+	0x0d, 0x28, 0x12, 0xc1, 0x39, 0x95, 0x15, 0x41, 0xba, 0x71, 0x66, 0x0d, 0x28, 0xd0, 0x00, 0xb6,
+	0x92, 0xc5, 0x40, 0x07, 0xa5, 0x62, 0xb6, 0x3e, 0x66, 0x1d, 0x2a, 0xd0, 0x6b, 0x68, 0xa5, 0xd7,
+	0x85, 0x0e, 0x4b, 0xf5, 0xd5, 0x7e, 0x98, 0xf5, 0xb8, 0x52, 0xa6, 0x57, 0x55, 0x51, 0xae, 0x2e,
+	0xda, 0xac, 0xc7, 0xc5, 0xa8, 0x73, 0xdd, 0x8e, 0x42, 0xb7, 0x4f, 0x84, 0x98, 0xb7, 0xd4, 0xff,
+	0xd4, 0xab, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x06, 0xab, 0xd1, 0x8a, 0x4b, 0x05, 0x00, 0x00,
 }

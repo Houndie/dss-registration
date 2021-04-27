@@ -1,178 +1,43 @@
 version: 2.1
-orbs:
-  heroku: circleci/heroku@1.0.1
 jobs:
-  #go-test:
-  #  docker:
-  #    # specify the version
-  #    - image: circleci/golang:1.14
-  #      environment:
-  #        DSS_PG_URL: postgres://root:password@localhost/circle_test?sslmode=disable
-  #        GOPROXY: https://proxy.golang.org
-  #    - image: circleci/postgres:9.4
-  #      environment:
-  #        POSTGRES_USER: root
-  #        POSTGRES_PASSWORD: password
-  #  steps:
-  #    - checkout
-  #    - run:
-  #        name: install tools
-  #        command: go get github.com/Houndie/toolbox@v0.3.0 && toolbox -v sync
-
-  #    - run: 
-  #        name: Wait on DB
-  #        command: |
-  #          timeout 300 sh -c \
-  #            'until nc -z localhost 5432; do
-  #               echo "Waiting for port ..."
-  #               sleep 1
-  #             done'
-
-  #    - run: 
-  #        name: Perform DB Migrations
-  #        command: toolbox do -- migrate -path=dynamic/storage/postgres/migrations -database $DSS_PG_URL up
-
-  #    - run: 
-  #        name: Perform tests
-  #        command: cd dynamic && go test ./...
-  #  end-to-end:
-  #    docker:
-  #      - image: cimg/base:2020.01
-  #    steps:
-  #      - checkout
-  #      - run: git submodule sync --recursive && git submodule update --recursive --init
-  #
-  #      - setup_remote_docker
-  #
-  #      - run:
-  #          name: Perform tests
-  #          command: docker-compose -f docker-compose.yml -f docker-compose.circle-testing.yml up --build --abort-on-container-exit 
-  #
-  #      - run:
-  #          name: Retrieve Test Results
-  #          command: |
-  #            mkdir junit 
-  #            docker cp project_end_to_end_1:results.xml junit/
-  #          when: always
-  #
-  #      - store_test_results:
-  #          path: junit/
-  #
-  #      - store_artifacts:
-  #          path: junit/
-  #
-  deploy:
+  go-test:
     docker:
-      - image: circleci/golang:1.14-node
-    steps: 
-      - heroku/install
-      - run:
-          working_directory: /tmp
-          command: npm install netlify-cli
-
+      # specify the version
+      - image: circleci/golang:1.16
+        environment:
+          DSS_TEST_POSTGRESURL: postgres://root:password@localhost/circle_test?sslmode=disable
+          GOPROXY: https://proxy.golang.org
+      - image: circleci/postgres:9.4
+        environment:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password
+    steps:
       - checkout
-      - run: git submodule sync --recursive && git submodule update --recursive --init
-
-      - setup_remote_docker
       - run:
-          name: Build source
-          command: docker-compose -f docker-compose.circle-testdeploy.yml up --build --no-start
+          name: install tools
+          command: go get github.com/Houndie/toolbox@v0.3.0 && toolbox -v sync
 
-            #- run:
-            #    name: Perform migrations
-            #    command: |
-            #      go get github.com/Houndie/toolbox@v0.3.0 
-            #      toolbox -v sync
-            #      toolbox do -- migrate -path=dynamic/storage/postgres/migrations -database $(heroku config:get -a dayton-swing-smackdown-testing DATABASE_URL) up
-
-      - run:
-          name: Deploy Frontend
-          working_directory: /tmp
+      - run: 
+          name: Wait on DB
           command: |
-            docker cp project_frontend_1:/usr/share/nginx/html site/
-            npx netlify deploy --prod --dir site --site 0d6d2212-a391-4f2b-8d20-6d5122f86019
+            timeout 300 sh -c \
+              'until nc -z localhost 5432; do
+                 echo "Waiting for port ..."
+                 sleep 1
+               done'
 
-            #- run:
-            #    name: Deploy Backend
-            #    command: |
-            #      heroku container:login
-            #      docker tag project_backend registry.heroku.com/dayton-swing-smackdown-testing/web
-            #      docker push registry.heroku.com/dayton-swing-smackdown-testing/web
-            #      heroku container:release -a dayton-swing-smackdown-testing web
-  deploy-prod:
-    docker:
-      - image: circleci/golang:1.14-node
-    steps: 
-      - heroku/install
-      - run:
-          working_directory: /tmp
-          command: npm install netlify-cli
+      - run: 
+          name: Perform DB Migrations
+          command: toolbox do -- migrate -path=dynamic/storage/postgres/migrations -database $DSS_TEST_POSTGRESURL up
 
-      - checkout
-      - run: git submodule sync --recursive && git submodule update --recursive --init
-
-      - setup_remote_docker
-      - run:
-          name: Build source
-          command: docker-compose -f docker-compose.circle-testdeploy.yml up --build --no-start
-
-            #- run:
-            #    name: Perform migrations
-            #    command: |
-            #      go get github.com/Houndie/toolbox@v0.3.0 
-            #      toolbox -v sync
-            #      toolbox do -- migrate -path=dynamic/storage/postgres/migrations -database $(heroku config:get -a dayton-swing-smackdown-testing DATABASE_URL) up
-
-      - run:
-          name: Deploy Frontend
-          working_directory: /tmp
-          command: |
-            docker cp project_frontend_1:/usr/share/nginx/html site/
-            npx netlify deploy --prod --dir site --site 797d149a-b1cf-4566-bb76-16629c5cb366
-
-            #- run:
-            #    name: Deploy Backend
-            #    command: |
-            #      heroku container:login
-            #      docker tag project_backend registry.heroku.com/dayton-swing-smackdown-testing/web
-            #      docker push registry.heroku.com/dayton-swing-smackdown-testing/web
-            #      heroku container:release -a dayton-swing-smackdown-testing web
-
+      - run: 
+          name: Perform tests
+          command: cd dynamic && go test ./...
 workflows:
   version: 2
-  test-and-deploy:
+  test:
     jobs:
-      #- go-test:
-      #    filters:
-      #      tags:
-      #        only: /^v[0-9]\.[0-9]\.[0-9]$/
-      #- end-to-end:
-      #    filters:
-      #      tags:
-      #        only: /^v[0-9]\.[0-9]\.[0-9]$/
-      - deploy:
-        #requires:
-        #    - go-test
-        #    - end-to-end
+      - go-test:
           filters:
             tags:
               only: /^v[0-9]\.[0-9]\.[0-9]$/
-            branches:
-              ignore: /.*/
-      - approve:
-          type: approval
-          requires: 
-             - deploy
-          filters:
-            tags:
-              only: /^v[0-9]\.[0-9]\.[0-9]$/
-            branches:
-              ignore: /.*/
-      - deploy-prod:
-          requires: 
-             - approve
-          filters:
-            tags:
-              only: /^v[0-9]\.[0-9]\.[0-9]$/
-            branches:
-              ignore: /.*/

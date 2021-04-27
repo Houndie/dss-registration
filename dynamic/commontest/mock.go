@@ -3,17 +3,16 @@ package commontest
 import (
 	"context"
 
+	"github.com/Houndie/dss-registration/dynamic/sendinblue"
 	"github.com/Houndie/dss-registration/dynamic/storage"
-	"github.com/sendgrid/rest"
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
 type MockMailClient struct {
-	SendFunc func(*mail.SGMailV3) (*rest.Response, error)
+	SendSMTPEmailFunc func(ctx context.Context, params *sendinblue.SMTPEmailParams) (string, error)
 }
 
-func (m *MockMailClient) Send(email *mail.SGMailV3) (*rest.Response, error) {
-	return m.SendFunc(email)
+func (m *MockMailClient) SendSMTPEmail(ctx context.Context, params *sendinblue.SMTPEmailParams) (string, error) {
+	return m.SendSMTPEmailFunc(ctx, params)
 }
 
 type MockStore struct {
@@ -24,6 +23,9 @@ type MockStore struct {
 	GetRegistrationsByUserFunc func(context.Context, string) ([]*storage.Registration, error)
 	IsAdminFunc                func(context.Context, string) (bool, error)
 	UpdateRegistrationFunc     func(ctx context.Context, r *storage.Registration) error
+	ListDiscountsFunc          func(context.Context) ([]*storage.Discount, error)
+	UpdateDiscountFunc         func(ctx context.Context, oldCode string, newDiscount *storage.Discount) error
+	DeleteDiscountFunc         func(ctx context.Context, code string) error
 }
 
 func (m *MockStore) AddRegistration(ctx context.Context, registration *storage.Registration) (string, error) {
@@ -52,4 +54,16 @@ func (m *MockStore) GetRegistration(ctx context.Context, userID string) (*storag
 
 func (m *MockStore) UpdateRegistration(ctx context.Context, r *storage.Registration) error {
 	return m.UpdateRegistrationFunc(ctx, r)
+}
+
+func (m *MockStore) ListDiscounts(ctx context.Context) ([]*storage.Discount, error) {
+	return m.ListDiscountsFunc(ctx)
+}
+
+func (m *MockStore) UpdateDiscount(ctx context.Context, oldCode string, newDiscount *storage.Discount) error {
+	return m.UpdateDiscountFunc(ctx, oldCode, newDiscount)
+}
+
+func (m *MockStore) DeleteDiscount(ctx context.Context, code string) error {
+	return m.DeleteDiscountFunc(ctx, code)
 }

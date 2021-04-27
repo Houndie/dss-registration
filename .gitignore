@@ -4,5 +4,8 @@
 node_modules
 *.swp
 /_tools
-/dynamic/docker/*.toml
 /.env
+
+/static/gatsby/.cache
+/static/gatsby/public
+/terraform/.terraform

@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/Houndie/dss-registration/dynamic/common"
-	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
+	"github.com/Houndie/square-go/objects"
 	"github.com/gofrs/uuid"
 )
 
@@ -111,15 +111,15 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 	}
 
 	s.logger.Tracef("fetching user-info for token %s", token)
-	userinfo, err := s.authorizer.Userinfo(ctx, token)
+	userinfo, err := s.authorizer.GetUserinfo(ctx, token)
 	if err != nil {
 		return "", fmt.Errorf("could not authorize user: %w", err)
 	}
-	s.logger.Tracef("found user %s", userinfo.UserID)
+	s.logger.Tracef("found user %s", userinfo.UserID())
 
-	if oldRegistration.UserID != userinfo.UserID {
+	if oldRegistration.UserID != userinfo.UserID() {
 		s.logger.WithError(err).Debug("user id does not match that of found registration")
-		s.logger.WithError(err).Tracef("registration provided user id %s, user provided %s", oldRegistration.UserID, userinfo.UserID)
+		s.logger.WithError(err).Tracef("registration provided user id %s, user provided %s", oldRegistration.UserID, userinfo.UserID())
 		return "", storage.ErrNoRegistrationForID{ID: registration.ID}
 	}
 
@@ -136,12 +136,12 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 			return "", fmt.Errorf("error generating reference id: %w", err)
 		}
 
-		locations, err := s.client.ListLocations(ctx)
+		locationsListRes, err := s.client.Locations.List(ctx, nil)
 		if err != nil {
-			return "", fmt.Errorf("error listing locations from square: %w", err)
+			return "", fmt.Errorf("error listing locationsListRes.Locations from square: %w", err)
 		}
-		if len(locations) != 1 {
-			return "", fmt.Errorf("found wrong number of locations %v", len(locations))
+		if len(locationsListRes.Locations) != 1 {
+			return "", fmt.Errorf("found wrong number of locationsListRes.Locations %v", len(locationsListRes.Locations))
 		}
 
 		squareData, err := common.GetSquareCatalog(ctx, s.client)
@@ -151,7 +151,7 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 
 		paymentData := &common.PaymentData{}
 		if len(oldRegistration.OrderIDs) > 0 {
-			paymentData, err = common.GetSquarePayments(ctx, s.client, squareData, locations[0].ID, oldRegistration.OrderIDs)
+			paymentData, err = common.GetSquarePayments(ctx, s.client, squareData, locationsListRes.Locations[0].ID, oldRegistration.OrderIDs)
 			if err != nil {
 				return "", err
 			}
@@ -186,22 +186,23 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 			return "", err
 		}
 
-		lineItems, err := makeLineItems(registration, squareData, paymentData, discounts)
+		lineItems, lineDiscounts, err := makeLineItems(registration, squareData, paymentData, discounts)
 		if err != nil {
 			return "", err
 		}
 
-		order := &square.CreateOrderRequest{
+		order := &objects.CreateOrderRequest{
 			IdempotencyKey: idempotencyKey,
-			Order: &square.Order{
+			Order: &objects.Order{
 				ReferenceID: referenceID.String(),
-				LocationID:  locations[0].ID,
+				LocationID:  locationsListRes.Locations[0].ID,
 				LineItems:   lineItems,
+				Discounts:   lineDiscounts,
 			},
 		}
 
 		s.logger.Trace("creating checkout with square")
-		returnerURL, orderID, err = common.CreateCheckout(ctx, s.client, locations[0].ID, idempotencyKey, order, registration.Email, redirectUrl)
+		returnerURL, orderID, err = common.CreateCheckout(ctx, s.client, locationsListRes.Locations[0].ID, idempotencyKey, order, registration.Email, redirectUrl)
 	}
 
 	s.logger.Trace("Updating registration in database")
@@ -228,7 +229,7 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 		TeamCompetition: toStorageTeamCompetition(registration.TeamCompetition),
 		TShirt:          toStorageTShirt(registration.TShirt),
 		Housing:         registration.Housing,
-		UserID:          userinfo.UserID,
+		UserID:          userinfo.UserID(),
 		DiscountCodes:   registration.DiscountCodes,
 		OrderIDs:        orderIDs,
 	}

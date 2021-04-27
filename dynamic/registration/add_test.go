@@ -2,21 +2,23 @@ package registration
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
-	"github.com/Houndie/dss-registration/dynamic/square"
+	"github.com/Houndie/dss-registration/dynamic/sendinblue"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
 	"github.com/Houndie/dss-registration/dynamic/utility"
+	"github.com/Houndie/square-go"
+	"github.com/Houndie/square-go/catalog"
+	"github.com/Houndie/square-go/checkout"
+	"github.com/Houndie/square-go/inventory"
+	"github.com/Houndie/square-go/locations"
+	"github.com/Houndie/square-go/objects"
 	"github.com/gofrs/uuid"
-	"github.com/sendgrid/rest"
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"github.com/sirupsen/logrus"
 )
 
@@ -25,11 +27,22 @@ type itemCheck struct {
 	id    string
 }
 
-func discountCheck(t *testing.T, discountArray []*square.OrderLineItemDiscount, discountID string) {
+func discountCheck(t *testing.T, discountArray []*objects.OrderLineItemDiscount, appliedDiscounts []*objects.OrderLineItemAppliedDiscount, discountID string) {
 	found := false
 	for _, d := range discountArray {
 		if d.CatalogObjectID == discountID {
 			found = true
+			appliedFound := false
+			for _, ad := range appliedDiscounts {
+				if ad.DiscountUID == d.UID {
+					appliedFound = true
+					break
+				}
+			}
+			if !appliedFound {
+				t.Fatalf("discount %q found, but not it was not applied to this item", discountID)
+			}
+			break
 		}
 	}
 	if !found {
@@ -62,10 +75,10 @@ func TestAdd(t *testing.T) {
 
 	co := commontest.CommonCatalogObjects()
 
-	inventoryCounts := make([]*square.InventoryCount, len(co.WeekendPassID))
+	inventoryCounts := make([]*objects.InventoryCount, len(co.WeekendPassID))
 	idx := 0
 	for _, id := range co.WeekendPassID {
-		inventoryCounts[idx] = &square.InventoryCount{
+		inventoryCounts[idx] = &objects.InventoryCount{
 			CatalogObjectID: id,
 			Quantity:        "25",
 		}
@@ -144,113 +157,125 @@ func TestAdd(t *testing.T) {
 	}
 
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedAccessToken, expectedUserID),
+		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedAccessToken, []authorizer.Permission{}, expectedUserID, []authorizer.Permission{}),
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			client := &commontest.MockSquareClient{
-				ListCatalogFunc: func(ctx context.Context, types []square.CatalogObjectType) square.ListCatalogIterator {
-					if !test.makeOrder {
-						t.Fatalf("no orderable items found, square should not be called")
-					}
-					return commontest.ListCatalogFuncFromSlice(co.Catalog())(ctx, types)
-				},
-				BatchRetrieveInventoryCountsFunc: func(ctx context.Context, catalogObjectIDs, locationIDs []string, updatedAfter *time.Time) square.BatchRetrieveInventoryCountsIterator {
-					if !test.makeOrder {
-						t.Fatalf("no orderable items found, square should not be called")
-					}
-					return commontest.InventoryCountsFromSliceCheck(t, co.WeekendPassID, inventoryCounts)(ctx, catalogObjectIDs, locationIDs, updatedAfter)
-				},
-				ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
-					if !test.makeOrder {
-						t.Fatalf("no orderable items found, square should not be called")
-					}
-					return []*square.Location{{ID: expectedLocationID}}, nil
-				},
-				CreateCheckoutFunc: func(ctx context.Context, locationID, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error) {
-					if !test.makeOrder {
-						t.Fatalf("no orderable items found, square should not be called")
-					}
-					if locationID != expectedLocationID {
-						t.Fatalf("expected location ID %s, found %s", expectedLocationID, locationID)
-					}
-					if idempotencyKey != expectedIdempotencyKey.String() {
-						t.Fatalf("expected idempotencyKey %v, found %s", expectedIdempotencyKey, idempotencyKey)
-					}
-					if merchantSupportEmail != utility.SmackdownEmail {
-						t.Fatalf("expected merchant email %s, found %s", utility.SmackdownEmail, merchantSupportEmail)
-					}
-					if prePopulateBuyerEmail != test.registration.Email {
-						t.Fatalf("expected user email %s, found %s", test.registration.Email, prePopulateBuyerEmail)
-					}
-					if redirectUrl != expectedRedirectUrl {
-						t.Fatalf("expected redirectUrl %s, found %s", expectedRedirectUrl, redirectUrl)
-					}
-
-					itemChecks := []*itemCheck{}
-					switch p := test.registration.PassType.(type) {
-					case *WeekendPass:
-						itemChecks = append(itemChecks, &itemCheck{id: co.WeekendPassID[p.Tier]})
-					case *DanceOnlyPass:
-						itemChecks = append(itemChecks, &itemCheck{id: co.DancePassID})
-						// default, do nothing
-					}
-					if test.registration.MixAndMatch != nil {
-						itemChecks = append(itemChecks, &itemCheck{id: co.MixAndMatchID})
-					}
-					if test.registration.TeamCompetition != nil {
-						itemChecks = append(itemChecks, &itemCheck{id: co.TeamCompetitionID})
-					}
-					if test.registration.TShirt != nil {
-						itemChecks = append(itemChecks, &itemCheck{id: co.TShirtID})
-					}
-					if test.registration.SoloJazz != nil {
-						itemChecks = append(itemChecks, &itemCheck{id: co.SoloJazzID})
-					}
-					for _, lineItem := range order.Order.LineItems {
-						if lineItem.Quantity != "1" {
-							t.Fatalf("found unknown quantity of items %s, expected \"1\"", lineItem.Quantity)
+			client := &square.Client{
+				Catalog: &commontest.MockSquareCatalogClient{
+					ListFunc: func(ctx context.Context, req *catalog.ListRequest) (*catalog.ListResponse, error) {
+						if !test.makeOrder {
+							t.Fatalf("no orderable items found, square should not be called")
 						}
-						found := false
-						for _, itemCheck := range itemChecks {
-							if itemCheck.id == lineItem.CatalogObjectID {
-								if itemCheck.found {
-									t.Fatalf("order item with id %q found twice", itemCheck.id)
-								}
-								itemCheck.found = true
-								found = true
+						return commontest.ListCatalogFuncFromSlice(co.Catalog())(ctx, req)
+					},
+				},
+				Inventory: &commontest.MockSquareInventoryClient{
+					BatchRetrieveCountsFunc: func(ctx context.Context, req *inventory.BatchRetrieveCountsRequest) (*inventory.BatchRetrieveCountsResponse, error) {
+						if !test.makeOrder {
+							t.Fatalf("no orderable items found, square should not be called")
+						}
+						return commontest.InventoryCountsFromSliceCheck(t, co.WeekendPassID, inventoryCounts)(ctx, req)
+					},
+				},
+				Locations: &commontest.MockSquareLocationsClient{
+					ListFunc: func(context.Context, *locations.ListRequest) (*locations.ListResponse, error) {
+						if !test.makeOrder {
+							t.Fatalf("no orderable items found, square should not be called")
+						}
+						return &locations.ListResponse{
+							Locations: []*objects.Location{{ID: expectedLocationID}},
+						}, nil
+					},
+				},
+				Checkout: &commontest.MockSquareCheckoutClient{
+					CreateFunc: func(ctx context.Context, req *checkout.CreateRequest) (*checkout.CreateResponse, error) {
+						if !test.makeOrder {
+							t.Fatalf("no orderable items found, square should not be called")
+						}
+						if req.LocationID != expectedLocationID {
+							t.Fatalf("expected location ID %s, found %s", expectedLocationID, req.LocationID)
+						}
+						if req.IdempotencyKey != expectedIdempotencyKey.String() {
+							t.Fatalf("expected idempotencyKey %v, found %s", expectedIdempotencyKey, req.IdempotencyKey)
+						}
+						if req.MerchantSupportEmail != utility.SmackdownEmail {
+							t.Fatalf("expected merchant email %s, found %s", utility.SmackdownEmail, req.MerchantSupportEmail)
+						}
+						if req.PrePopulateBuyerEmail != test.registration.Email {
+							t.Fatalf("expected user email %s, found %s", test.registration.Email, req.PrePopulateBuyerEmail)
+						}
+						if req.RedirectURL != expectedRedirectUrl {
+							t.Fatalf("expected redirectUrl %s, found %s", expectedRedirectUrl, req.RedirectURL)
+						}
 
-								if p, ok := test.registration.PassType.(*WeekendPass); ok && lineItem.CatalogObjectID == co.WeekendPassID[p.Tier] {
-									if len(test.registration.DiscountCodes) > 0 {
-										discountCheck(t, lineItem.Discounts, co.FullWeekendDiscountID)
+						itemChecks := []*itemCheck{}
+						switch p := test.registration.PassType.(type) {
+						case *WeekendPass:
+							itemChecks = append(itemChecks, &itemCheck{id: co.WeekendPassID[p.Tier]})
+						case *DanceOnlyPass:
+							itemChecks = append(itemChecks, &itemCheck{id: co.DancePassID})
+							// default, do nothing
+						}
+						if test.registration.MixAndMatch != nil {
+							itemChecks = append(itemChecks, &itemCheck{id: co.MixAndMatchID})
+						}
+						if test.registration.TeamCompetition != nil {
+							itemChecks = append(itemChecks, &itemCheck{id: co.TeamCompetitionID})
+						}
+						if test.registration.TShirt != nil {
+							itemChecks = append(itemChecks, &itemCheck{id: co.TShirtID})
+						}
+						if test.registration.SoloJazz != nil {
+							itemChecks = append(itemChecks, &itemCheck{id: co.SoloJazzID})
+						}
+						for _, lineItem := range req.Order.Order.LineItems {
+							if lineItem.Quantity != "1" {
+								t.Fatalf("found unknown quantity of items %s, expected \"1\"", lineItem.Quantity)
+							}
+							found := false
+							for _, itemCheck := range itemChecks {
+								if itemCheck.id == lineItem.CatalogObjectID {
+									if itemCheck.found {
+										t.Fatalf("order item with id %q found twice", itemCheck.id)
 									}
-									if test.registration.IsStudent {
-										discountCheck(t, lineItem.Discounts, co.StudentDiscountID)
+									itemCheck.found = true
+									found = true
+
+									if p, ok := test.registration.PassType.(*WeekendPass); ok && lineItem.CatalogObjectID == co.WeekendPassID[p.Tier] {
+										if len(test.registration.DiscountCodes) > 0 {
+											discountCheck(t, req.Order.Order.Discounts, lineItem.AppliedDiscounts, co.FullWeekendDiscountID)
+										}
+										if test.registration.IsStudent {
+											discountCheck(t, req.Order.Order.Discounts, lineItem.AppliedDiscounts, co.StudentDiscountID)
+										}
+									} else if test.registration.MixAndMatch != nil && lineItem.CatalogObjectID == co.MixAndMatchID && len(test.registration.DiscountCodes) > 0 {
+										discountCheck(t, req.Order.Order.Discounts, lineItem.AppliedDiscounts, co.MixAndMatchDiscountID)
 									}
-								} else if test.registration.MixAndMatch != nil && lineItem.CatalogObjectID == co.MixAndMatchID && len(test.registration.DiscountCodes) > 0 {
-									discountCheck(t, lineItem.Discounts, co.MixAndMatchDiscountID)
+									break
 								}
-								break
+							}
+							if !found {
+								t.Fatalf("found order for unexpected item id %q", lineItem.CatalogObjectID)
+							}
+
+						}
+						for _, itemCheck := range itemChecks {
+							if !itemCheck.found {
+								t.Fatalf("item with id %q not found", itemCheck.id)
 							}
 						}
-						if !found {
-							t.Fatalf("found order for unexpected item id %q", lineItem.CatalogObjectID)
-						}
-
-					}
-					for _, itemCheck := range itemChecks {
-						if !itemCheck.found {
-							t.Fatalf("item with id %q not found", itemCheck.id)
-						}
-					}
-					return &square.Checkout{
-						CheckoutPageUrl: expectedCheckoutUrl,
-						Order: &square.Order{
-							ID: expectedOrderID,
-						},
-					}, nil
+						return &checkout.CreateResponse{
+							Checkout: &objects.Checkout{
+								CheckoutPageURL: expectedCheckoutUrl,
+								Order: &objects.Order{
+									ID: expectedOrderID,
+								},
+							},
+						}, nil
+					},
 				},
 			}
 
@@ -388,123 +413,166 @@ func TestAdd(t *testing.T) {
 
 			mailSent := false
 			mailClient := &commontest.MockMailClient{
-				SendFunc: func(msg *mail.SGMailV3) (*rest.Response, error) {
+				SendSMTPEmailFunc: func(ctx context.Context, params *sendinblue.SMTPEmailParams) (string, error) {
 					mailSent = true
-					if len(msg.Personalizations) != 1 {
-						t.Fatalf("xpected 1 personalization, found %d", len(msg.Personalizations))
+					p, ok := params.Params.(*mailParams)
+					if !ok {
+						t.Fatal("unexpected type for mail parameters")
 					}
-					dt := msg.Personalizations[0].DynamicTemplateData
-					if dt[mailFirstNameKey] != test.registration.FirstName {
-						t.Fatalf("expected registration first name %s, found %s", test.registration.FirstName, dt[mailFirstNameKey])
+					if p.FirstName != test.registration.FirstName {
+						t.Fatalf("expected registration first name %s, found %s", test.registration.FirstName, p.FirstName)
 					}
-					if dt[mailLastNameKey] != test.registration.LastName {
-						t.Fatalf("expected registration last name %s, found %s", test.registration.LastName, dt[mailLastNameKey])
+					if p.LastName != test.registration.LastName {
+						t.Fatalf("expected registration last name %s, found %s", test.registration.LastName, p.LastName)
 					}
-					if dt[mailStreetAddressKey] != test.registration.StreetAddress {
-						t.Fatalf("expected registration street address %s, found %s", test.registration.StreetAddress, dt[mailStreetAddressKey])
+					if p.StreetAddress != test.registration.StreetAddress {
+						t.Fatalf("expected registration street address %s, found %s", test.registration.StreetAddress, p.StreetAddress)
 					}
-					if dt[mailCityKey] != test.registration.City {
-						t.Fatalf("expected registration city %s, found %s", test.registration.City, dt[mailCityKey])
+					if p.City != test.registration.City {
+						t.Fatalf("expected registration city %s, found %s", test.registration.City, p.City)
 					}
-					if dt[mailStateKey] != test.registration.State {
-						t.Fatalf("expected registration state %s, found %s", test.registration.State, dt[mailStateKey])
+					if p.State != test.registration.State {
+						t.Fatalf("expected registration state %s, found %s", test.registration.State, p.State)
 					}
-					if dt[mailZipCodeKey] != test.registration.ZipCode {
-						t.Fatalf("expected registration zip code %s, found %s", test.registration.ZipCode, dt[mailZipCodeKey])
+					if p.ZipCode != test.registration.ZipCode {
+						t.Fatalf("expected registration zip code %s, found %s", test.registration.ZipCode, p.ZipCode)
 					}
-					if dt[mailEmailKey] != test.registration.Email {
-						t.Fatalf("expected registration email %s, found %s", test.registration.Email, dt[mailEmailKey])
+					if p.HomeScene != test.registration.HomeScene {
+						t.Fatalf("expected registration home scene %s, found %s", test.registration.HomeScene, p.HomeScene)
 					}
-					if dt[mailHomeSceneKey] != test.registration.HomeScene {
-						t.Fatalf("expected registration home scene %s, found %s", test.registration.HomeScene, dt[mailHomeSceneKey])
+					if p.IsStudent != test.registration.IsStudent {
+						t.Fatalf("expected registration student status %v, found %v", test.registration.IsStudent, p.IsStudent)
 					}
-					if dt[mailStudentKey] != test.registration.IsStudent {
-						t.Fatalf("expected registration student status %v, found %v", test.registration.IsStudent, dt[mailStudentKey])
+					if p.SoloJazz.Purchased != (test.registration.SoloJazz != nil) {
+						t.Fatalf("expected registration solo jazz purchase status %v, found %v", test.registration.SoloJazz != nil, p.SoloJazz.Purchased)
 					}
-					if dt[mailSoloJazzKey] != test.registration.SoloJazz {
-						t.Fatalf("expected registration solo jazz purchase status %v, found %v", test.registration.SoloJazz, dt[mailSoloJazzKey])
-					}
-					if dt[mailMixAndMatchKey] != (test.registration.MixAndMatch != nil) {
-						t.Fatalf("expected registration mix and match purchase status %v, found %v", test.registration.MixAndMatch != nil, dt[mailMixAndMatchKey])
-					}
-					if test.registration.MixAndMatch != nil && dt[mailMixAndMatchRoleKey] != test.registration.MixAndMatch.Role {
-						t.Fatalf("expected registration mix and match role %s, found %s", test.registration.MixAndMatch.Role, dt[mailMixAndMatchRoleKey])
-					}
-					if dt[mailTeamCompKey] != (test.registration.TeamCompetition != nil) {
-						t.Fatalf("expected registration team competition purchase status %v, found %v", test.registration.TeamCompetition != nil, dt[mailTeamCompKey])
-					}
-					if test.registration.TeamCompetition != nil && dt[mailTeamCompNameKey] != test.registration.TeamCompetition.Name {
-						t.Fatalf("expected registration team competition name %s, found %s", test.registration.TeamCompetition.Name, dt[mailTeamCompNameKey])
-					}
-					if dt[mailTShirtKey] != (test.registration.TShirt != nil) {
-						t.Fatalf("expected registration tshirt purchase status %v, found %v", test.registration.TShirt != nil, dt[mailTShirtKey])
-					}
-					if test.registration.TShirt != nil && dt[mailTShirtStyleKey] != test.registration.TShirt.Style {
-						t.Fatalf("expected registration t-shirt style %s, found %s", test.registration.TShirt.Style, dt[mailTShirtStyleKey])
+					if test.registration.MixAndMatch != nil {
+						if !p.MixAndMatch.Purchased {
+							t.Fatalf("expected mix and match purchase, found none")
+						}
+						switch test.registration.MixAndMatch.Role {
+						case storage.MixAndMatchRoleLeader:
+							if p.MixAndMatch.Role != mailLeader {
+								t.Fatalf("expected leader role, found %s", p.MixAndMatch.Role)
+							}
+						case storage.MixAndMatchRoleFollower:
+							if p.MixAndMatch.Role != mailFollower {
+								t.Fatalf("expected follower role, found %s", p.MixAndMatch.Role)
+							}
+						default:
+							t.Fatalf("unknown control mix and match role")
+						}
 					}
 
-					var expectedWeekendPassValue interface{}
-					switch p := test.registration.PassType.(type) {
+					if test.registration.TeamCompetition != nil {
+						if !p.TeamCompetition.Purchased {
+							t.Fatalf("expected team competition, found none")
+						}
+						if p.TeamCompetition.Name != test.registration.TeamCompetition.Name {
+							t.Fatalf("expected registration team competition name %s, found %s", test.registration.TeamCompetition.Name, p.TeamCompetition.Name)
+						}
+					}
+
+					if test.registration.TShirt != nil {
+						if !p.TShirt.Purchased {
+							t.Fatalf("expected t-shirt purchase, found none")
+						}
+						switch test.registration.TShirt.Style {
+						case storage.TShirtStyleUnisexS:
+							if p.TShirt.Style != mailUnisexS {
+								t.Fatalf("expected small unisex, found %s", p.TShirt.Style)
+							}
+						case storage.TShirtStyleUnisexM:
+							if p.TShirt.Style != mailUnisexM {
+								t.Fatalf("expected medium unisex, found %s", p.TShirt.Style)
+							}
+						case storage.TShirtStyleUnisexL:
+							if p.TShirt.Style != mailUnisexL {
+								t.Fatalf("expected large unisex, found %s", p.TShirt.Style)
+							}
+						case storage.TShirtStyleUnisexXL:
+							if p.TShirt.Style != mailUnisexXL {
+								t.Fatalf("expected extra large unisex, found %s", p.TShirt.Style)
+							}
+						case storage.TShirtStyleUnisex2XL:
+							if p.TShirt.Style != mailUnisex2XL {
+								t.Fatalf("expected 2XL unisex, found %s", p.TShirt.Style)
+							}
+						case storage.TShirtStyleUnisex3XL:
+							if p.TShirt.Style != mailUnisex3XL {
+								t.Fatalf("expected 3XL unisex, found %s", p.TShirt.Style)
+							}
+						case storage.TShirtStyleBellaS:
+							if p.TShirt.Style != mailBellaS {
+								t.Fatalf("expected small bella, found %s", p.TShirt.Style)
+							}
+						case storage.TShirtStyleBellaM:
+							if p.TShirt.Style != mailBellaM {
+								t.Fatalf("expected medium bella, found %s", p.TShirt.Style)
+							}
+						case storage.TShirtStyleBellaL:
+							if p.TShirt.Style != mailBellaL {
+								t.Fatalf("expected large bella, found %s", p.TShirt.Style)
+							}
+						case storage.TShirtStyleBellaXL:
+							if p.TShirt.Style != mailBellaXL {
+								t.Fatalf("expected extra large bella, found %s", p.TShirt.Style)
+							}
+						case storage.TShirtStyleBella2XL:
+							if p.TShirt.Style != mailBella2XL {
+								t.Fatalf("expected 2XL bella, found %s", p.TShirt.Style)
+							}
+						}
+					}
+
+					switch rp := test.registration.PassType.(type) {
 					case *WeekendPass:
-						expectedWeekendPassValue = mailFullWeekendValue
-						if dt[mailWorkshopLevelKey] != p.Level {
-							t.Fatalf("expected pass level %d, found %d", p.Level, dt[mailWorkshopLevelKey])
+						if p.PassType.Type != mailWeekendPass {
+							t.Fatalf("expected weekend pass found %v", p.PassType.Type)
+						}
+						if p.PassType.WeekendPass.Level != int(rp.Level) {
+							t.Fatalf("expected pass level %d, found %d", rp.Level, p.PassType.WeekendPass.Level)
 						}
 					case *DanceOnlyPass:
-						expectedWeekendPassValue = mailDanceOnlyValue
+						if p.PassType.Type != mailDanceOnlyPass {
+							t.Fatalf("expected dance only pass found %v", p.PassType.Type)
+						}
 					default:
-						expectedWeekendPassValue = mailNoPassValue
-					}
-					if dt[mailWeekendPassKey] != expectedWeekendPassValue {
-						t.Fatalf("expected weekend pass value %q, found %q", expectedWeekendPassValue, dt[mailWeekendPassKey])
+						if p.PassType.Type != mailNoPass {
+							t.Fatalf("expected no pass found %v", p.PassType.Type)
+						}
 					}
 
-					var expectedHousingValue interface{}
 					switch h := test.registration.Housing.(type) {
 					case *storage.ProvideHousing:
-						expectedHousingValue = mailProvideHousingValue
-						ph, ok := dt[mailProvideHousingKey]
-						if !ok {
-							t.Fatalf("No provide housing data found in mail")
+						if p.Housing.Type != mailProvideHousing {
+							t.Fatalf("expected providing housing found %v", p.PassType.Type)
 						}
-						phmap, ok := ph.(map[string]interface{})
-						if !ok {
-							t.Fatalf("could not convert provide housing data to map")
+						if p.Housing.Provide.Quantity != h.Quantity {
+							t.Fatalf("expected guests quantity %d, found %d", h.Quantity, p.Housing.Provide.Quantity)
 						}
-						if phmap[mailProvideHousingGuestsKey] != h.Quantity {
-							t.Fatalf("expected guests quantity %d, found %d", h.Quantity, phmap[mailProvideHousingGuestsKey])
+						if p.Housing.Provide.Pets != h.Pets {
+							t.Fatalf("expected pet information %s, found %s", h.Pets, p.Housing.Provide.Pets)
 						}
-						if phmap[mailProvideHousingPetsKey] != h.Pets {
-							t.Fatalf("expected pet information %s, found %s", h.Pets, phmap[mailProvideHousingPetsKey])
-						}
-						if phmap[mailProvideHousingDetailsKey] != h.Details {
-							t.Fatalf("expected provide housing detail information %s, found %s", h.Details, phmap[mailProvideHousingDetailsKey])
+						if p.Housing.Provide.Details != h.Details {
+							t.Fatalf("expected provide housing detail information %s, found %s", h.Details, p.Housing.Provide.Details)
 						}
 					case *storage.RequireHousing:
-						expectedHousingValue = mailRequireHousingValue
-						rh, ok := dt[mailRequireHousingKey]
-						if !ok {
-							t.Fatalf("No provide housing data found in mail")
+						if p.Housing.Type != mailRequireHousing {
+							t.Fatalf("expected requiring housing found %v", p.PassType.Type)
 						}
-						rhmap, ok := rh.(map[string]interface{})
-						if !ok {
-							t.Fatalf("could not convert require housing data to map")
+						if p.Housing.Require.PetAllergies != h.PetAllergies {
+							t.Fatalf("expected allergy information %s, found %s", h.PetAllergies, p.Housing.Require.PetAllergies)
 						}
-						if rhmap[mailRequireHousingAllergiesKey] != h.PetAllergies {
-							t.Fatalf("expected allergy information %s, found %s", h.PetAllergies, rhmap[mailRequireHousingAllergiesKey])
+						if p.Housing.Require.Details != h.Details {
+							t.Fatalf("expected require housing detail information %s, found %s", h.Details, p.Housing.Require.Details)
 						}
-						if rhmap[mailRequireHousingDetailsKey] != h.Details {
-							t.Fatalf("expected require housing detail information %s, found %s", h.Details, rhmap[mailRequireHousingDetailsKey])
+					case *storage.NoHousing:
+						if p.Housing.Type != mailNoHousing {
+							t.Fatalf("expected no housing found %v", p.PassType.Type)
 						}
-					default:
-						expectedHousingValue = mailNoHousingValue
 					}
-					if dt[mailHousingKey] != expectedHousingValue {
-						t.Fatalf("expected housing value %q, found %q", expectedHousingValue, dt[mailHousingKey])
-					}
-					return &rest.Response{
-						StatusCode: http.StatusAccepted,
-					}, nil
+					return "", nil
 				},
 			}
 
@@ -540,7 +608,7 @@ func TestAddNotActive(t *testing.T) {
 	}
 	logger.SetOutput(devnull)
 
-	service := NewService(active, false, logger, &commontest.MockSquareClient{}, &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{})
+	service := NewService(active, false, logger, &square.Client{}, &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{})
 
 	registration := &Info{
 		FirstName: "John",
@@ -567,41 +635,47 @@ func TestAddCostNothing(t *testing.T) {
 
 	co := commontest.CommonCatalogObjects()
 
-	inventoryCounts := make([]*square.InventoryCount, len(co.WeekendPassID))
+	inventoryCounts := make([]*objects.InventoryCount, len(co.WeekendPassID))
 	idx := 0
 	for _, id := range co.WeekendPassID {
-		inventoryCounts[idx] = &square.InventoryCount{
+		inventoryCounts[idx] = &objects.InventoryCount{
 			CatalogObjectID: id,
 			Quantity:        "25",
 		}
 		idx++
 	}
 
-	client := &commontest.MockSquareClient{
-		ListCatalogFunc:                  commontest.ListCatalogFuncFromSlice(co.Catalog()),
-		BatchRetrieveInventoryCountsFunc: commontest.InventoryCountsFromSlice(inventoryCounts),
-		ListLocationsFunc: func(context.Context) ([]*square.Location, error) {
-			return []*square.Location{{ID: "7"}}, nil
+	client := &square.Client{
+		Catalog: &commontest.MockSquareCatalogClient{
+			ListFunc: commontest.ListCatalogFuncFromSlice(co.Catalog()),
 		},
-		CreateCheckoutFunc: func(ctx context.Context, locationID, idempotencyKey string, order *square.CreateOrderRequest, askForShippingAddress bool, merchantSupportEmail, prePopulateBuyerEmail string, prePopulateShippingAddress *square.Address, redirectUrl string, additionalRecipients []*square.ChargeRequestAdditionalRecipient, note string) (*square.Checkout, error) {
-			return nil, &square.ErrorList{
-				Errors: []*square.Error{
-					{
-						Category: square.ErrorCategoryInvalidRequestError,
-						Code:     square.ErrorCodeValueTooLow,
-						Field:    "order.total_money.amount",
+		Inventory: &commontest.MockSquareInventoryClient{
+			BatchRetrieveCountsFunc: commontest.InventoryCountsFromSlice(inventoryCounts),
+		},
+		Locations: &commontest.MockSquareLocationsClient{
+			ListFunc: func(context.Context, *locations.ListRequest) (*locations.ListResponse, error) {
+				return &locations.ListResponse{
+					Locations: []*objects.Location{{ID: "7"}},
+				}, nil
+			},
+		},
+		Checkout: &commontest.MockSquareCheckoutClient{
+			CreateFunc: func(ctx context.Context, req *checkout.CreateRequest) (*checkout.CreateResponse, error) {
+				return nil, &objects.ErrorList{
+					Errors: []*objects.Error{
+						{
+							Category: objects.ErrorCategoryInvalidRequestError,
+							Code:     objects.ErrorCodeValueTooLow,
+							Field:    "order.total_money.amount",
+						},
 					},
-				},
-			}
+				}
+			},
 		},
 	}
 
 	authorizer := &commontest.MockAuthorizer{
-		UserinfoFunc: func(ctx context.Context, accessToken string) (*authorizer.Userinfo, error) {
-			return &authorizer.Userinfo{
-				UserID: "1235",
-			}, nil
-		},
+		GetUserinfoFunc: commontest.UserinfoFromID("12345", []authorizer.Permission{}),
 	}
 
 	registration := &Info{
@@ -631,24 +705,19 @@ func TestAddCostNothing(t *testing.T) {
 
 	mailSent := false
 	mailClient := &commontest.MockMailClient{
-		SendFunc: func(msg *mail.SGMailV3) (*rest.Response, error) {
+		SendSMTPEmailFunc: func(ctx context.Context, params *sendinblue.SMTPEmailParams) (string, error) {
 			mailSent = true
-			if len(msg.Personalizations) != 1 {
-				t.Fatalf("xpected 1 personalization, found %d", len(msg.Personalizations))
+			p, ok := params.Params.(*mailParams)
+			if !ok {
+				t.Fatal("unexpected type for mail parameters")
 			}
-			dt := msg.Personalizations[0].DynamicTemplateData
-			if dt[mailFirstNameKey] != registration.FirstName {
-				t.Fatalf("expected registration first name %s, found %s", registration.FirstName, dt[mailFirstNameKey])
+			if p.FirstName != registration.FirstName {
+				t.Fatalf("expected registration first name %s, found %s", registration.FirstName, p.FirstName)
 			}
-			if dt[mailLastNameKey] != registration.LastName {
-				t.Fatalf("expected registration last name %s, found %s", registration.LastName, dt[mailLastNameKey])
+			if p.LastName != registration.LastName {
+				t.Fatalf("expected registration last name %s, found %s", registration.LastName, p.LastName)
 			}
-			if dt[mailEmailKey] != registration.Email {
-				t.Fatalf("expected registration email %s, found %s", registration.Email, dt[mailEmailKey])
-			}
-			return &rest.Response{
-				StatusCode: http.StatusAccepted,
-			}, nil
+			return "", nil
 		},
 	}
 

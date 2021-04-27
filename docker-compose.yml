@@ -9,6 +9,15 @@ services:
     environment:
       - POSTGRES_USER=dbuser
       - POSTGRES_PASSWORD=dbpass
+  test_db: 
+    build:
+      context: dynamic
+      dockerfile: docker/Dockerfile.postgres
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=dbpass
   backend:
     build: 
       context: dynamic
@@ -18,16 +27,28 @@ services:
     environment:
       - DSS_FRONTEND=http://localhost:8081
       - DSS_POSTGRESURL=postgres://dbuser:dbpass@db:5432/dbuser?sslmode=disable
+      - DSS_TEST_POSTGRESURL=postgres://dbuser:dbpass@test_db:5432/dbuser?sslmode=disable
+      - DSS_AUTH0ENDPOINT=https://daytonswingsmackdown-test.us.auth0.com
       - DSS_ENVIRONMENT=development
       - DSS_SQUAREKEY
       - DSS_MAILKEY
+      - DSS_RECAPTCHAKEY
       - DSS_PORT=80
+      - DSS_ADMINS
+    volumes:
+      - "./dynamic/:/app:ro"
   frontend:
     build:
       context: static
       dockerfile: docker/Dockerfile
-      args:
-        - HUGO_BASEURL=http://localhost:8081
-        - HUGO_DYNAMIC=http://localhost:8080
+    environment:
+      - GATSBY_BACKEND=http://localhost:8080
+      - GATSBY_FRONTEND=http://localhost:8081
+      - GATSBY_CLIENT_ID=t3FWpgTRr9ESBPhQbnQ3r3j9C0v4ZGAE
+      - GATSBY_AUTH0_DOMAIN=daytonswingsmackdown-test.us.auth0.com
+      - GATSBY_AUTH0_AUDIENCE=https://dayton-swing-smackdown-testing.herokuapp.com
+    volumes:
+      - "./static/src:/app/src:ro"
+      - "./static/static:/app/static:ro"
     ports:
-      - "8081:80"
+      - "8081:8000"

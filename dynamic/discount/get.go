@@ -16,17 +16,9 @@ func (s *Service) Get(ctx context.Context, code string) (*Bundle, error) {
 	}
 
 	squareData, err := common.GetSquareCatalog(ctx, s.client)
-	singleDiscounts := make([]*Single, len(discount.Discounts))
-	for i, singleDiscount := range discount.Discounts {
-		singleDiscounts[i] = &Single{
-			Amount:    squareData.Discounts[singleDiscount.Name].Amount,
-			Name:      singleDiscount.Name,
-			AppliedTo: singleDiscount.AppliedTo,
-		}
-
+	bundle, err := fromStore(discount, squareData)
+	if err != nil {
+		return nil, fmt.Errorf("error converting store bundle to model type: %w", err)
 	}
-	return &Bundle{
-		Code:      discount.Code,
-		Discounts: singleDiscounts,
-	}, nil
+	return bundle, nil
 }

@@ -6,11 +6,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
-	"github.com/Houndie/dss-registration/dynamic/square"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
+	"github.com/Houndie/square-go"
+	"github.com/Houndie/square-go/catalog"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,7 +20,7 @@ func compareSingleDiscount(t *testing.T, sd *Single, appliedTo storage.PurchaseI
 		t.Fatalf("found unexpected appliedTo %v, expected %v", sd.AppliedTo, appliedTo)
 	}
 
-	amt, ok := sd.Amount.(common.DollarDiscount)
+	amt, ok := sd.Amount.(DollarDiscount)
 	if !ok {
 		t.Fatalf("expected dollar discount, did not find it")
 	}
@@ -41,8 +41,8 @@ func TestGetDiscount(t *testing.T) {
 	logger.SetOutput(devnull)
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
-	client := &commontest.MockSquareClient{
-		ListCatalogFunc: commontest.ListCatalogFuncFromSlice(co.Catalog()),
+	client := &commontest.MockSquareCatalogClient{
+		ListFunc: commontest.ListCatalogFuncFromSlice(co.Catalog()),
 	}
 
 	store := &commontest.MockStore{
@@ -68,7 +68,7 @@ func TestGetDiscount(t *testing.T) {
 		},
 	}
 
-	service := NewService(store, client, logger, &commontest.MockAuthorizer{})
+	service := NewService(store, &square.Client{Catalog: client}, logger, &commontest.MockAuthorizer{})
 
 	discount, err := service.Get(context.Background(), expectedCode)
 	if err != nil {
@@ -111,10 +111,10 @@ func TestGetNotExists(t *testing.T) {
 	logger.SetOutput(devnull)
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
-	client := &commontest.MockSquareClient{
-		ListCatalogFunc: func(context.Context, []square.CatalogObjectType) square.ListCatalogIterator {
+	client := &commontest.MockSquareCatalogClient{
+		ListFunc: func(context.Context, *catalog.ListRequest) (*catalog.ListResponse, error) {
 			t.Fatalf("no need for square calls if discount does not exist")
-			return nil
+			return nil, nil
 		},
 	}
 
@@ -124,7 +124,7 @@ func TestGetNotExists(t *testing.T) {
 		},
 	}
 
-	service := NewService(store, client, logger, &commontest.MockAuthorizer{})
+	service := NewService(store, &square.Client{Catalog: client}, logger, &commontest.MockAuthorizer{})
 
 	_, err = service.Get(context.Background(), expectedCode)
 	if err == nil {

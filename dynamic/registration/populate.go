@@ -2,9 +2,11 @@ package registration
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/Houndie/dss-registration/dynamic/common"
+	"github.com/Houndie/dss-registration/dynamic/discount"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/utility"
 )
@@ -17,7 +19,7 @@ type FormData struct {
 	SoloJazzCost    int
 	TeamCompCost    int
 	TShirtCost      int
-	StudentDiscount common.DiscountAmount
+	StudentDiscount discount.DiscountAmount
 }
 
 func (s *Service) Populate(ctx context.Context) (*FormData, error) {
@@ -36,6 +38,16 @@ func (s *Service) Populate(ctx context.Context) (*FormData, error) {
 		return nil, fmt.Errorf("error finding best tier and cost: %w", err)
 	}
 
+	var studentDiscount discount.DiscountAmount
+	switch sd := catalogData.StudentDiscount.Amount.(type) {
+	case common.DollarDiscount:
+		studentDiscount = discount.DollarDiscount(int(sd))
+	case common.PercentDiscount:
+		studentDiscount = discount.PercentDiscount(string(sd))
+	default:
+		return nil, errors.New("unknown discount type from square data")
+	}
+
 	return &FormData{
 		WeekendPassTier: bestTier,
 		WeekendPassCost: bestCost,
@@ -44,6 +56,6 @@ func (s *Service) Populate(ctx context.Context) (*FormData, error) {
 		MixAndMatchCost: catalogData.MixAndMatch.Cost,
 		TeamCompCost:    catalogData.TeamCompetition.Cost,
 		TShirtCost:      catalogData.TShirt.Cost,
-		StudentDiscount: catalogData.StudentDiscount.Amount,
+		StudentDiscount: studentDiscount,
 	}, nil
 }
