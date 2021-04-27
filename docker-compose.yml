@@ -48,7 +48,7 @@ services:
       - GATSBY_AUTH0_DOMAIN=daytonswingsmackdown-test.us.auth0.com
       - GATSBY_AUTH0_AUDIENCE=https://dayton-swing-smackdown-testing.herokuapp.com
     volumes:
-      - "./static/gatsby/src:/app/src:ro"
-      - "./static/gatsby/static:/app/static:ro"
+      - "./static/src:/app/src:ro"
+      - "./static/static:/app/static:ro"
     ports:
       - "8081:8000"
