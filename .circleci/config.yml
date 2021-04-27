@@ -1,13 +1,11 @@
 version: 2.1
-orbs:
-  heroku: circleci/heroku@1.0.1
 jobs:
   go-test:
     docker:
       # specify the version
-      - image: circleci/golang:1.14
+      - image: circleci/golang:1.16
         environment:
-          DSS_PG_URL: postgres://root:password@localhost/circle_test?sslmode=disable
+          DSS_TEST_POSTGRESURL: postgres://root:password@localhost/circle_test?sslmode=disable
           GOPROXY: https://proxy.golang.org
       - image: circleci/postgres:9.4
         environment:
@@ -30,8 +28,16 @@ jobs:
 
       - run: 
           name: Perform DB Migrations
-          command: toolbox do -- migrate -path=dynamic/storage/postgres/migrations -database $DSS_PG_URL up
+          command: toolbox do -- migrate -path=dynamic/storage/postgres/migrations -database $DSS_TEST_POSTGRESURL up
 
       - run: 
           name: Perform tests
           command: cd dynamic && go test ./...
+workflows:
+  version: 2
+  test:
+    jobs:
+      - go-test:
+          filters:
+            tags:
+              only: /^v[0-9]\.[0-9]\.[0-9]$/
