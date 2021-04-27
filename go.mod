@@ -15,7 +15,6 @@ require (
 	github.com/moby/moby v20.10.6+incompatible
 	github.com/moby/sys/mount v0.2.0 // indirect
 	github.com/moby/term v0.0.0-20201216013528-df9cb8a40635 // indirect
-	github.com/tidwall/pretty v0.0.0-20190325153808-1166b9ac2b65 // indirect
 	github.com/twitchtv/twirp v5.10.3-0.20200514000016-2bffe5f9b8c3+incompatible
 	go.larrymyers.com/protoc-gen-twirp_typescript v0.0.0-20210107230451-97fd63e543be
 	golang.org/x/sys v0.0.0-20210423185535-09eb48e85fd7 // indirect
