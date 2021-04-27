@@ -15,6 +15,7 @@ var (
 	deployVersion   string
 	terraformClient *tfe.Client
 	herokuAPIKey    string
+	migrationURL    string
 )
 
 func Workspace() string {
@@ -97,4 +98,22 @@ func InitHerokuAPIKey() error {
 	}
 
 	return nil
+}
+
+func InitMigrationURL() error {
+	var ok bool
+	migrationURL, ok = os.LookupEnv("MIGRATION_URL")
+	if !ok {
+		return errors.New("environment variable MIGRATION_URL must not be empty")
+	}
+
+	return nil
+}
+
+func MigrationURL() string {
+	if migrationURL == "" {
+		panic("migrationURL not initialized")
+	}
+
+	return migrationURL
 }

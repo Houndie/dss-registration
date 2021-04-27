@@ -14,8 +14,12 @@ import (
 	"github.com/Houndie/dss-registration/mage"
 	"github.com/Houndie/toolbox/pkg/toolbox"
 	"github.com/docker/docker/client"
+	"github.com/golang-migrate/migrate/v4"
 	"github.com/hashicorp/go-tfe"
 	"github.com/magefile/mage/mg"
+
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 func Tools() error {
@@ -174,6 +178,25 @@ func TerraformApply(ctx context.Context) error {
 		}
 
 		time.Sleep(5 * time.Second)
+	}
+
+	return nil
+}
+
+func Migrate(ctx context.Context) error {
+	mg.Deps(mage.InitMigrationURL)
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("error getting current working directory: %w", err)
+	}
+	m, err := migrate.New("file://"+filepath.Join(cwd, "dynamic/storage/postgres/migrations"), mage.MigrationURL())
+	if err != nil {
+		return fmt.Errorf("error creating migration client: %w", err)
+	}
+
+	if err := m.Up(); err != nil {
+		return fmt.Errorf("error migrating up: %w", err)
 	}
 
 	return nil

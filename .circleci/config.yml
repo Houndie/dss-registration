@@ -13,9 +13,10 @@ jobs:
           POSTGRES_PASSWORD: password
     steps:
       - checkout
+
       - run:
-          name: install tools
-          command: go get github.com/Houndie/toolbox@v0.3.0 && toolbox -v sync
+          name: Install mage
+          command: wget https://github.com/magefile/mage/releases/download/v1.11.0/mage_1.11.0_Linux-64bit.tar.gz -O - | tar xzf - -C /tmp
 
       - run: 
           name: Wait on DB
@@ -28,7 +29,7 @@ jobs:
 
       - run: 
           name: Perform DB Migrations
-          command: toolbox do -- migrate -path=dynamic/storage/postgres/migrations -database $DSS_TEST_POSTGRESURL up
+          command: MIGRATION_URL=$DSS_TEST_POSTGRESURL /tmp/mage -v migrate
 
       - run: 
           name: Perform tests
