@@ -44,7 +44,7 @@ services:
     environment:
       - GATSBY_BACKEND=http://localhost:8080
       - GATSBY_FRONTEND=http://localhost:8081
-      - GATSBY_CLIENT_ID=t3FWpgTRr9ESBPhQbnQ3r3j9C0v4ZGAE
+      - GATSBY_CLIENT_ID=aq41or3TwXgjftpR9k9rep48xi8SHMBJ
       - GATSBY_AUTH0_DOMAIN=daytonswingsmackdown-test.us.auth0.com
       - GATSBY_AUTH0_AUDIENCE=https://dayton-swing-smackdown-testing.herokuapp.com
     volumes:
