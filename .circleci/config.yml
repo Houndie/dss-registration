@@ -1,6 +1,22 @@
 version: 2.1
 jobs:
-  go-test:
+  checkout:
+    docker:
+      - image: circleci/golang:1.16
+    steps:
+      - checkout:
+          path: src/
+
+      - run:
+          name: Install mage
+          command: mkdir bin && wget https://github.com/magefile/mage/releases/download/v1.11.0/mage_1.11.0_Linux-64bit.tar.gz -O - | tar xzf - -C bin
+
+      - persist_to_workspace:
+          root: .
+          paths: 
+            - src
+            - bin
+  go_test:
     docker:
       # specify the version
       - image: circleci/golang:1.16
@@ -12,11 +28,8 @@ jobs:
           POSTGRES_USER: root
           POSTGRES_PASSWORD: password
     steps:
-      - checkout
-
-      - run:
-          name: Install mage
-          command: wget https://github.com/magefile/mage/releases/download/v1.11.0/mage_1.11.0_Linux-64bit.tar.gz -O - | tar xzf - -C /tmp
+      - attach_workspace:
+          at: .
 
       - run: 
           name: Wait on DB
@@ -29,16 +42,153 @@ jobs:
 
       - run: 
           name: Perform DB Migrations
-          command: MIGRATION_URL=$DSS_TEST_POSTGRESURL /tmp/mage -v migrate
+          command: cd src && MIGRATION_URL=$DSS_TEST_POSTGRESURL ../bin/mage -v migrate
 
       - run: 
           name: Perform tests
-          command: cd dynamic && go test ./...
+          command: cd src/dynamic && go test ./...
+
+  build_backend:
+    docker:
+      - image: circleci/golang:1.16
+        environment:
+          WORKSPACE: testing
+          DOCKER_CACHE: ../cache/docker.cache
+    steps:
+      - attach_workspace:
+          at: .
+
+      - setup_remote_docker:
+          version: 20.10.2
+
+      - run:
+          name: Build Backend Image
+          command: cd src && DEPLOY_VERSION="${CIRCLE_TAG:-v0.0.0}" ../bin/mage -v docker:build
+
+      - run:
+          name: Persist Backend Image
+          command: mkdir cache && cd src && DEPLOY_VERSION="${CIRCLE_TAG:-v0.0.0}" ../bin/mage -v docker:save
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - cache
+
+  build_frontend:
+    docker:
+      - image: circleci/node:14.3.0
+        environment:
+          WORKSPACE: testing
+          DOCKER_CACHE: ../cache/docker.cache
+          GATSBY_BACKEND: http://example.com:8080
+          GATSBY_FRONTEND: http://example.com:8081
+          GATSBY_AUTH0_DOMAIN: http://example.com
+          GATSBY_CLIENT_ID: clientid
+          GATSBY_AUTH0_AUDIENCE: audience
+    steps:
+      - attach_workspace:
+          at: .
+
+      - run:
+          name: Install dependencies
+          command: cd src/static && npm install
+
+      - run:
+          name: Build Frontend Image
+          command: cd src/static && npx gatsby build
+
+  push_backend_image:
+    docker:
+      - image: circleci/golang:1.16
+        environment:
+          WORKSPACE: testing
+          DOCKER_CACHE: ../cache/docker.cache
+          DEPLOY_VERSION: v0.0.0
+    steps:
+      - attach_workspace:
+          at: .
+
+      - run:
+          name: Load Backend Image
+          command: cd src && ../bin/mage -v docker:load
+
+      - run:
+          name: Push To Heroku Registry
+          command: cd src && ../bin/mage -v docker:DeployHeroku
+
+  update_terraform_deploy_version:
+    docker:
+      - image: circleci/golang:1.16
+        environment:
+          WORKSPACE: testing
+          DEPLOY_VERSION: v0.0.0
+    steps:
+      - run:
+          name: Set Terraform Deploy Version
+          command: cd src && ../bin/mage -v terraform:setdeployversion
+
+  deploy:
+    docker:
+      - image: circleci/golang:1.16
+        environment:
+          WORKSPACE: testing
+    steps:
+      - run:
+          name: Terraform Apply
+          command: cd src && ../bin/mage -v terraform:apply
+
 workflows:
   version: 2
-  test:
+  on_push:
     jobs:
-      - go-test:
+      - checkout:
+          filters:
+            tags:
+              only: /^v[0-9]\.[0-9]\.[0-9]$/
+
+      - go_test:
+          requires:
+            - checkout
+          filters:
+            tags:
+              only: /^v[0-9]\.[0-9]\.[0-9]$/
+
+      - build_backend:
+          requires:
+            - checkout
+          filters:
+            tags:
+              only: /^v[0-9]\.[0-9]\.[0-9]$/
+
+      - build_frontend:
+          requires:
+            - checkout
+          filters:
+            tags:
+              only: /^v[0-9]\.[0-9]\.[0-9]$/
+
+      - push_backend_image:
+          requires:
+            - go_test
+            - build_backend
+            - build_frontend
+          filters:
+            tags:
+              only: /^v[0-9]\.[0-9]\.[0-9]$/
+
+      - update_terraform_deploy_version:
+          requires:
+            - go_test
+            - build_backend
+            - build_frontend
+          filters:
+            tags:
+              only: /^v[0-9]\.[0-9]\.[0-9]$/
+
+      - deploy:
+          requires:
+            - push_backend_image
+            - update_terraform_deploy_version
           filters:
             tags:
               only: /^v[0-9]\.[0-9]\.[0-9]$/

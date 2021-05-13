@@ -8,14 +8,18 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-tfe"
+	"github.com/magefile/mage/mg"
+	"github.com/moby/moby/client"
 )
 
 var (
 	workspace       string
 	deployVersion   string
 	terraformClient *tfe.Client
+	dockerClient    *client.Client
 	herokuAPIKey    string
 	migrationURL    string
+	dockerCache     string
 )
 
 func Workspace() string {
@@ -31,6 +35,10 @@ func InitWorkspace() error {
 	workspace, ok = os.LookupEnv("WORKSPACE")
 	if !ok {
 		return errors.New("environment variable WORKSPACE must not be empty")
+	}
+
+	if mg.Verbose() {
+		fmt.Fprintf(os.Stderr, "using workspace: %s\n", workspace)
 	}
 
 	return nil
@@ -49,6 +57,10 @@ func InitDeployVersion() error {
 	deployVersion, ok = os.LookupEnv("DEPLOY_VERSION")
 	if !ok {
 		return errors.New("environment variable DEPLOY_VERSION must not be empty")
+	}
+
+	if mg.Verbose() {
+		fmt.Fprintf(os.Stderr, "using deploy version: %s\n", deployVersion)
 	}
 
 	return nil
@@ -107,6 +119,10 @@ func InitMigrationURL() error {
 		return errors.New("environment variable MIGRATION_URL must not be empty")
 	}
 
+	if mg.Verbose() {
+		fmt.Fprintf(os.Stderr, "using migration url: %s\n", migrationURL)
+	}
+
 	return nil
 }
 
@@ -116,4 +132,44 @@ func MigrationURL() string {
 	}
 
 	return migrationURL
+}
+
+func InitDockerClient() error {
+	var err error
+	dockerClient, err = client.NewClientWithOpts(client.WithTimeout(10*time.Minute), client.FromEnv)
+	if err != nil {
+		return fmt.Errorf("error creating new client: %w", err)
+	}
+
+	return nil
+}
+
+func DockerClient() *client.Client {
+	if dockerClient == nil {
+		panic("docker client not initialized")
+	}
+
+	return dockerClient
+}
+
+func InitDockerCache() error {
+	var ok bool
+	dockerCache, ok = os.LookupEnv("DOCKER_CACHE")
+	if !ok {
+		return errors.New("environment variable DOCKER_CACHE must not be empty")
+	}
+
+	if mg.Verbose() {
+		fmt.Fprintf(os.Stderr, "using docker cache: %s\n", dockerCache)
+	}
+
+	return nil
+}
+
+func DockerCache() string {
+	if dockerCache == "" {
+		panic("dockerCache not initialized")
+	}
+
+	return dockerCache
 }

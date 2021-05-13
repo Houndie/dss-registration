@@ -13,7 +13,6 @@ import (
 
 	"github.com/Houndie/dss-registration/mage"
 	"github.com/Houndie/toolbox/pkg/toolbox"
-	"github.com/docker/docker/client"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/hashicorp/go-tfe"
 	"github.com/magefile/mage/mg"
@@ -29,7 +28,9 @@ func Tools() error {
 
 const eslint = "eslint-disable block-scoped-var, id-length, no-control-regex, no-magic-numbers, no-prototype-builtins, no-redeclare, no-shadow, no-var, sort-vars, strict, no-lone-blocks, default-case"
 
-func GenerateProtoc() error {
+type Protoc mg.Namespace
+
+func (Protoc) Generate() error {
 	mg.Deps(Tools)
 	fmt.Println("generating protocs")
 	for _, file := range []string{"registration", "discount", "forms"} {
@@ -93,7 +94,9 @@ func GenerateProtoc() error {
 	return nil
 }
 
-func SetTerraformDeployVersion(ctx context.Context) error {
+type Terraform mg.Namespace
+
+func (Terraform) SetDeployVersion(ctx context.Context) error {
 	mg.Deps(mage.InitWorkspace, mage.InitDeployVersion, mage.InitTerraformClient)
 	fmt.Println("setting terraform deploy version")
 
@@ -108,26 +111,7 @@ func SetTerraformDeployVersion(ctx context.Context) error {
 	return nil
 }
 
-func DeployHeroku(ctx context.Context) error {
-	mg.Deps(mage.InitHerokuAPIKey, mage.InitDeployVersion, mage.InitWorkspace)
-
-	client, err := client.NewClientWithOpts(client.WithTimeout(10 * time.Second))
-	if err != nil {
-		return fmt.Errorf("error creating new client: %w", err)
-	}
-
-	if err := mage.DockerBuild(ctx, client, mage.HerokuProject[mage.Workspace()], mage.DeployVersion()); err != nil {
-		return err
-	}
-
-	if err := mage.DockerPush(ctx, client, mage.HerokuAPIKey(), mage.HerokuProject[mage.Workspace()], mage.DeployVersion()); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func TerraformApply(ctx context.Context) error {
+func (Terraform) Apply(ctx context.Context) error {
 	mg.Deps(mage.InitTerraformClient, mage.InitWorkspace)
 
 	configurationVersion, err := mage.TerraformClient().ConfigurationVersions.Create(
@@ -178,6 +162,53 @@ func TerraformApply(ctx context.Context) error {
 		}
 
 		time.Sleep(5 * time.Second)
+	}
+
+	return nil
+}
+
+type Docker mg.Namespace
+
+func (Docker) Build(ctx context.Context) error {
+	mg.Deps(mage.InitDeployVersion, mage.InitWorkspace, mage.InitDockerClient)
+	client := mage.DockerClient()
+
+	if err := mage.DockerBuild(ctx, client, mage.HerokuProject[mage.Workspace()], mage.DeployVersion()); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (Docker) Save(ctx context.Context) error {
+	mg.Deps(mage.InitDeployVersion, mage.InitWorkspace, mage.InitDockerClient, mage.InitDockerCache)
+	client := mage.DockerClient()
+
+	if err := mage.DockerSave(ctx, client, mage.HerokuProject[mage.Workspace()], mage.DeployVersion(), mage.DockerCache()); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (Docker) Load(ctx context.Context) error {
+	mg.Deps(mage.InitDockerClient, mage.InitDockerCache)
+	client := mage.DockerClient()
+
+	if err := mage.DockerLoad(ctx, client, mage.HerokuProject[mage.Workspace()]); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (Docker) DeployHeroku(ctx context.Context) error {
+	mg.Deps(mage.InitHerokuAPIKey, mage.InitDeployVersion, mage.InitWorkspace, mage.InitDockerClient)
+
+	client := mage.DockerClient()
+
+	if err := mage.DockerPush(ctx, client, mage.HerokuAPIKey(), mage.HerokuProject[mage.Workspace()], mage.DeployVersion()); err != nil {
+		return err
 	}
 
 	return nil
