@@ -21,6 +21,18 @@ terraform {
 			source = "davidji99/herokux"
 			version = "0.22.1"
 		}
+		github = {
+			source = "integrations/github"
+			version = "4.9.2"
+		}
+		netlify = {
+			source = "aegirhealth/netlify"
+			version = "0.6.12"
+		}
+		git = {
+			source = "innovationnorway/git"
+			version = "0.1.3"
+		}
 	}
 	backend "remote" {
 		organization = "daytonswingsmackdown"

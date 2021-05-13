@@ -13,7 +13,6 @@ import (
 
 	"github.com/Houndie/dss-registration/mage"
 	"github.com/Houndie/toolbox/pkg/toolbox"
-	"github.com/docker/docker/client"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/hashicorp/go-tfe"
 	"github.com/magefile/mage/mg"
@@ -29,7 +28,9 @@ func Tools() error {
 
 const eslint = "eslint-disable block-scoped-var, id-length, no-control-regex, no-magic-numbers, no-prototype-builtins, no-redeclare, no-shadow, no-var, sort-vars, strict, no-lone-blocks, default-case"
 
-func GenerateProtoc() error {
+type Protoc mg.Namespace
+
+func (Protoc) Generate() error {
 	mg.Deps(Tools)
 	fmt.Println("generating protocs")
 	for _, file := range []string{"registration", "discount", "forms"} {
@@ -93,7 +94,9 @@ func GenerateProtoc() error {
 	return nil
 }
 
-func SetTerraformDeployVersion(ctx context.Context) error {
+type Terraform mg.Namespace
+
+func (Terraform) SetDeployVersion(ctx context.Context) error {
 	mg.Deps(mage.InitWorkspace, mage.InitDeployVersion, mage.InitTerraformClient)
 	fmt.Println("setting terraform deploy version")
 
@@ -108,32 +111,16 @@ func SetTerraformDeployVersion(ctx context.Context) error {
 	return nil
 }
 
-func DeployHeroku(ctx context.Context) error {
-	mg.Deps(mage.InitHerokuAPIKey, mage.InitDeployVersion, mage.InitWorkspace)
-
-	client, err := client.NewClientWithOpts(client.WithTimeout(10 * time.Second))
-	if err != nil {
-		return fmt.Errorf("error creating new client: %w", err)
-	}
-
-	if err := mage.DockerBuild(ctx, client, mage.HerokuProject[mage.Workspace()], mage.DeployVersion()); err != nil {
-		return err
-	}
-
-	if err := mage.DockerPush(ctx, client, mage.HerokuAPIKey(), mage.HerokuProject[mage.Workspace()], mage.DeployVersion()); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func TerraformApply(ctx context.Context) error {
+func (Terraform) Apply(ctx context.Context) error {
 	mg.Deps(mage.InitTerraformClient, mage.InitWorkspace)
 
+	autoQueueRuns := false
 	configurationVersion, err := mage.TerraformClient().ConfigurationVersions.Create(
 		ctx,
 		mage.TerraformWorkspace[mage.Workspace()],
-		tfe.ConfigurationVersionCreateOptions{},
+		tfe.ConfigurationVersionCreateOptions{
+			AutoQueueRuns: &autoQueueRuns,
+		},
 	)
 	if err != nil {
 		return fmt.Errorf("error creating terraform configuration version: %w", err)
@@ -141,6 +128,32 @@ func TerraformApply(ctx context.Context) error {
 
 	if err := mage.TerraformClient().ConfigurationVersions.Upload(ctx, configurationVersion.UploadURL, "terraform"); err != nil {
 		return fmt.Errorf("error uploading terraform files: %w", err)
+	}
+
+	timeoutCtx1, cancel1 := context.WithTimeout(ctx, 2*time.Minute)
+	defer cancel1()
+	for {
+		if mg.Verbose() {
+			fmt.Fprintln(os.Stderr, "polling to see if configuration upload is complete")
+		}
+
+		updatedConfigurationVersion, err := mage.TerraformClient().ConfigurationVersions.Read(timeoutCtx1, configurationVersion.ID)
+		if timeoutCtx1.Err() != nil {
+			return fmt.Errorf("terraform configuration version did not finish uploading before poll timeout")
+		}
+		if err != nil {
+			return fmt.Errorf("error reading configuration version")
+		}
+
+		if updatedConfigurationVersion.Status == tfe.ConfigurationErrored || updatedConfigurationVersion.Status == tfe.ConfigurationUploaded {
+			if mg.Verbose() {
+				fmt.Fprintln(os.Stderr, "done polling for configuration version upload")
+			}
+
+			break
+		}
+
+		time.Sleep(5 * time.Second)
 	}
 
 	run, err := mage.TerraformClient().Runs.Create(ctx, tfe.RunCreateOptions{
@@ -153,15 +166,15 @@ func TerraformApply(ctx context.Context) error {
 		return fmt.Errorf("error creating terraform run: %w", err)
 	}
 
-	timeoutCtx, cancel := context.WithTimeout(ctx, 2*time.Minute)
-	defer cancel()
+	timeoutCtx2, cancel2 := context.WithTimeout(ctx, 2*time.Minute)
+	defer cancel2()
 	for {
 		if mg.Verbose() {
 			fmt.Fprintln(os.Stderr, "polling to see if terraform run is complete")
 		}
 
-		updatedRun, err := mage.TerraformClient().Runs.Read(timeoutCtx, run.ID)
-		if timeoutCtx.Err() != nil {
+		updatedRun, err := mage.TerraformClient().Runs.Read(timeoutCtx2, run.ID)
+		if timeoutCtx2.Err() != nil {
 			return fmt.Errorf("terraform run did not finish applying before poll timeout")
 		}
 
@@ -170,7 +183,19 @@ func TerraformApply(ctx context.Context) error {
 		}
 
 		if updatedRun.Status == tfe.RunPlannedAndFinished || updatedRun.Status == tfe.RunApplied {
+			if mg.Verbose() {
+				fmt.Fprintln(os.Stderr, "run complete!")
+			}
+
 			break
+		} else if updatedRun.Status == tfe.RunPlanned {
+			if mg.Verbose() {
+				fmt.Fprintln(os.Stderr, "run state \"planned\" found, attempting to apply")
+			}
+
+			if err := mage.TerraformClient().Runs.Apply(ctx, run.ID, tfe.RunApplyOptions{}); err != nil {
+				return fmt.Errorf("error applying terraform run: %w", err)
+			}
 		}
 
 		if mg.Verbose() {
@@ -178,6 +203,53 @@ func TerraformApply(ctx context.Context) error {
 		}
 
 		time.Sleep(5 * time.Second)
+	}
+
+	return nil
+}
+
+type Docker mg.Namespace
+
+func (Docker) Build(ctx context.Context) error {
+	mg.Deps(mage.InitDeployVersion, mage.InitWorkspace, mage.InitDockerClient)
+	client := mage.DockerClient()
+
+	if err := mage.DockerBuild(ctx, client, mage.HerokuProject[mage.Workspace()], mage.DeployVersion()); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (Docker) Save(ctx context.Context) error {
+	mg.Deps(mage.InitDeployVersion, mage.InitWorkspace, mage.InitDockerClient, mage.InitDockerCache)
+	client := mage.DockerClient()
+
+	if err := mage.DockerSave(ctx, client, mage.HerokuProject[mage.Workspace()], mage.DeployVersion(), mage.DockerCache()); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (Docker) Load(ctx context.Context) error {
+	mg.Deps(mage.InitDockerClient, mage.InitDockerCache)
+	client := mage.DockerClient()
+
+	if err := mage.DockerLoad(ctx, client, mage.DockerCache()); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (Docker) DeployHeroku(ctx context.Context) error {
+	mg.Deps(mage.InitHerokuAPIKey, mage.InitDeployVersion, mage.InitWorkspace, mage.InitDockerClient)
+
+	client := mage.DockerClient()
+
+	if err := mage.DockerPush(ctx, client, mage.HerokuAPIKey(), mage.HerokuProject[mage.Workspace()], mage.DeployVersion()); err != nil {
+		return err
 	}
 
 	return nil
