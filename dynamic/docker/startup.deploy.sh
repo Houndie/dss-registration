@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 if [[ -z "${DSS_POSTGRESURL}" ]]; then
 	if [[ -n "$DATABASE_URL" ]]; then

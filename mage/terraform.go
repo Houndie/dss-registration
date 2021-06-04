@@ -36,7 +36,7 @@ var (
 	}
 
 	backendAddr        string
-	initializedOutputs map[string]struct{}
+	initializedOutputs map[string]struct{} = map[string]struct{}{}
 )
 
 func initOutputVars(ctx context.Context, stopAfter string) error {
@@ -92,7 +92,7 @@ func InitBackendAddr(ctx context.Context) error {
 
 	initOutputVars(ctx, terraformOutputs.BackendAddr)
 
-	if backendAddr != "" {
+	if backendAddr == "" {
 		return fmt.Errorf("could not initialize backendAddr")
 	}
 
