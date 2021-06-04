@@ -25,6 +25,7 @@ services:
     ports:
       - "8080:80"
     environment:
+      - DSS_VERSION=local
       - DSS_FRONTEND=http://localhost:8081
       - DSS_POSTGRESURL=postgres://dbuser:dbpass@db:5432/dbuser?sslmode=disable
       - DSS_TEST_POSTGRESURL=postgres://dbuser:dbpass@test_db:5432/dbuser?sslmode=disable
