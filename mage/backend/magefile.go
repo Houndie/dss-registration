@@ -129,7 +129,7 @@ func Save(ctx context.Context) error {
 }
 
 func Load(ctx context.Context) error {
-	mg.Deps(mage.InitDockerCache(), mage.InitDockerClient)
+	mg.Deps(mage.InitDockerCache, mage.InitDockerClient)
 
 	f, err := os.Open(mage.DockerCache())
 	if err != nil {
