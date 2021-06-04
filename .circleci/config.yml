@@ -150,6 +150,9 @@ jobs:
         environment:
           WORKSPACE: testing
     steps:
+      - attach_workspace:
+          at: .
+
       - run:
           name: Wait for Backend Deployment
           command: cd src && DEPLOY_VERSION=$CIRCLE_TAG ../bin/mage -v backend:waitfordeploy
