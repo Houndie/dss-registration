@@ -63,11 +63,11 @@ jobs:
 
       - run:
           name: Build Backend Image
-          command: cd src && DEPLOY_VERSION="${CIRCLE_TAG:-v0.0.0}" ../bin/mage -v docker:build
+          command: cd src && DEPLOY_VERSION="${CIRCLE_TAG:-v0.0.0}" ../bin/mage -v backend:build
 
       - run:
           name: Persist Backend Image
-          command: mkdir cache && cd src && DEPLOY_VERSION="${CIRCLE_TAG:-v0.0.0}" ../bin/mage -v docker:save
+          command: mkdir cache && cd src && DEPLOY_VERSION="${CIRCLE_TAG:-v0.0.0}" ../bin/mage -v backend:save
 
       - persist_to_workspace:
           root: .
@@ -112,11 +112,11 @@ jobs:
 
       - run:
           name: Load Backend Image
-          command: cd src && ../bin/mage -v docker:load
+          command: cd src && ../bin/mage -v backend:load
 
       - run:
           name: Push To Heroku Registry
-          command: cd src && DEPLOY_VERSION=$CIRCLE_TAG ../bin/mage -v docker:DeployHeroku
+          command: cd src && DEPLOY_VERSION=$CIRCLE_TAG ../bin/mage -v backend:deploy
 
   update_terraform_deploy_version:
     docker:
@@ -144,6 +144,16 @@ jobs:
           name: Terraform Apply
           command: cd src && ../bin/mage -v terraform:apply
 
+  wait_for_backend_deployment:
+    docker:
+      - image: circleci/golang:1.16
+        environment:
+          WORKSPACE: testing
+    steps:
+      - run:
+          name: Wait for Backend Deployment
+          command: cd src && DEPLOY_VERSION=$CIRCLE_TAG ../bin/mage -v backend:waitfordeploy
+
 workflows:
   version: 2
   on_push:
@@ -152,6 +162,8 @@ workflows:
            filters:
               tags:
                  only: /^v[0-9]\.[0-9]\.[0-9]$/
+              branches:
+                 ignore: netlify-deploy-testing
 
       - go_test:
            requires:
@@ -159,6 +171,8 @@ workflows:
            filters:
               tags:
                  only: /^v[0-9]\.[0-9]\.[0-9]$/
+              branches:
+                 ignore: netlify-deploy-testing
 
       - build_backend:
            requires:
@@ -166,6 +180,8 @@ workflows:
            filters:
               tags:
                  only: /^v[0-9]\.[0-9]\.[0-9]$/
+              branches:
+                 ignore: netlify-deploy-testing
 
       - build_frontend:
            requires:
@@ -173,6 +189,8 @@ workflows:
            filters:
               tags:
                  only: /^v[0-9]\.[0-9]\.[0-9]$/
+              branches:
+                 ignore: netlify-deploy-testing
 
       - push_backend_image:
            requires:
@@ -201,6 +219,15 @@ workflows:
            requires:
               - push_backend_image
               - update_terraform_deploy_version
+           filters:
+              tags:
+                 only: /^v[0-9]\.[0-9]\.[0-9]$/
+              branches:
+                 ignore: /.*/
+
+      - wait_for_backend_deployment:
+           requires:
+              - deploy
            filters:
               tags:
                  only: /^v[0-9]\.[0-9]\.[0-9]$/

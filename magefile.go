@@ -12,6 +12,9 @@ import (
 	"time"
 
 	"github.com/Houndie/dss-registration/mage"
+
+	// mage:import backend
+	_ "github.com/Houndie/dss-registration/mage/backend"
 	"github.com/Houndie/toolbox/pkg/toolbox"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/hashicorp/go-tfe"
@@ -33,21 +36,21 @@ type Protoc mg.Namespace
 func (Protoc) Generate() error {
 	mg.Deps(Tools)
 	fmt.Println("generating protocs")
-	for _, file := range []string{"registration", "discount", "forms"} {
-		pbjs := exec.Command("npx", "pbjs", "-t", "static-module", "-w", "commonjs", "-l", eslint, "-r", file, "-o", "static/gatsby/src/rpc/"+file+".pb.js", "rpc/dss/"+file+".proto")
+	for _, file := range []string{"registration", "discount", "forms", "health"} {
+		pbjs := exec.Command("npx", "pbjs", "-t", "static-module", "-w", "commonjs", "-l", eslint, "-r", file, "-o", "static/src/rpc/"+file+".pb.js", "rpc/dss/"+file+".proto")
 		pbjs.Stderr = os.Stderr
 		err := pbjs.Run()
 		if err != nil {
 			return err
 		}
-		pbts := exec.Command("npx", "pbts", "--no-comments", "-o", "static/gatsby/src/rpc/"+file+".pb.d.ts", "static/gatsby/src/rpc/"+file+".pb.js")
+		pbts := exec.Command("npx", "pbts", "--no-comments", "-o", "static/src/rpc/"+file+".pb.d.ts", "static/src/rpc/"+file+".pb.js")
 		pbts.Stderr = os.Stderr
 		err = pbts.Run()
 		if err != nil {
 			return err
 		}
 	}
-	cmd, err := toolbox.Command("protoc", "--proto_path", "rpc/dss", "--twirp_out=dynamic/", "--go_out=dynamic/", "--twirp_typescript_out=library=pbjs:static/gatsby/src/rpc", "registration.proto", "discount.proto", "forms.proto")
+	cmd, err := toolbox.Command("protoc", "--proto_path", "rpc/dss", "--twirp_out=dynamic/", "--go_out=dynamic/", "--twirp_typescript_out=library=pbjs:static/src/rpc", "registration.proto", "discount.proto", "forms.proto", "health.proto")
 	if err != nil {
 		return err
 	}
@@ -60,7 +63,7 @@ func (Protoc) Generate() error {
 	}
 
 	// Prepend /* eslint-disable */ to files
-	files, err := filepath.Glob("static/gatsby/src/rpc/*_pb.js")
+	files, err := filepath.Glob("static/src/rpc/*_pb.js")
 	if err != nil {
 		return fmt.Errorf("error globbing pb files: %w", err)
 	}
@@ -97,11 +100,16 @@ func (Protoc) Generate() error {
 type Terraform mg.Namespace
 
 func (Terraform) SetDeployVersion(ctx context.Context) error {
-	mg.Deps(mage.InitWorkspace, mage.InitDeployVersion, mage.InitTerraformClient)
+	mg.Deps(mage.InitDeployVersion, mage.InitTerraformClient)
 	fmt.Println("setting terraform deploy version")
 
+	terraformVars, err := mage.TerraformVars()
+	if err != nil {
+		return err
+	}
+
 	deployVersion := mage.DeployVersion()
-	_, err := mage.TerraformClient().Variables.Update(ctx, mage.TerraformWorkspace[mage.Workspace()], mage.TerraformDeployVar[mage.Workspace()], tfe.VariableUpdateOptions{
+	_, err = mage.TerraformClient().Variables.Update(ctx, terraformVars.Workspace, terraformVars.Input.Deploy, tfe.VariableUpdateOptions{
 		Value: &deployVersion,
 	})
 	if err != nil {
@@ -112,12 +120,17 @@ func (Terraform) SetDeployVersion(ctx context.Context) error {
 }
 
 func (Terraform) Apply(ctx context.Context) error {
-	mg.Deps(mage.InitTerraformClient, mage.InitWorkspace)
+	mg.Deps(mage.InitTerraformClient)
+
+	terraformVars, err := mage.TerraformVars()
+	if err != nil {
+		return err
+	}
 
 	autoQueueRuns := false
 	configurationVersion, err := mage.TerraformClient().ConfigurationVersions.Create(
 		ctx,
-		mage.TerraformWorkspace[mage.Workspace()],
+		terraformVars.Workspace,
 		tfe.ConfigurationVersionCreateOptions{
 			AutoQueueRuns: &autoQueueRuns,
 		},
@@ -159,7 +172,7 @@ func (Terraform) Apply(ctx context.Context) error {
 	run, err := mage.TerraformClient().Runs.Create(ctx, tfe.RunCreateOptions{
 		ConfigurationVersion: configurationVersion,
 		Workspace: &tfe.Workspace{
-			ID: mage.TerraformWorkspace[mage.Workspace()],
+			ID: terraformVars.Workspace,
 		},
 	})
 	if err != nil {
@@ -203,53 +216,6 @@ func (Terraform) Apply(ctx context.Context) error {
 		}
 
 		time.Sleep(5 * time.Second)
-	}
-
-	return nil
-}
-
-type Docker mg.Namespace
-
-func (Docker) Build(ctx context.Context) error {
-	mg.Deps(mage.InitDeployVersion, mage.InitWorkspace, mage.InitDockerClient)
-	client := mage.DockerClient()
-
-	if err := mage.DockerBuild(ctx, client, mage.HerokuProject[mage.Workspace()], mage.DeployVersion()); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (Docker) Save(ctx context.Context) error {
-	mg.Deps(mage.InitDeployVersion, mage.InitWorkspace, mage.InitDockerClient, mage.InitDockerCache)
-	client := mage.DockerClient()
-
-	if err := mage.DockerSave(ctx, client, mage.HerokuProject[mage.Workspace()], mage.DeployVersion(), mage.DockerCache()); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (Docker) Load(ctx context.Context) error {
-	mg.Deps(mage.InitDockerClient, mage.InitDockerCache)
-	client := mage.DockerClient()
-
-	if err := mage.DockerLoad(ctx, client, mage.DockerCache()); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (Docker) DeployHeroku(ctx context.Context) error {
-	mg.Deps(mage.InitHerokuAPIKey, mage.InitDeployVersion, mage.InitWorkspace, mage.InitDockerClient)
-
-	client := mage.DockerClient()
-
-	if err := mage.DockerPush(ctx, client, mage.HerokuAPIKey(), mage.HerokuProject[mage.Workspace()], mage.DeployVersion()); err != nil {
-		return err
 	}
 
 	return nil

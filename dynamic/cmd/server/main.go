@@ -10,10 +10,12 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/api"
 	api_discount "github.com/Houndie/dss-registration/dynamic/api/discount"
 	api_forms "github.com/Houndie/dss-registration/dynamic/api/forms"
+	api_info "github.com/Houndie/dss-registration/dynamic/api/info"
 	api_registration "github.com/Houndie/dss-registration/dynamic/api/registration"
 	"github.com/Houndie/dss-registration/dynamic/authorizer/auth0"
 	"github.com/Houndie/dss-registration/dynamic/discount"
 	"github.com/Houndie/dss-registration/dynamic/forms"
+	"github.com/Houndie/dss-registration/dynamic/info"
 	"github.com/Houndie/dss-registration/dynamic/recaptcha"
 	"github.com/Houndie/dss-registration/dynamic/registration"
 	pb "github.com/Houndie/dss-registration/dynamic/rpc/dss"
@@ -146,6 +148,11 @@ var rootCmd = &cobra.Command{
 		formsServer := api_forms.NewServer(formsService)
 		formsHandler := pb.NewFormsServer(formsServer, errorHook)
 		mux.Handle(pb.FormsPathPrefix, formsHandler)
+
+		infoService := info.NewService(pool, viper.GetString("version"))
+		infoServer := api_info.NewServer(infoService)
+		infoHandler := pb.NewInfoServer(infoServer, errorHook)
+		mux.Handle(pb.InfoPathPrefix, infoHandler)
 
 		corsHandler := cors.New(cors.Options{
 			AllowedOrigins: viper.GetStringSlice("frontend"),

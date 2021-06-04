@@ -9,6 +9,7 @@ It is generated from these files:
 	registration.proto
 	discount.proto
 	forms.proto
+	health.proto
 */
 package dss
 

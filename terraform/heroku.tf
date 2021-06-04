@@ -20,6 +20,7 @@ resource "heroku_app" "dayton_swing_smackdown" {
 		DSS_FRONTEND = "https://test.daytonswingsmackdown.com"
 		DSS_AUTH0ENDPOINT = var.auth0_domain
 		DSS_ENVIRONMENT = "development"
+		DSS_VERSION = var.deploy_version
    }
 
 	sensitive_config_vars = {
@@ -48,4 +49,8 @@ resource "heroku_formation" "dayton_swing_smackdown" {
 	size = "free"
 
 	depends_on = [herokux_app_container_release.dayton_swing_smackdown]
+}
+
+output "backend_addr" {
+	value = "https://${heroku_app.dayton_swing_smackdown.name}.herokuapp.com"
 }

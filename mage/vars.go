@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	workspace       string
+	workspace       WorkspaceType
 	deployVersion   string
 	terraformClient *tfe.Client
 	dockerClient    *client.Client
@@ -22,7 +22,15 @@ var (
 	dockerCache     string
 )
 
-func Workspace() string {
+type WorkspaceType string
+
+const (
+	Local      WorkspaceType = "local"
+	Testing    WorkspaceType = "testing"
+	Production WorkspaceType = "production"
+)
+
+func Workspace() WorkspaceType {
 	if workspace == "" {
 		panic("workspace not initialized")
 	}
@@ -31,10 +39,19 @@ func Workspace() string {
 }
 
 func InitWorkspace() error {
-	var ok bool
-	workspace, ok = os.LookupEnv("WORKSPACE")
+	workspaceStr, ok := os.LookupEnv("WORKSPACE")
 	if !ok {
 		return errors.New("environment variable WORKSPACE must not be empty")
+	}
+	switch workspaceStr {
+	case "testing":
+		workspace = Testing
+	case "production":
+		workspace = Production
+	case "local":
+		workspace = Local
+	default:
+		return fmt.Errorf("unknown workspace found: %s", workspaceStr)
 	}
 
 	if mg.Verbose() {

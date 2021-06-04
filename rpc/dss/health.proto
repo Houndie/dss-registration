@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package dss;
+option go_package = "rpc/dss";
+
+service Info {
+	rpc Health(InfoHealthReq) returns (InfoHealthRes);
+	rpc Version(InfoVersionReq) returns (InfoVersionRes);
+}
+
+message InfoHealthReq {}
+
+message InfoHealthRes {
+	enum Healthiness {
+		Unknown = 0;
+		Healthy = 1;
+		Unhealthy = 2;
+	}
+
+	Healthiness healthiness = 1;
+}
+
+message InfoVersionReq {}
+
+message InfoVersionRes {
+	string version = 1;
+}
