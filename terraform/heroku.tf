@@ -51,6 +51,11 @@ resource "heroku_formation" "dayton_swing_smackdown" {
 	depends_on = [herokux_app_container_release.dayton_swing_smackdown]
 }
 
+resource "heroku_addon" "database" {
+  app  = heroku_app.dayton_swing_smackdown.name
+  plan = "heroku-postgresql:hobby-dev"
+}
+
 output "backend_addr" {
 	value = "https://${heroku_app.dayton_swing_smackdown.name}.herokuapp.com"
 }
