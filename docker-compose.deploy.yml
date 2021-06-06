@@ -1,0 +1,29 @@
+version: "3"
+services:
+  db: 
+    build:
+      context: dynamic
+      dockerfile: docker/Dockerfile.postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=dbpass
+  backend:
+    build: 
+      context: dynamic
+      dockerfile: docker/Dockerfile.deploy
+    ports:
+      - "8080:80"
+    environment:
+      - DSS_VERSION=local
+      - DSS_FRONTEND=http://localhost:8081
+      - DSS_POSTGRESURL=postgres://dbuser:dbpass@db:5432/dbuser?sslmode=disable
+      - DSS_TEST_POSTGRESURL=postgres://dbuser:dbpass@test_db:5432/dbuser?sslmode=disable
+      - DSS_AUTH0ENDPOINT=https://daytonswingsmackdown-test.us.auth0.com
+      - DSS_ENVIRONMENT=development
+      - DSS_SQUAREKEY
+      - DSS_MAILKEY
+      - DSS_RECAPTCHAKEY
+      - DSS_PORT=80
+      - DSS_ADMINS
