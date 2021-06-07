@@ -1,7 +1,6 @@
 package backend
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -152,54 +151,17 @@ func Load(ctx context.Context) error {
 func HealthCheck(ctx context.Context) error {
 	mg.Deps(mage.InitBackendAddr)
 
-	client := &http.Client{
-		Timeout: 30 * time.Second,
-	}
-
 	u, err := url.Parse(mage.BackendAddr())
 	if err != nil {
 		return fmt.Errorf("error parsing backend address \"%s\": %w", mage.BackendAddr(), err)
 	}
 	u.Path = path.Join(u.Path, "/twirp/dss.Info/Health")
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewBuffer([]byte("{}")))
-	if err != nil {
-		return fmt.Errorf("error generating new http request: %w", err)
-	}
-
-	req.Header.Add("Content-Type", "application/json")
-
-	res, err := client.Do(req)
-	if err != nil {
-		return fmt.Errorf("error performing http request: %w", err)
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("found unexpected status: %s", res.Status)
-	}
-
-	body := struct {
-		Healthiness string
-	}{}
-
-	if err := json.NewDecoder(res.Body).Decode(&body); err != nil {
-		return fmt.Errorf("error decoding json body: %w", err)
-	}
-
-	if body.Healthiness != "Healthy" {
-		return fmt.Errorf("found healthiness status: %s", body.Healthiness)
-	}
-
-	return nil
+	return mage.HealthCheck(ctx, http.MethodPost, u.String())
 }
 
 func VersionCheck(ctx context.Context) error {
-	mg.Deps(mage.InitBackendAddr, mage.InitDeployVersion)
-
-	client := &http.Client{
-		Timeout: 30 * time.Second,
-	}
+	mg.Deps(mage.InitBackendAddr)
 
 	u, err := url.Parse(mage.BackendAddr())
 	if err != nil {
@@ -207,36 +169,7 @@ func VersionCheck(ctx context.Context) error {
 	}
 	u.Path = path.Join(u.Path, "/twirp/dss.Info/Version")
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewBuffer([]byte("{}")))
-	if err != nil {
-		return fmt.Errorf("error generating new http request: %w", err)
-	}
-
-	req.Header.Add("Content-Type", "application/json")
-
-	res, err := client.Do(req)
-	if err != nil {
-		return fmt.Errorf("error performing http request: %w", err)
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("found unexpected status: %s", res.Status)
-	}
-
-	body := struct {
-		Version string
-	}{}
-
-	if err := json.NewDecoder(res.Body).Decode(&body); err != nil {
-		return fmt.Errorf("error decoding json body: %w", err)
-	}
-
-	if body.Version != mage.DeployVersion() {
-		return fmt.Errorf("found version %s, expected %s", body.Version, mage.DeployVersion())
-	}
-
-	return nil
+	return mage.VersionCheck(ctx, http.MethodPost, u.String())
 }
 
 func WaitForDeploy(ctx context.Context) error {

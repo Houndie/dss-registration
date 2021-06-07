@@ -157,6 +157,19 @@ jobs:
           name: Wait for Backend Deployment
           command: cd src && DEPLOY_VERSION=$CIRCLE_TAG ../bin/mage -v backend:waitfordeploy
 
+  wait_for_frontend_deployment:
+    docker:
+      - image: circleci/golang:1.16
+        environment:
+          WORKSPACE: testing
+    steps:
+      - attach_workspace:
+          at: .
+
+      - run:
+          name: Wait for Frontend Deployment
+          command: cd src && DEPLOY_VERSION=$CIRCLE_TAG ../bin/mage -v frontend:waitfordeploy
+
 workflows:
   version: 2
   on_push:
@@ -229,6 +242,15 @@ workflows:
                  ignore: /.*/
 
       - wait_for_backend_deployment:
+           requires:
+              - deploy
+           filters:
+              tags:
+                 only: /^v[0-9]\.[0-9]\.[0-9]$/
+              branches:
+                 ignore: /.*/
+
+      - wait_for_frontend_deployment:
            requires:
               - deploy
            filters:

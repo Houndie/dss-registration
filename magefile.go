@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -238,4 +239,38 @@ func Migrate(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+type Frontend mg.Namespace
+
+func (Frontend) HealthCheck(ctx context.Context) error {
+	mg.Deps(mage.InitWorkspace)
+
+	var u string
+	switch mage.Workspace() {
+	case mage.Local:
+		u = "http://localhost:8081"
+	default:
+		return fmt.Errorf("unknown worspace: %s", mage.Workspace())
+	}
+
+	u += "/info/health.json"
+
+	return mage.HealthCheck(ctx, http.MethodGet, u)
+}
+
+func (Frontend) VersionCheck(ctx context.Context) error {
+	mg.Deps(mage.InitWorkspace)
+
+	var u string
+	switch mage.Workspace() {
+	case mage.Local:
+		u = "http://localhost:8081"
+	default:
+		return fmt.Errorf("unknown worspace: %s", mage.Workspace())
+	}
+
+	u += "/info/version.json"
+
+	return mage.VersionCheck(ctx, http.MethodGet, u)
 }
