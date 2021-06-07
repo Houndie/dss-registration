@@ -35,6 +35,7 @@ resource "github_repository_deploy_key" "dayton_swing_smackdown" {
 
 resource "netlify_site" "dayton_swing_smackdown" {
 	name = "dayton-swing-smackdown-${var.workspace}"
+	custom_domain = "test.daytonswingsmackdown.com"
 
 	repo {
 		repo_branch   = github_branch.netlify_deploy.branch
@@ -46,6 +47,7 @@ GATSBY_FRONTEND=https://test.daytonswingsmackdown.com \
 GATSBY_CLIENT_ID=${auth0_client.smackdown-website.client_id} \
 GATSBY_AUTH0_DOMAIN=${var.auth0_domain}
 GATSBY_AUTH_AUDIENCE=${auth0_resource_server.smackdown-website.identifier} \
+GATSBY_VERSION=${var.deploy_version} \
 npx gatsby build
 EOT
 		deploy_key_id = netlify_deploy_key.dayton_swing_smackdown.id

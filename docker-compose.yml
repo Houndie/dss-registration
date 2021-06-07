@@ -48,6 +48,7 @@ services:
       - GATSBY_CLIENT_ID=aq41or3TwXgjftpR9k9rep48xi8SHMBJ
       - GATSBY_AUTH0_DOMAIN=daytonswingsmackdown-test.us.auth0.com
       - GATSBY_AUTH0_AUDIENCE=https://dayton-swing-smackdown-testing.herokuapp.com
+      - GATSBY_VERSION=local
     volumes:
       - "./static/src:/app/src:ro"
       - "./static/static:/app/static:ro"
