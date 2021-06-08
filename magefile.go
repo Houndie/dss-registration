@@ -266,8 +266,10 @@ func (Frontend) VersionCheck(ctx context.Context) error {
 	switch mage.Workspace() {
 	case mage.Local:
 		u = "http://localhost:8081"
+	case mage.Testing:
+		u = "http://test.daytonswingsmackdown.com"
 	default:
-		return fmt.Errorf("unknown worspace: %s", mage.Workspace())
+		return fmt.Errorf("unknown workspace: %s", mage.Workspace())
 	}
 
 	u += "/info/version.json"
@@ -291,7 +293,7 @@ func (f Frontend) WaitForDeploy(ctx context.Context) error {
 			}
 
 			if mg.Verbose() {
-				fmt.Fprintln(os.Stderr, "health check response: %w", err)
+				fmt.Fprintf(os.Stderr, "health check response: %s\n", err.Error())
 			}
 
 			time.Sleep(5 * time.Second)
@@ -312,7 +314,7 @@ func (f Frontend) WaitForDeploy(ctx context.Context) error {
 		}
 
 		if mg.Verbose() {
-			fmt.Fprintln(os.Stderr, "version check response: %w", err)
+			fmt.Fprintf(os.Stderr, "version check response: %s\n", err.Error())
 		}
 
 		time.Sleep(5 * time.Second)
