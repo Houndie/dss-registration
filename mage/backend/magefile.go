@@ -188,7 +188,7 @@ func WaitForDeploy(ctx context.Context) error {
 			}
 
 			if mg.Verbose() {
-				fmt.Fprintln(os.Stderr, "health check response: %w", err)
+				fmt.Fprintf(os.Stderr, "health check response: %s\n", err.Error())
 			}
 
 			time.Sleep(5 * time.Second)
@@ -209,7 +209,7 @@ func WaitForDeploy(ctx context.Context) error {
 		}
 
 		if mg.Verbose() {
-			fmt.Fprintln(os.Stderr, "version check response: %w", err)
+			fmt.Fprintf(os.Stderr, "version check response: %s\n", err.Error())
 		}
 
 		time.Sleep(5 * time.Second)
