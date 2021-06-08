@@ -274,3 +274,49 @@ func (Frontend) VersionCheck(ctx context.Context) error {
 
 	return mage.VersionCheck(ctx, http.MethodGet, u)
 }
+
+func (f Frontend) WaitForDeploy(ctx context.Context) error {
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+	defer cancel()
+
+	for {
+		if mg.Verbose() {
+			fmt.Fprintln(os.Stderr, "performing health check")
+		}
+
+		err := f.HealthCheck(ctx)
+		if err != nil {
+			if ctx.Err() != nil {
+				return fmt.Errorf("frontend not detected before timeout")
+			}
+
+			if mg.Verbose() {
+				fmt.Fprintln(os.Stderr, "health check response: %w", err)
+			}
+
+			time.Sleep(5 * time.Second)
+			continue
+		}
+
+		if mg.Verbose() {
+			fmt.Fprintln(os.Stderr, "performing version check")
+		}
+
+		err = f.VersionCheck(ctx)
+		if err == nil {
+			break
+		}
+
+		if ctx.Err() != nil {
+			return fmt.Errorf("frontend not detected before timeout")
+		}
+
+		if mg.Verbose() {
+			fmt.Fprintln(os.Stderr, "version check response: %w", err)
+		}
+
+		time.Sleep(5 * time.Second)
+	}
+
+	return nil
+}
