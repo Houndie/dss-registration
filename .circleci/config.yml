@@ -177,7 +177,7 @@ workflows:
       - checkout:
            filters:
               tags:
-                 only: /^v[0-9]\.[0-9]\.[0-9]$/
+                 only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
               branches:
                  ignore: netlify-deploy-testing
 
@@ -186,7 +186,7 @@ workflows:
               - checkout
            filters:
               tags:
-                 only: /^v[0-9]\.[0-9]\.[0-9]$/
+                 only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
               branches:
                  ignore: netlify-deploy-testing
 
@@ -195,7 +195,7 @@ workflows:
               - checkout
            filters:
               tags:
-                 only: /^v[0-9]\.[0-9]\.[0-9]$/
+                 only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
               branches:
                  ignore: netlify-deploy-testing
 
@@ -204,7 +204,7 @@ workflows:
               - checkout
            filters:
               tags:
-                 only: /^v[0-9]\.[0-9]\.[0-9]$/
+                 only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
               branches:
                  ignore: netlify-deploy-testing
 
@@ -215,7 +215,7 @@ workflows:
               - build_frontend
            filters:
               tags:
-                 only: /^v[0-9]\.[0-9]\.[0-9]$/
+                 only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
               branches:
                  ignore: /.*/
 
@@ -227,7 +227,7 @@ workflows:
               - build_frontend
            filters:
               tags:
-                 only: /^v[0-9]\.[0-9]\.[0-9]$/
+                 only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
               branches:
                  ignore: /.*/
 
@@ -237,7 +237,7 @@ workflows:
               - update_terraform_deploy_version
            filters:
               tags:
-                 only: /^v[0-9]\.[0-9]\.[0-9]$/
+                 only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
               branches:
                  ignore: /.*/
 
@@ -246,7 +246,7 @@ workflows:
               - deploy
            filters:
               tags:
-                 only: /^v[0-9]\.[0-9]\.[0-9]$/
+                 only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
               branches:
                  ignore: /.*/
 
@@ -255,6 +255,6 @@ workflows:
               - deploy
            filters:
               tags:
-                 only: /^v[0-9]\.[0-9]\.[0-9]$/
+                 only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
               branches:
                  ignore: /.*/
