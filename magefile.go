@@ -250,8 +250,10 @@ func (Frontend) HealthCheck(ctx context.Context) error {
 	switch mage.Workspace() {
 	case mage.Local:
 		u = "http://localhost:8081"
+	case mage.Testing:
+		u = "http://test.daytonswingsmackdown.com"
 	default:
-		return fmt.Errorf("unknown worspace: %s", mage.Workspace())
+		return fmt.Errorf("unknown workspace: %s", mage.Workspace())
 	}
 
 	u += "/info/health.json"
