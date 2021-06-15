@@ -280,7 +280,7 @@ func (Frontend) VersionCheck(ctx context.Context) error {
 }
 
 func (f Frontend) WaitForDeploy(ctx context.Context) error {
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+	ctx, cancel := context.WithTimeout(ctx, 7*time.Minute)
 	defer cancel()
 
 	for {
