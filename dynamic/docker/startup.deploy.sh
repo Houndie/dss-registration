@@ -20,4 +20,7 @@ until nc -z $(echo $DSS_POSTGRESURL | sed "s%^.*@\(.*\):\(.*\)\/.*$%\1 \2%"); do
 	sleep 1; \
 done; \
 
+
+/migrate.linux-amd64 -path=/migrations -database $DSS_POSTGRESURL up
+
 ./server

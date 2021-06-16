@@ -8,9 +8,19 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 go build -o server ./cmd/server
 
+
+FROM alpine:3.13.5 AS migration-fetcher
+
+RUN apk add --no-cache curl
+RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.11.0/migrate.linux-amd64.tar.gz | tar xvz
+
+
 FROM alpine:3.13.5 AS runner
 
 RUN apk add --no-cache tzdata
 COPY --from=builder /app/server .
+COPY --from=migration-fetcher /migrate.linux-amd64 .
 COPY docker/startup.deploy.sh .
+COPY storage/postgres/migrations /migrations
+
 CMD ./startup.deploy.sh
