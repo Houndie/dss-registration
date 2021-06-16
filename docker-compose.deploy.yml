@@ -1,9 +1,7 @@
 version: "3"
 services:
   db: 
-    build:
-      context: dynamic
-      dockerfile: docker/Dockerfile.postgres
+    image: postgres:12.3
     ports:
       - "5432:5432"
     environment:
