@@ -1,4 +1,4 @@
-FROM node:14.3.0
+FROM node:16.3.0
 
 WORKDIR /app
 COPY gatsby-config.js package.json package-lock.json tsconfig.json gatsby-browser.js gatsby-node.js ./

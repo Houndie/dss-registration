@@ -58,6 +58,11 @@ func TestUserinfo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error setting public kid: %v", err)
 	}
+
+	err = jwkPublicKey.Set(jwk.AlgorithmKey, jwa.RS256)
+	if err != nil {
+		t.Fatalf("error setting public kid: %v", err)
+	}
 	keySet := jwk.NewSet()
 	keySet.Add(jwkPublicKey)
 
