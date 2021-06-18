@@ -4,7 +4,6 @@ import Container from 'react-bootstrap/Container'
 import Footer from './Footer'
 import Hero from './Hero'
 import AuthGuard from './AuthGuard'
-import {GoogleLoginResponse} from "react-google-login"
 
 export type RequireAuth = {
 	required: true
