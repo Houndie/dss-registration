@@ -55,7 +55,3 @@ resource "heroku_addon" "database" {
   app  = heroku_app.dayton_swing_smackdown.name
   plan = "heroku-postgresql:hobby-dev"
 }
-
-output "backend_addr" {
-	value = "https://${heroku_app.dayton_swing_smackdown.name}.herokuapp.com"
-}
