@@ -2,7 +2,6 @@ package mage
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/magefile/mage/mg"
@@ -13,7 +12,23 @@ type TerraformInputVars struct {
 }
 
 type TerraformOutputVars struct {
-	BackendAddr string
+	BackendAddr   string
+	MailKey       string
+	SquareKey     string
+	RecaptchaKey  string
+	Auth0Domain   string
+	Auth0ClientID string
+	Auth0Audience string
+}
+
+type TerraformOutputValues struct {
+	BackendAddr   string
+	MailKey       string
+	SquareKey     string
+	RecaptchaKey  string
+	Auth0Domain   string
+	Auth0ClientID string
+	Auth0Audience string
 }
 
 type TerraformVarType struct {
@@ -32,20 +47,22 @@ var (
 	}
 
 	terraformOutputs = &TerraformOutputVars{
-		BackendAddr: "backend_addr",
+		BackendAddr:   "backend_addr",
+		SquareKey:     "square_key",
+		MailKey:       "mail_key",
+		RecaptchaKey:  "recaptcha_key",
+		Auth0Domain:   "auth0_domain",
+		Auth0ClientID: "auth0_client_id",
+		Auth0Audience: "auth0_audience",
 	}
 
-	backendAddr        string
-	initializedOutputs map[string]struct{} = map[string]struct{}{}
+	terraformOutputValues = &TerraformOutputValues{}
 )
 
-func initOutputVars(ctx context.Context, stopAfter string) error {
-	mg.Deps(InitTerraformClient)
+func InitTerraformOutputs(ctx context.Context) error {
+	mg.Deps(InitTerraformClient, InitWorkspace)
 
-	terraformVars, err := TerraformVars()
-	if err != nil {
-		return err
-	}
+	terraformVars := TerraformVars()
 
 	version, err := TerraformClient().StateVersions.Current(ctx, terraformVars.Workspace)
 	if err != nil {
@@ -53,10 +70,6 @@ func initOutputVars(ctx context.Context, stopAfter string) error {
 	}
 
 	for _, outputVar := range version.Outputs {
-		if _, ok := initializedOutputs[outputVar.ID]; ok {
-			continue
-		}
-
 		svo, err := TerraformClient().StateVersionOutputs.Read(ctx, outputVar.ID)
 		if err != nil {
 			return fmt.Errorf("error getting state version output \"%s\": %w", outputVar.ID, err)
@@ -64,55 +77,44 @@ func initOutputVars(ctx context.Context, stopAfter string) error {
 
 		switch svo.Name {
 		case terraformOutputs.BackendAddr:
-			backendAddr = svo.Value
-			initializedOutputs[outputVar.ID] = struct{}{}
+			terraformOutputValues.BackendAddr = svo.Value
+		case terraformOutputs.SquareKey:
+			terraformOutputValues.SquareKey = svo.Value
+		case terraformOutputs.MailKey:
+			terraformOutputValues.MailKey = svo.Value
+		case terraformOutputs.RecaptchaKey:
+			terraformOutputValues.RecaptchaKey = svo.Value
+		case terraformOutputs.Auth0Domain:
+			terraformOutputValues.Auth0Domain = svo.Value
+		case terraformOutputs.Auth0ClientID:
+			terraformOutputValues.Auth0ClientID = svo.Value
+		case terraformOutputs.Auth0Audience:
+			terraformOutputValues.Auth0Audience = svo.Value
 		default:
 			// Do nothing
 		}
+	}
 
-		if svo.Name == stopAfter {
-			return nil
-		}
+	if Workspace() == Local {
+		terraformOutputValues.BackendAddr = "http://localhost:8080"
 	}
 
 	return nil
 }
 
-func InitBackendAddr(ctx context.Context) error {
-	mg.Deps(InitWorkspace)
+func TerraformOutputs() *TerraformOutputValues {
+	mg.Deps(InitTerraformOutputs)
 
-	if backendAddr != "" {
-		return nil
-	}
-
-	if Workspace() == Local {
-		backendAddr = "http://localhost:8080"
-		return nil
-	}
-
-	initOutputVars(ctx, terraformOutputs.BackendAddr)
-
-	if backendAddr == "" {
-		return fmt.Errorf("could not initialize backendAddr")
-	}
-
-	return nil
+	return terraformOutputValues
 }
 
-func BackendAddr() string {
-	if backendAddr == "" {
-		panic("backend addr not initialized")
-	}
-
-	return backendAddr
-}
-
-func TerraformVars() (*TerraformVarType, error) {
+func TerraformVars() *TerraformVarType {
 	mg.Deps(InitWorkspace)
 
+	workspace := Workspace()
 	if Workspace() == Local {
-		return nil, errors.New("no local terraform vars, use \"testing\"")
+		workspace = Testing
 	}
 
-	return TerraformVarMap[Workspace()], nil
+	return TerraformVarMap[workspace]
 }

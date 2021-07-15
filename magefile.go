@@ -104,13 +104,10 @@ func (Terraform) SetDeployVersion(ctx context.Context) error {
 	mg.Deps(mage.InitDeployVersion, mage.InitTerraformClient)
 	fmt.Println("setting terraform deploy version")
 
-	terraformVars, err := mage.TerraformVars()
-	if err != nil {
-		return err
-	}
+	terraformVars := mage.TerraformVars()
 
 	deployVersion := mage.DeployVersion()
-	_, err = mage.TerraformClient().Variables.Update(ctx, terraformVars.Workspace, terraformVars.Input.Deploy, tfe.VariableUpdateOptions{
+	_, err := mage.TerraformClient().Variables.Update(ctx, terraformVars.Workspace, terraformVars.Input.Deploy, tfe.VariableUpdateOptions{
 		Value: &deployVersion,
 	})
 	if err != nil {
@@ -123,10 +120,7 @@ func (Terraform) SetDeployVersion(ctx context.Context) error {
 func (Terraform) Apply(ctx context.Context) error {
 	mg.Deps(mage.InitTerraformClient)
 
-	terraformVars, err := mage.TerraformVars()
-	if err != nil {
-		return err
-	}
+	terraformVars := mage.TerraformVars()
 
 	autoQueueRuns := false
 	configurationVersion, err := mage.TerraformClient().ConfigurationVersions.Create(
@@ -320,6 +314,35 @@ func (f Frontend) WaitForDeploy(ctx context.Context) error {
 		}
 
 		time.Sleep(5 * time.Second)
+	}
+
+	return nil
+}
+
+type Compose mg.Namespace
+
+func (Compose) Develop(ctx context.Context) error {
+	cmd := exec.Command("docker-compose", "up", "--build")
+
+	if mg.Verbose() {
+		cmd.Stderr = os.Stderr
+		cmd.Stdout = os.Stdout
+	}
+
+	terraformOutputs := mage.TerraformOutputs()
+
+	cmd.Env = []string{
+		"DSS_SQUAREKEY=" + terraformOutputs.SquareKey,
+		"DSS_MAILKEY=" + terraformOutputs.MailKey,
+		"DSS_RECAPTCHAKEY=" + terraformOutputs.RecaptchaKey,
+		"DSS_AUTH0ENDPOINT=" + terraformOutputs.Auth0Domain,
+		"GATSBY_AUTH0_DOMAIN=" + terraformOutputs.Auth0Domain,
+		"GATSBY_AUTH0_AUDIENCE=" + terraformOutputs.Auth0Audience,
+		"GATSBY_AUTH0_CLIENTID=" + terraformOutputs.Auth0ClientID,
+	}
+
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("error running compose command: %w", err)
 	}
 
 	return nil

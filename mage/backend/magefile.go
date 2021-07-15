@@ -16,10 +16,6 @@ import (
 	"github.com/Houndie/dss-registration/mage"
 	"github.com/docker/docker/api/types"
 	"github.com/magefile/mage/mg"
-	"github.com/moby/buildkit/frontend/dockerfile/dockerignore"
-	"github.com/moby/moby/pkg/archive"
-	"github.com/moby/moby/pkg/jsonmessage"
-	"github.com/moby/term"
 )
 
 var HerokuProject = map[mage.WorkspaceType]string{
@@ -27,57 +23,9 @@ var HerokuProject = map[mage.WorkspaceType]string{
 }
 
 func Build(ctx context.Context) error {
-	mg.Deps(mage.InitDeployVersion, mage.InitWorkspace, mage.InitDockerClient)
+	mg.Deps(mage.InitDeployVersion, mage.InitWorkspace)
 
-	f, err := os.Open("dynamic/.dockerignore")
-	if err != nil {
-		return fmt.Errorf("error opening dockeringore file: %w", err)
-	}
-
-	excludes, err := dockerignore.ReadAll(f)
-	if err != nil {
-		return fmt.Errorf("error reading dockerignore file: %w", err)
-	}
-
-	buildCtx, err := archive.TarWithOptions("dynamic", &archive.TarOptions{
-		ExcludePatterns: excludes,
-	})
-	if err != nil {
-		return fmt.Errorf("error creating build context: %w", err)
-	}
-
-	res, err := mage.DockerClient().ImageBuild(ctx, buildCtx, types.ImageBuildOptions{
-		Tags:       []string{imageName(HerokuProject[mage.Workspace()], mage.DeployVersion())},
-		Dockerfile: "docker/Dockerfile.deploy",
-	})
-	if err != nil {
-		return fmt.Errorf("error building docker image: %w", err)
-	}
-	defer res.Body.Close()
-
-	if err := processDockerResponse(res.Body); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func processDockerResponse(body io.Reader) error {
-	output := io.Discard
-	if mg.Verbose() {
-		output = os.Stderr
-	}
-
-	ptr, isTerm := term.GetFdInfo(output)
-	if err := jsonmessage.DisplayJSONMessagesStream(body, output, ptr, isTerm, nil); err != nil {
-		return fmt.Errorf("error in response from docker daemon: %w", err)
-	}
-
-	return nil
-}
-
-func imageName(project, tag string) string {
-	return fmt.Sprintf("registry.heroku.com/%s/web:%s", project, tag)
+	return mage.DockerBuild(ctx, "dynamic", "docker/Dockerfile.deploy", HerokuProject[mage.Workspace()], mage.DeployVersion())
 }
 
 func Deploy(ctx context.Context) error {
@@ -91,7 +39,7 @@ func Deploy(ctx context.Context) error {
 		return fmt.Errorf("error encoding auth config: %w", err)
 	}
 
-	res, err := mage.DockerClient().ImagePush(ctx, imageName(HerokuProject[mage.Workspace()], mage.DeployVersion()), types.ImagePushOptions{
+	res, err := mage.DockerClient().ImagePush(ctx, mage.DockerImageName(HerokuProject[mage.Workspace()], mage.DeployVersion()), types.ImagePushOptions{
 		RegistryAuth: base64.URLEncoding.EncodeToString(buf),
 	})
 	if err != nil {
@@ -99,7 +47,7 @@ func Deploy(ctx context.Context) error {
 	}
 	defer res.Close()
 
-	if err := processDockerResponse(res); err != nil {
+	if err := mage.ProcessDockerResponse(res); err != nil {
 		return err
 	}
 
@@ -114,7 +62,7 @@ func Save(ctx context.Context) error {
 		return fmt.Errorf("error opening %s for saving: %w", mage.DockerCache(), err)
 	}
 
-	res, err := mage.DockerClient().ImageSave(ctx, []string{imageName(HerokuProject[mage.Workspace()], mage.DeployVersion())})
+	res, err := mage.DockerClient().ImageSave(ctx, []string{mage.DockerImageName(HerokuProject[mage.Workspace()], mage.DeployVersion())})
 	if err != nil {
 		return fmt.Errorf("error saving docker image: %w", err)
 	}
@@ -141,7 +89,7 @@ func Load(ctx context.Context) error {
 	}
 	defer res.Body.Close()
 
-	if err := processDockerResponse(res.Body); err != nil {
+	if err := mage.ProcessDockerResponse(res.Body); err != nil {
 		return err
 	}
 
@@ -149,11 +97,11 @@ func Load(ctx context.Context) error {
 }
 
 func HealthCheck(ctx context.Context) error {
-	mg.Deps(mage.InitBackendAddr)
+	terraformOutputs := mage.TerraformOutputs()
 
-	u, err := url.Parse(mage.BackendAddr())
+	u, err := url.Parse(terraformOutputs.BackendAddr)
 	if err != nil {
-		return fmt.Errorf("error parsing backend address \"%s\": %w", mage.BackendAddr(), err)
+		return fmt.Errorf("error parsing backend address \"%s\": %w", terraformOutputs.BackendAddr, err)
 	}
 	u.Path = path.Join(u.Path, "/twirp/dss.Info/Health")
 
@@ -161,11 +109,11 @@ func HealthCheck(ctx context.Context) error {
 }
 
 func VersionCheck(ctx context.Context) error {
-	mg.Deps(mage.InitBackendAddr)
+	terraformOutputs := mage.TerraformOutputs()
 
-	u, err := url.Parse(mage.BackendAddr())
+	u, err := url.Parse(terraformOutputs.BackendAddr)
 	if err != nil {
-		return fmt.Errorf("error parsing backend address \"%s\": %w", mage.BackendAddr(), err)
+		return fmt.Errorf("error parsing backend address \"%s\": %w", terraformOutputs.BackendAddr, err)
 	}
 	u.Path = path.Join(u.Path, "/twirp/dss.Info/Version")
 
