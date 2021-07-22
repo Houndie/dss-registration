@@ -17,27 +17,14 @@ func (m *MockMailClient) SendSMTPEmail(ctx context.Context, params *sendinblue.S
 
 type MockStore struct {
 	AddRegistrationFunc        func(context.Context, *storage.Registration) (string, error)
-	GetDiscountFunc            func(context.Context, string) (*storage.Discount, error)
-	AddDiscountFunc            func(context.Context, *storage.Discount) error
 	GetRegistrationFunc        func(context.Context, string) (*storage.Registration, error)
 	GetRegistrationsByUserFunc func(context.Context, string) ([]*storage.Registration, error)
 	IsAdminFunc                func(context.Context, string) (bool, error)
 	UpdateRegistrationFunc     func(ctx context.Context, r *storage.Registration) error
-	ListDiscountsFunc          func(context.Context) ([]*storage.Discount, error)
-	UpdateDiscountFunc         func(ctx context.Context, oldCode string, newDiscount *storage.Discount) error
-	DeleteDiscountFunc         func(ctx context.Context, code string) error
 }
 
 func (m *MockStore) AddRegistration(ctx context.Context, registration *storage.Registration) (string, error) {
 	return m.AddRegistrationFunc(ctx, registration)
-}
-
-func (m *MockStore) GetDiscount(ctx context.Context, code string) (*storage.Discount, error) {
-	return m.GetDiscountFunc(ctx, code)
-}
-
-func (m *MockStore) AddDiscount(ctx context.Context, discount *storage.Discount) error {
-	return m.AddDiscountFunc(ctx, discount)
 }
 
 func (m *MockStore) IsAdmin(ctx context.Context, userID string) (bool, error) {
@@ -54,16 +41,4 @@ func (m *MockStore) GetRegistration(ctx context.Context, userID string) (*storag
 
 func (m *MockStore) UpdateRegistration(ctx context.Context, r *storage.Registration) error {
 	return m.UpdateRegistrationFunc(ctx, r)
-}
-
-func (m *MockStore) ListDiscounts(ctx context.Context) ([]*storage.Discount, error) {
-	return m.ListDiscountsFunc(ctx)
-}
-
-func (m *MockStore) UpdateDiscount(ctx context.Context, oldCode string, newDiscount *storage.Discount) error {
-	return m.UpdateDiscountFunc(ctx, oldCode, newDiscount)
-}
-
-func (m *MockStore) DeleteDiscount(ctx context.Context, code string) error {
-	return m.DeleteDiscountFunc(ctx, code)
 }

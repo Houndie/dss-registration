@@ -13,11 +13,6 @@ import (
 	"github.com/Houndie/square-go/orders"
 )
 
-type MockSquareCatalogClient struct {
-	catalog.Client
-	ListFunc func(ctx context.Context, req *catalog.ListRequest) (*catalog.ListResponse, error)
-}
-
 type MockSquareInventoryClient struct {
 	inventory.Client
 	BatchRetrieveCountsFunc func(ctx context.Context, req *inventory.BatchRetrieveCountsRequest) (*inventory.BatchRetrieveCountsResponse, error)
@@ -36,10 +31,6 @@ type MockSquareCheckoutClient struct {
 type MockSquareOrdersClient struct {
 	orders.Client
 	BatchRetrieveFunc func(ctx context.Context, req *orders.BatchRetrieveRequest) (*orders.BatchRetrieveResponse, error)
-}
-
-func (m *MockSquareCatalogClient) List(ctx context.Context, req *catalog.ListRequest) (*catalog.ListResponse, error) {
-	return m.ListFunc(ctx, req)
 }
 
 func (m *MockSquareInventoryClient) BatchRetrieveCounts(ctx context.Context, req *inventory.BatchRetrieveCountsRequest) (*inventory.BatchRetrieveCountsResponse, error) {
@@ -95,28 +86,6 @@ func (m *MockSquareOrdersClient) BatchRetrieve(ctx context.Context, req *orders.
 }
 
 /** Some common func implementations */
-
-func ListCatalogFuncFromSlice(catalogObjects []*objects.CatalogObject) func(ctx context.Context, req *catalog.ListRequest) (*catalog.ListResponse, error) {
-	catalogObjectsIdx := -1
-	return func(ctx context.Context, req *catalog.ListRequest) (*catalog.ListResponse, error) {
-		return &catalog.ListResponse{
-			Objects: &MockListCatalogIterator{
-				ValueFunc: func() *catalog.ListIteratorValue {
-					return &catalog.ListIteratorValue{
-						Object: catalogObjects[catalogObjectsIdx],
-					}
-				},
-				ErrorFunc: func() error {
-					return nil
-				},
-				NextFunc: func() bool {
-					catalogObjectsIdx++
-					return catalogObjectsIdx < len(catalogObjects)
-				},
-			},
-		}, nil
-	}
-}
 
 func InventoryCountsFromSliceCheck(t *testing.T, expectedObjectIDs map[storage.WeekendPassTier]string, inventoryCounts []*objects.InventoryCount) func(ctx context.Context, req *inventory.BatchRetrieveCountsRequest) (*inventory.BatchRetrieveCountsResponse, error) {
 	inventoryCountsIdx := -1

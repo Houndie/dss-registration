@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/Houndie/dss-registration/dynamic/commontest"
-	"github.com/Houndie/dss-registration/dynamic/discount"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
 	"github.com/Houndie/square-go"
@@ -39,8 +38,6 @@ func TestPopulate(t *testing.T) {
 				counts = map[storage.WeekendPassTier]string{storage.Tier1: "0", storage.Tier2: "0", storage.Tier3: "0", storage.Tier4: "0", storage.Tier5: "25"}
 			}
 
-			var expectedCost = co.WeekendPassCost[expectTier]
-
 			inventoryCounts := make([]*objects.InventoryCount, len(counts))
 			idx := 0
 			for tier, count := range counts {
@@ -52,55 +49,20 @@ func TestPopulate(t *testing.T) {
 			}
 
 			client := &square.Client{
-				Catalog: &commontest.MockSquareCatalogClient{
-					ListFunc: commontest.ListCatalogFuncFromSlice(co.Catalog()),
-				},
 				Inventory: &commontest.MockSquareInventoryClient{
 					BatchRetrieveCountsFunc: commontest.InventoryCountsFromSliceCheck(t, co.WeekendPassID, inventoryCounts),
 				},
 			}
 
-			formData, err := NewService(true, false, logger, client, &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{}).Populate(context.Background())
+			tier, err := NewService(true, false, logger, client, commontest.CommonCatalogObjects().SquareData(), &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{}).Populate(context.Background())
 			if err != nil {
 				t.Fatalf("error populating form data: %v", err)
 			}
 
-			if formData.WeekendPassCost != expectedCost {
-				t.Errorf("found unexpected weekend pass cost %d, expected %d", formData.WeekendPassCost, expectedCost)
+			if tier != expectTier {
+				t.Errorf("found unexpected weekend pass tier %d, expected %d", tier, expectTier)
 			}
 
-			if formData.WeekendPassTier != expectTier {
-				t.Errorf("found unexpected weekend pass tier %d, expected %d", formData.WeekendPassTier, expectTier)
-			}
-
-			if formData.DancePassCost != co.DancePassCost {
-				t.Errorf("found unexpected dance pass cost %d, expected %d", formData.DancePassCost, co.DancePassCost)
-			}
-
-			if formData.MixAndMatchCost != co.MixAndMatchCost {
-				t.Errorf("found unexpected mix and match cost %d, expected %d", formData.MixAndMatchCost, co.MixAndMatchCost)
-			}
-
-			if formData.SoloJazzCost != co.SoloJazzCost {
-				t.Errorf("found unexpected solo jazz cost %d, expected %d", formData.SoloJazzCost, co.SoloJazzCost)
-			}
-
-			if formData.TeamCompCost != co.TeamCompCost {
-				t.Errorf("found unexpected team competition cost %d, expected %d", formData.TeamCompCost, co.TeamCompCost)
-			}
-
-			if formData.TShirtCost != co.TShirtCost {
-				t.Errorf("found unexpected team competition cost %d, expected %d", formData.TShirtCost, co.TShirtCost)
-			}
-
-			dd, ok := formData.StudentDiscount.(discount.DollarDiscount)
-			if !ok {
-				t.Fatalf("student disocunt is not of dollar discount type")
-			}
-
-			if int(dd) != co.StudentDiscountAmount {
-				t.Errorf("unexpected student discount amount %d, expected %d", int(dd), co.StudentDiscountAmount)
-			}
 		})
 	}
 

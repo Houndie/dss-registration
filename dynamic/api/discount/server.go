@@ -3,16 +3,12 @@ package discount
 import (
 	"context"
 
-	"github.com/Houndie/dss-registration/dynamic/discount"
+	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/sirupsen/logrus"
 )
 
 type DiscountService interface {
-	Add(ctx context.Context, token string, discount *discount.Bundle) error
-	Get(ctx context.Context, code string) (*discount.Bundle, error)
-	List(ctx context.Context, accessToken string) ([]*discount.Bundle, error)
-	Update(ctx context.Context, token, oldCode string, newDiscount *discount.Bundle) error
-	Delete(ctx context.Context, token, code string) error
+	Get(ctx context.Context, code string) ([]*common.Discount, error)
 }
 
 type Server struct {

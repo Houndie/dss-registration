@@ -37,6 +37,7 @@ func TestGet(t *testing.T) {
 		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, []authorizer.Permission{}, expectedUserID, []authorizer.Permission{}),
 	}
 	co := commontest.CommonCatalogObjects()
+	style := storage.TShirtStyleBellaM
 	expectedOrders := []*objects.Order{
 		{
 			ID:    "order1",
@@ -44,7 +45,7 @@ func TestGet(t *testing.T) {
 			LineItems: []*objects.OrderLineItem{
 				{CatalogObjectID: co.WeekendPassID[storage.Tier2]},
 				{CatalogObjectID: co.SoloJazzID},
-				{CatalogObjectID: co.TShirtID},
+				{CatalogObjectID: co.TShirtID[style]},
 			},
 		},
 	}
@@ -78,7 +79,7 @@ func TestGet(t *testing.T) {
 			Name: "Cops R Us",
 		},
 		TShirt: &TShirt{
-			Style: storage.TShirtStyleBellaM,
+			Style: style,
 			Paid:  true,
 		},
 		Housing: &storage.ProvideHousing{
@@ -127,15 +128,12 @@ func TestGet(t *testing.T) {
 				}, nil
 			},
 		},
-		Catalog: &commontest.MockSquareCatalogClient{
-			ListFunc: commontest.ListCatalogFuncFromSlice(co.Catalog()),
-		},
 		Orders: &commontest.MockSquareOrdersClient{
 			BatchRetrieveFunc: commontest.OrdersFromSliceCheck(t, expectedLocationID, expectedOrders),
 		},
 	}
 
-	service := NewService(true, false, logger, client, authorizer, store, &commontest.MockMailClient{})
+	service := NewService(true, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, &commontest.MockMailClient{})
 	r, err := service.Get(context.Background(), expectedToken, expectedRegistrationID)
 	if err != nil {
 		t.Fatalf("error in get registration call: %v", err)
@@ -162,6 +160,7 @@ func TestGetWrongUser(t *testing.T) {
 	authorizer := &commontest.MockAuthorizer{
 		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, []authorizer.Permission{}, expectedUserID, []authorizer.Permission{}),
 	}
+	style := storage.TShirtStyleBellaM
 	co := commontest.CommonCatalogObjects()
 	expectedOrders := []*objects.Order{
 		{
@@ -170,7 +169,7 @@ func TestGetWrongUser(t *testing.T) {
 			LineItems: []*objects.OrderLineItem{
 				{CatalogObjectID: co.WeekendPassID[storage.Tier2]},
 				{CatalogObjectID: co.SoloJazzID},
-				{CatalogObjectID: co.TShirtID},
+				{CatalogObjectID: co.TShirtID[style]},
 			},
 		},
 	}
@@ -203,7 +202,7 @@ func TestGetWrongUser(t *testing.T) {
 			Name: "Cops R Us",
 		},
 		TShirt: &TShirt{
-			Style: storage.TShirtStyleBellaM,
+			Style: style,
 			Paid:  true,
 		},
 		Housing: &storage.ProvideHousing{
@@ -221,9 +220,6 @@ func TestGetWrongUser(t *testing.T) {
 					[]*objects.Location{{ID: expectedLocationID}},
 				}, nil
 			},
-		},
-		Catalog: &commontest.MockSquareCatalogClient{
-			ListFunc: commontest.ListCatalogFuncFromSlice(co.Catalog()),
 		},
 		Orders: &commontest.MockSquareOrdersClient{
 			BatchRetrieveFunc: commontest.OrdersFromSliceCheck(t, expectedLocationID, expectedOrders),
@@ -276,7 +272,7 @@ func TestGetWrongUser(t *testing.T) {
 				},
 			}
 
-			service := NewService(true, false, logger, client, authorizer, store, &commontest.MockMailClient{})
+			service := NewService(true, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, &commontest.MockMailClient{})
 			_, err = service.Get(context.Background(), expectedToken, expectedRegistrationID)
 			if err == nil {
 				t.Fatalf("expected error, found none")

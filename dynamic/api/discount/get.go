@@ -19,7 +19,7 @@ func (s *Server) Get(ctx context.Context, req *pb.DiscountGetReq) (*pb.DiscountG
 		return nil, err
 	}
 
-	b, err := bundleToProto(bundle)
+	b, err := bundleToProto(req.Code, bundle)
 	if err != nil {
 		return nil, err
 	}

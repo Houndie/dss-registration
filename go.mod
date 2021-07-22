@@ -11,11 +11,11 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/hashicorp/go-tfe v0.16.0
 	github.com/magefile/mage v1.11.0
+	github.com/mitchellh/mapstructure v1.3.1
 	github.com/moby/buildkit v0.8.3 // indirect
 	github.com/moby/moby v20.10.7+incompatible
 	github.com/moby/sys/mount v0.2.0 // indirect
 	github.com/moby/term v0.0.0-20210610120745-9d4ed1856297
-	github.com/opencontainers/image-spec v1.0.1
 	github.com/twitchtv/twirp v8.1.0+incompatible
 	go.larrymyers.com/protoc-gen-twirp_typescript v0.0.0-20210412220659-c6a13478a8d8
 	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22 // indirect

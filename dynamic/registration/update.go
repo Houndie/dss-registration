@@ -144,14 +144,9 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 			return "", fmt.Errorf("found wrong number of locationsListRes.Locations %v", len(locationsListRes.Locations))
 		}
 
-		squareData, err := common.GetSquareCatalog(ctx, s.client)
-		if err != nil {
-			return "", err
-		}
-
 		paymentData := &common.PaymentData{}
 		if len(oldRegistration.OrderIDs) > 0 {
-			paymentData, err = common.GetSquarePayments(ctx, s.client, squareData, locationsListRes.Locations[0].ID, oldRegistration.OrderIDs)
+			paymentData, err = common.GetSquarePayments(ctx, s.client, s.squareData.PurchaseItems, locationsListRes.Locations[0].ID, oldRegistration.OrderIDs)
 			if err != nil {
 				return "", err
 			}
@@ -169,24 +164,23 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 			newFullWeekendPurchaseTier = oldFullWeekend.Tier
 		}
 		if newFullWeekendPurchase {
-			bestTier, bestCost, err := common.LowestInStockTier(ctx, squareData, s.client)
+			bestTier, _, err := common.LowestInStockTier(ctx, s.squareData.PurchaseItems.FullWeekend, s.client)
 			if err != nil {
 				return "", fmt.Errorf("error finding best tier and cost: %w", err)
 			}
 			if newFullWeekendPurchaseTier < bestTier {
 				return "", ErrOutOfStock{
 					NextTier: bestTier,
-					NextCost: bestCost,
 				}
 			}
 		}
 
-		discounts, err := discountCodeMap(ctx, s.store, registration.DiscountCodes)
+		discounts, err := discountCodeMap(ctx, s.squareData.Discounts.CodeDiscounts, registration.DiscountCodes)
 		if err != nil {
 			return "", err
 		}
 
-		lineItems, lineDiscounts, err := makeLineItems(registration, squareData, paymentData, discounts)
+		lineItems, lineDiscounts, err := makeLineItems(registration, s.squareData, paymentData, discounts)
 		if err != nil {
 			return "", err
 		}

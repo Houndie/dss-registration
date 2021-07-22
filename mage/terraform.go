@@ -2,6 +2,7 @@ package mage
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/magefile/mage/mg"
@@ -12,23 +13,20 @@ type TerraformInputVars struct {
 }
 
 type TerraformOutputVars struct {
-	BackendAddr   string
-	MailKey       string
-	SquareKey     string
-	RecaptchaKey  string
-	Auth0Domain   string
-	Auth0ClientID string
-	Auth0Audience string
+	BackendAddr                string
+	BackendConfigVars          string
+	BackendSensitiveConfigVars string
+	FrontendConfigVars         string
 }
 
 type TerraformOutputValues struct {
-	BackendAddr   string
-	MailKey       string
-	SquareKey     string
-	RecaptchaKey  string
-	Auth0Domain   string
-	Auth0ClientID string
-	Auth0Audience string
+	BackendAddr                string
+	Auth0Domain                string
+	Auth0ClientID              string
+	Auth0Audience              string
+	BackendConfigVars          map[string]string
+	BackendSensitiveConfigVars map[string]string
+	FrontendConfigVars         map[string]string
 }
 
 type TerraformVarType struct {
@@ -47,17 +45,33 @@ var (
 	}
 
 	terraformOutputs = &TerraformOutputVars{
-		BackendAddr:   "backend_addr",
-		SquareKey:     "square_key",
-		MailKey:       "mail_key",
-		RecaptchaKey:  "recaptcha_key",
-		Auth0Domain:   "auth0_domain",
-		Auth0ClientID: "auth0_client_id",
-		Auth0Audience: "auth0_audience",
+		BackendAddr:                "backend_addr",
+		BackendConfigVars:          "backend_config_vars",
+		BackendSensitiveConfigVars: "backend_sensitive_config_vars",
+		FrontendConfigVars:         "frontend_config_vars",
 	}
 
 	terraformOutputValues = &TerraformOutputValues{}
 )
+
+func parseConfigVars(input interface{}) (map[string]string, error) {
+	vars, ok := input.(map[string]interface{})
+	if !ok {
+		return nil, errors.New("config vars are not map")
+	}
+
+	output := map[string]string{}
+	for key, value := range vars {
+		stringValue, ok := value.(string)
+		if !ok {
+			return nil, fmt.Errorf("config var value for %s is not string", key)
+		}
+
+		output[key] = stringValue
+	}
+
+	return output, nil
+}
 
 func InitTerraformOutputs(ctx context.Context) error {
 	mg.Deps(InitTerraformClient, InitWorkspace)
@@ -77,19 +91,26 @@ func InitTerraformOutputs(ctx context.Context) error {
 
 		switch svo.Name {
 		case terraformOutputs.BackendAddr:
-			terraformOutputValues.BackendAddr = svo.Value
-		case terraformOutputs.SquareKey:
-			terraformOutputValues.SquareKey = svo.Value
-		case terraformOutputs.MailKey:
-			terraformOutputValues.MailKey = svo.Value
-		case terraformOutputs.RecaptchaKey:
-			terraformOutputValues.RecaptchaKey = svo.Value
-		case terraformOutputs.Auth0Domain:
-			terraformOutputValues.Auth0Domain = svo.Value
-		case terraformOutputs.Auth0ClientID:
-			terraformOutputValues.Auth0ClientID = svo.Value
-		case terraformOutputs.Auth0Audience:
-			terraformOutputValues.Auth0Audience = svo.Value
+			ok := true
+			terraformOutputValues.BackendAddr, ok = svo.Value.(string)
+			if !ok {
+				return errors.New("error parsing backend addr as string")
+			}
+		case terraformOutputs.BackendConfigVars:
+			terraformOutputValues.BackendConfigVars, err = parseConfigVars(svo.Value)
+			if err != nil {
+				return fmt.Errorf("error parsing backend config vars: %w", err)
+			}
+		case terraformOutputs.BackendSensitiveConfigVars:
+			terraformOutputValues.BackendSensitiveConfigVars, err = parseConfigVars(svo.Value)
+			if err != nil {
+				return fmt.Errorf("error parsing backend sensitive config vars: %w", err)
+			}
+		case terraformOutputs.FrontendConfigVars:
+			terraformOutputValues.FrontendConfigVars, err = parseConfigVars(svo.Value)
+			if err != nil {
+				return fmt.Errorf("error parsing frontend config vars: %w", err)
+			}
 		default:
 			// Do nothing
 		}

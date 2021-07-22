@@ -77,6 +77,13 @@ resource "square_catalog_object" "solo_jazz_variation" {
 	}
 }
 
+locals {
+	dance_only_variants = {
+		"Presale": 4500,
+		"Regular": 5000,
+	}
+}
+
 resource "square_catalog_object" "dance_only_pass" {
 	type = "ITEM"
 	
@@ -86,15 +93,17 @@ resource "square_catalog_object" "dance_only_pass" {
 }
 
 resource "square_catalog_object" "dance_only_pass_variation" {
+	for_each = local.dance_only_variants
+
 	type = "ITEM_VARIATION"
 
 	item_variation_data {
 		item_id = square_catalog_object.dance_only_pass.id
-		name = "Regular"
+		name = each.key
 		pricing_type = "FIXED_PRICING"
 
 		price_money {
-			amount = 4500
+			amount = each.value
 			currency = "USD"
 		}
 	}

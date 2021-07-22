@@ -1,9 +1,8 @@
 package commontest
 
 import (
+	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/storage"
-	"github.com/Houndie/dss-registration/dynamic/utility"
-	"github.com/Houndie/square-go/objects"
 )
 
 type CatalogObjects struct {
@@ -20,10 +19,10 @@ type CatalogObjects struct {
 
 	WeekendPassID     map[storage.WeekendPassTier]string
 	DancePassID       string
-	MixAndMatchID     string
+	MixAndMatchID     map[storage.MixAndMatchRole]string
 	SoloJazzID        string
 	TeamCompetitionID string
-	TShirtID          string
+	TShirtID          map[storage.TShirtStyle]string
 
 	StudentDiscountID       string
 	FullWeekendDiscountID   string
@@ -32,17 +31,123 @@ type CatalogObjects struct {
 	MixAndMatchDiscountName string
 }
 
-func (o *CatalogObjects) Catalog() []*objects.CatalogObject {
-	return []*objects.CatalogObject{
-		soloJazzItem(o.SoloJazzID, o.SoloJazzCost),
-		mixAndMatchItem(o.MixAndMatchID, o.MixAndMatchCost),
-		teamCompItem(o.TeamCompetitionID, o.TeamCompCost),
-		tShirtItem(o.TShirtID, o.TShirtCost),
-		dancePassItem(o.DancePassID, o.DancePassCost),
-		weekendPassItem(o.WeekendPassID, o.WeekendPassCost),
-		discountItem(utility.StudentDiscountItem, o.StudentDiscountAmount, o.StudentDiscountID),
-		discountItem(o.FullWeekendDiscountName, o.FullWeekendDiscountAmount, o.FullWeekendDiscountID),
-		discountItem(o.MixAndMatchDiscountName, o.MixAndMatchDiscountAmount, o.MixAndMatchDiscountID),
+func (o *CatalogObjects) SquareData() *common.SquareData {
+	return &common.SquareData{
+		PurchaseItems: &common.PurchaseItems{
+			SoloJazz: &common.PurchaseItem{
+				ID:    o.SoloJazzID,
+				Price: o.SoloJazzCost,
+			},
+			MixAndMatch: map[storage.MixAndMatchRole]*common.PurchaseItem{
+				storage.MixAndMatchRoleLeader: &common.PurchaseItem{
+					ID:    o.MixAndMatchID[storage.MixAndMatchRoleLeader],
+					Price: o.MixAndMatchCost,
+				},
+				storage.MixAndMatchRoleFollower: &common.PurchaseItem{
+					ID:    o.MixAndMatchID[storage.MixAndMatchRoleFollower],
+					Price: o.MixAndMatchCost,
+				},
+			},
+			TeamCompetition: &common.PurchaseItem{
+				ID:    o.TeamCompetitionID,
+				Price: o.TeamCompCost,
+			},
+			TShirt: map[storage.TShirtStyle]*common.PurchaseItem{
+				storage.TShirtStyleUnisexS: &common.PurchaseItem{
+					ID:    o.TShirtID[storage.TShirtStyleUnisexS],
+					Price: o.TShirtCost,
+				},
+				storage.TShirtStyleUnisexM: &common.PurchaseItem{
+					ID:    o.TShirtID[storage.TShirtStyleUnisexM],
+					Price: o.TShirtCost,
+				},
+				storage.TShirtStyleUnisexL: &common.PurchaseItem{
+					ID:    o.TShirtID[storage.TShirtStyleUnisexL],
+					Price: o.TShirtCost,
+				},
+				storage.TShirtStyleUnisexXL: &common.PurchaseItem{
+					ID:    o.TShirtID[storage.TShirtStyleUnisexXL],
+					Price: o.TShirtCost,
+				},
+				storage.TShirtStyleUnisex2XL: &common.PurchaseItem{
+					ID:    o.TShirtID[storage.TShirtStyleUnisex2XL],
+					Price: o.TShirtCost,
+				},
+				storage.TShirtStyleUnisex3XL: &common.PurchaseItem{
+					ID:    o.TShirtID[storage.TShirtStyleUnisex3XL],
+					Price: o.TShirtCost,
+				},
+				storage.TShirtStyleBellaS: &common.PurchaseItem{
+					ID:    o.TShirtID[storage.TShirtStyleBellaS],
+					Price: o.TShirtCost,
+				},
+				storage.TShirtStyleBellaM: &common.PurchaseItem{
+					ID:    o.TShirtID[storage.TShirtStyleBellaM],
+					Price: o.TShirtCost,
+				},
+				storage.TShirtStyleBellaL: &common.PurchaseItem{
+					ID:    o.TShirtID[storage.TShirtStyleBellaL],
+					Price: o.TShirtCost,
+				},
+				storage.TShirtStyleBellaXL: &common.PurchaseItem{
+					ID:    o.TShirtID[storage.TShirtStyleBellaXL],
+					Price: o.TShirtCost,
+				},
+				storage.TShirtStyleBella2XL: &common.PurchaseItem{
+					ID:    o.TShirtID[storage.TShirtStyleBella2XL],
+					Price: o.TShirtCost,
+				},
+			},
+			DanceOnly: &common.PurchaseItem{
+				ID:    o.DancePassID,
+				Price: o.DancePassCost,
+			},
+			FullWeekend: map[storage.WeekendPassTier]*common.PurchaseItem{
+				storage.Tier1: &common.PurchaseItem{
+					ID:    o.WeekendPassID[storage.Tier1],
+					Price: o.WeekendPassCost[storage.Tier1],
+				},
+				storage.Tier2: &common.PurchaseItem{
+					ID:    o.WeekendPassID[storage.Tier2],
+					Price: o.WeekendPassCost[storage.Tier2],
+				},
+				storage.Tier3: &common.PurchaseItem{
+					ID:    o.WeekendPassID[storage.Tier3],
+					Price: o.WeekendPassCost[storage.Tier3],
+				},
+				storage.Tier4: &common.PurchaseItem{
+					ID:    o.WeekendPassID[storage.Tier4],
+					Price: o.WeekendPassCost[storage.Tier4],
+				},
+				storage.Tier5: &common.PurchaseItem{
+					ID:    o.WeekendPassID[storage.Tier5],
+					Price: o.WeekendPassCost[storage.Tier5],
+				},
+			},
+		},
+		Discounts: &common.Discounts{
+			StudentDiscount: &common.Discount{
+				ID:        o.StudentDiscountID,
+				Amount:    common.DollarDiscount(o.StudentDiscountAmount),
+				AppliedTo: storage.FullWeekendPurchaseItem,
+			},
+			CodeDiscounts: map[string][]*common.Discount{
+				o.FullWeekendDiscountName: []*common.Discount{
+					&common.Discount{
+						ID:        o.FullWeekendDiscountID,
+						Amount:    common.DollarDiscount(o.FullWeekendDiscountAmount),
+						AppliedTo: storage.FullWeekendPurchaseItem,
+					},
+				},
+				o.MixAndMatchDiscountName: []*common.Discount{
+					&common.Discount{
+						ID:        o.MixAndMatchDiscountID,
+						Amount:    common.DollarDiscount(o.MixAndMatchDiscountAmount),
+						AppliedTo: storage.MixAndMatchPurchaseItem,
+					},
+				},
+			},
+		},
 	}
 }
 
@@ -72,144 +177,32 @@ func CommonCatalogObjects() *CatalogObjects {
 			storage.Tier4: "weekend pass tier 4 variation id",
 			storage.Tier5: "weekend pass tier 5 variation id",
 		},
-		DancePassID:       "dance pass id",
-		MixAndMatchID:     "mix and match id",
+
+		DancePassID: "dance pass id",
+		MixAndMatchID: map[storage.MixAndMatchRole]string{
+			storage.MixAndMatchRoleLeader:   "mix and match leader id",
+			storage.MixAndMatchRoleFollower: "mix and match leader id",
+		},
 		SoloJazzID:        "solo jazz id",
 		TeamCompetitionID: "team competition id",
-		TShirtID:          "tshirt id",
+		TShirtID: map[storage.TShirtStyle]string{
+			storage.TShirtStyleUnisexS:   "tshirt unisex s id",
+			storage.TShirtStyleUnisexM:   "tshirt unisex m id",
+			storage.TShirtStyleUnisexL:   "tshirt unisex l id",
+			storage.TShirtStyleUnisexXL:  "tshirt unisex xl id",
+			storage.TShirtStyleUnisex2XL: "tshirt unisex 2xl id",
+			storage.TShirtStyleUnisex3XL: "tshirt unisex 3xl id",
+			storage.TShirtStyleBellaS:    "tshirt bella s id",
+			storage.TShirtStyleBellaM:    "tshirt bella m id",
+			storage.TShirtStyleBellaL:    "tshirt bella l id",
+			storage.TShirtStyleBellaXL:   "tshirt bella xl id",
+			storage.TShirtStyleBella2XL:  "tshirt bella 2xl id",
+		},
 
 		StudentDiscountID:       "student discount id",
 		FullWeekendDiscountID:   "full weekend discount id",
 		MixAndMatchDiscountID:   "mix and match discount id",
 		FullWeekendDiscountName: "full weekend discount name",
 		MixAndMatchDiscountName: "mix and match discount name",
-	}
-}
-
-func discountItem(name string, amt int, id string) *objects.CatalogObject {
-	return &objects.CatalogObject{
-		ID: id,
-		Type: &objects.CatalogDiscount{
-			Name: name,
-			DiscountType: &objects.CatalogDiscountFixedAmount{
-				AmountMoney: &objects.Money{
-					Amount: amt,
-				},
-			},
-		},
-	}
-}
-
-func soloJazzItem(id string, cost int) *objects.CatalogObject {
-	return &objects.CatalogObject{
-		Type: &objects.CatalogItem{
-			Name: utility.SoloJazzItem,
-			Variations: []*objects.CatalogObject{
-				&objects.CatalogObject{
-					ID: id,
-					Type: &objects.CatalogItemVariation{
-						PriceMoney: &objects.Money{
-							Amount: cost,
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func mixAndMatchItem(id string, cost int) *objects.CatalogObject {
-	return &objects.CatalogObject{
-		Type: &objects.CatalogItem{
-			Name: utility.MixAndMatchItem,
-			Variations: []*objects.CatalogObject{
-				&objects.CatalogObject{
-					ID: id,
-					Type: &objects.CatalogItemVariation{
-						PriceMoney: &objects.Money{
-							Amount: cost,
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func teamCompItem(id string, cost int) *objects.CatalogObject {
-	return &objects.CatalogObject{
-		Type: &objects.CatalogItem{
-			Name: utility.TeamCompItem,
-			Variations: []*objects.CatalogObject{
-				&objects.CatalogObject{
-					ID: id,
-					Type: &objects.CatalogItemVariation{
-						PriceMoney: &objects.Money{
-							Amount: cost,
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func tShirtItem(id string, cost int) *objects.CatalogObject {
-	return &objects.CatalogObject{
-		Type: &objects.CatalogItem{
-			Name: utility.TShirtItem,
-			Variations: []*objects.CatalogObject{
-				&objects.CatalogObject{
-					ID: id,
-					Type: &objects.CatalogItemVariation{
-						PriceMoney: &objects.Money{
-							Amount: cost,
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func dancePassItem(id string, cost int) *objects.CatalogObject {
-	return &objects.CatalogObject{
-		Type: &objects.CatalogItem{
-			Name: utility.DancePassItem,
-			Variations: []*objects.CatalogObject{
-				&objects.CatalogObject{
-					ID: id,
-					Type: &objects.CatalogItemVariation{
-						Name: utility.DancePassPresaleName,
-						PriceMoney: &objects.Money{
-							Amount: cost,
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func weekendPassItem(weekendPassIDs map[storage.WeekendPassTier]string, weekendPassCosts map[storage.WeekendPassTier]int) *objects.CatalogObject {
-	variations := make([]*objects.CatalogObject, len(weekendPassIDs))
-	idx := 0
-	for tier, id := range weekendPassIDs {
-		variations[idx] = &objects.CatalogObject{
-			ID: id,
-			Type: &objects.CatalogItemVariation{
-				Name: utility.WeekendPassName[tier],
-				PriceMoney: &objects.Money{
-					Amount: weekendPassCosts[tier],
-				},
-			},
-		}
-		idx++
-	}
-	return &objects.CatalogObject{
-		Type: &objects.CatalogItem{
-			Name:       utility.WeekendPassItem,
-			Variations: variations,
-		},
 	}
 }

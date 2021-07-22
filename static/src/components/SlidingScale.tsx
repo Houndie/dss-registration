@@ -23,7 +23,7 @@ export default ({ granularity, smallEnd, bigEnd, label, ...props }: SlidingScale
 		)
 	}
 	return (
-		<Form.Group as={Col}>
+		<Col>
 			<Container>
 				<Row><Col>
 					{smallEnd}
@@ -33,6 +33,6 @@ export default ({ granularity, smallEnd, bigEnd, label, ...props }: SlidingScale
 				<Row>{cols}</Row>
 			</Container>
 			<Form.Control.Feedback type='invalid' tooltip>{meta.error}</Form.Control.Feedback>
-		</Form.Group>
+		</Col>
 	);
 };
