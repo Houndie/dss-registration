@@ -10,9 +10,9 @@ type FormCheckProps = {
 export default ({ label, ...props }: FormCheckProps) => {
 	const [field, meta] = useField(props);
 	return (
-		<Form.Group as={Col}>
+		<Col>
 			<Form.Check label={label} isInvalid={meta.touched && !!meta.error} {...field} />
 			<Form.Control.Feedback type='invalid' tooltip>{meta.error}</Form.Control.Feedback>
-		</Form.Group>
+		</Col>
 	);
 };

@@ -13,7 +13,6 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
 	"github.com/Houndie/dss-registration/dynamic/utility"
 	"github.com/Houndie/square-go"
-	"github.com/Houndie/square-go/catalog"
 	"github.com/Houndie/square-go/checkout"
 	"github.com/Houndie/square-go/inventory"
 	"github.com/Houndie/square-go/locations"
@@ -28,6 +27,7 @@ type itemCheck struct {
 }
 
 func discountCheck(t *testing.T, discountArray []*objects.OrderLineItemDiscount, appliedDiscounts []*objects.OrderLineItemAppliedDiscount, discountID string) {
+	t.Helper()
 	found := false
 	for _, d := range discountArray {
 		if d.CatalogObjectID == discountID {
@@ -57,7 +57,6 @@ func TestAdd(t *testing.T) {
 	expectedRedirectUrl := "https://daytonswingsmackdown.com/landing"
 	expectedAccessToken := "12345"
 	expectedUserID := "67890"
-	expectedDiscountCode := "DJ"
 	active := true
 
 	expectedIdempotencyKey, err := uuid.NewV4()
@@ -114,7 +113,7 @@ func TestAdd(t *testing.T) {
 					PetAllergies: "cats",
 					Details:      "please house me with my 100 closest friends",
 				},
-				DiscountCodes: []string{expectedDiscountCode},
+				DiscountCodes: []string{co.FullWeekendDiscountName, co.MixAndMatchDiscountName},
 			},
 		},
 		{
@@ -164,14 +163,6 @@ func TestAdd(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 
 			client := &square.Client{
-				Catalog: &commontest.MockSquareCatalogClient{
-					ListFunc: func(ctx context.Context, req *catalog.ListRequest) (*catalog.ListResponse, error) {
-						if !test.makeOrder {
-							t.Fatalf("no orderable items found, square should not be called")
-						}
-						return commontest.ListCatalogFuncFromSlice(co.Catalog())(ctx, req)
-					},
-				},
 				Inventory: &commontest.MockSquareInventoryClient{
 					BatchRetrieveCountsFunc: func(ctx context.Context, req *inventory.BatchRetrieveCountsRequest) (*inventory.BatchRetrieveCountsResponse, error) {
 						if !test.makeOrder {
@@ -220,13 +211,13 @@ func TestAdd(t *testing.T) {
 							// default, do nothing
 						}
 						if test.registration.MixAndMatch != nil {
-							itemChecks = append(itemChecks, &itemCheck{id: co.MixAndMatchID})
+							itemChecks = append(itemChecks, &itemCheck{id: co.MixAndMatchID[test.registration.MixAndMatch.Role]})
 						}
 						if test.registration.TeamCompetition != nil {
 							itemChecks = append(itemChecks, &itemCheck{id: co.TeamCompetitionID})
 						}
 						if test.registration.TShirt != nil {
-							itemChecks = append(itemChecks, &itemCheck{id: co.TShirtID})
+							itemChecks = append(itemChecks, &itemCheck{id: co.TShirtID[test.registration.TShirt.Style]})
 						}
 						if test.registration.SoloJazz != nil {
 							itemChecks = append(itemChecks, &itemCheck{id: co.SoloJazzID})
@@ -251,7 +242,7 @@ func TestAdd(t *testing.T) {
 										if test.registration.IsStudent {
 											discountCheck(t, req.Order.Order.Discounts, lineItem.AppliedDiscounts, co.StudentDiscountID)
 										}
-									} else if test.registration.MixAndMatch != nil && lineItem.CatalogObjectID == co.MixAndMatchID && len(test.registration.DiscountCodes) > 0 {
+									} else if test.registration.MixAndMatch != nil && lineItem.CatalogObjectID == co.MixAndMatchID[test.registration.MixAndMatch.Role] && len(test.registration.DiscountCodes) > 0 {
 										discountCheck(t, req.Order.Order.Discounts, lineItem.AppliedDiscounts, co.MixAndMatchDiscountID)
 									}
 									break
@@ -378,8 +369,8 @@ func TestAdd(t *testing.T) {
 					if len(r.DiscountCodes) != len(test.registration.DiscountCodes) {
 						t.Fatalf("expected %d discounts, found %d", len(r.DiscountCodes), len(test.registration.DiscountCodes))
 					}
-					if len(r.DiscountCodes) == 1 && r.DiscountCodes[0] != expectedDiscountCode {
-						t.Fatalf("expected registration discount codes  %#q, found %#q", []string{expectedDiscountCode}, r.DiscountCodes)
+					if len(r.DiscountCodes) != 2 && len(r.DiscountCodes) != 0 {
+						t.Fatalf("expected 2 or 0 registration discount codes, found %d", len(r.DiscountCodes))
 					}
 					if test.makeOrder {
 						if len(r.OrderIDs) != 1 || r.OrderIDs[0] != expectedOrderID {
@@ -389,25 +380,6 @@ func TestAdd(t *testing.T) {
 						t.Fatalf("expected no order, found one")
 					}
 					return "some key", nil
-				},
-				GetDiscountFunc: func(ctx context.Context, code string) (*storage.Discount, error) {
-					if code != test.registration.DiscountCodes[0] {
-						t.Fatalf("expected discount code %s, found %s", test.registration.DiscountCodes[0], code)
-					}
-					return &storage.Discount{
-						ID:   "123534",
-						Code: code,
-						Discounts: []*storage.SingleDiscount{
-							{
-								Name:      co.FullWeekendDiscountName,
-								AppliedTo: storage.FullWeekendPurchaseItem,
-							},
-							{
-								Name:      co.MixAndMatchDiscountName,
-								AppliedTo: storage.MixAndMatchPurchaseItem,
-							},
-						},
-					}, nil
 				},
 			}
 
@@ -576,7 +548,7 @@ func TestAdd(t *testing.T) {
 				},
 			}
 
-			service := NewService(active, false, logger, client, authorizer, store, mailClient)
+			service := NewService(active, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, mailClient)
 
 			checkoutUrl, err := service.Add(context.Background(), test.registration, expectedRedirectUrl, expectedIdempotencyKey.String(), expectedAccessToken)
 			if err != nil {
@@ -608,7 +580,7 @@ func TestAddNotActive(t *testing.T) {
 	}
 	logger.SetOutput(devnull)
 
-	service := NewService(active, false, logger, &square.Client{}, &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{})
+	service := NewService(active, false, logger, &square.Client{}, commontest.CommonCatalogObjects().SquareData(), &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{})
 
 	registration := &Info{
 		FirstName: "John",
@@ -646,9 +618,6 @@ func TestAddCostNothing(t *testing.T) {
 	}
 
 	client := &square.Client{
-		Catalog: &commontest.MockSquareCatalogClient{
-			ListFunc: commontest.ListCatalogFuncFromSlice(co.Catalog()),
-		},
 		Inventory: &commontest.MockSquareInventoryClient{
 			BatchRetrieveCountsFunc: commontest.InventoryCountsFromSlice(inventoryCounts),
 		},
@@ -721,7 +690,7 @@ func TestAddCostNothing(t *testing.T) {
 		},
 	}
 
-	service := NewService(active, false, logger, client, authorizer, store, mailClient)
+	service := NewService(active, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, mailClient)
 
 	redirectUrl := "https://smackdown.com"
 	checkoutUrl, err := service.Add(context.Background(), registration, redirectUrl, "7", "7")

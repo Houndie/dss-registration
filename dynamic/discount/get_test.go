@@ -6,21 +6,20 @@ import (
 	"os"
 	"testing"
 
+	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
-	"github.com/Houndie/square-go"
-	"github.com/Houndie/square-go/catalog"
 	"github.com/sirupsen/logrus"
 )
 
-func compareSingleDiscount(t *testing.T, sd *Single, appliedTo storage.PurchaseItem, amount int) {
+func compareSingleDiscount(t *testing.T, sd *common.Discount, appliedTo storage.PurchaseItem, amount int) {
 	t.Helper()
 	if appliedTo != sd.AppliedTo {
 		t.Fatalf("found unexpected appliedTo %v, expected %v", sd.AppliedTo, appliedTo)
 	}
 
-	amt, ok := sd.Amount.(DollarDiscount)
+	amt, ok := sd.Amount.(common.DollarDiscount)
 	if !ok {
 		t.Fatalf("expected dollar discount, did not find it")
 	}
@@ -30,8 +29,8 @@ func compareSingleDiscount(t *testing.T, sd *Single, appliedTo storage.PurchaseI
 }
 
 func TestGetDiscount(t *testing.T) {
-	expectedCode := "DJs rock"
 	co := commontest.CommonCatalogObjects()
+	expectedCode := co.FullWeekendDiscountName
 
 	logger := logrus.New()
 	devnull, err := os.OpenFile(os.DevNull, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
@@ -41,63 +40,16 @@ func TestGetDiscount(t *testing.T) {
 	logger.SetOutput(devnull)
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
-	client := &commontest.MockSquareCatalogClient{
-		ListFunc: commontest.ListCatalogFuncFromSlice(co.Catalog()),
-	}
-
-	store := &commontest.MockStore{
-		GetDiscountFunc: func(ctx context.Context, code string) (*storage.Discount, error) {
-			if code != expectedCode {
-				t.Fatalf("found unexpected code in store call %s, expected %s", code, expectedCode)
-			}
-
-			return &storage.Discount{
-				Code: code,
-				Discounts: []*storage.SingleDiscount{
-					{
-						Name:      co.FullWeekendDiscountName,
-						AppliedTo: storage.FullWeekendPurchaseItem,
-					},
-					{
-						Name:      co.MixAndMatchDiscountName,
-						AppliedTo: storage.MixAndMatchPurchaseItem,
-					},
-				},
-			}, nil
-
-		},
-	}
-
-	service := NewService(store, &square.Client{Catalog: client}, logger, &commontest.MockAuthorizer{})
+	service := NewService(logger, co.SquareData())
 
 	discount, err := service.Get(context.Background(), expectedCode)
 	if err != nil {
 		t.Fatalf("unexpected error in get discount call: %v", err)
 	}
-	if discount.Code != expectedCode {
-		t.Fatalf("found unexpected code in discount %s, expected %s", discount.Code, expectedCode)
+	if len(discount) != 1 {
+		t.Fatalf("returned discount group contains too many single discounts %d, expected 1", len(discount))
 	}
-	if len(discount.Discounts) != 2 {
-		t.Fatalf("returned discount group contains too many single discounts %d, expected 2", len(discount.Discounts))
-	}
-	foundFullWeekend := false
-	foundMixAndMatch := false
-	for _, sd := range discount.Discounts {
-		switch sd.Name {
-		case co.FullWeekendDiscountName:
-			foundFullWeekend = true
-			compareSingleDiscount(t, sd, storage.FullWeekendPurchaseItem, co.FullWeekendDiscountAmount)
-		case co.MixAndMatchDiscountName:
-			foundMixAndMatch = true
-			compareSingleDiscount(t, sd, storage.MixAndMatchPurchaseItem, co.MixAndMatchDiscountAmount)
-		}
-	}
-	if !foundFullWeekend {
-		t.Fatalf("did not find full weekend discount in result")
-	}
-	if !foundMixAndMatch {
-		t.Fatalf("did not find mix and match discount in result")
-	}
+	compareSingleDiscount(t, discount[0], storage.FullWeekendPurchaseItem, co.FullWeekendDiscountAmount)
 }
 
 func TestGetNotExists(t *testing.T) {
@@ -111,26 +63,13 @@ func TestGetNotExists(t *testing.T) {
 	logger.SetOutput(devnull)
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
-	client := &commontest.MockSquareCatalogClient{
-		ListFunc: func(context.Context, *catalog.ListRequest) (*catalog.ListResponse, error) {
-			t.Fatalf("no need for square calls if discount does not exist")
-			return nil, nil
-		},
-	}
-
-	store := &commontest.MockStore{
-		GetDiscountFunc: func(ctx context.Context, code string) (*storage.Discount, error) {
-			return nil, storage.ErrDiscountDoesNotExist{Code: code}
-		},
-	}
-
-	service := NewService(store, &square.Client{Catalog: client}, logger, &commontest.MockAuthorizer{})
+	service := NewService(logger, commontest.CommonCatalogObjects().SquareData())
 
 	_, err = service.Get(context.Background(), expectedCode)
 	if err == nil {
 		t.Fatalf("expected error, found none")
 	}
-	terr := storage.ErrDiscountDoesNotExist{}
+	terr := storage.ErrDiscountNotFound{}
 	if !errors.As(err, &terr) {
 		t.Fatalf("expected error to be of type \"discount does not exists\", found %v", err)
 	}

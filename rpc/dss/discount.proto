@@ -3,14 +3,8 @@ syntax = "proto3";
 package dss;
 option go_package = "rpc/dss";
 
-import "google/protobuf/empty.proto";
-
 service Discount {
-	rpc Add(DiscountAddReq) returns (DiscountAddRes);
 	rpc Get(DiscountGetReq) returns (DiscountGetRes);
-	rpc List(DiscountListReq) returns (DiscountListRes);
-	rpc Update(DiscountUpdateReq) returns (DiscountUpdateRes);
-	rpc Delete(DiscountDeleteReq) returns (DiscountDeleteRes);
 }
 
 enum PurchaseItem {
@@ -26,26 +20,18 @@ message DiscountAmount {
 	oneof amount {
 		int64 dollar = 1;
 		string percent = 2;
-		google.protobuf.Empty squareNotFound = 3;
 	}
 }
 
 message SingleDiscount {
-	string name = 1;
-	DiscountAmount amount = 2;
-	PurchaseItem applied_to = 3;
+	DiscountAmount amount = 1;
+	PurchaseItem applied_to = 2;
 }
 
 message DiscountBundle {
 	string code = 1;
 	repeated SingleDiscount discounts = 2;
 }
-
-message DiscountAddReq {
-	DiscountBundle bundle = 1;
-}
-
-message DiscountAddRes {}
 
 message DiscountGetReq {
 	string code = 1;
@@ -54,22 +40,3 @@ message DiscountGetReq {
 message DiscountGetRes {
 	DiscountBundle bundle = 1;
 }
-
-message DiscountListReq {}
-
-message DiscountListRes {
-	repeated DiscountBundle bundles = 1;
-}
-
-message DiscountUpdateReq {
-	string oldCode = 1;
-	DiscountBundle bundle = 2;
-}
-
-message DiscountUpdateRes {}
-
-message DiscountDeleteReq {
-	string code = 1;
-}
-
-message DiscountDeleteRes {}

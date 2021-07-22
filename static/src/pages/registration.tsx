@@ -2,8 +2,10 @@ import React, {useState, useEffect} from 'react'
 import Form from "react-bootstrap/Form"
 import Button from "react-bootstrap/Button"
 import Col from "react-bootstrap/Col"
+import Row from "react-bootstrap/Row"
 import Page from '../components/Page'
 import FormField from '../components/FormField'
+import FormSelect from '../components/FormSelect'
 import FormCheck from '../components/FormCheck'
 import {Formik} from 'formik'
 import {createRegistration} from "../rpc/registration.twirp"
@@ -104,6 +106,23 @@ const toProtoStyle = (style: FormStyle) => {
 	}
 }
 
+const fromProtoTier = (tier: number | Long) => {
+	switch(tier) {
+		case 0:
+			return "Tier 1"
+		case 1:
+			return "Tier 2"
+		case 2:
+			return "Tier 3"
+		case 3:
+			return "Tier 4"
+		case 4:
+			return "Tier 5"
+		default:
+			throw "unknown tier"
+	}
+}
+
 const Registration = () => {
 	const [prices, setPrices] = useState<dss.RegistrationPricesRes | null>(null)
 	useEffect(() => {
@@ -113,6 +132,9 @@ const Registration = () => {
 			console.error(err);
 		});
 	}, [])
+
+
+	const square_data = JSON.parse(`${process.env.GATSBY_SQUARE_DATA}`)
 
 	return (
 		<Page title="Registration">
@@ -228,16 +250,16 @@ const Registration = () => {
 					<Form onSubmit={handleSubmit}>
 						<fieldset>
 							<h2>Personal Information</h2>
-							<Form.Row><Col>
+							<Row><Col>
 								<FormField label="First Name" name="firstName" type="text" />
 							</Col><Col>
 								<FormField label="Last Name" name="lastName" type="text" />
-							</Col></Form.Row>
+							</Col></Row>
 							<FormField label="Street Address" name="streetAddress" type="text" />
-							<Form.Row><Col>
+							<Row><Col>
 								<FormField label="City" name="city" type="text" />
 							</Col><Col xs={1}>
-								<FormField as="select" label="State" name="state">
+								<FormSelect label="State" name="state">
 									<option aria-label="none" value=""></option>
 									<option value="AK">AK</option>
 									<option value="AL">AL</option>
@@ -289,58 +311,58 @@ const Registration = () => {
 									<option value="WI">WI</option>
 									<option value="WV">WV</option>
 									<option value="WY">WY</option>
-								</FormField>
+								</FormSelect>
 							</Col><Col xs={3}>
 								<FormField label="Zip Code" name="zipCode" type="text" />
-							</Col></Form.Row>
-							<Form.Row><Col>
+							</Col></Row>
+							<Row><Col>
 								<FormField label="Email" name="email" type="email" />
 							</Col><Col>
 								<FormField label="Home Scene" name="homeScene" type="text" />
-							</Col></Form.Row>
+							</Col></Row>
 							<FormCheck name="isStudent" label="I am a student" />
 							<hr />
 						</fieldset>
 						<fieldset>
 							<h2>Purchase</h2>
-							<Form.Row><Col xs={6}>
-								<FormField as="select" label="Weekend Pass Type" name="passType">
+							<Row><Col xs={6}>
+								<FormSelect label="Weekend Pass Type" name="passType">
 									<option aria-label="no pass" value={noPassOption} />
-									<option value={fullWeekendPassOption}>{"Full Weekend Pass - "+dss.FullWeekendPassTier[prices.weekendPassTier]+" ("+parseDollar(prices.weekendPassCost)+")"}</option>
-									<option value={danceOnlyPassOption}>{"Dance Only Pass ("+parseDollar(prices.dancePassCost)+")"}</option>
-								</FormField>
-							</Col></Form.Row>
+									<option value={fullWeekendPassOption}>{"Full Weekend Pass - "+dss.FullWeekendPassTier[prices.weekendPassTier]+" ("+parseDollar(square_data.purchase_items.full_weekend_pass[fromProtoTier(prices.weekendPassTier)])+")"}</option>
+									<option value={danceOnlyPassOption}>{"Dance Only Pass ("+parseDollar(square_data.purchase_items.dance_only_pass)+")"}</option>
+								</FormSelect>
+							</Col></Row>
 							{values.passType === fullWeekendPassOption && (
-								<Form.Row><Col xs={1}></Col><Col xs={6}>
-									<FormField as="select" label="Level" name="level">
+								<Row><Col xs={1}></Col><Col xs={6}>
+									<FormSelect label="Level" name="level">
 										<option aria-label="none" value={FormFullWeekendPassLevel.NotSelected} />
 										<option value={FormFullWeekendPassLevel.Level1}>Level 1</option>
 										<option value={FormFullWeekendPassLevel.Level2}>Level 2</option>
 										<option value={FormFullWeekendPassLevel.Level3}>Level 3</option>
-									</FormField>
-							</Col></Form.Row>
+									</FormSelect>
+							</Col></Row>
 							)}
-							<FormCheck name="mixAndMatch" label={"Mix & Match Competition ("+parseDollar(prices.mixAndMatchCost)+")"} />
+							<FormCheck name="mixAndMatch" label={"Mix & Match Competition ("+parseDollar(square_data.purchase_items.mix_and_match)+")"} />
 							{values.mixAndMatch && (
-								<Form.Row><Col xs={1}></Col><Col xs={6}>
-									<FormField as="select" label="Role" name="role">
+								<Row><Col xs={1}></Col><Col xs={6}>
+									<FormSelect label="Role" name="role">
 										<option aria-label="none" value={FormRole.NotSelected} />
 										<option value={FormRole.Follower}>Follower</option>
 										<option value={FormRole.Leader}>Leader</option>
-									</FormField>
-								</Col></Form.Row>
+									</FormSelect>
+								</Col></Row>
 							)}
-							<FormCheck name="soloJazz" label={"Solo Jazz Competition ("+parseDollar(prices.soloJazzCost)+")"} />
-							<FormCheck name="teamCompetition" label={"Team Competition ("+parseDollar(prices.teamCompetitionCost)+")"} />
+							<FormCheck name="soloJazz" label={"Solo Jazz Competition ("+parseDollar(square_data.purchase_items.solo_jazz)+")"} />
+							<FormCheck name="teamCompetition" label={"Team Competition ("+parseDollar(square_data.purchase_items.team_competition)+")"} />
 							{values.teamCompetition && (
-								<Form.Row><Col xs={1}></Col><Col xs={6}>
+								<Row><Col xs={1}></Col><Col xs={6}>
 									<FormField label="Team Name" name="teamName" type="text" />
-								</Col></Form.Row>
+								</Col></Row>
 							)}
-							<FormCheck name="tshirt" label={"T-Shirt ("+parseDollar(prices.tshirtCost)+")"} />
+							<FormCheck name="tshirt" label={"T-Shirt ("+parseDollar(square_data.purchase_items.t_shirt)+")"} />
 							{values.tshirt && (
-								<Form.Row><Col xs={1}></Col><Col xs={6}>
-									<FormField as="select" label="T-Shirt Size/Style" name="style">
+								<Row><Col xs={1}></Col><Col xs={6}>
+									<FormSelect label="T-Shirt Size/Style" name="style">
 										<option aria-label="none" value={FormStyle.NotSelected}></option>
 										<option value={FormStyle.UnisexS}>Unisex S</option>
 										<option value={FormStyle.UnisexM}>Unisex M</option>
@@ -353,21 +375,21 @@ const Registration = () => {
 										<option value={FormStyle.BellaL}>Bella L</option>
 										<option value={FormStyle.BellaXL}>Bella XL</option>
 										<option value={FormStyle.Bella2XL}>Bella 2XL</option>
-									</FormField>
-								</Col></Form.Row>
+									</FormSelect>
+								</Col></Row>
 							)}
 							<hr />
 						</fieldset>
 						<fieldset>
 							<h2>Housing</h2>
-							<Form.Row><Col>
-								<FormField as="select" label="Housing Status" name="housing">
+							<Row><Col>
+								<FormSelect label="Housing Status" name="housing">
 									<option value={noHousingOption}>I neither require nor can provide housing</option>
 									<option value={provideOption}>I can provide housing</option>
 									<option value={requireOption}>I require housing</option>
-								</FormField>
-							</Col></Form.Row>
-							<Form.Row><Col xs={1}></Col><Col>
+								</FormSelect>
+							</Col></Row>
+							<Row><Col xs={1}></Col><Col>
 								{values.housing === "Provide" ? (
 									<>
 									<FormField label="I have the following pets (cats, dogs, etc)" name="pets" type="text" />
@@ -380,8 +402,9 @@ const Registration = () => {
 									<FormField as="textarea" label="Anything else I would like to say about my housing request" name="requireDetails" />
 									</>
 								))}
-							</Col></Form.Row>
+							</Col></Row>
 						</fieldset>
+						<hr/>
 						<fieldset>
 							<h2>Discounts</h2>
 							<Formik
@@ -401,11 +424,11 @@ const Registration = () => {
 								}}
 							>
 								{(innerProps) => (
-									<Form.Row><Col>
+									<Row><Col>
 										<FormField label="Add Discount Code" name="newDiscount" type="text" />
 									</Col><Col xs={1}>
 										<br style={{"lineHeight": "200%"}} /><Button disabled={innerProps.isSubmitting} onClick={innerProps.submitForm}>Add</Button>
-									</Col></Form.Row>
+									</Col></Row>
 								)}
 							</Formik>
 						</fieldset>

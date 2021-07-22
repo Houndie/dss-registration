@@ -3,7 +3,7 @@ package utility
 import "github.com/Houndie/dss-registration/dynamic/storage"
 
 const (
-	MixAndMatchItem = "Mix And Match"
+	MixAndMatchItem = "Mix and Match"
 	TeamCompItem    = "Team Competition"
 	SoloJazzItem    = "Solo"
 	DancePassItem   = "Dance Only"

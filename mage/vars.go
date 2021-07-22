@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/Houndie/dss-registration/mage/terraform"
 	"github.com/hashicorp/go-tfe"
 	"github.com/magefile/mage/mg"
 	"github.com/moby/moby/client"
@@ -15,7 +16,7 @@ import (
 var (
 	workspace       WorkspaceType
 	deployVersion   string
-	terraformClient *tfe.Client
+	terraformClient *terraform.Client
 	dockerClient    *client.Client
 	herokuAPIKey    string
 	migrationURL    string
@@ -83,7 +84,7 @@ func InitDeployVersion() error {
 	return nil
 }
 
-func TerraformClient() *tfe.Client {
+func TerraformClient() *terraform.Client {
 	if terraformClient == nil {
 		panic("terraformClient not initialized")
 	}
@@ -98,7 +99,7 @@ func InitTerraformClient() error {
 	}
 
 	var err error
-	terraformClient, err = tfe.NewClient(&tfe.Config{
+	terraformClient, err = terraform.NewClient(&tfe.Config{
 		Token: terraformAPIKey,
 		HTTPClient: &http.Client{
 			Timeout: 10 * time.Second,

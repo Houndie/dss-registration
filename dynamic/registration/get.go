@@ -42,12 +42,7 @@ func (s *Service) Get(ctx context.Context, token, registrationID string) (*Info,
 		}
 		s.logger.Tracef("found location %s", locationsListRes.Locations[0].ID)
 
-		squareData, err := common.GetSquareCatalog(ctx, s.client)
-		if err != nil {
-			return nil, err
-		}
-
-		pd, err = common.GetSquarePayments(ctx, s.client, squareData, locationsListRes.Locations[0].ID, r.OrderIDs)
+		pd, err = common.GetSquarePayments(ctx, s.client, s.squareData.PurchaseItems, locationsListRes.Locations[0].ID, r.OrderIDs)
 		if err != nil {
 			return nil, err
 		}

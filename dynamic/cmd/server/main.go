@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -13,6 +14,7 @@ import (
 	api_info "github.com/Houndie/dss-registration/dynamic/api/info"
 	api_registration "github.com/Houndie/dss-registration/dynamic/api/registration"
 	"github.com/Houndie/dss-registration/dynamic/authorizer/auth0"
+	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/discount"
 	"github.com/Houndie/dss-registration/dynamic/forms"
 	"github.com/Houndie/dss-registration/dynamic/info"
@@ -129,14 +131,19 @@ var rootCmd = &cobra.Command{
 			},
 		}
 
+		squareData := &common.SquareData{}
+		if err := json.Unmarshal([]byte(viper.GetString("squaredata")), &squareData); err != nil {
+			return fmt.Errorf("error unmarshalling square data: %w", err)
+		}
+
 		mux := http.NewServeMux()
 
-		registrationService := registration.NewService(true, viper.GetString("environment") != "production", logger, squareClient, authorizer, store, sendInBlueClient)
+		registrationService := registration.NewService(true, viper.GetString("environment") != "production", logger, squareClient, squareData, authorizer, store, sendInBlueClient)
 		registrationServer := api_registration.NewServer(registrationService)
 		registrationHandler := pb.NewRegistrationServer(registrationServer, errorHook)
 		mux.Handle(pb.RegistrationPathPrefix, registrationHandler)
 
-		discountService := discount.NewService(store, squareClient, logger, authorizer)
+		discountService := discount.NewService(logger, squareData)
 		discountServer := api_discount.NewServer(discountService)
 		discountHandler := pb.NewDiscountServer(discountServer, errorHook)
 		mux.Handle(pb.DiscountPathPrefix, discountHandler)

@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/Houndie/dss-registration/mage"
@@ -319,30 +320,25 @@ func (f Frontend) WaitForDeploy(ctx context.Context) error {
 	return nil
 }
 
-type Compose mg.Namespace
-
-func (Compose) Develop(ctx context.Context) error {
-	cmd := exec.Command("docker-compose", "up", "--build")
-
-	if mg.Verbose() {
-		cmd.Stderr = os.Stderr
-		cmd.Stdout = os.Stdout
+func toEnviron(configVars map[string]string) []string {
+	env := make([]string, 0, len(configVars))
+	for key, value := range configVars {
+		env = append(env, fmt.Sprintf("%s=\"%s\"", strings.ToUpper(strings.ReplaceAll(key, "-", "_")), strings.ReplaceAll(value, "\"", "\\\"")))
 	}
 
+	return env
+}
+
+func (Terraform) Vars(ctx context.Context) error {
 	terraformOutputs := mage.TerraformOutputs()
 
-	cmd.Env = []string{
-		"DSS_SQUAREKEY=" + terraformOutputs.SquareKey,
-		"DSS_MAILKEY=" + terraformOutputs.MailKey,
-		"DSS_RECAPTCHAKEY=" + terraformOutputs.RecaptchaKey,
-		"DSS_AUTH0ENDPOINT=" + terraformOutputs.Auth0Domain,
-		"GATSBY_AUTH0_DOMAIN=" + terraformOutputs.Auth0Domain,
-		"GATSBY_AUTH0_AUDIENCE=" + terraformOutputs.Auth0Audience,
-		"GATSBY_AUTH0_CLIENTID=" + terraformOutputs.Auth0ClientID,
-	}
+	env := []string{}
+	env = append(env, toEnviron(terraformOutputs.BackendConfigVars)...)
+	env = append(env, toEnviron(terraformOutputs.BackendSensitiveConfigVars)...)
+	env = append(env, toEnviron(terraformOutputs.FrontendConfigVars)...)
 
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("error running compose command: %w", err)
+	for _, e := range env {
+		fmt.Println(e)
 	}
 
 	return nil

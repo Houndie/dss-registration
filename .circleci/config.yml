@@ -85,6 +85,7 @@ jobs:
           GATSBY_AUTH0_DOMAIN: http://example.com
           GATSBY_CLIENT_ID: clientid
           GATSBY_AUTH0_AUDIENCE: audience
+          GATSBY_SQUARE_DATA: "{}"
     steps:
       - attach_workspace:
           at: .

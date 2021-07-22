@@ -2,6 +2,7 @@ package common
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -9,7 +10,6 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/utility"
 	"github.com/Houndie/square-go"
-	"github.com/Houndie/square-go/catalog"
 	"github.com/Houndie/square-go/checkout"
 	"github.com/Houndie/square-go/inventory"
 	"github.com/Houndie/square-go/objects"
@@ -17,8 +17,8 @@ import (
 )
 
 type PurchaseItem struct {
-	VariationID string
-	Cost        int
+	ID    string `json:"id"`
+	Price int    `json:"price"`
 }
 
 type DiscountAmount interface {
@@ -33,198 +33,297 @@ func (DollarDiscount) isDiscountAmount()  {}
 func (PercentDiscount) isDiscountAmount() {}
 
 type Discount struct {
-	ID     string
-	Amount DiscountAmount
+	ID        string               `json:"id"`
+	Amount    DiscountAmount       `json:"-"`
+	AppliedTo storage.PurchaseItem `json:"-"`
+}
+
+type discountAlias Discount
+
+type jsonDiscount struct {
+	*discountAlias
+	Amount       int    `json:"amount"`
+	Percentage   string `json:"percentage"`
+	DiscountType string `json:"discount_type"`
+	AppliedTo    string `json:"applied_to"`
+}
+
+var (
+	appliedToToJSON = map[storage.PurchaseItem]string{
+		storage.FullWeekendPurchaseItem:     "Full Weekend",
+		storage.DanceOnlyPurchaseItem:       "Dance Only",
+		storage.MixAndMatchPurchaseItem:     "Mix And Match",
+		storage.SoloJazzPurchaseItem:        "Solo Jazz",
+		storage.TeamCompetitionPurchaseItem: "Team Competition",
+		storage.TShirtPurchaseItem:          "TShirt",
+	}
+
+	appliedToFromJSON = map[string]storage.PurchaseItem{
+		"Full Weekend":     storage.FullWeekendPurchaseItem,
+		"Dance Only":       storage.DanceOnlyPurchaseItem,
+		"Mix And Match":    storage.MixAndMatchPurchaseItem,
+		"Solo Jazz":        storage.SoloJazzPurchaseItem,
+		"Team Competition": storage.TeamCompetitionPurchaseItem,
+		"TShirt":           storage.TShirtPurchaseItem,
+	}
+)
+
+func (d *Discount) MarshalJSON() ([]byte, error) {
+	j := jsonDiscount{
+		discountAlias: (*discountAlias)(d),
+	}
+
+	appliedTo, ok := appliedToToJSON[d.AppliedTo]
+	if !ok {
+		return nil, fmt.Errorf("unknown applied to found: %v", d.AppliedTo)
+	}
+
+	j.AppliedTo = appliedTo
+
+	switch a := d.Amount.(type) {
+	case DollarDiscount:
+		j.Amount = (int)(a)
+		j.DiscountType = "FIXED_AMOUNT"
+	case PercentDiscount:
+		j.Percentage = (string)(a)
+		j.DiscountType = "FIXED_PERCENTAGE"
+	default:
+		return nil, errors.New("unknown discount type found")
+	}
+
+	b, err := json.Marshal(j)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling discount type: %w", err)
+	}
+
+	return b, nil
+}
+
+func (d *Discount) UnmarshalJSON(b []byte) error {
+	j := jsonDiscount{
+		discountAlias: (*discountAlias)(d),
+	}
+
+	if err := json.Unmarshal(b, &j); err != nil {
+		return fmt.Errorf("error unmarhsaling discount type: %w", err)
+	}
+
+	appliedTo, ok := appliedToFromJSON[j.AppliedTo]
+	if !ok {
+		return fmt.Errorf("unknown applied to found: %v", j.AppliedTo)
+	}
+	d.AppliedTo = appliedTo
+
+	switch j.DiscountType {
+	case "FIXED_AMOUNT", "VARIABLE_AMOUNT":
+		d.Amount = DollarDiscount(j.Amount)
+	case "FIXED_PERCENTAGE", "VARIABLE_PERCENTAGE":
+		d.Amount = PercentDiscount(j.Percentage)
+	default:
+		return fmt.Errorf("unknown discount type found: %v", j.DiscountType)
+	}
+
+	return nil
+}
+
+var (
+	tierToJson = map[storage.WeekendPassTier]string{
+		storage.Tier1: "Tier 1",
+		storage.Tier2: "Tier 2",
+		storage.Tier3: "Tier 3",
+		storage.Tier4: "Tier 4",
+		storage.Tier5: "Tier 5",
+	}
+	tierFromJson = map[string]storage.WeekendPassTier{
+		"Tier 1": storage.Tier1,
+		"Tier 2": storage.Tier2,
+		"Tier 3": storage.Tier3,
+		"Tier 4": storage.Tier4,
+		"Tier 5": storage.Tier5,
+	}
+
+	roleToJson = map[storage.MixAndMatchRole]string{
+		storage.MixAndMatchRoleLeader:   "Leader",
+		storage.MixAndMatchRoleFollower: "Follower",
+	}
+	roleFromJson = map[string]storage.MixAndMatchRole{
+		"Leader":   storage.MixAndMatchRoleLeader,
+		"Follower": storage.MixAndMatchRoleFollower,
+	}
+
+	styleToJson = map[storage.TShirtStyle]string{
+		storage.TShirtStyleUnisexS:   "Unisex Small",
+		storage.TShirtStyleUnisexM:   "Unisex Medium",
+		storage.TShirtStyleUnisexL:   "Unisex Large",
+		storage.TShirtStyleUnisexXL:  "Unisex XL",
+		storage.TShirtStyleUnisex2XL: "Unisex 2XL",
+		storage.TShirtStyleUnisex3XL: "Unisex 3XL",
+		storage.TShirtStyleBellaS:    "Bella Small",
+		storage.TShirtStyleBellaM:    "Bella Medium",
+		storage.TShirtStyleBellaL:    "Bella Large",
+		storage.TShirtStyleBellaXL:   "Bella XL",
+		storage.TShirtStyleBella2XL:  "Bella 2XL",
+	}
+
+	styleFromJson = map[string]storage.TShirtStyle{
+		"Unisex Small":  storage.TShirtStyleUnisexS,
+		"Unisex Medium": storage.TShirtStyleUnisexM,
+		"Unisex Large":  storage.TShirtStyleUnisexL,
+		"Unisex XL":     storage.TShirtStyleUnisexXL,
+		"Unisex 2XL":    storage.TShirtStyleUnisex2XL,
+		"Unisex 3XL":    storage.TShirtStyleUnisex3XL,
+		"Bella Small":   storage.TShirtStyleBellaS,
+		"Bella Medium":  storage.TShirtStyleBellaM,
+		"Bella Large":   storage.TShirtStyleBellaL,
+		"Bella XL":      storage.TShirtStyleBellaXL,
+		"Bella 2XL":     storage.TShirtStyleBella2XL,
+	}
+)
+
+type PurchaseItems struct {
+	FullWeekend     map[storage.WeekendPassTier]*PurchaseItem `json:"-"`
+	DanceOnly       *PurchaseItem                             `json:"dance_only_pass"`
+	SoloJazz        *PurchaseItem                             `json:"solo_jazz"`
+	MixAndMatch     map[storage.MixAndMatchRole]*PurchaseItem `json:"-"`
+	TeamCompetition *PurchaseItem                             `json:"team_competition"`
+	TShirt          map[storage.TShirtStyle]*PurchaseItem     `json:"-"`
+}
+
+type purchaseItemsAlias PurchaseItems
+
+type jsonPurchaseItems struct {
+	*purchaseItemsAlias
+	FullWeekend map[string]*PurchaseItem `json:"full_weekend_pass"`
+	MixAndMatch map[string]*PurchaseItem `json:"mix_and_match"`
+	TShirt      map[string]*PurchaseItem `json:"t_shirt"`
+}
+
+func (p *PurchaseItems) MarshalJSON() ([]byte, error) {
+	j := jsonPurchaseItems{
+		purchaseItemsAlias: (*purchaseItemsAlias)(p),
+	}
+
+	if len(p.FullWeekend) > 0 {
+		j.FullWeekend = map[string]*PurchaseItem{}
+		for tier, item := range p.FullWeekend {
+			jTier, ok := tierToJson[tier]
+			if !ok {
+				return nil, fmt.Errorf("unknown tier found: %v", tier)
+			}
+
+			j.FullWeekend[jTier] = item
+		}
+	}
+
+	if len(p.MixAndMatch) > 0 {
+		j.MixAndMatch = map[string]*PurchaseItem{}
+		for role, item := range p.MixAndMatch {
+			jRole, ok := roleToJson[role]
+			if !ok {
+				return nil, fmt.Errorf("unknown role found: %v", role)
+			}
+
+			j.MixAndMatch[jRole] = item
+		}
+	}
+
+	if len(p.TShirt) > 0 {
+		j.TShirt = map[string]*PurchaseItem{}
+		for style, item := range p.TShirt {
+			jStyle, ok := styleToJson[style]
+			if !ok {
+				return nil, fmt.Errorf("unknown style found: %v", style)
+			}
+
+			j.TShirt[jStyle] = item
+		}
+	}
+
+	b, err := json.Marshal(j)
+	if err != nil {
+		return nil, fmt.Errorf("error marshalling purchase items type: %w", err)
+	}
+
+	return b, nil
+}
+
+func (p *PurchaseItems) UnmarshalJSON(b []byte) error {
+	j := jsonPurchaseItems{
+		purchaseItemsAlias: (*purchaseItemsAlias)(p),
+	}
+
+	if err := json.Unmarshal(b, &j); err != nil {
+		return fmt.Errorf("error unmarshaling purchase items type: %w", err)
+	}
+
+	if len(j.FullWeekend) > 0 {
+		p.FullWeekend = map[storage.WeekendPassTier]*PurchaseItem{}
+		for jTier, item := range j.FullWeekend {
+			tier, ok := tierFromJson[jTier]
+			if !ok {
+				return fmt.Errorf("unknown tier found: %v", jTier)
+			}
+
+			p.FullWeekend[tier] = item
+		}
+	}
+
+	if len(j.MixAndMatch) > 0 {
+		p.MixAndMatch = map[storage.MixAndMatchRole]*PurchaseItem{}
+		for jRole, item := range j.MixAndMatch {
+			role, ok := roleFromJson[jRole]
+			if !ok {
+				return fmt.Errorf("unknown role found: %v", jRole)
+			}
+
+			p.MixAndMatch[role] = item
+		}
+	}
+
+	if len(j.TShirt) > 0 {
+		p.TShirt = map[storage.TShirtStyle]*PurchaseItem{}
+		for jStyle, item := range j.TShirt {
+			style, ok := styleFromJson[jStyle]
+			if !ok {
+				return fmt.Errorf("unknown style found: %v", jStyle)
+			}
+
+			p.TShirt[style] = item
+		}
+	}
+
+	return nil
+}
+
+type Discounts struct {
+	StudentDiscount *Discount
+	CodeDiscounts   map[string][]*Discount
 }
 
 type SquareData struct {
-	FullWeekend     map[storage.WeekendPassTier]*PurchaseItem
-	DanceOnly       *PurchaseItem
-	SoloJazz        *PurchaseItem
-	MixAndMatch     *PurchaseItem
-	TeamCompetition *PurchaseItem
-	TShirt          *PurchaseItem
-
-	StudentDiscount *Discount
-	Discounts       map[string]*Discount
-}
-
-func singleVariationItem(o *objects.CatalogItem) (*PurchaseItem, error) {
-	if len(o.Variations) != 1 {
-		return nil, fmt.Errorf("expected 1 variation, found %d", len(o.Variations))
-	}
-	variation, ok := o.Variations[0].Type.(*objects.CatalogItemVariation)
-	if !ok {
-		return nil, errors.New("item variation isn't variation")
-	}
-	return &PurchaseItem{
-		VariationID: o.Variations[0].ID,
-		Cost:        variation.PriceMoney.Amount,
-	}, nil
-}
-
-func GetSquareCatalog(ctx context.Context, client *square.Client) (*SquareData, error) {
-	result := &SquareData{}
-	result.FullWeekend = map[storage.WeekendPassTier]*PurchaseItem{}
-	result.Discounts = map[string]*Discount{}
-	res, err := client.Catalog.List(ctx, &catalog.ListRequest{
-		Types: []objects.CatalogObjectEnumType{objects.CatalogObjectEnumTypeItem, objects.CatalogObjectEnumTypeDiscount},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error listing catalog objects: %w", err)
-	}
-
-	for res.Objects.Next() {
-		switch o := res.Objects.Value().Object.Type.(type) {
-		case *objects.CatalogItem:
-			switch o.Name {
-			case utility.MixAndMatchItem:
-				result.MixAndMatch, err = singleVariationItem(o)
-				if err != nil {
-					return nil, fmt.Errorf("error fetching mix and match data: %w", err)
-				}
-			case utility.SoloJazzItem:
-				result.SoloJazz, err = singleVariationItem(o)
-				if err != nil {
-					return nil, fmt.Errorf("error fetching solo jazz data: %w", err)
-				}
-			case utility.TeamCompItem:
-				result.TeamCompetition, err = singleVariationItem(o)
-				if err != nil {
-					return nil, fmt.Errorf("error fetching team competition data: %w", err)
-				}
-			case utility.TShirtItem:
-				result.TShirt, err = singleVariationItem(o)
-				if err != nil {
-					return nil, fmt.Errorf("error fetching t-shirt data: %w", err)
-				}
-			case utility.DancePassItem:
-				for _, variation := range o.Variations {
-					v, ok := variation.Type.(*objects.CatalogItemVariation)
-					if !ok {
-						// Should never happen, but just move on
-						continue
-					}
-
-					if v.Name != utility.DancePassPresaleName {
-						continue
-					}
-					result.DanceOnly = &PurchaseItem{
-						VariationID: variation.ID,
-						Cost:        v.PriceMoney.Amount,
-					}
-				}
-				if result.DanceOnly == nil {
-					return nil, errors.New("dance only item found, but no presale variation found")
-				}
-			case utility.WeekendPassItem:
-				for _, variation := range o.Variations {
-					v, ok := variation.Type.(*objects.CatalogItemVariation)
-					if !ok {
-						// Should never happen, but just move on
-						continue
-					}
-
-					for tier, name := range utility.WeekendPassName {
-						if v.Name == name {
-							result.FullWeekend[tier] = &PurchaseItem{
-								VariationID: variation.ID,
-								Cost:        v.PriceMoney.Amount,
-							}
-							break
-						}
-					}
-					//if not found, continue
-				}
-			}
-		case *objects.CatalogDiscount:
-			var amount DiscountAmount
-			switch t := o.DiscountType.(type) {
-			case *objects.CatalogDiscountFixedAmount:
-				amount = DollarDiscount(t.AmountMoney.Amount)
-			case *objects.CatalogDiscountVariableAmount:
-				amount = DollarDiscount(t.AmountMoney.Amount)
-			case *objects.CatalogDiscountFixedPercentage:
-				amount = PercentDiscount(t.Percentage)
-			case *objects.CatalogDiscountVariablePercentage:
-				amount = PercentDiscount(t.Percentage)
-			default:
-				return nil, errors.New("found unknown catalog discount type")
-
-			}
-			if o.Name == utility.StudentDiscountItem {
-				result.StudentDiscount = &Discount{
-					ID:     res.Objects.Value().Object.ID,
-					Amount: amount,
-				}
-				continue
-			}
-
-			result.Discounts[o.Name] = &Discount{
-				ID:     res.Objects.Value().Object.ID,
-				Amount: amount,
-			}
-		}
-	}
-	if res.Objects.Error() != nil {
-		return nil, fmt.Errorf("error fetching all items from square: %w", res.Objects.Error())
-	}
-
-	if result.FullWeekend[storage.Tier1] == nil {
-		return nil, errors.New("no full weekend tier 1 data found")
-	}
-	if result.FullWeekend[storage.Tier2] == nil {
-		return nil, errors.New("no full weekend tier 2 data found")
-	}
-	if result.FullWeekend[storage.Tier3] == nil {
-		return nil, errors.New("no full weekend tier 3 data found")
-	}
-	if result.FullWeekend[storage.Tier4] == nil {
-		return nil, errors.New("no full weekend tier 4 data found")
-	}
-	if result.FullWeekend[storage.Tier5] == nil {
-		return nil, errors.New("no full weekend tier 5 data found")
-	}
-	if result.DanceOnly == nil {
-		return nil, errors.New("no dance only data found")
-	}
-	if result.MixAndMatch == nil {
-		return nil, errors.New("no mix and match data found")
-	}
-	if result.TeamCompetition == nil {
-		return nil, errors.New("no team competition data found")
-	}
-	if result.SoloJazz == nil {
-		return nil, errors.New("no solo jazz data found")
-	}
-	if result.TShirt == nil {
-		return nil, errors.New("no tshirt data found")
-	}
-	if result.StudentDiscount == nil {
-		return nil, errors.New("no student discount found")
-	}
-	return result, nil
+	PurchaseItems *PurchaseItems `json:"purchase_items"`
+	Discounts     *Discounts     `json:"discounts"`
 }
 
 type tierData struct {
-	tier storage.WeekendPassTier
-	cost int
+	tier  storage.WeekendPassTier
+	price int
 }
 
-func LowestInStockTier(ctx context.Context, s *SquareData, squareClient *square.Client) (storage.WeekendPassTier, int, error) {
-	weekendPassIDs := make([]string, len(s.FullWeekend))
+func LowestInStockTier(ctx context.Context, s map[storage.WeekendPassTier]*PurchaseItem, squareClient *square.Client) (storage.WeekendPassTier, int, error) {
+	weekendPassIDs := make([]string, len(s))
 	tierMap := map[string]*tierData{}
 	idx := 0
-	for tier, weekendItem := range s.FullWeekend {
-		weekendPassIDs[idx] = weekendItem.VariationID
-		tierMap[weekendItem.VariationID] = &tierData{
-			tier: tier,
-			cost: weekendItem.Cost,
+	for tier, weekendItem := range s {
+		weekendPassIDs[idx] = weekendItem.ID
+		tierMap[weekendItem.ID] = &tierData{
+			tier:  tier,
+			price: weekendItem.Price,
 		}
 		idx++
 	}
 
-	bestTier, bestCost := storage.Tier5, s.FullWeekend[storage.Tier5].Cost
+	bestTier, bestCost := storage.Tier5, s[storage.Tier5].Price
 	res, err := squareClient.Inventory.BatchRetrieveCounts(ctx, &inventory.BatchRetrieveCountsRequest{
 		CatalogObjectIDs: weekendPassIDs,
 	})
@@ -243,7 +342,7 @@ func LowestInStockTier(ctx context.Context, s *SquareData, squareClient *square.
 			thisTier := tierMap[count.CatalogObjectID]
 			if thisTier.tier < bestTier {
 				bestTier = thisTier.tier
-				bestCost = thisTier.cost
+				bestCost = thisTier.price
 			}
 		}
 	}
@@ -264,7 +363,7 @@ type PaymentData struct {
 	TShirtPaid          bool
 }
 
-func GetSquarePayments(ctx context.Context, client *square.Client, squareData *SquareData, locationID string, orderIDs []string) (*PaymentData, error) {
+func GetSquarePayments(ctx context.Context, client *square.Client, purchaseItems *PurchaseItems, locationID string, orderIDs []string) (*PaymentData, error) {
 	res, err := client.Orders.BatchRetrieve(ctx, &orders.BatchRetrieveRequest{
 		LocationID: locationID,
 		OrderIDs:   orderIDs,
@@ -279,22 +378,22 @@ func GetSquarePayments(ctx context.Context, client *square.Client, squareData *S
 			continue
 		}
 		for _, lineItem := range order.LineItems {
-			for _, purchaseItem := range squareData.FullWeekend {
-				if purchaseItem.VariationID == lineItem.CatalogObjectID {
+			for _, purchaseItem := range purchaseItems.FullWeekend {
+				if purchaseItem.ID == lineItem.CatalogObjectID {
 					pd.WeekendPassPaid = true
 					break
 				}
 			}
 			switch lineItem.CatalogObjectID {
-			case squareData.DanceOnly.VariationID:
+			case purchaseItems.DanceOnly.ID:
 				pd.DanceOnlyPaid = true
-			case squareData.MixAndMatch.VariationID:
+			case purchaseItems.MixAndMatch[storage.MixAndMatchRoleLeader].ID, purchaseItems.MixAndMatch[storage.MixAndMatchRoleFollower].ID:
 				pd.MixAndMatchPaid = true
-			case squareData.SoloJazz.VariationID:
+			case purchaseItems.SoloJazz.ID:
 				pd.SoloJazzPaid = true
-			case squareData.TeamCompetition.VariationID:
+			case purchaseItems.TeamCompetition.ID:
 				pd.TeamCompetitionPaid = true
-			case squareData.TShirt.VariationID:
+			case purchaseItems.TShirt[storage.TShirtStyleUnisexS].ID, purchaseItems.TShirt[storage.TShirtStyleUnisexM].ID, purchaseItems.TShirt[storage.TShirtStyleUnisexL].ID, purchaseItems.TShirt[storage.TShirtStyleUnisexXL].ID, purchaseItems.TShirt[storage.TShirtStyleUnisex2XL].ID, purchaseItems.TShirt[storage.TShirtStyleUnisex3XL].ID, purchaseItems.TShirt[storage.TShirtStyleBellaS].ID, purchaseItems.TShirt[storage.TShirtStyleBellaM].ID, purchaseItems.TShirt[storage.TShirtStyleBellaL].ID, purchaseItems.TShirt[storage.TShirtStyleBellaXL].ID, purchaseItems.TShirt[storage.TShirtStyleBella2XL].ID:
 				pd.TShirtPaid = true
 			}
 		}

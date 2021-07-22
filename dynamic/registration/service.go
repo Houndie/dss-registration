@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
+	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/sendinblue"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/square-go"
@@ -17,7 +18,6 @@ type MailClient interface {
 
 type Store interface {
 	AddRegistration(context.Context, *storage.Registration) (string, error)
-	GetDiscount(context.Context, string) (*storage.Discount, error)
 	GetRegistrationsByUser(ctx context.Context, userId string) ([]*storage.Registration, error)
 	GetRegistration(ctx context.Context, id string) (*storage.Registration, error)
 	IsAdmin(context.Context, string) (bool, error)
@@ -26,6 +26,7 @@ type Store interface {
 
 type Service struct {
 	client         *square.Client
+	squareData     *common.SquareData
 	logger         *logrus.Logger
 	active         bool
 	useMailSandbox bool
@@ -34,7 +35,7 @@ type Service struct {
 	mailClient     MailClient
 }
 
-func NewService(active, useMailSandbox bool, logger *logrus.Logger, client *square.Client, authorizer Authorizer, store Store, mailClient MailClient) *Service {
+func NewService(active, useMailSandbox bool, logger *logrus.Logger, client *square.Client, squareData *common.SquareData, authorizer Authorizer, store Store, mailClient MailClient) *Service {
 	return &Service{
 		active:         active,
 		useMailSandbox: useMailSandbox,
@@ -43,6 +44,7 @@ func NewService(active, useMailSandbox bool, logger *logrus.Logger, client *squa
 		authorizer:     authorizer,
 		store:          store,
 		mailClient:     mailClient,
+		squareData:     squareData,
 	}
 }
 

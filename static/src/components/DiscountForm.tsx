@@ -4,6 +4,7 @@ import WindowClose from './WindowClose'
 import FormField from './FormField'
 import Button from 'react-bootstrap/Button'
 import Col from 'react-bootstrap/Col'
+import Row from 'react-bootstrap/Row'
 import Form from 'react-bootstrap/Form'
 import ListGroup from 'react-bootstrap/ListGroup'
 
@@ -18,17 +19,17 @@ interface DiscountFormProps {
 
 export default ({values, setFieldValue}: DiscountFormProps) => (
 	<>
-		<Form.Row><Col>
+		<Row><Col>
 			<FormField label="Code" name="code" type="text" />
-		</Col></Form.Row>
+		</Col></Row>
 		{ values.discounts && values.discounts.length > 0 && (
-			<Form.Row className="mb-3"><Col>
+			<Row className="mb-3"><Col>
 				<ListGroup>
 					{ values.discounts.map((sd, idx) => (
 						<ListGroup.Item key={idx}>
-							<Form.Row><Col className="text-right">
+							<Row><Col className="text-right">
 								<WindowClose onClick={() => setFieldValue('discounts', [...values.discounts.slice(0,idx), ...values.discounts.slice(idx+1)])} />
-							</Col></Form.Row><Form.Row><Col>
+							</Col></Row><Row><Col>
 								<FormField label="Name" name={`discounts[${idx}].name`} />
 							</Col><Col>
 								<FormField label="Applied To" name={`discounts[${idx}].appliedTo`} as="select">
@@ -39,19 +40,19 @@ export default ({values, setFieldValue}: DiscountFormProps) => (
 									<option value={dss.PurchaseItem.TeamCompetitionPurchaseItem}>Team Competition</option>
 									<option value={dss.PurchaseItem.TShirtPurchaseItem}>T-Shirt</option>
 								</FormField>
-							</Col></Form.Row>
+							</Col></Row>
 						</ListGroup.Item>
 					))}
 				</ListGroup>
-			</Col></Form.Row>
+			</Col></Row>
 		)}
-		<Form.Row><Col>
+		<Row><Col>
 			<Button onClick={() => {
 				setFieldValue("discounts", [...values.discounts, {
 					name: '',
 					appliedTo: ''
 				}])
 			}}>Add New Single Discount</Button>
-		</Col></Form.Row>
+		</Col></Row>
 	</>
 )

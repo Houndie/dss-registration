@@ -3,8 +3,6 @@ syntax = "proto3";
 package dss;
 option go_package = "rpc/dss";
 
-import "discount.proto";
-
 service Registration {
   rpc Add(RegistrationAddReq) returns (RegistrationAddRes);
   rpc Get(RegistrationGetReq) returns (RegistrationGetRes);
@@ -137,14 +135,7 @@ message RegistrationGetRes {
 message RegistrationPricesReq {}
 
 message RegistrationPricesRes{
-	int64 weekend_pass_cost = 1;
 	FullWeekendPassTier weekend_pass_tier = 2;
-	int64 dance_pass_cost = 3;
-	int64 mix_and_match_cost = 4;
-	int64 solo_jazz_cost = 5;
-	int64 team_competition_cost = 6;
-	int64 tshirt_cost = 7;
-	DiscountAmount student_discount = 8;
 }
 
 message RegistrationUpdateReq {

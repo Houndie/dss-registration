@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import Page from '../components/Page'
 import Form from "react-bootstrap/Form"
 import Col from "react-bootstrap/Col"
+import Row from "react-bootstrap/Row"
 import Container from "react-bootstrap/Container"
 import Button from "react-bootstrap/Button"
 import Spinner from "react-bootstrap/Spinner"
@@ -86,13 +87,13 @@ export default () => {
 						{({values, handleSubmit, submitForm, setFieldValue, isSubmitting}) => (
 							<Form onSubmit={handleSubmit}>
 								<Container>
-									<Form.Row><FormField as="textarea" name="description" label="Describe the incident that occurred (required)"/></Form.Row>
-									<Form.Row>
+									<Row><FormField as="textarea" name="description" label="Describe the incident that occurred (required)"/></Row>
+									<Row>
 										<FormField type="date" name="occurredOnDate" label="Date the issue occurred" />
 										<FormField type="time" name="occurredOnTime" label="Time the issue occurred" />
-									</Form.Row>
+									</Row>
 									<p>Please Rank the severity of the issue</p>
-									<Form.Row>
+									<Row>
 										<SlidingScale 
 											granularity={10}
 											smallEnd="Barely a problem" 
@@ -100,9 +101,9 @@ export default () => {
 											label="severity"
 											name="severity"
 										/>
-									</Form.Row>
+									</Row>
 									<p>What would you like to see done to resolve this issue?</p>
-									<Form.Row>
+									<Row>
 										<RadioGroup 
 											labels={[
 												"No action, just raising awareness.",
@@ -114,23 +115,23 @@ export default () => {
 											name='resolution'
 											otherName='resolutionOther'
 										/>
-									</Form.Row>
+									</Row>
 									<p>Have you add an issue with this person before?</p>
-									<Form.Row>
+									<Row>
 										<RadioGroup
 											labels={["Yes","No"]}
 											name='issuesBefore'
 										/>
-									</Form.Row>
-									<Form.Row><FormCheck label="I am okay with sharing my contact information" name="contactInformation"/></Form.Row>
+									</Row>
+									<Row><FormCheck label="I am okay with sharing my contact information" name="contactInformation"/></Row>
 									{values.contactInformation && (
-										<Form.Row>
+										<Row>
 											<FormField label="Name" name="name" type="text"/>
 											<FormField label="Email" name="email" type="email"/>
 											<FormField label="Phone Number" name="phone" type="tel"/>
-										</Form.Row>
+										</Row>
 									)}
-									<Form.Row><Col>
+									<Row><Col>
 										{ recaptchaLoaded ? (
 												<Button type="submit" disabled={isSubmitting}>Submit</Button>
 										) : (
@@ -139,7 +140,7 @@ export default () => {
 												<p>Please wait while form loads</p>
 											</>
 										)}
-									</Col></Form.Row>
+									</Col></Row>
 									<Recaptcha
 										ref={e => recaptchaInstance = e}
 										render="explicit"

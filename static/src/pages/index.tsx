@@ -126,14 +126,14 @@ const ContactUs = () => {
 		{({handleSubmit, submitForm, isSubmitting, setFieldValue}) => (
 			<Form as={FormikForm}>
 				<Container>
-					<Form.Row>
+					<Row>
 						<FormField label="Name" name="name" type="text"/>
 						<FormField label="Email" name="email" type="text"/>
-					</Form.Row><Form.Row>
+					</Row><Row>
 						<FormField label="Message" name="message" as="textarea"/>
-					</Form.Row><Form.Row>
-					</Form.Row>
-					<Form.Row><Col>
+					</Row><Row>
+					</Row>
+					<Row><Col>
 					{ recaptchaLoaded ? (
 							<Button type="submit" disabled={isSubmitting}>Submit</Button>
 					) : (
@@ -142,9 +142,9 @@ const ContactUs = () => {
 							<p>Please wait while form loads</p>
 						</>
 					)}
-					</Col></Form.Row>
+					</Col></Row>
 					<br/>
-					<Form.Row><Col className="justify-content-center d-flex">
+					<Row><Col className="justify-content-center d-flex">
 							<Recaptcha
 								badge="inline"
 								ref={e => recaptchaInstance = e}
@@ -158,7 +158,7 @@ const ContactUs = () => {
 								onloadCallback={() => setRecaptchaLoaded(true) }
 								expiredCallback={() => setFieldValue('recaptchaResponse', '')}
 							/>
-					</Col></Form.Row>
+					</Col></Row>
 
 				</Container>
 			</Form>
