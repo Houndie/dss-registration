@@ -51,7 +51,7 @@ locals {
 		GATSBY_FRONTEND="https://test.daytonswingsmackdown.com"
 		GATSBY_CLIENT_ID=auth0_client.smackdown-website.client_id
 		GATSBY_AUTH0_DOMAIN=var.auth0_domain
-		GATSBY_AUTH_AUDIENCE=auth0_resource_server.smackdown-website.identifier
+		GATSBY_AUTH0_AUDIENCE=auth0_resource_server.smackdown-website.identifier
 		GATSBY_VERSION=var.deploy_version
 		GATSBY_SQUARE_DATA=jsonencode(local.frontend_square_data)
 	}

@@ -5,6 +5,7 @@ option go_package = "rpc/dss";
 
 service Registration {
   rpc Add(RegistrationAddReq) returns (RegistrationAddRes);
+  rpc Pay(RegistrationPayReq) returns (RegistrationPayRes);
   rpc Get(RegistrationGetReq) returns (RegistrationGetRes);
   rpc GetSummary(RegistrationGetSummaryReq) returns (RegistrationGetSummaryRes);
   rpc Prices(RegistrationPricesReq) returns (RegistrationPricesRes);
@@ -115,13 +116,21 @@ message RequireHousing {
 message NoHousing {}
 
 message RegistrationAddReq {
-	string idempotency_key = 1; 
-	RegistrationInfo registration = 2;
-	string redirect_url = 3;
+	RegistrationInfo registration = 1;
 }
 
 message RegistrationAddRes {
-	string redirect_url = 1;
+	RegistrationInfo registration = 1;
+}
+
+message RegistrationPayReq {
+	string id = 1;
+	string idempotency_key = 2;
+	string redirect_url = 3;
+}
+
+message RegistrationPayRes {
+	string checkout_url = 1;
 }
 
 message RegistrationGetReq {
@@ -135,17 +144,15 @@ message RegistrationGetRes {
 message RegistrationPricesReq {}
 
 message RegistrationPricesRes{
-	FullWeekendPassTier weekend_pass_tier = 2;
+	FullWeekendPassTier weekend_pass_tier = 1;
 }
 
 message RegistrationUpdateReq {
-	string idempotency_key = 1;
-	RegistrationInfo registration = 2;
-	string redirect_url = 3;
+	RegistrationInfo registration = 1;
 }
 
 message RegistrationUpdateRes {
-	string redirect_url = 1;
+	RegistrationInfo registration = 1;
 }
 
 message RegistrationGetSummaryReq {}

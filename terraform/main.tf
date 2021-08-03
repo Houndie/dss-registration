@@ -56,6 +56,8 @@ resource "auth0_client" "smackdown-website" {
 	allowed_logout_urls = ["http://localhost:8081"]
 	web_origins         = ["http://localhost:8081"]
 	oidc_conformant = true
+	grant_types = ["authorization_code"]
+	token_endpoint_auth_method = "none"
 
 	jwt_configuration {
 		alg = "RS256"
@@ -73,4 +75,6 @@ resource "auth0_resource_server" "smackdown-website" {
 		value = "list:discounts"
 		description = "list discounts"
 	}
+
+	skip_consent_for_verifiable_first_party_clients = true
 }

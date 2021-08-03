@@ -84,6 +84,39 @@ $root.dss = (function() {
          */
 
         /**
+         * Callback as used by {@link dss.Registration#pay}.
+         * @memberof dss.Registration
+         * @typedef PayCallback
+         * @type {function}
+         * @param {Error|null} error Error, if any
+         * @param {dss.RegistrationPayRes} [response] RegistrationPayRes
+         */
+
+        /**
+         * Calls Pay.
+         * @function pay
+         * @memberof dss.Registration
+         * @instance
+         * @param {dss.IRegistrationPayReq} request RegistrationPayReq message or plain object
+         * @param {dss.Registration.PayCallback} callback Node-style callback called with the error, if any, and RegistrationPayRes
+         * @returns {undefined}
+         * @variation 1
+         */
+        Object.defineProperty(Registration.prototype.pay = function pay(request, callback) {
+            return this.rpcCall(pay, $root.dss.RegistrationPayReq, $root.dss.RegistrationPayRes, request, callback);
+        }, "name", { value: "Pay" });
+
+        /**
+         * Calls Pay.
+         * @function pay
+         * @memberof dss.Registration
+         * @instance
+         * @param {dss.IRegistrationPayReq} request RegistrationPayReq message or plain object
+         * @returns {Promise<dss.RegistrationPayRes>} Promise
+         * @variation 2
+         */
+
+        /**
          * Callback as used by {@link dss.Registration#get}.
          * @memberof dss.Registration
          * @typedef GetCallback
@@ -3216,9 +3249,7 @@ $root.dss = (function() {
          * Properties of a RegistrationAddReq.
          * @memberof dss
          * @interface IRegistrationAddReq
-         * @property {string|null} [idempotencyKey] RegistrationAddReq idempotencyKey
          * @property {dss.IRegistrationInfo|null} [registration] RegistrationAddReq registration
-         * @property {string|null} [redirectUrl] RegistrationAddReq redirectUrl
          */
 
         /**
@@ -3237,28 +3268,12 @@ $root.dss = (function() {
         }
 
         /**
-         * RegistrationAddReq idempotencyKey.
-         * @member {string} idempotencyKey
-         * @memberof dss.RegistrationAddReq
-         * @instance
-         */
-        RegistrationAddReq.prototype.idempotencyKey = "";
-
-        /**
          * RegistrationAddReq registration.
          * @member {dss.IRegistrationInfo|null|undefined} registration
          * @memberof dss.RegistrationAddReq
          * @instance
          */
         RegistrationAddReq.prototype.registration = null;
-
-        /**
-         * RegistrationAddReq redirectUrl.
-         * @member {string} redirectUrl
-         * @memberof dss.RegistrationAddReq
-         * @instance
-         */
-        RegistrationAddReq.prototype.redirectUrl = "";
 
         /**
          * Creates a new RegistrationAddReq instance using the specified properties.
@@ -3284,12 +3299,8 @@ $root.dss = (function() {
         RegistrationAddReq.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.idempotencyKey != null && Object.hasOwnProperty.call(message, "idempotencyKey"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.idempotencyKey);
             if (message.registration != null && Object.hasOwnProperty.call(message, "registration"))
-                $root.dss.RegistrationInfo.encode(message.registration, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            if (message.redirectUrl != null && Object.hasOwnProperty.call(message, "redirectUrl"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.redirectUrl);
+                $root.dss.RegistrationInfo.encode(message.registration, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             return writer;
         };
 
@@ -3325,13 +3336,7 @@ $root.dss = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.idempotencyKey = reader.string();
-                    break;
-                case 2:
                     message.registration = $root.dss.RegistrationInfo.decode(reader, reader.uint32());
-                    break;
-                case 3:
-                    message.redirectUrl = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -3368,17 +3373,11 @@ $root.dss = (function() {
         RegistrationAddReq.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.idempotencyKey != null && message.hasOwnProperty("idempotencyKey"))
-                if (!$util.isString(message.idempotencyKey))
-                    return "idempotencyKey: string expected";
             if (message.registration != null && message.hasOwnProperty("registration")) {
                 var error = $root.dss.RegistrationInfo.verify(message.registration);
                 if (error)
                     return "registration." + error;
             }
-            if (message.redirectUrl != null && message.hasOwnProperty("redirectUrl"))
-                if (!$util.isString(message.redirectUrl))
-                    return "redirectUrl: string expected";
             return null;
         };
 
@@ -3394,15 +3393,11 @@ $root.dss = (function() {
             if (object instanceof $root.dss.RegistrationAddReq)
                 return object;
             var message = new $root.dss.RegistrationAddReq();
-            if (object.idempotencyKey != null)
-                message.idempotencyKey = String(object.idempotencyKey);
             if (object.registration != null) {
                 if (typeof object.registration !== "object")
                     throw TypeError(".dss.RegistrationAddReq.registration: object expected");
                 message.registration = $root.dss.RegistrationInfo.fromObject(object.registration);
             }
-            if (object.redirectUrl != null)
-                message.redirectUrl = String(object.redirectUrl);
             return message;
         };
 
@@ -3419,17 +3414,10 @@ $root.dss = (function() {
             if (!options)
                 options = {};
             var object = {};
-            if (options.defaults) {
-                object.idempotencyKey = "";
+            if (options.defaults)
                 object.registration = null;
-                object.redirectUrl = "";
-            }
-            if (message.idempotencyKey != null && message.hasOwnProperty("idempotencyKey"))
-                object.idempotencyKey = message.idempotencyKey;
             if (message.registration != null && message.hasOwnProperty("registration"))
                 object.registration = $root.dss.RegistrationInfo.toObject(message.registration, options);
-            if (message.redirectUrl != null && message.hasOwnProperty("redirectUrl"))
-                object.redirectUrl = message.redirectUrl;
             return object;
         };
 
@@ -3453,7 +3441,7 @@ $root.dss = (function() {
          * Properties of a RegistrationAddRes.
          * @memberof dss
          * @interface IRegistrationAddRes
-         * @property {string|null} [redirectUrl] RegistrationAddRes redirectUrl
+         * @property {dss.IRegistrationInfo|null} [registration] RegistrationAddRes registration
          */
 
         /**
@@ -3472,12 +3460,12 @@ $root.dss = (function() {
         }
 
         /**
-         * RegistrationAddRes redirectUrl.
-         * @member {string} redirectUrl
+         * RegistrationAddRes registration.
+         * @member {dss.IRegistrationInfo|null|undefined} registration
          * @memberof dss.RegistrationAddRes
          * @instance
          */
-        RegistrationAddRes.prototype.redirectUrl = "";
+        RegistrationAddRes.prototype.registration = null;
 
         /**
          * Creates a new RegistrationAddRes instance using the specified properties.
@@ -3503,8 +3491,8 @@ $root.dss = (function() {
         RegistrationAddRes.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.redirectUrl != null && Object.hasOwnProperty.call(message, "redirectUrl"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.redirectUrl);
+            if (message.registration != null && Object.hasOwnProperty.call(message, "registration"))
+                $root.dss.RegistrationInfo.encode(message.registration, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             return writer;
         };
 
@@ -3540,7 +3528,7 @@ $root.dss = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.redirectUrl = reader.string();
+                    message.registration = $root.dss.RegistrationInfo.decode(reader, reader.uint32());
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -3577,9 +3565,11 @@ $root.dss = (function() {
         RegistrationAddRes.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.redirectUrl != null && message.hasOwnProperty("redirectUrl"))
-                if (!$util.isString(message.redirectUrl))
-                    return "redirectUrl: string expected";
+            if (message.registration != null && message.hasOwnProperty("registration")) {
+                var error = $root.dss.RegistrationInfo.verify(message.registration);
+                if (error)
+                    return "registration." + error;
+            }
             return null;
         };
 
@@ -3595,8 +3585,11 @@ $root.dss = (function() {
             if (object instanceof $root.dss.RegistrationAddRes)
                 return object;
             var message = new $root.dss.RegistrationAddRes();
-            if (object.redirectUrl != null)
-                message.redirectUrl = String(object.redirectUrl);
+            if (object.registration != null) {
+                if (typeof object.registration !== "object")
+                    throw TypeError(".dss.RegistrationAddRes.registration: object expected");
+                message.registration = $root.dss.RegistrationInfo.fromObject(object.registration);
+            }
             return message;
         };
 
@@ -3614,9 +3607,9 @@ $root.dss = (function() {
                 options = {};
             var object = {};
             if (options.defaults)
-                object.redirectUrl = "";
-            if (message.redirectUrl != null && message.hasOwnProperty("redirectUrl"))
-                object.redirectUrl = message.redirectUrl;
+                object.registration = null;
+            if (message.registration != null && message.hasOwnProperty("registration"))
+                object.registration = $root.dss.RegistrationInfo.toObject(message.registration, options);
             return object;
         };
 
@@ -3632,6 +3625,425 @@ $root.dss = (function() {
         };
 
         return RegistrationAddRes;
+    })();
+
+    dss.RegistrationPayReq = (function() {
+
+        /**
+         * Properties of a RegistrationPayReq.
+         * @memberof dss
+         * @interface IRegistrationPayReq
+         * @property {string|null} [id] RegistrationPayReq id
+         * @property {string|null} [idempotencyKey] RegistrationPayReq idempotencyKey
+         * @property {string|null} [redirectUrl] RegistrationPayReq redirectUrl
+         */
+
+        /**
+         * Constructs a new RegistrationPayReq.
+         * @memberof dss
+         * @classdesc Represents a RegistrationPayReq.
+         * @implements IRegistrationPayReq
+         * @constructor
+         * @param {dss.IRegistrationPayReq=} [properties] Properties to set
+         */
+        function RegistrationPayReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * RegistrationPayReq id.
+         * @member {string} id
+         * @memberof dss.RegistrationPayReq
+         * @instance
+         */
+        RegistrationPayReq.prototype.id = "";
+
+        /**
+         * RegistrationPayReq idempotencyKey.
+         * @member {string} idempotencyKey
+         * @memberof dss.RegistrationPayReq
+         * @instance
+         */
+        RegistrationPayReq.prototype.idempotencyKey = "";
+
+        /**
+         * RegistrationPayReq redirectUrl.
+         * @member {string} redirectUrl
+         * @memberof dss.RegistrationPayReq
+         * @instance
+         */
+        RegistrationPayReq.prototype.redirectUrl = "";
+
+        /**
+         * Creates a new RegistrationPayReq instance using the specified properties.
+         * @function create
+         * @memberof dss.RegistrationPayReq
+         * @static
+         * @param {dss.IRegistrationPayReq=} [properties] Properties to set
+         * @returns {dss.RegistrationPayReq} RegistrationPayReq instance
+         */
+        RegistrationPayReq.create = function create(properties) {
+            return new RegistrationPayReq(properties);
+        };
+
+        /**
+         * Encodes the specified RegistrationPayReq message. Does not implicitly {@link dss.RegistrationPayReq.verify|verify} messages.
+         * @function encode
+         * @memberof dss.RegistrationPayReq
+         * @static
+         * @param {dss.IRegistrationPayReq} message RegistrationPayReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        RegistrationPayReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.id != null && Object.hasOwnProperty.call(message, "id"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
+            if (message.idempotencyKey != null && Object.hasOwnProperty.call(message, "idempotencyKey"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.idempotencyKey);
+            if (message.redirectUrl != null && Object.hasOwnProperty.call(message, "redirectUrl"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.redirectUrl);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified RegistrationPayReq message, length delimited. Does not implicitly {@link dss.RegistrationPayReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof dss.RegistrationPayReq
+         * @static
+         * @param {dss.IRegistrationPayReq} message RegistrationPayReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        RegistrationPayReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a RegistrationPayReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof dss.RegistrationPayReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {dss.RegistrationPayReq} RegistrationPayReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        RegistrationPayReq.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.dss.RegistrationPayReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.id = reader.string();
+                    break;
+                case 2:
+                    message.idempotencyKey = reader.string();
+                    break;
+                case 3:
+                    message.redirectUrl = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a RegistrationPayReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof dss.RegistrationPayReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {dss.RegistrationPayReq} RegistrationPayReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        RegistrationPayReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a RegistrationPayReq message.
+         * @function verify
+         * @memberof dss.RegistrationPayReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        RegistrationPayReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.id != null && message.hasOwnProperty("id"))
+                if (!$util.isString(message.id))
+                    return "id: string expected";
+            if (message.idempotencyKey != null && message.hasOwnProperty("idempotencyKey"))
+                if (!$util.isString(message.idempotencyKey))
+                    return "idempotencyKey: string expected";
+            if (message.redirectUrl != null && message.hasOwnProperty("redirectUrl"))
+                if (!$util.isString(message.redirectUrl))
+                    return "redirectUrl: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a RegistrationPayReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof dss.RegistrationPayReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {dss.RegistrationPayReq} RegistrationPayReq
+         */
+        RegistrationPayReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.dss.RegistrationPayReq)
+                return object;
+            var message = new $root.dss.RegistrationPayReq();
+            if (object.id != null)
+                message.id = String(object.id);
+            if (object.idempotencyKey != null)
+                message.idempotencyKey = String(object.idempotencyKey);
+            if (object.redirectUrl != null)
+                message.redirectUrl = String(object.redirectUrl);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a RegistrationPayReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof dss.RegistrationPayReq
+         * @static
+         * @param {dss.RegistrationPayReq} message RegistrationPayReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        RegistrationPayReq.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.id = "";
+                object.idempotencyKey = "";
+                object.redirectUrl = "";
+            }
+            if (message.id != null && message.hasOwnProperty("id"))
+                object.id = message.id;
+            if (message.idempotencyKey != null && message.hasOwnProperty("idempotencyKey"))
+                object.idempotencyKey = message.idempotencyKey;
+            if (message.redirectUrl != null && message.hasOwnProperty("redirectUrl"))
+                object.redirectUrl = message.redirectUrl;
+            return object;
+        };
+
+        /**
+         * Converts this RegistrationPayReq to JSON.
+         * @function toJSON
+         * @memberof dss.RegistrationPayReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        RegistrationPayReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return RegistrationPayReq;
+    })();
+
+    dss.RegistrationPayRes = (function() {
+
+        /**
+         * Properties of a RegistrationPayRes.
+         * @memberof dss
+         * @interface IRegistrationPayRes
+         * @property {string|null} [checkoutUrl] RegistrationPayRes checkoutUrl
+         */
+
+        /**
+         * Constructs a new RegistrationPayRes.
+         * @memberof dss
+         * @classdesc Represents a RegistrationPayRes.
+         * @implements IRegistrationPayRes
+         * @constructor
+         * @param {dss.IRegistrationPayRes=} [properties] Properties to set
+         */
+        function RegistrationPayRes(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * RegistrationPayRes checkoutUrl.
+         * @member {string} checkoutUrl
+         * @memberof dss.RegistrationPayRes
+         * @instance
+         */
+        RegistrationPayRes.prototype.checkoutUrl = "";
+
+        /**
+         * Creates a new RegistrationPayRes instance using the specified properties.
+         * @function create
+         * @memberof dss.RegistrationPayRes
+         * @static
+         * @param {dss.IRegistrationPayRes=} [properties] Properties to set
+         * @returns {dss.RegistrationPayRes} RegistrationPayRes instance
+         */
+        RegistrationPayRes.create = function create(properties) {
+            return new RegistrationPayRes(properties);
+        };
+
+        /**
+         * Encodes the specified RegistrationPayRes message. Does not implicitly {@link dss.RegistrationPayRes.verify|verify} messages.
+         * @function encode
+         * @memberof dss.RegistrationPayRes
+         * @static
+         * @param {dss.IRegistrationPayRes} message RegistrationPayRes message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        RegistrationPayRes.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.checkoutUrl != null && Object.hasOwnProperty.call(message, "checkoutUrl"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.checkoutUrl);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified RegistrationPayRes message, length delimited. Does not implicitly {@link dss.RegistrationPayRes.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof dss.RegistrationPayRes
+         * @static
+         * @param {dss.IRegistrationPayRes} message RegistrationPayRes message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        RegistrationPayRes.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a RegistrationPayRes message from the specified reader or buffer.
+         * @function decode
+         * @memberof dss.RegistrationPayRes
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {dss.RegistrationPayRes} RegistrationPayRes
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        RegistrationPayRes.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.dss.RegistrationPayRes();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.checkoutUrl = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a RegistrationPayRes message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof dss.RegistrationPayRes
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {dss.RegistrationPayRes} RegistrationPayRes
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        RegistrationPayRes.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a RegistrationPayRes message.
+         * @function verify
+         * @memberof dss.RegistrationPayRes
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        RegistrationPayRes.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.checkoutUrl != null && message.hasOwnProperty("checkoutUrl"))
+                if (!$util.isString(message.checkoutUrl))
+                    return "checkoutUrl: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a RegistrationPayRes message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof dss.RegistrationPayRes
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {dss.RegistrationPayRes} RegistrationPayRes
+         */
+        RegistrationPayRes.fromObject = function fromObject(object) {
+            if (object instanceof $root.dss.RegistrationPayRes)
+                return object;
+            var message = new $root.dss.RegistrationPayRes();
+            if (object.checkoutUrl != null)
+                message.checkoutUrl = String(object.checkoutUrl);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a RegistrationPayRes message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof dss.RegistrationPayRes
+         * @static
+         * @param {dss.RegistrationPayRes} message RegistrationPayRes
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        RegistrationPayRes.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                object.checkoutUrl = "";
+            if (message.checkoutUrl != null && message.hasOwnProperty("checkoutUrl"))
+                object.checkoutUrl = message.checkoutUrl;
+            return object;
+        };
+
+        /**
+         * Converts this RegistrationPayRes to JSON.
+         * @function toJSON
+         * @memberof dss.RegistrationPayRes
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        RegistrationPayRes.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return RegistrationPayRes;
     })();
 
     dss.RegistrationGetReq = (function() {
@@ -4230,7 +4642,7 @@ $root.dss = (function() {
             if (!writer)
                 writer = $Writer.create();
             if (message.weekendPassTier != null && Object.hasOwnProperty.call(message, "weekendPassTier"))
-                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.weekendPassTier);
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.weekendPassTier);
             return writer;
         };
 
@@ -4265,7 +4677,7 @@ $root.dss = (function() {
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
-                case 2:
+                case 1:
                     message.weekendPassTier = reader.int32();
                     break;
                 default:
@@ -4394,9 +4806,7 @@ $root.dss = (function() {
          * Properties of a RegistrationUpdateReq.
          * @memberof dss
          * @interface IRegistrationUpdateReq
-         * @property {string|null} [idempotencyKey] RegistrationUpdateReq idempotencyKey
          * @property {dss.IRegistrationInfo|null} [registration] RegistrationUpdateReq registration
-         * @property {string|null} [redirectUrl] RegistrationUpdateReq redirectUrl
          */
 
         /**
@@ -4415,28 +4825,12 @@ $root.dss = (function() {
         }
 
         /**
-         * RegistrationUpdateReq idempotencyKey.
-         * @member {string} idempotencyKey
-         * @memberof dss.RegistrationUpdateReq
-         * @instance
-         */
-        RegistrationUpdateReq.prototype.idempotencyKey = "";
-
-        /**
          * RegistrationUpdateReq registration.
          * @member {dss.IRegistrationInfo|null|undefined} registration
          * @memberof dss.RegistrationUpdateReq
          * @instance
          */
         RegistrationUpdateReq.prototype.registration = null;
-
-        /**
-         * RegistrationUpdateReq redirectUrl.
-         * @member {string} redirectUrl
-         * @memberof dss.RegistrationUpdateReq
-         * @instance
-         */
-        RegistrationUpdateReq.prototype.redirectUrl = "";
 
         /**
          * Creates a new RegistrationUpdateReq instance using the specified properties.
@@ -4462,12 +4856,8 @@ $root.dss = (function() {
         RegistrationUpdateReq.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.idempotencyKey != null && Object.hasOwnProperty.call(message, "idempotencyKey"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.idempotencyKey);
             if (message.registration != null && Object.hasOwnProperty.call(message, "registration"))
-                $root.dss.RegistrationInfo.encode(message.registration, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            if (message.redirectUrl != null && Object.hasOwnProperty.call(message, "redirectUrl"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.redirectUrl);
+                $root.dss.RegistrationInfo.encode(message.registration, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             return writer;
         };
 
@@ -4503,13 +4893,7 @@ $root.dss = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.idempotencyKey = reader.string();
-                    break;
-                case 2:
                     message.registration = $root.dss.RegistrationInfo.decode(reader, reader.uint32());
-                    break;
-                case 3:
-                    message.redirectUrl = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -4546,17 +4930,11 @@ $root.dss = (function() {
         RegistrationUpdateReq.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.idempotencyKey != null && message.hasOwnProperty("idempotencyKey"))
-                if (!$util.isString(message.idempotencyKey))
-                    return "idempotencyKey: string expected";
             if (message.registration != null && message.hasOwnProperty("registration")) {
                 var error = $root.dss.RegistrationInfo.verify(message.registration);
                 if (error)
                     return "registration." + error;
             }
-            if (message.redirectUrl != null && message.hasOwnProperty("redirectUrl"))
-                if (!$util.isString(message.redirectUrl))
-                    return "redirectUrl: string expected";
             return null;
         };
 
@@ -4572,15 +4950,11 @@ $root.dss = (function() {
             if (object instanceof $root.dss.RegistrationUpdateReq)
                 return object;
             var message = new $root.dss.RegistrationUpdateReq();
-            if (object.idempotencyKey != null)
-                message.idempotencyKey = String(object.idempotencyKey);
             if (object.registration != null) {
                 if (typeof object.registration !== "object")
                     throw TypeError(".dss.RegistrationUpdateReq.registration: object expected");
                 message.registration = $root.dss.RegistrationInfo.fromObject(object.registration);
             }
-            if (object.redirectUrl != null)
-                message.redirectUrl = String(object.redirectUrl);
             return message;
         };
 
@@ -4597,17 +4971,10 @@ $root.dss = (function() {
             if (!options)
                 options = {};
             var object = {};
-            if (options.defaults) {
-                object.idempotencyKey = "";
+            if (options.defaults)
                 object.registration = null;
-                object.redirectUrl = "";
-            }
-            if (message.idempotencyKey != null && message.hasOwnProperty("idempotencyKey"))
-                object.idempotencyKey = message.idempotencyKey;
             if (message.registration != null && message.hasOwnProperty("registration"))
                 object.registration = $root.dss.RegistrationInfo.toObject(message.registration, options);
-            if (message.redirectUrl != null && message.hasOwnProperty("redirectUrl"))
-                object.redirectUrl = message.redirectUrl;
             return object;
         };
 
@@ -4631,7 +4998,7 @@ $root.dss = (function() {
          * Properties of a RegistrationUpdateRes.
          * @memberof dss
          * @interface IRegistrationUpdateRes
-         * @property {string|null} [redirectUrl] RegistrationUpdateRes redirectUrl
+         * @property {dss.IRegistrationInfo|null} [registration] RegistrationUpdateRes registration
          */
 
         /**
@@ -4650,12 +5017,12 @@ $root.dss = (function() {
         }
 
         /**
-         * RegistrationUpdateRes redirectUrl.
-         * @member {string} redirectUrl
+         * RegistrationUpdateRes registration.
+         * @member {dss.IRegistrationInfo|null|undefined} registration
          * @memberof dss.RegistrationUpdateRes
          * @instance
          */
-        RegistrationUpdateRes.prototype.redirectUrl = "";
+        RegistrationUpdateRes.prototype.registration = null;
 
         /**
          * Creates a new RegistrationUpdateRes instance using the specified properties.
@@ -4681,8 +5048,8 @@ $root.dss = (function() {
         RegistrationUpdateRes.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.redirectUrl != null && Object.hasOwnProperty.call(message, "redirectUrl"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.redirectUrl);
+            if (message.registration != null && Object.hasOwnProperty.call(message, "registration"))
+                $root.dss.RegistrationInfo.encode(message.registration, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             return writer;
         };
 
@@ -4718,7 +5085,7 @@ $root.dss = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.redirectUrl = reader.string();
+                    message.registration = $root.dss.RegistrationInfo.decode(reader, reader.uint32());
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -4755,9 +5122,11 @@ $root.dss = (function() {
         RegistrationUpdateRes.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.redirectUrl != null && message.hasOwnProperty("redirectUrl"))
-                if (!$util.isString(message.redirectUrl))
-                    return "redirectUrl: string expected";
+            if (message.registration != null && message.hasOwnProperty("registration")) {
+                var error = $root.dss.RegistrationInfo.verify(message.registration);
+                if (error)
+                    return "registration." + error;
+            }
             return null;
         };
 
@@ -4773,8 +5142,11 @@ $root.dss = (function() {
             if (object instanceof $root.dss.RegistrationUpdateRes)
                 return object;
             var message = new $root.dss.RegistrationUpdateRes();
-            if (object.redirectUrl != null)
-                message.redirectUrl = String(object.redirectUrl);
+            if (object.registration != null) {
+                if (typeof object.registration !== "object")
+                    throw TypeError(".dss.RegistrationUpdateRes.registration: object expected");
+                message.registration = $root.dss.RegistrationInfo.fromObject(object.registration);
+            }
             return message;
         };
 
@@ -4792,9 +5164,9 @@ $root.dss = (function() {
                 options = {};
             var object = {};
             if (options.defaults)
-                object.redirectUrl = "";
-            if (message.redirectUrl != null && message.hasOwnProperty("redirectUrl"))
-                object.redirectUrl = message.redirectUrl;
+                object.registration = null;
+            if (message.registration != null && message.hasOwnProperty("registration"))
+                object.registration = $root.dss.RegistrationInfo.toObject(message.registration, options);
             return object;
         };
 

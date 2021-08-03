@@ -9,11 +9,12 @@ import (
 )
 
 type RegistrationService interface {
-	Add(ctx context.Context, registration *registration.Info, redirectUrl, idempotencyKey, accessToken string) (string, error)
+	Add(ctx context.Context, registration *registration.Info, accessToken string) (*registration.Info, error)
 	Get(ctx context.Context, token, registrationID string) (*registration.Info, error)
 	Populate(ctx context.Context) (storage.WeekendPassTier, error)
 	SummaryByUser(ctx context.Context, token string) ([]*registration.Summary, error)
-	Update(ctx context.Context, token string, idempotencyKey string, registration *registration.Info, redirectUrl string) (string, error)
+	Update(ctx context.Context, token string, registration *registration.Info) (*registration.Info, error)
+	Pay(ctx context.Context, id, redirectURL, idempotencyKey, token string) (string, error)
 }
 
 type Server struct {

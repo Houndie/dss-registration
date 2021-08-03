@@ -54,7 +54,7 @@ locals {
 
 	backend_config_vars = {
 		DSS_FRONTEND = "https://test.daytonswingsmackdown.com"
-		DSS_AUTH0ENDPOINT = var.auth0_domain
+		DSS_AUTHENDPOINT = "https://${var.auth0_domain}"
 		DSS_ENVIRONMENT = "development"
 		DSS_VERSION = var.deploy_version
 		DSS_SQUAREDATA = jsonencode(local.backend_square_data)

@@ -6,6 +6,8 @@ export namespace dss {
         public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): Registration;
         public add(request: dss.IRegistrationAddReq, callback: dss.Registration.AddCallback): void;
         public add(request: dss.IRegistrationAddReq): Promise<dss.RegistrationAddRes>;
+        public pay(request: dss.IRegistrationPayReq, callback: dss.Registration.PayCallback): void;
+        public pay(request: dss.IRegistrationPayReq): Promise<dss.RegistrationPayRes>;
         public get(request: dss.IRegistrationGetReq, callback: dss.Registration.GetCallback): void;
         public get(request: dss.IRegistrationGetReq): Promise<dss.RegistrationGetRes>;
         public getSummary(request: dss.IRegistrationGetSummaryReq, callback: dss.Registration.GetSummaryCallback): void;
@@ -19,6 +21,8 @@ export namespace dss {
     namespace Registration {
 
         type AddCallback = (error: (Error|null), response?: dss.RegistrationAddRes) => void;
+
+        type PayCallback = (error: (Error|null), response?: dss.RegistrationPayRes) => void;
 
         type GetCallback = (error: (Error|null), response?: dss.RegistrationGetRes) => void;
 
@@ -323,16 +327,12 @@ export namespace dss {
     }
 
     interface IRegistrationAddReq {
-        idempotencyKey?: (string|null);
         registration?: (dss.IRegistrationInfo|null);
-        redirectUrl?: (string|null);
     }
 
     class RegistrationAddReq implements IRegistrationAddReq {
         constructor(properties?: dss.IRegistrationAddReq);
-        public idempotencyKey: string;
         public registration?: (dss.IRegistrationInfo|null);
-        public redirectUrl: string;
         public static create(properties?: dss.IRegistrationAddReq): dss.RegistrationAddReq;
         public static encode(message: dss.IRegistrationAddReq, writer?: $protobuf.Writer): $protobuf.Writer;
         public static encodeDelimited(message: dss.IRegistrationAddReq, writer?: $protobuf.Writer): $protobuf.Writer;
@@ -345,12 +345,12 @@ export namespace dss {
     }
 
     interface IRegistrationAddRes {
-        redirectUrl?: (string|null);
+        registration?: (dss.IRegistrationInfo|null);
     }
 
     class RegistrationAddRes implements IRegistrationAddRes {
         constructor(properties?: dss.IRegistrationAddRes);
-        public redirectUrl: string;
+        public registration?: (dss.IRegistrationInfo|null);
         public static create(properties?: dss.IRegistrationAddRes): dss.RegistrationAddRes;
         public static encode(message: dss.IRegistrationAddRes, writer?: $protobuf.Writer): $protobuf.Writer;
         public static encodeDelimited(message: dss.IRegistrationAddRes, writer?: $protobuf.Writer): $protobuf.Writer;
@@ -359,6 +359,46 @@ export namespace dss {
         public static verify(message: { [k: string]: any }): (string|null);
         public static fromObject(object: { [k: string]: any }): dss.RegistrationAddRes;
         public static toObject(message: dss.RegistrationAddRes, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+    }
+
+    interface IRegistrationPayReq {
+        id?: (string|null);
+        idempotencyKey?: (string|null);
+        redirectUrl?: (string|null);
+    }
+
+    class RegistrationPayReq implements IRegistrationPayReq {
+        constructor(properties?: dss.IRegistrationPayReq);
+        public id: string;
+        public idempotencyKey: string;
+        public redirectUrl: string;
+        public static create(properties?: dss.IRegistrationPayReq): dss.RegistrationPayReq;
+        public static encode(message: dss.IRegistrationPayReq, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: dss.IRegistrationPayReq, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): dss.RegistrationPayReq;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): dss.RegistrationPayReq;
+        public static verify(message: { [k: string]: any }): (string|null);
+        public static fromObject(object: { [k: string]: any }): dss.RegistrationPayReq;
+        public static toObject(message: dss.RegistrationPayReq, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+    }
+
+    interface IRegistrationPayRes {
+        checkoutUrl?: (string|null);
+    }
+
+    class RegistrationPayRes implements IRegistrationPayRes {
+        constructor(properties?: dss.IRegistrationPayRes);
+        public checkoutUrl: string;
+        public static create(properties?: dss.IRegistrationPayRes): dss.RegistrationPayRes;
+        public static encode(message: dss.IRegistrationPayRes, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: dss.IRegistrationPayRes, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): dss.RegistrationPayRes;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): dss.RegistrationPayRes;
+        public static verify(message: { [k: string]: any }): (string|null);
+        public static fromObject(object: { [k: string]: any }): dss.RegistrationPayRes;
+        public static toObject(message: dss.RegistrationPayRes, options?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
     }
 
@@ -433,16 +473,12 @@ export namespace dss {
     }
 
     interface IRegistrationUpdateReq {
-        idempotencyKey?: (string|null);
         registration?: (dss.IRegistrationInfo|null);
-        redirectUrl?: (string|null);
     }
 
     class RegistrationUpdateReq implements IRegistrationUpdateReq {
         constructor(properties?: dss.IRegistrationUpdateReq);
-        public idempotencyKey: string;
         public registration?: (dss.IRegistrationInfo|null);
-        public redirectUrl: string;
         public static create(properties?: dss.IRegistrationUpdateReq): dss.RegistrationUpdateReq;
         public static encode(message: dss.IRegistrationUpdateReq, writer?: $protobuf.Writer): $protobuf.Writer;
         public static encodeDelimited(message: dss.IRegistrationUpdateReq, writer?: $protobuf.Writer): $protobuf.Writer;
@@ -455,12 +491,12 @@ export namespace dss {
     }
 
     interface IRegistrationUpdateRes {
-        redirectUrl?: (string|null);
+        registration?: (dss.IRegistrationInfo|null);
     }
 
     class RegistrationUpdateRes implements IRegistrationUpdateRes {
         constructor(properties?: dss.IRegistrationUpdateRes);
-        public redirectUrl: string;
+        public registration?: (dss.IRegistrationInfo|null);
         public static create(properties?: dss.IRegistrationUpdateRes): dss.RegistrationUpdateRes;
         public static encode(message: dss.IRegistrationUpdateRes, writer?: $protobuf.Writer): $protobuf.Writer;
         public static encodeDelimited(message: dss.IRegistrationUpdateRes, writer?: $protobuf.Writer): $protobuf.Writer;

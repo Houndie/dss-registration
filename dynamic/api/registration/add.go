@@ -41,7 +41,8 @@ func (s *Server) Add(ctx context.Context, req *pb.RegistrationAddReq) (*pb.Regis
 		}
 		return nil, err
 	}
-	redirectURL, err := s.service.Add(ctx, info, req.RedirectUrl, req.IdempotencyKey, auth)
+
+	r, err := s.service.Add(ctx, info, auth)
 	if err != nil {
 		var noDiscountErr storage.ErrDiscountNotFound
 		var outOfStockErr registration.ErrOutOfStock
@@ -54,8 +55,13 @@ func (s *Server) Add(ctx context.Context, req *pb.RegistrationAddReq) (*pb.Regis
 		}
 		return nil, err
 	}
+
+	protoRegistration, err := toProtoc(r)
+	if err != nil {
+		return nil, fmt.Errorf("error transforming registration to protoc type: %w", err)
+	}
 	return &pb.RegistrationAddRes{
-		RedirectUrl: redirectURL,
+		Registration: protoRegistration,
 	}, nil
 
 }

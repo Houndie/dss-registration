@@ -30,7 +30,7 @@ services:
       - DSS_POSTGRESURL=postgres://dbuser:dbpass@db:5432/dbuser?sslmode=disable
       - DSS_TEST_POSTGRESURL=postgres://dbuser:dbpass@test_db:5432/dbuser?sslmode=disable
       - DSS_ENVIRONMENT=development
-      - DSS_AUTH0ENDPOINT
+      - DSS_AUTHENDPOINT
       - DSS_SQUAREKEY
       - DSS_MAILKEY
       - DSS_RECAPTCHAKEY
