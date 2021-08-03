@@ -89,7 +89,7 @@ func (s *Store) UpdateRegistration(ctx context.Context, registration *storage.Re
 
 	tshirt := false
 	var tshirtStyle *string
-	if registration.MixAndMatch != nil {
+	if registration.TShirt != nil {
 		tshirt = true
 		tshirtStyleStr, ok := styleToEnum[registration.TShirt.Style]
 		if !ok {

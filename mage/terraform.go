@@ -21,9 +21,6 @@ type TerraformOutputVars struct {
 
 type TerraformOutputValues struct {
 	BackendAddr                string
-	Auth0Domain                string
-	Auth0ClientID              string
-	Auth0Audience              string
 	BackendConfigVars          map[string]string
 	BackendSensitiveConfigVars map[string]string
 	FrontendConfigVars         map[string]string

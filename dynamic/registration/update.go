@@ -4,10 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/storage"
-	"github.com/Houndie/square-go/objects"
-	"github.com/gofrs/uuid"
 )
 
 func checkOldPurchases(newRegistration *Info, oldRegistration *storage.Registration) error {
@@ -73,138 +70,31 @@ func checkOldPurchases(newRegistration *Info, oldRegistration *storage.Registrat
 	return nil
 }
 
-func hasUpdatePurchase(newRegistration *Info, oldRegistration *storage.Registration) bool {
-	switch newRegistration.PassType.(type) {
-	case *WeekendPass:
-		if _, ok := oldRegistration.PassType.(*storage.WeekendPass); !ok {
-			return true
-		}
-	case *DanceOnlyPass:
-		if _, ok := oldRegistration.PassType.(*storage.DanceOnlyPass); !ok {
-			return true
-		}
-	}
-
-	if newRegistration.MixAndMatch != nil && oldRegistration.MixAndMatch == nil {
-		return true
-	}
-
-	if newRegistration.TShirt != nil && oldRegistration.TShirt == nil {
-		return true
-	}
-
-	if newRegistration.TeamCompetition != nil && oldRegistration.TeamCompetition == nil {
-		return true
-	}
-
-	if newRegistration.SoloJazz != nil && !oldRegistration.SoloJazz {
-		return true
-	}
-	return false
-}
-
-func (s *Service) Update(ctx context.Context, token string, idempotencyKey string, registration *Info, redirectUrl string) (string, error) {
+func (s *Service) Update(ctx context.Context, token string, registration *Info) (*Info, error) {
 	s.logger.Tracef("fetching old registration id %s", registration.ID)
 	oldRegistration, err := s.store.GetRegistration(ctx, registration.ID)
 	if err != nil {
-		return "", fmt.Errorf("error fetching registration from store: %w", err)
+		return nil, fmt.Errorf("error fetching registration from store: %w", err)
 	}
 
 	s.logger.Tracef("fetching user-info for token %s", token)
 	userinfo, err := s.authorizer.GetUserinfo(ctx, token)
 	if err != nil {
-		return "", fmt.Errorf("could not authorize user: %w", err)
+		return nil, fmt.Errorf("could not authorize user: %w", err)
 	}
 	s.logger.Tracef("found user %s", userinfo.UserID())
 
 	if oldRegistration.UserID != userinfo.UserID() {
 		s.logger.WithError(err).Debug("user id does not match that of found registration")
 		s.logger.WithError(err).Tracef("registration provided user id %s, user provided %s", oldRegistration.UserID, userinfo.UserID())
-		return "", storage.ErrNoRegistrationForID{ID: registration.ID}
+		return nil, storage.ErrNoRegistrationForID{ID: registration.ID}
 	}
 
 	if err := checkOldPurchases(registration, oldRegistration); err != nil {
-		return "", err
-	}
-
-	returnerURL := redirectUrl
-	orderID := ""
-	if hasPurchase := hasUpdatePurchase(registration, oldRegistration); hasPurchase || len(oldRegistration.OrderIDs) > 0 {
-		s.logger.Trace("generating reference id")
-		referenceID, err := uuid.NewV4()
-		if err != nil {
-			return "", fmt.Errorf("error generating reference id: %w", err)
-		}
-
-		locationsListRes, err := s.client.Locations.List(ctx, nil)
-		if err != nil {
-			return "", fmt.Errorf("error listing locationsListRes.Locations from square: %w", err)
-		}
-		if len(locationsListRes.Locations) != 1 {
-			return "", fmt.Errorf("found wrong number of locationsListRes.Locations %v", len(locationsListRes.Locations))
-		}
-
-		paymentData := &common.PaymentData{}
-		if len(oldRegistration.OrderIDs) > 0 {
-			paymentData, err = common.GetSquarePayments(ctx, s.client, s.squareData.PurchaseItems, locationsListRes.Locations[0].ID, oldRegistration.OrderIDs)
-			if err != nil {
-				return "", err
-			}
-		}
-
-		newFullWeekend, hasNewFullWeekend := registration.PassType.(*WeekendPass)
-		oldFullWeekend, hasOldFullWeekend := oldRegistration.PassType.(*storage.WeekendPass)
-		newFullWeekendPurchase := false
-		var newFullWeekendPurchaseTier storage.WeekendPassTier
-		if hasNewFullWeekend && !hasOldFullWeekend {
-			newFullWeekendPurchase = true
-			newFullWeekendPurchaseTier = newFullWeekend.Tier
-		} else if hasOldFullWeekend && !paymentData.WeekendPassPaid {
-			newFullWeekendPurchase = true
-			newFullWeekendPurchaseTier = oldFullWeekend.Tier
-		}
-		if newFullWeekendPurchase {
-			bestTier, _, err := common.LowestInStockTier(ctx, s.squareData.PurchaseItems.FullWeekend, s.client)
-			if err != nil {
-				return "", fmt.Errorf("error finding best tier and cost: %w", err)
-			}
-			if newFullWeekendPurchaseTier < bestTier {
-				return "", ErrOutOfStock{
-					NextTier: bestTier,
-				}
-			}
-		}
-
-		discounts, err := discountCodeMap(ctx, s.squareData.Discounts.CodeDiscounts, registration.DiscountCodes)
-		if err != nil {
-			return "", err
-		}
-
-		lineItems, lineDiscounts, err := makeLineItems(registration, s.squareData, paymentData, discounts)
-		if err != nil {
-			return "", err
-		}
-
-		order := &objects.CreateOrderRequest{
-			IdempotencyKey: idempotencyKey,
-			Order: &objects.Order{
-				ReferenceID: referenceID.String(),
-				LocationID:  locationsListRes.Locations[0].ID,
-				LineItems:   lineItems,
-				Discounts:   lineDiscounts,
-			},
-		}
-
-		s.logger.Trace("creating checkout with square")
-		returnerURL, orderID, err = common.CreateCheckout(ctx, s.client, locationsListRes.Locations[0].ID, idempotencyKey, order, registration.Email, redirectUrl)
+		return nil, err
 	}
 
 	s.logger.Trace("Updating registration in database")
-	var orderIDs []string
-	if orderID != "" {
-		orderIDs = []string{orderID}
-	}
-
 	storeRegistration := &storage.Registration{
 		ID:              oldRegistration.ID,
 		CreatedAt:       oldRegistration.CreatedAt,
@@ -225,11 +115,69 @@ func (s *Service) Update(ctx context.Context, token string, idempotencyKey strin
 		Housing:         registration.Housing,
 		UserID:          userinfo.UserID(),
 		DiscountCodes:   registration.DiscountCodes,
-		OrderIDs:        orderIDs,
+		OrderIDs:        oldRegistration.OrderIDs,
 	}
 	err = s.store.UpdateRegistration(ctx, storeRegistration)
 	if err != nil {
-		return "", fmt.Errorf("error updating registration in database: %w", err)
+		return nil, fmt.Errorf("error updating registration in database: %w", err)
 	}
-	return returnerURL, nil
+
+	returnInfo := &Info{
+		ID:            oldRegistration.ID,
+		FirstName:     registration.FirstName,
+		LastName:      registration.LastName,
+		StreetAddress: registration.StreetAddress,
+		City:          registration.City,
+		State:         registration.State,
+		ZipCode:       registration.ZipCode,
+		Email:         registration.Email,
+		HomeScene:     registration.HomeScene,
+		IsStudent:     registration.IsStudent,
+		Housing:       registration.Housing,
+		DiscountCodes: registration.DiscountCodes,
+	}
+
+	switch p := registration.PassType.(type) {
+	case *WeekendPass:
+		returnInfo.PassType = &WeekendPass{
+			Level: p.Level,
+			Tier:  p.Tier,
+			Paid:  p.Paid,
+		}
+	case *DanceOnlyPass:
+		returnInfo.PassType = &DanceOnlyPass{
+			Paid: p.Paid,
+		}
+	case *NoPass:
+		returnInfo.PassType = &NoPass{}
+	}
+
+	if registration.MixAndMatch != nil {
+		returnInfo.MixAndMatch = &MixAndMatch{
+			Role: registration.MixAndMatch.Role,
+			Paid: registration.MixAndMatch.Paid,
+		}
+	}
+
+	if registration.SoloJazz != nil {
+		returnInfo.SoloJazz = &SoloJazz{
+			Paid: registration.SoloJazz.Paid,
+		}
+	}
+
+	if registration.TeamCompetition != nil {
+		returnInfo.TeamCompetition = &TeamCompetition{
+			Name: registration.TeamCompetition.Name,
+			Paid: registration.TeamCompetition.Paid,
+		}
+	}
+
+	if registration.TShirt != nil {
+		returnInfo.TShirt = &TShirt{
+			Style: registration.TShirt.Style,
+			Paid:  registration.TShirt.Paid,
+		}
+	}
+
+	return returnInfo, nil
 }

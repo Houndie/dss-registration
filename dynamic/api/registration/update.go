@@ -43,10 +43,9 @@ func (s *Server) Update(ctx context.Context, req *pb.RegistrationUpdateReq) (*pb
 		return nil, err
 	}
 
-	redirectURL, err := s.service.Update(ctx, auth, req.IdempotencyKey, info, req.RedirectUrl)
+	r, err := s.service.Update(ctx, auth, info)
 	if err != nil {
 		var noDiscountErr storage.ErrDiscountNotFound
-		var outOfStockErr registration.ErrOutOfStock
 		var noRegistrationErr storage.ErrNoRegistrationForID
 		if errors.As(err, &noDiscountErr) {
 			return nil, twirp.NewError(twirp.NotFound, noDiscountErr.Error()).WithMeta("Code", noDiscountErr.Code)
@@ -54,14 +53,18 @@ func (s *Server) Update(ctx context.Context, req *pb.RegistrationUpdateReq) (*pb
 			return nil, twirp.NewError(twirp.NotFound, noRegistrationErr.Error()).WithMeta("id", noRegistrationErr.ID)
 		} else if errors.Is(err, registration.ErrRegistrationDisabled) {
 			return nil, twirp.NewError(twirp.FailedPrecondition, "registration is disabled")
-		} else if errors.As(err, &outOfStockErr) {
-			return nil, twirp.NewError(twirp.FailedPrecondition, outOfStockErr.Error()).WithMeta("next_tier", fmt.Sprintf("%v", outOfStockErr.NextTier)).WithMeta("next_cost", fmt.Sprintf("%v", outOfStockErr.NextCost))
 		} else if errors.Is(err, authorizer.Unauthenticated) {
 			return nil, twirp.NewError(twirp.Unauthenticated, "unauthenticated")
 		}
 		return nil, err
 	}
+
+	protoRegistration, err := toProtoc(r)
+	if err != nil {
+		return nil, fmt.Errorf("error transforming registration to protoc type: %w", err)
+	}
+
 	return &pb.RegistrationUpdateRes{
-		RedirectUrl: redirectURL,
+		Registration: protoRegistration,
 	}, nil
 }

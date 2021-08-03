@@ -7,6 +7,9 @@ const getServiceMethodName = (fn: any): string => {
 	if (fn === dss.Registration.prototype.add) {
 		return 'Add';
     }
+	if (fn === dss.Registration.prototype.pay) {
+		return 'Pay';
+    }
 	if (fn === dss.Registration.prototype.get) {
 		return 'Get';
     }

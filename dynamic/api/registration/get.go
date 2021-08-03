@@ -20,10 +20,6 @@ func (s *Server) Get(ctx context.Context, req *pb.RegistrationGetReq) (*pb.Regis
 
 	r, err := s.service.Get(ctx, auth, req.Id)
 	if err != nil {
-		return nil, err
-	}
-	protoRegistration, err := toProtoc(r)
-	if err != nil {
 		var noRegistrationErr storage.ErrNoRegistrationForID
 		var noDiscountErr storage.ErrDiscountNotFound
 		if errors.Is(err, authorizer.Unauthenticated) {
@@ -33,6 +29,11 @@ func (s *Server) Get(ctx context.Context, req *pb.RegistrationGetReq) (*pb.Regis
 		} else if errors.As(err, &noDiscountErr) {
 			return nil, twirp.NewError(twirp.NotFound, noDiscountErr.Error()).WithMeta("Code", noDiscountErr.Code)
 		}
+		return nil, fmt.Errorf("error fetching registration: %w", err)
+	}
+
+	protoRegistration, err := toProtoc(r)
+	if err != nil {
 		return nil, fmt.Errorf("error transforming registration to protoc type: %w", err)
 	}
 

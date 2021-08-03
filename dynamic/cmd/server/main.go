@@ -89,7 +89,7 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("error creating square client: %w", err)
 		}
-		authorizer, err := auth0.NewAuthorizer(viper.GetString("auth0endpoint"), &http.Client{}, logger)
+		authorizer, err := auth0.NewAuthorizer(viper.GetString("authendpoint"), &http.Client{}, logger)
 		if err != nil {
 			return fmt.Errorf("error creating auth0 authorizer: %w", err)
 		}

@@ -4,6 +4,7 @@ import Container from "react-bootstrap/Container"
 import Alert from "react-bootstrap/Alert"
 import Spinner from "react-bootstrap/Spinner"
 import Row from "react-bootstrap/Row"
+import { useAuth0 } from '@auth0/auth0-react'
 import Col from "react-bootstrap/Col"
 import Image from "react-bootstrap/Image"
 import Form from "react-bootstrap/Form"

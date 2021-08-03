@@ -11,13 +11,10 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/sendinblue"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
-	"github.com/Houndie/dss-registration/dynamic/utility"
 	"github.com/Houndie/square-go"
 	"github.com/Houndie/square-go/checkout"
-	"github.com/Houndie/square-go/inventory"
 	"github.com/Houndie/square-go/locations"
 	"github.com/Houndie/square-go/objects"
-	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -25,6 +22,55 @@ type itemCheck struct {
 	found bool
 	id    string
 }
+
+/*func registrationCheck(t *testing.T, testRegistration, controlRegistration *Info, controlID string) {
+	t.Helper()
+
+	if testRegistration.ID != controlID {
+		t.Fatalf("expected test id %v, found %v", testRegistration.ID, controlID)
+	}
+
+	if testRegistration.FirstName != controlRegistration.FirstName {
+		t.Fatalf("expected first name %v, found %v", testRegistration.FirstName, controlRegistration.FirstName)
+	}
+
+	if testRegistration.LastName != controlRegistration.LastName {
+		t.Fatalf("expected last name %v, found %v", testRegistration.LastName, controlRegistration.LastName)
+	}
+
+	if testRegistration.StreetAddress != controlRegistration.StreetAddress {
+		t.Fatalf("expected street address %v, found %v", testRegistration.StreetAddress, controlRegistration.StreetAddress)
+	}
+
+	if testRegistration.City != controlRegistration.City {
+		t.Fatalf("expected city %v, found %v", testRegistration.City, controlRegistration.City)
+	}
+
+	if testRegistration.State != controlRegistration.State {
+		t.Fatalf("expected state %v, found %v", testRegistration.State, controlRegistration.State)
+	}
+
+	if testRegistration.ZipCode != controlRegistration.ZipCode {
+		t.Fatalf("expected zip code %v, found %v", testRegistration.ZipCode, controlRegistration.ZipCode)
+	}
+
+	if testRegistration.Email != controlRegistration.Email {
+		t.Fatalf("expected email %v, found %v", testRegistration.Email, controlRegistration.Email)
+	}
+
+	if testRegistration.HomeScene != controlRegistration.HomeScene {
+		t.Fatalf("expected home scene %v, found %v", testRegistration.HomeScene, controlRegistration.HomeScene)
+	}
+
+	if testRegistration.IsStudent != controlRegistration.IsStudent {
+		t.Fatalf("expected student status %v, found %v", testRegistration.IsStudent, controlRegistration.IsStudent)
+	}
+
+	switch t := testRegistration.PassType.(type) {
+	case *WeekendPass:
+	}
+
+}*/
 
 func discountCheck(t *testing.T, discountArray []*objects.OrderLineItemDiscount, appliedDiscounts []*objects.OrderLineItemAppliedDiscount, discountID string) {
 	t.Helper()
@@ -52,17 +98,10 @@ func discountCheck(t *testing.T, discountArray []*objects.OrderLineItemDiscount,
 }
 
 func TestAdd(t *testing.T) {
-	expectedCheckoutUrl := "https://squareup.com/some_checkout"
-	expectedOrderID := "some order id"
-	expectedRedirectUrl := "https://daytonswingsmackdown.com/landing"
 	expectedAccessToken := "12345"
 	expectedUserID := "67890"
 	active := true
-
-	expectedIdempotencyKey, err := uuid.NewV4()
-	if err != nil {
-		t.Fatalf("error generating idempotency key for test: %v", err)
-	}
+	registrationID := "some key"
 
 	logger := logrus.New()
 	devnull, err := os.OpenFile(os.DevNull, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
@@ -84,16 +123,12 @@ func TestAdd(t *testing.T) {
 		idx++
 	}
 
-	expectedLocationID := "here"
-
 	tests := []struct {
 		name         string
 		registration *Info
-		makeOrder    bool
 	}{
 		{
-			name:      "all_items",
-			makeOrder: true,
+			name: "all_items",
 			registration: &Info{
 				FirstName:       "John",
 				LastName:        "Smith",
@@ -117,8 +152,7 @@ func TestAdd(t *testing.T) {
 			},
 		},
 		{
-			name:      "dance_only_provide_housing",
-			makeOrder: true,
+			name: "dance_only_provide_housing",
 			registration: &Info{
 				FirstName:     "John",
 				LastName:      "Smith",
@@ -162,113 +196,7 @@ func TestAdd(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			client := &square.Client{
-				Inventory: &commontest.MockSquareInventoryClient{
-					BatchRetrieveCountsFunc: func(ctx context.Context, req *inventory.BatchRetrieveCountsRequest) (*inventory.BatchRetrieveCountsResponse, error) {
-						if !test.makeOrder {
-							t.Fatalf("no orderable items found, square should not be called")
-						}
-						return commontest.InventoryCountsFromSliceCheck(t, co.WeekendPassID, inventoryCounts)(ctx, req)
-					},
-				},
-				Locations: &commontest.MockSquareLocationsClient{
-					ListFunc: func(context.Context, *locations.ListRequest) (*locations.ListResponse, error) {
-						if !test.makeOrder {
-							t.Fatalf("no orderable items found, square should not be called")
-						}
-						return &locations.ListResponse{
-							Locations: []*objects.Location{{ID: expectedLocationID}},
-						}, nil
-					},
-				},
-				Checkout: &commontest.MockSquareCheckoutClient{
-					CreateFunc: func(ctx context.Context, req *checkout.CreateRequest) (*checkout.CreateResponse, error) {
-						if !test.makeOrder {
-							t.Fatalf("no orderable items found, square should not be called")
-						}
-						if req.LocationID != expectedLocationID {
-							t.Fatalf("expected location ID %s, found %s", expectedLocationID, req.LocationID)
-						}
-						if req.IdempotencyKey != expectedIdempotencyKey.String() {
-							t.Fatalf("expected idempotencyKey %v, found %s", expectedIdempotencyKey, req.IdempotencyKey)
-						}
-						if req.MerchantSupportEmail != utility.SmackdownEmail {
-							t.Fatalf("expected merchant email %s, found %s", utility.SmackdownEmail, req.MerchantSupportEmail)
-						}
-						if req.PrePopulateBuyerEmail != test.registration.Email {
-							t.Fatalf("expected user email %s, found %s", test.registration.Email, req.PrePopulateBuyerEmail)
-						}
-						if req.RedirectURL != expectedRedirectUrl {
-							t.Fatalf("expected redirectUrl %s, found %s", expectedRedirectUrl, req.RedirectURL)
-						}
-
-						itemChecks := []*itemCheck{}
-						switch p := test.registration.PassType.(type) {
-						case *WeekendPass:
-							itemChecks = append(itemChecks, &itemCheck{id: co.WeekendPassID[p.Tier]})
-						case *DanceOnlyPass:
-							itemChecks = append(itemChecks, &itemCheck{id: co.DancePassID})
-							// default, do nothing
-						}
-						if test.registration.MixAndMatch != nil {
-							itemChecks = append(itemChecks, &itemCheck{id: co.MixAndMatchID[test.registration.MixAndMatch.Role]})
-						}
-						if test.registration.TeamCompetition != nil {
-							itemChecks = append(itemChecks, &itemCheck{id: co.TeamCompetitionID})
-						}
-						if test.registration.TShirt != nil {
-							itemChecks = append(itemChecks, &itemCheck{id: co.TShirtID[test.registration.TShirt.Style]})
-						}
-						if test.registration.SoloJazz != nil {
-							itemChecks = append(itemChecks, &itemCheck{id: co.SoloJazzID})
-						}
-						for _, lineItem := range req.Order.Order.LineItems {
-							if lineItem.Quantity != "1" {
-								t.Fatalf("found unknown quantity of items %s, expected \"1\"", lineItem.Quantity)
-							}
-							found := false
-							for _, itemCheck := range itemChecks {
-								if itemCheck.id == lineItem.CatalogObjectID {
-									if itemCheck.found {
-										t.Fatalf("order item with id %q found twice", itemCheck.id)
-									}
-									itemCheck.found = true
-									found = true
-
-									if p, ok := test.registration.PassType.(*WeekendPass); ok && lineItem.CatalogObjectID == co.WeekendPassID[p.Tier] {
-										if len(test.registration.DiscountCodes) > 0 {
-											discountCheck(t, req.Order.Order.Discounts, lineItem.AppliedDiscounts, co.FullWeekendDiscountID)
-										}
-										if test.registration.IsStudent {
-											discountCheck(t, req.Order.Order.Discounts, lineItem.AppliedDiscounts, co.StudentDiscountID)
-										}
-									} else if test.registration.MixAndMatch != nil && lineItem.CatalogObjectID == co.MixAndMatchID[test.registration.MixAndMatch.Role] && len(test.registration.DiscountCodes) > 0 {
-										discountCheck(t, req.Order.Order.Discounts, lineItem.AppliedDiscounts, co.MixAndMatchDiscountID)
-									}
-									break
-								}
-							}
-							if !found {
-								t.Fatalf("found order for unexpected item id %q", lineItem.CatalogObjectID)
-							}
-
-						}
-						for _, itemCheck := range itemChecks {
-							if !itemCheck.found {
-								t.Fatalf("item with id %q not found", itemCheck.id)
-							}
-						}
-						return &checkout.CreateResponse{
-							Checkout: &objects.Checkout{
-								CheckoutPageURL: expectedCheckoutUrl,
-								Order: &objects.Order{
-									ID: expectedOrderID,
-								},
-							},
-						}, nil
-					},
-				},
-			}
+			client := &square.Client{}
 
 			storeAdded := false
 			store := &commontest.MockStore{
@@ -372,14 +300,10 @@ func TestAdd(t *testing.T) {
 					if len(r.DiscountCodes) != 2 && len(r.DiscountCodes) != 0 {
 						t.Fatalf("expected 2 or 0 registration discount codes, found %d", len(r.DiscountCodes))
 					}
-					if test.makeOrder {
-						if len(r.OrderIDs) != 1 || r.OrderIDs[0] != expectedOrderID {
-							t.Fatalf("expected registration order id %#q, found %#q", []string{expectedOrderID}, r.OrderIDs)
-						}
-					} else if len(r.OrderIDs) != 0 {
+					if len(r.OrderIDs) != 0 {
 						t.Fatalf("expected no order, found one")
 					}
-					return "some key", nil
+					return registrationID, nil
 				},
 			}
 
@@ -550,16 +474,18 @@ func TestAdd(t *testing.T) {
 
 			service := NewService(active, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, mailClient)
 
-			checkoutUrl, err := service.Add(context.Background(), test.registration, expectedRedirectUrl, expectedIdempotencyKey.String(), expectedAccessToken)
+			outputRegistration, err := service.Add(context.Background(), test.registration, expectedAccessToken)
 			if err != nil {
 				t.Fatalf("error found in call to add: %v", err)
 			}
-			if test.makeOrder {
-				if checkoutUrl != expectedCheckoutUrl {
-					t.Fatalf("expected checkout url %s, found %s", expectedCheckoutUrl, checkoutUrl)
-				}
-			} else if checkoutUrl != expectedRedirectUrl {
-				t.Fatalf("expected checkout url %s, found %s", expectedCheckoutUrl, expectedRedirectUrl)
+
+			if outputRegistration.ID != registrationID {
+				t.Fatalf("expected ID %s, found %s", registrationID, outputRegistration.ID)
+			}
+
+			outputRegistration.ID = test.registration.ID
+			if !reflect.DeepEqual(test.registration, outputRegistration) {
+				t.Fatalf("expected registration %v, found %v", outputRegistration, test.registration)
 			}
 			if !mailSent {
 				t.Fatalf("Mail was not sent to user")
@@ -590,13 +516,14 @@ func TestAddNotActive(t *testing.T) {
 		Housing:   &storage.NoHousing{},
 	}
 
-	_, err = service.Add(context.Background(), registration, "https://smackdown.com", "7", "7")
+	_, err = service.Add(context.Background(), registration, "7")
 	if err == nil {
 		t.Fatalf("service not active, expected error, found none")
 	}
 }
 
 func TestAddCostNothing(t *testing.T) {
+	registrationID := "key"
 	active := true
 	logger := logrus.New()
 	devnull, err := os.OpenFile(os.DevNull, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
@@ -668,7 +595,7 @@ func TestAddCostNothing(t *testing.T) {
 			if r.Email != registration.Email {
 				t.Fatalf("expected registration email %s, found %s", registration.Email, r.Email)
 			}
-			return "key", nil
+			return registrationID, nil
 		},
 	}
 
@@ -692,13 +619,17 @@ func TestAddCostNothing(t *testing.T) {
 
 	service := NewService(active, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, mailClient)
 
-	redirectUrl := "https://smackdown.com"
-	checkoutUrl, err := service.Add(context.Background(), registration, redirectUrl, "7", "7")
+	outputRegistration, err := service.Add(context.Background(), registration, "7")
 	if err != nil {
 		t.Fatalf("error found in call to add: %v", err)
 	}
-	if checkoutUrl != redirectUrl {
-		t.Fatalf("expected checkout url %s, found %s", checkoutUrl, redirectUrl)
+	if outputRegistration.ID != registrationID {
+		t.Fatalf("expected ID %s, found %s", registrationID, outputRegistration.ID)
+	}
+
+	outputRegistration.ID = ""
+	if !reflect.DeepEqual(registration, outputRegistration) {
+		t.Fatalf("expected registration %v, found %v", outputRegistration, registration)
 	}
 	if !mailSent {
 		t.Fatalf("Mail was not sent to user")

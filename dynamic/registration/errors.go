@@ -26,3 +26,5 @@ func (e ErrAlreadyPurchased) Error() string {
 }
 
 var ErrRegistrationDisabled = errors.New("registration found when service is not active")
+
+var ErrNoPaidItems = errors.New("registration contains no paid items")
