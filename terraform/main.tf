@@ -33,6 +33,10 @@ terraform {
 			source = "innovationnorway/git"
 			version = "0.1.3"
 		}
+		aws = {
+			source = "hashicorp/aws"
+			version = "3.55.0"
+		}
 	}
 	backend "remote" {
 		organization = "daytonswingsmackdown"
