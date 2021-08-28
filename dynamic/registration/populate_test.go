@@ -54,7 +54,7 @@ func TestPopulate(t *testing.T) {
 				},
 			}
 
-			tier, err := NewService(true, false, logger, client, commontest.CommonCatalogObjects().SquareData(), &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{}).Populate(context.Background())
+			tier, err := NewService(true, false, logger, client, commontest.CommonCatalogObjects().SquareData(), &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{}, nil).Populate(context.Background())
 			if err != nil {
 				t.Fatalf("error populating form data: %v", err)
 			}

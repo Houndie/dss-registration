@@ -1685,6 +1685,108 @@ func (x *RegistrationGetSummaryRes) GetSummaries() []*RegistrationSummary {
 	return nil
 }
 
+type RegistrationUploadVaxImageReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id       string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Filesize int64  `protobuf:"varint,2,opt,name=filesize,proto3" json:"filesize,omitempty"`
+}
+
+func (x *RegistrationUploadVaxImageReq) Reset() {
+	*x = RegistrationUploadVaxImageReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_registration_proto_msgTypes[24]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RegistrationUploadVaxImageReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegistrationUploadVaxImageReq) ProtoMessage() {}
+
+func (x *RegistrationUploadVaxImageReq) ProtoReflect() protoreflect.Message {
+	mi := &file_registration_proto_msgTypes[24]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegistrationUploadVaxImageReq.ProtoReflect.Descriptor instead.
+func (*RegistrationUploadVaxImageReq) Descriptor() ([]byte, []int) {
+	return file_registration_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *RegistrationUploadVaxImageReq) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *RegistrationUploadVaxImageReq) GetFilesize() int64 {
+	if x != nil {
+		return x.Filesize
+	}
+	return 0
+}
+
+type RegistrationUploadVaxImageRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Url string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+}
+
+func (x *RegistrationUploadVaxImageRes) Reset() {
+	*x = RegistrationUploadVaxImageRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_registration_proto_msgTypes[25]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RegistrationUploadVaxImageRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegistrationUploadVaxImageRes) ProtoMessage() {}
+
+func (x *RegistrationUploadVaxImageRes) ProtoReflect() protoreflect.Message {
+	mi := &file_registration_proto_msgTypes[25]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegistrationUploadVaxImageRes.ProtoReflect.Descriptor instead.
+func (*RegistrationUploadVaxImageRes) Descriptor() ([]byte, []int) {
+	return file_registration_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *RegistrationUploadVaxImageRes) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
 var File_registration_proto protoreflect.FileDescriptor
 
 var file_registration_proto_rawDesc = []byte{
@@ -1861,7 +1963,15 @@ var file_registration_proto_rawDesc = []byte{
 	0x72, 0x79, 0x52, 0x65, 0x73, 0x12, 0x36, 0x0a, 0x09, 0x73, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x69,
 	0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52,
 	0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x75, 0x6d, 0x6d, 0x61,
-	0x72, 0x79, 0x52, 0x09, 0x73, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x69, 0x65, 0x73, 0x2a, 0x4c, 0x0a,
+	0x72, 0x79, 0x52, 0x09, 0x73, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x69, 0x65, 0x73, 0x22, 0x4b, 0x0a,
+	0x1d, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x55, 0x70, 0x6c,
+	0x6f, 0x61, 0x64, 0x56, 0x61, 0x78, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71, 0x12, 0x0e,
+	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1a,
+	0x0a, 0x08, 0x66, 0x69, 0x6c, 0x65, 0x73, 0x69, 0x7a, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03,
+	0x52, 0x08, 0x66, 0x69, 0x6c, 0x65, 0x73, 0x69, 0x7a, 0x65, 0x22, 0x31, 0x0a, 0x1d, 0x52, 0x65,
+	0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64,
+	0x56, 0x61, 0x78, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x12, 0x10, 0x0a, 0x03, 0x75,
+	0x72, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x75, 0x72, 0x6c, 0x2a, 0x4c, 0x0a,
 	0x13, 0x46, 0x75, 0x6c, 0x6c, 0x57, 0x65, 0x65, 0x6b, 0x65, 0x6e, 0x64, 0x50, 0x61, 0x73, 0x73,
 	0x54, 0x69, 0x65, 0x72, 0x12, 0x09, 0x0a, 0x05, 0x54, 0x69, 0x65, 0x72, 0x31, 0x10, 0x00, 0x12,
 	0x09, 0x0a, 0x05, 0x54, 0x69, 0x65, 0x72, 0x32, 0x10, 0x01, 0x12, 0x09, 0x0a, 0x05, 0x54, 0x69,
@@ -1870,7 +1980,7 @@ var file_registration_proto_rawDesc = []byte{
 	0x75, 0x6c, 0x6c, 0x57, 0x65, 0x65, 0x6b, 0x65, 0x6e, 0x64, 0x50, 0x61, 0x73, 0x73, 0x4c, 0x65,
 	0x76, 0x65, 0x6c, 0x12, 0x0a, 0x0a, 0x06, 0x4c, 0x65, 0x76, 0x65, 0x6c, 0x31, 0x10, 0x00, 0x12,
 	0x0a, 0x0a, 0x06, 0x4c, 0x65, 0x76, 0x65, 0x6c, 0x32, 0x10, 0x01, 0x12, 0x0a, 0x0a, 0x06, 0x4c,
-	0x65, 0x76, 0x65, 0x6c, 0x33, 0x10, 0x02, 0x32, 0x8b, 0x03, 0x0a, 0x0c, 0x52, 0x65, 0x67, 0x69,
+	0x65, 0x76, 0x65, 0x6c, 0x33, 0x10, 0x02, 0x32, 0xe5, 0x03, 0x0a, 0x0c, 0x52, 0x65, 0x67, 0x69,
 	0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x37, 0x0a, 0x03, 0x41, 0x64, 0x64, 0x12,
 	0x17, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69,
 	0x6f, 0x6e, 0x41, 0x64, 0x64, 0x52, 0x65, 0x71, 0x1a, 0x17, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52,
@@ -1895,8 +2005,14 @@ var file_registration_proto_rawDesc = []byte{
 	0x64, 0x73, 0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e,
 	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x1a, 0x1a, 0x2e, 0x64, 0x73, 0x73, 0x2e,
 	0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x55, 0x70, 0x64, 0x61,
-	0x74, 0x65, 0x52, 0x65, 0x73, 0x42, 0x09, 0x5a, 0x07, 0x72, 0x70, 0x63, 0x2f, 0x64, 0x73, 0x73,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x65, 0x52, 0x65, 0x73, 0x12, 0x58, 0x0a, 0x0e, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x56,
+	0x61, 0x78, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x12, 0x22, 0x2e, 0x64, 0x73, 0x73, 0x2e, 0x52, 0x65,
+	0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64,
+	0x56, 0x61, 0x78, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71, 0x1a, 0x22, 0x2e, 0x64, 0x73,
+	0x73, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x55, 0x70,
+	0x6c, 0x6f, 0x61, 0x64, 0x56, 0x61, 0x78, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x42,
+	0x09, 0x5a, 0x07, 0x72, 0x70, 0x63, 0x2f, 0x64, 0x73, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -1912,36 +2028,38 @@ func file_registration_proto_rawDescGZIP() []byte {
 }
 
 var file_registration_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_registration_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_registration_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_registration_proto_goTypes = []interface{}{
-	(FullWeekendPassTier)(0),          // 0: dss.FullWeekendPassTier
-	(FullWeekendPassLevel)(0),         // 1: dss.FullWeekendPassLevel
-	(MixAndMatch_Role)(0),             // 2: dss.MixAndMatch.Role
-	(TShirt_Style)(0),                 // 3: dss.TShirt.Style
-	(*RegistrationInfo)(nil),          // 4: dss.RegistrationInfo
-	(*FullWeekendPass)(nil),           // 5: dss.FullWeekendPass
-	(*DanceOnlyPass)(nil),             // 6: dss.DanceOnlyPass
-	(*NoPass)(nil),                    // 7: dss.NoPass
-	(*MixAndMatch)(nil),               // 8: dss.MixAndMatch
-	(*SoloJazz)(nil),                  // 9: dss.SoloJazz
-	(*TeamCompetition)(nil),           // 10: dss.TeamCompetition
-	(*TShirt)(nil),                    // 11: dss.TShirt
-	(*ProvideHousing)(nil),            // 12: dss.ProvideHousing
-	(*RequireHousing)(nil),            // 13: dss.RequireHousing
-	(*NoHousing)(nil),                 // 14: dss.NoHousing
-	(*RegistrationAddReq)(nil),        // 15: dss.RegistrationAddReq
-	(*RegistrationAddRes)(nil),        // 16: dss.RegistrationAddRes
-	(*RegistrationPayReq)(nil),        // 17: dss.RegistrationPayReq
-	(*RegistrationPayRes)(nil),        // 18: dss.RegistrationPayRes
-	(*RegistrationGetReq)(nil),        // 19: dss.RegistrationGetReq
-	(*RegistrationGetRes)(nil),        // 20: dss.RegistrationGetRes
-	(*RegistrationPricesReq)(nil),     // 21: dss.RegistrationPricesReq
-	(*RegistrationPricesRes)(nil),     // 22: dss.RegistrationPricesRes
-	(*RegistrationUpdateReq)(nil),     // 23: dss.RegistrationUpdateReq
-	(*RegistrationUpdateRes)(nil),     // 24: dss.RegistrationUpdateRes
-	(*RegistrationGetSummaryReq)(nil), // 25: dss.RegistrationGetSummaryReq
-	(*RegistrationSummary)(nil),       // 26: dss.RegistrationSummary
-	(*RegistrationGetSummaryRes)(nil), // 27: dss.RegistrationGetSummaryRes
+	(FullWeekendPassTier)(0),              // 0: dss.FullWeekendPassTier
+	(FullWeekendPassLevel)(0),             // 1: dss.FullWeekendPassLevel
+	(MixAndMatch_Role)(0),                 // 2: dss.MixAndMatch.Role
+	(TShirt_Style)(0),                     // 3: dss.TShirt.Style
+	(*RegistrationInfo)(nil),              // 4: dss.RegistrationInfo
+	(*FullWeekendPass)(nil),               // 5: dss.FullWeekendPass
+	(*DanceOnlyPass)(nil),                 // 6: dss.DanceOnlyPass
+	(*NoPass)(nil),                        // 7: dss.NoPass
+	(*MixAndMatch)(nil),                   // 8: dss.MixAndMatch
+	(*SoloJazz)(nil),                      // 9: dss.SoloJazz
+	(*TeamCompetition)(nil),               // 10: dss.TeamCompetition
+	(*TShirt)(nil),                        // 11: dss.TShirt
+	(*ProvideHousing)(nil),                // 12: dss.ProvideHousing
+	(*RequireHousing)(nil),                // 13: dss.RequireHousing
+	(*NoHousing)(nil),                     // 14: dss.NoHousing
+	(*RegistrationAddReq)(nil),            // 15: dss.RegistrationAddReq
+	(*RegistrationAddRes)(nil),            // 16: dss.RegistrationAddRes
+	(*RegistrationPayReq)(nil),            // 17: dss.RegistrationPayReq
+	(*RegistrationPayRes)(nil),            // 18: dss.RegistrationPayRes
+	(*RegistrationGetReq)(nil),            // 19: dss.RegistrationGetReq
+	(*RegistrationGetRes)(nil),            // 20: dss.RegistrationGetRes
+	(*RegistrationPricesReq)(nil),         // 21: dss.RegistrationPricesReq
+	(*RegistrationPricesRes)(nil),         // 22: dss.RegistrationPricesRes
+	(*RegistrationUpdateReq)(nil),         // 23: dss.RegistrationUpdateReq
+	(*RegistrationUpdateRes)(nil),         // 24: dss.RegistrationUpdateRes
+	(*RegistrationGetSummaryReq)(nil),     // 25: dss.RegistrationGetSummaryReq
+	(*RegistrationSummary)(nil),           // 26: dss.RegistrationSummary
+	(*RegistrationGetSummaryRes)(nil),     // 27: dss.RegistrationGetSummaryRes
+	(*RegistrationUploadVaxImageReq)(nil), // 28: dss.RegistrationUploadVaxImageReq
+	(*RegistrationUploadVaxImageRes)(nil), // 29: dss.RegistrationUploadVaxImageRes
 }
 var file_registration_proto_depIdxs = []int32{
 	5,  // 0: dss.RegistrationInfo.full_weekend_pass:type_name -> dss.FullWeekendPass
@@ -1971,14 +2089,16 @@ var file_registration_proto_depIdxs = []int32{
 	25, // 24: dss.Registration.GetSummary:input_type -> dss.RegistrationGetSummaryReq
 	21, // 25: dss.Registration.Prices:input_type -> dss.RegistrationPricesReq
 	23, // 26: dss.Registration.Update:input_type -> dss.RegistrationUpdateReq
-	16, // 27: dss.Registration.Add:output_type -> dss.RegistrationAddRes
-	18, // 28: dss.Registration.Pay:output_type -> dss.RegistrationPayRes
-	20, // 29: dss.Registration.Get:output_type -> dss.RegistrationGetRes
-	27, // 30: dss.Registration.GetSummary:output_type -> dss.RegistrationGetSummaryRes
-	22, // 31: dss.Registration.Prices:output_type -> dss.RegistrationPricesRes
-	24, // 32: dss.Registration.Update:output_type -> dss.RegistrationUpdateRes
-	27, // [27:33] is the sub-list for method output_type
-	21, // [21:27] is the sub-list for method input_type
+	28, // 27: dss.Registration.UploadVaxImage:input_type -> dss.RegistrationUploadVaxImageReq
+	16, // 28: dss.Registration.Add:output_type -> dss.RegistrationAddRes
+	18, // 29: dss.Registration.Pay:output_type -> dss.RegistrationPayRes
+	20, // 30: dss.Registration.Get:output_type -> dss.RegistrationGetRes
+	27, // 31: dss.Registration.GetSummary:output_type -> dss.RegistrationGetSummaryRes
+	22, // 32: dss.Registration.Prices:output_type -> dss.RegistrationPricesRes
+	24, // 33: dss.Registration.Update:output_type -> dss.RegistrationUpdateRes
+	29, // 34: dss.Registration.UploadVaxImage:output_type -> dss.RegistrationUploadVaxImageRes
+	28, // [28:35] is the sub-list for method output_type
+	21, // [21:28] is the sub-list for method input_type
 	21, // [21:21] is the sub-list for extension type_name
 	21, // [21:21] is the sub-list for extension extendee
 	0,  // [0:21] is the sub-list for field type_name
@@ -2278,6 +2398,30 @@ func file_registration_proto_init() {
 				return nil
 			}
 		}
+		file_registration_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RegistrationUploadVaxImageReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_registration_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RegistrationUploadVaxImageRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_registration_proto_msgTypes[0].OneofWrappers = []interface{}{
 		(*RegistrationInfo_FullWeekendPass)(nil),
@@ -2293,7 +2437,7 @@ func file_registration_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_registration_proto_rawDesc,
 			NumEnums:      4,
-			NumMessages:   24,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

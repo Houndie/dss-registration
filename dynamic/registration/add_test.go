@@ -472,7 +472,7 @@ func TestAdd(t *testing.T) {
 				},
 			}
 
-			service := NewService(active, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, mailClient)
+			service := NewService(active, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, mailClient, nil)
 
 			outputRegistration, err := service.Add(context.Background(), test.registration, expectedAccessToken)
 			if err != nil {
@@ -506,7 +506,7 @@ func TestAddNotActive(t *testing.T) {
 	}
 	logger.SetOutput(devnull)
 
-	service := NewService(active, false, logger, &square.Client{}, commontest.CommonCatalogObjects().SquareData(), &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{})
+	service := NewService(active, false, logger, &square.Client{}, commontest.CommonCatalogObjects().SquareData(), &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{}, nil)
 
 	registration := &Info{
 		FirstName: "John",
@@ -617,7 +617,7 @@ func TestAddCostNothing(t *testing.T) {
 		},
 	}
 
-	service := NewService(active, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, mailClient)
+	service := NewService(active, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, mailClient, nil)
 
 	outputRegistration, err := service.Add(context.Background(), registration, "7")
 	if err != nil {

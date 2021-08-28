@@ -122,7 +122,7 @@ func TestSummaryByUser(t *testing.T) {
 		},
 	}
 
-	service := NewService(true, false, logger, squareClient, commontest.CommonCatalogObjects().SquareData(), authorizer, store, &commontest.MockMailClient{})
+	service := NewService(true, false, logger, squareClient, commontest.CommonCatalogObjects().SquareData(), authorizer, store, &commontest.MockMailClient{}, nil)
 
 	summaries, err := service.SummaryByUser(context.Background(), expectedToken)
 	if err != nil {

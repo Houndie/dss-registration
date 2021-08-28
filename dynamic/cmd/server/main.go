@@ -18,6 +18,7 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/discount"
 	"github.com/Houndie/dss-registration/dynamic/forms"
 	"github.com/Houndie/dss-registration/dynamic/info"
+	"github.com/Houndie/dss-registration/dynamic/object/aws"
 	"github.com/Houndie/dss-registration/dynamic/recaptcha"
 	"github.com/Houndie/dss-registration/dynamic/registration"
 	pb "github.com/Houndie/dss-registration/dynamic/rpc/dss"
@@ -85,6 +86,7 @@ var rootCmd = &cobra.Command{
 		default:
 			return fmt.Errorf("unknown environment: %s", viper.GetString("environment"))
 		}
+
 		squareClient, err := square.NewClient(viper.GetString("squarekey"), squareEnvironment, &http.Client{})
 		if err != nil {
 			return fmt.Errorf("error creating square client: %w", err)
@@ -136,9 +138,14 @@ var rootCmd = &cobra.Command{
 			return fmt.Errorf("error unmarshalling square data: %w", err)
 		}
 
+		objectClient, err := aws.NewObjectClient(viper.GetString("aws.accesskey"), viper.GetString("aws.secretkey"), "us-east-2", viper.GetString("aws.vaxbucket"))
+		if err != nil {
+			return fmt.Errorf("error initializing object client: %w", err)
+		}
+
 		mux := http.NewServeMux()
 
-		registrationService := registration.NewService(true, viper.GetString("environment") != "production", logger, squareClient, squareData, authorizer, store, sendInBlueClient)
+		registrationService := registration.NewService(true, viper.GetString("environment") != "production", logger, squareClient, squareData, authorizer, store, sendInBlueClient, objectClient)
 		registrationServer := api_registration.NewServer(registrationService)
 		registrationHandler := pb.NewRegistrationServer(registrationServer, errorHook)
 		mux.Handle(pb.RegistrationPathPrefix, registrationHandler)

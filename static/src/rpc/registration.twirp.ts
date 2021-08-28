@@ -22,6 +22,9 @@ const getServiceMethodName = (fn: any): string => {
 	if (fn === dss.Registration.prototype.update) {
 		return 'Update';
     }
+	if (fn === dss.Registration.prototype.uploadVaxImage) {
+		return 'UploadVaxImage';
+    }
 
     throw new Error('Unknown Method');
 };
