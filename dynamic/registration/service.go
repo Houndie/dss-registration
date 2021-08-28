@@ -6,6 +6,7 @@ import (
 
 	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/common"
+	"github.com/Houndie/dss-registration/dynamic/object"
 	"github.com/Houndie/dss-registration/dynamic/sendinblue"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/square-go"
@@ -33,9 +34,10 @@ type Service struct {
 	authorizer     Authorizer
 	store          Store
 	mailClient     MailClient
+	objectClient   object.Client
 }
 
-func NewService(active, useMailSandbox bool, logger *logrus.Logger, client *square.Client, squareData *common.SquareData, authorizer Authorizer, store Store, mailClient MailClient) *Service {
+func NewService(active, useMailSandbox bool, logger *logrus.Logger, client *square.Client, squareData *common.SquareData, authorizer Authorizer, store Store, mailClient MailClient, objectClient object.Client) *Service {
 	return &Service{
 		active:         active,
 		useMailSandbox: useMailSandbox,
@@ -45,6 +47,7 @@ func NewService(active, useMailSandbox bool, logger *logrus.Logger, client *squa
 		store:          store,
 		mailClient:     mailClient,
 		squareData:     squareData,
+		objectClient:   objectClient,
 	}
 }
 

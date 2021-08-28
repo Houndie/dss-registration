@@ -28,3 +28,11 @@ func (e ErrAlreadyPurchased) Error() string {
 var ErrRegistrationDisabled = errors.New("registration found when service is not active")
 
 var ErrNoPaidItems = errors.New("registration contains no paid items")
+
+type ErrFileTooBig struct {
+	Filesize int64
+}
+
+func (e ErrFileTooBig) Error() string {
+	return fmt.Sprintf("filesize %d is too big", e.Filesize)
+}

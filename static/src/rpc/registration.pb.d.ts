@@ -16,6 +16,8 @@ export namespace dss {
         public prices(request: dss.IRegistrationPricesReq): Promise<dss.RegistrationPricesRes>;
         public update(request: dss.IRegistrationUpdateReq, callback: dss.Registration.UpdateCallback): void;
         public update(request: dss.IRegistrationUpdateReq): Promise<dss.RegistrationUpdateRes>;
+        public uploadVaxImage(request: dss.IRegistrationUploadVaxImageReq, callback: dss.Registration.UploadVaxImageCallback): void;
+        public uploadVaxImage(request: dss.IRegistrationUploadVaxImageReq): Promise<dss.RegistrationUploadVaxImageRes>;
     }
 
     namespace Registration {
@@ -31,6 +33,8 @@ export namespace dss {
         type PricesCallback = (error: (Error|null), response?: dss.RegistrationPricesRes) => void;
 
         type UpdateCallback = (error: (Error|null), response?: dss.RegistrationUpdateRes) => void;
+
+        type UploadVaxImageCallback = (error: (Error|null), response?: dss.RegistrationUploadVaxImageRes) => void;
     }
 
     interface IRegistrationInfo {
@@ -567,6 +571,44 @@ export namespace dss {
         public static verify(message: { [k: string]: any }): (string|null);
         public static fromObject(object: { [k: string]: any }): dss.RegistrationGetSummaryRes;
         public static toObject(message: dss.RegistrationGetSummaryRes, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+    }
+
+    interface IRegistrationUploadVaxImageReq {
+        id?: (string|null);
+        filesize?: (number|Long|null);
+    }
+
+    class RegistrationUploadVaxImageReq implements IRegistrationUploadVaxImageReq {
+        constructor(properties?: dss.IRegistrationUploadVaxImageReq);
+        public id: string;
+        public filesize: (number|Long);
+        public static create(properties?: dss.IRegistrationUploadVaxImageReq): dss.RegistrationUploadVaxImageReq;
+        public static encode(message: dss.IRegistrationUploadVaxImageReq, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: dss.IRegistrationUploadVaxImageReq, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): dss.RegistrationUploadVaxImageReq;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): dss.RegistrationUploadVaxImageReq;
+        public static verify(message: { [k: string]: any }): (string|null);
+        public static fromObject(object: { [k: string]: any }): dss.RegistrationUploadVaxImageReq;
+        public static toObject(message: dss.RegistrationUploadVaxImageReq, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+    }
+
+    interface IRegistrationUploadVaxImageRes {
+        url?: (string|null);
+    }
+
+    class RegistrationUploadVaxImageRes implements IRegistrationUploadVaxImageRes {
+        constructor(properties?: dss.IRegistrationUploadVaxImageRes);
+        public url: string;
+        public static create(properties?: dss.IRegistrationUploadVaxImageRes): dss.RegistrationUploadVaxImageRes;
+        public static encode(message: dss.IRegistrationUploadVaxImageRes, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: dss.IRegistrationUploadVaxImageRes, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): dss.RegistrationUploadVaxImageRes;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): dss.RegistrationUploadVaxImageRes;
+        public static verify(message: { [k: string]: any }): (string|null);
+        public static fromObject(object: { [k: string]: any }): dss.RegistrationUploadVaxImageRes;
+        public static toObject(message: dss.RegistrationUploadVaxImageRes, options?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
     }
 }

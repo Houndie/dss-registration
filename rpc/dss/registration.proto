@@ -10,6 +10,7 @@ service Registration {
   rpc GetSummary(RegistrationGetSummaryReq) returns (RegistrationGetSummaryRes);
   rpc Prices(RegistrationPricesReq) returns (RegistrationPricesRes);
   rpc Update(RegistrationUpdateReq) returns (RegistrationUpdateRes);
+  rpc UploadVaxImage(RegistrationUploadVaxImageReq) returns (RegistrationUploadVaxImageRes);
 }
 
 message RegistrationInfo {
@@ -168,4 +169,13 @@ message RegistrationSummary{
 
 message RegistrationGetSummaryRes{
 	repeated RegistrationSummary summaries = 1;
+}
+
+message RegistrationUploadVaxImageReq {
+	string id = 1;
+	int64 filesize = 2;
+}
+
+message RegistrationUploadVaxImageRes {
+	string url = 1;
 }
