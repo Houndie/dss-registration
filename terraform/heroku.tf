@@ -58,12 +58,15 @@ locals {
 		DSS_ENVIRONMENT = "development"
 		DSS_VERSION = var.deploy_version
 		DSS_SQUAREDATA = jsonencode(local.backend_square_data)
+		DSS_AWS_ACCESSKEY = aws_iam_access_key.backend.id
+		DSS_AWS_VAXBUCKET = aws_s3_bucket.vax.bucket
 	}
 
 	backend_sensitive_config_vars = {
 		DSS_SQUAREKEY = var.square_access_token
 		DSS_MAILKEY = var.sendinblue_token
 		DSS_REAPTCHAKEY = var.recaptcha_token
+		DSS_AWS_SECRETKEY = aws_iam_access_key.backend.secret
 	}
 }
 
