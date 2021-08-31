@@ -5,6 +5,7 @@ import Col from "react-bootstrap/Col"
 import Row from "react-bootstrap/Row"
 import Page from '../components/Page'
 import FormField from '../components/FormField'
+import FormFile from '../components/FormFile'
 import FormSelect from '../components/FormSelect'
 import FormCheck from '../components/FormCheck'
 import {Formik} from 'formik'
@@ -129,6 +130,64 @@ const fromProtoTier = (tier: number | Long) => {
 	}
 }
 
+type RegistrationFormState = {
+	firstName: string, 
+	lastName: string,
+	streetAddress: string,
+	city: string,
+	state: string,
+	zipCode: string,
+	email: string,
+	homeScene: string,
+	isStudent: boolean,
+	passType: string,
+	level: FormFullWeekendPassLevel,
+	mixAndMatch: boolean,
+	role: FormRole,
+	soloJazz: boolean,
+	teamCompetition: boolean,
+	teamName: string,
+	tshirt: boolean,
+	style: FormStyle,
+	housing: string,
+	pets: string,
+	quantity: number,
+	provideDetails: string,
+	petAllergies: string,
+	requireDetails: string,
+	vaccine: File|undefined,
+	discounts: string[]
+}
+
+const initialState: RegistrationFormState  = {
+	firstName: '', 
+	lastName: '',
+	streetAddress: '',
+	city: '',
+	state: '',
+	zipCode: '',
+	email: '',
+	homeScene: '',
+	isStudent: false,
+	passType: noPassOption,
+	level: FormFullWeekendPassLevel.NotSelected,
+	mixAndMatch: false,
+	role: FormRole.NotSelected,
+	soloJazz: false,
+	teamCompetition: false,
+	teamName: '',
+	tshirt: false,
+	style: FormStyle.NotSelected,
+	housing: noHousingOption,
+	pets: '',
+	quantity: 0,
+	provideDetails: '',
+	petAllergies: '',
+	requireDetails: '',
+	vaccine: undefined,
+	discounts: []
+}
+
 const Registration = () => {
 	const [prices, setPrices] = useState<dss.RegistrationPricesRes | null>(null)
 	const {registration} = useTwirp()
@@ -159,33 +218,7 @@ const Registration = () => {
 				}
 				return (
 					<Formik
-						initialValues={{
-							firstName: '', 
-							lastName: '',
-							streetAddress: '',
-							city: '',
-							state: '',
-							zipCode: '',
-							email: '',
-							homeScene: '',
-							isStudent: false,
-							passType: noPassOption,
-							level: FormFullWeekendPassLevel.NotSelected,
-							mixAndMatch: false,
-							role: FormRole.NotSelected,
-							soloJazz: false,
-							teamCompetition: false,
-							teamName: '',
-							tshirt: false,
-							style: FormStyle.NotSelected,
-							housing: noHousingOption,
-							pets: '',
-							quantity: 0,
-							provideDetails: '',
-							petAllergies: '',
-							requireDetails: '',
-							discounts: []
-						}}
+						initialValues={initialState}
 						onSubmit={(values, { setSubmitting }) => {
 							if(!prices) {
 								console.error("prices is null?")
@@ -220,7 +253,6 @@ const Registration = () => {
 							}
 
 							if (values.mixAndMatch) {
-								console.log(values.role)
 								clientReg.mixAndMatch = { role: toProtoRole(values.role) }
 							}
 
@@ -260,14 +292,41 @@ const Registration = () => {
 							return registration().then(client => {
 								return client.add({
 									registration: clientReg
-								}).then(res => {
-									if( !res.registration) {
+								}).then(createRes => {
+									if( !createRes.registration) {
 										throw "No registration returned";
 									}
-									return client.pay({
-										id: res.registration.id,
-										idempotencyKey: uuidv4(),
-										redirectUrl: `${process.env.GATSBY_FRONTEND}/registration-complete`,
+
+									if (!values.vaccine) {
+										return client.pay({
+											id: createRes.registration.id,
+											idempotencyKey: uuidv4(),
+											redirectUrl: `${process.env.GATSBY_FRONTEND}/registration-complete`,
+										})
+									}
+
+									return client.uploadVaxImage({
+										id: createRes.registration.id,
+										filesize: values.vaccine.size
+									}).then(uploadRes => {
+										if(!uploadRes.url) {
+											throw "No upload url returned"
+										}
+
+										return fetch(uploadRes.url, {
+											method: "PUT",
+											body: values.vaccine
+										})
+									}).then(s3Res => {
+										if( !createRes.registration) {
+											throw "No registration returned";
+										}
+
+										return client.pay({
+											id: createRes.registration.id,
+											idempotencyKey: uuidv4(),
+											redirectUrl: `${process.env.GATSBY_FRONTEND}/registration-complete`,
+										})
 									})
 								})
 							}).then(res => {
@@ -462,6 +521,13 @@ const Registration = () => {
 										</Col></Row>
 									)}
 								</Formik>
+							</fieldset>
+							<hr/>
+							<fieldset>
+								<h2>Vaccination Card</h2>
+								<p>Dayton Swing Smackdown is an event only for dancers who have the Covid-19 Vaccine.  You can upload an image of your vaccine card now in order to provide proof of vaccination.  This image will only be stored as long as it takes to verify your vaccine information, and will be subsequently deleted.</p>
+								<p>If you do not wish to upload an image of your vaccine card, or do not yet have one, you can also present your vaccine information at the door.  Keep in mind that if you do not have your card (or an image of your card) you will be turned away and a refund will NOT be offerred</p>
+								<FormFile label="Add Vaccine Card" name="vaccine" />
 							</fieldset>
 							<Button type="submit" disabled={isSubmitting}>Submit</Button>
 						</Form>
