@@ -102,7 +102,6 @@ func (Protoc) Generate() error {
 type Terraform mg.Namespace
 
 func (Terraform) SetDeployVersion(ctx context.Context) error {
-	mg.Deps(mage.InitDeployVersion, mage.InitTerraformClient)
 	fmt.Println("setting terraform deploy version")
 
 	terraformVars := mage.TerraformVars()
@@ -119,8 +118,6 @@ func (Terraform) SetDeployVersion(ctx context.Context) error {
 }
 
 func (Terraform) Apply(ctx context.Context) error {
-	mg.Deps(mage.InitTerraformClient)
-
 	terraformVars := mage.TerraformVars()
 
 	autoQueueRuns := false
@@ -218,8 +215,6 @@ func (Terraform) Apply(ctx context.Context) error {
 }
 
 func Migrate(ctx context.Context) error {
-	mg.Deps(mage.InitMigrationURL)
-
 	cwd, err := os.Getwd()
 	if err != nil {
 		return fmt.Errorf("error getting current working directory: %w", err)
@@ -239,8 +234,6 @@ func Migrate(ctx context.Context) error {
 type Frontend mg.Namespace
 
 func (Frontend) HealthCheck(ctx context.Context) error {
-	mg.Deps(mage.InitWorkspace)
-
 	var u string
 	switch mage.Workspace() {
 	case mage.Local:
@@ -257,8 +250,6 @@ func (Frontend) HealthCheck(ctx context.Context) error {
 }
 
 func (Frontend) VersionCheck(ctx context.Context) error {
-	mg.Deps(mage.InitWorkspace)
-
 	var u string
 	switch mage.Workspace() {
 	case mage.Local:
