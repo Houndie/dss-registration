@@ -23,14 +23,10 @@ var HerokuProject = map[mage.WorkspaceType]string{
 }
 
 func Build(ctx context.Context) error {
-	mg.Deps(mage.InitDeployVersion, mage.InitWorkspace)
-
 	return mage.DockerBuild(ctx, "dynamic", "docker/Dockerfile.deploy", HerokuProject[mage.Workspace()], mage.DeployVersion())
 }
 
 func Deploy(ctx context.Context) error {
-	mg.Deps(mage.InitHerokuAPIKey, mage.InitDeployVersion, mage.InitWorkspace, mage.InitDockerClient)
-
 	buf, err := json.Marshal(&types.AuthConfig{
 		Username: "_",
 		Password: mage.HerokuAPIKey(),
@@ -55,8 +51,6 @@ func Deploy(ctx context.Context) error {
 }
 
 func Save(ctx context.Context) error {
-	mg.Deps(mage.InitDockerClient, mage.InitDockerCache, mage.InitWorkspace, mage.InitDeployVersion)
-
 	f, err := os.OpenFile(mage.DockerCache(), os.O_WRONLY|os.O_CREATE, fs.ModePerm)
 	if err != nil {
 		return fmt.Errorf("error opening %s for saving: %w", mage.DockerCache(), err)
@@ -76,8 +70,6 @@ func Save(ctx context.Context) error {
 }
 
 func Load(ctx context.Context) error {
-	mg.Deps(mage.InitDockerCache, mage.InitDockerClient)
-
 	f, err := os.Open(mage.DockerCache())
 	if err != nil {
 		return fmt.Errorf("error opening %s for loading: %w", mage.DockerCache(), err)

@@ -1,10 +1,12 @@
 package mage
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/Houndie/dss-registration/mage/terraform"
@@ -32,9 +34,7 @@ const (
 )
 
 func Workspace() WorkspaceType {
-	if workspace == "" {
-		panic("workspace not initialized")
-	}
+	mg.Deps(InitWorkspace)
 
 	return workspace
 }
@@ -42,8 +42,10 @@ func Workspace() WorkspaceType {
 func InitWorkspace() error {
 	workspaceStr, ok := os.LookupEnv("WORKSPACE")
 	if !ok {
-		return errors.New("environment variable WORKSPACE must not be empty")
+		workspace = Local
+		return nil
 	}
+
 	switch workspaceStr {
 	case "testing":
 		workspace = Testing
@@ -63,9 +65,7 @@ func InitWorkspace() error {
 }
 
 func DeployVersion() string {
-	if deployVersion == "" {
-		panic("deployVersion not initialized")
-	}
+	mg.Deps(InitDeployVersion)
 
 	return deployVersion
 }
@@ -85,9 +85,7 @@ func InitDeployVersion() error {
 }
 
 func TerraformClient() *terraform.Client {
-	if terraformClient == nil {
-		panic("terraformClient not initialized")
-	}
+	mg.Deps(InitTerraformClient)
 
 	return terraformClient
 }
@@ -95,7 +93,28 @@ func TerraformClient() *terraform.Client {
 func InitTerraformClient() error {
 	terraformAPIKey, ok := os.LookupEnv("TERRAFORM_API_KEY")
 	if !ok {
-		return errors.New("environment variable TERRAFORM_API_KEY must not be empty")
+		home, ok := os.LookupEnv("HOME")
+		if !ok {
+			return errors.New("TERRAFORM_API_KEY not set and unable to find HOME")
+		}
+		f, err := os.Open(filepath.Join(home, ".terraform.d/credentials.tfrc.json"))
+		if err != nil {
+			return fmt.Errorf("error opening credentials file: %w", err)
+		}
+
+		body := &struct {
+			Credentials *struct {
+				Terraform *struct {
+					Token string `json:"token"`
+				} `json:"app.terraform.io"`
+			} `json:"credentials"`
+		}{}
+
+		if err = json.NewDecoder(f).Decode(&body); err != nil {
+			return fmt.Errorf("error reading terraform credentials file: %w", err)
+		}
+
+		terraformAPIKey = body.Credentials.Terraform.Token
 	}
 
 	var err error
@@ -113,9 +132,7 @@ func InitTerraformClient() error {
 }
 
 func HerokuAPIKey() string {
-	if herokuAPIKey == "" {
-		panic("herokuAPIKey not initialize")
-	}
+	mg.Deps(InitHerokuAPIKey)
 
 	return herokuAPIKey
 }
@@ -145,9 +162,7 @@ func InitMigrationURL() error {
 }
 
 func MigrationURL() string {
-	if migrationURL == "" {
-		panic("migrationURL not initialized")
-	}
+	mg.Deps(InitMigrationURL)
 
 	return migrationURL
 }
@@ -163,9 +178,7 @@ func InitDockerClient() error {
 }
 
 func DockerClient() *client.Client {
-	if dockerClient == nil {
-		panic("docker client not initialized")
-	}
+	mg.Deps(InitDockerClient)
 
 	return dockerClient
 }
@@ -185,9 +198,7 @@ func InitDockerCache() error {
 }
 
 func DockerCache() string {
-	if dockerCache == "" {
-		panic("dockerCache not initialized")
-	}
+	mg.Deps(InitDockerCache)
 
 	return dockerCache
 }
