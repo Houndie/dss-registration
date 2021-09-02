@@ -13,7 +13,7 @@ export default () => (
 			<Navbar.Collapse className="justify-content-end">
 				<Nav>
 					<NavDropdown title="Registration" id="menu-registration">
-						<NavDropdown.Item href="/registration">Register Now</NavDropdown.Item>
+						<NavDropdown.Item href="/register">Register Now</NavDropdown.Item>
 						<NavDropdown.Item href="/pricing-and-tshirts">Pricing & T-Shirts</NavDropdown.Item>
 						<NavDropdown.Item href="/housing">Housing</NavDropdown.Item>
 						<NavDropdown.Item href="/volunteer">Volunteer</NavDropdown.Item>
