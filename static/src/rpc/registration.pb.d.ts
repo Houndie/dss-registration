@@ -10,8 +10,8 @@ export namespace dss {
         public pay(request: dss.IRegistrationPayReq): Promise<dss.RegistrationPayRes>;
         public get(request: dss.IRegistrationGetReq, callback: dss.Registration.GetCallback): void;
         public get(request: dss.IRegistrationGetReq): Promise<dss.RegistrationGetRes>;
-        public getSummary(request: dss.IRegistrationGetSummaryReq, callback: dss.Registration.GetSummaryCallback): void;
-        public getSummary(request: dss.IRegistrationGetSummaryReq): Promise<dss.RegistrationGetSummaryRes>;
+        public listByUser(request: dss.IRegistrationListByUserReq, callback: dss.Registration.ListByUserCallback): void;
+        public listByUser(request: dss.IRegistrationListByUserReq): Promise<dss.RegistrationListByUserRes>;
         public prices(request: dss.IRegistrationPricesReq, callback: dss.Registration.PricesCallback): void;
         public prices(request: dss.IRegistrationPricesReq): Promise<dss.RegistrationPricesRes>;
         public update(request: dss.IRegistrationUpdateReq, callback: dss.Registration.UpdateCallback): void;
@@ -28,7 +28,7 @@ export namespace dss {
 
         type GetCallback = (error: (Error|null), response?: dss.RegistrationGetRes) => void;
 
-        type GetSummaryCallback = (error: (Error|null), response?: dss.RegistrationGetSummaryRes) => void;
+        type ListByUserCallback = (error: (Error|null), response?: dss.RegistrationListByUserRes) => void;
 
         type PricesCallback = (error: (Error|null), response?: dss.RegistrationPricesRes) => void;
 
@@ -512,65 +512,37 @@ export namespace dss {
         public toJSON(): { [k: string]: any };
     }
 
-    interface IRegistrationGetSummaryReq {
+    interface IRegistrationListByUserReq {
     }
 
-    class RegistrationGetSummaryReq implements IRegistrationGetSummaryReq {
-        constructor(properties?: dss.IRegistrationGetSummaryReq);
-        public static create(properties?: dss.IRegistrationGetSummaryReq): dss.RegistrationGetSummaryReq;
-        public static encode(message: dss.IRegistrationGetSummaryReq, writer?: $protobuf.Writer): $protobuf.Writer;
-        public static encodeDelimited(message: dss.IRegistrationGetSummaryReq, writer?: $protobuf.Writer): $protobuf.Writer;
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): dss.RegistrationGetSummaryReq;
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): dss.RegistrationGetSummaryReq;
+    class RegistrationListByUserReq implements IRegistrationListByUserReq {
+        constructor(properties?: dss.IRegistrationListByUserReq);
+        public static create(properties?: dss.IRegistrationListByUserReq): dss.RegistrationListByUserReq;
+        public static encode(message: dss.IRegistrationListByUserReq, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: dss.IRegistrationListByUserReq, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): dss.RegistrationListByUserReq;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): dss.RegistrationListByUserReq;
         public static verify(message: { [k: string]: any }): (string|null);
-        public static fromObject(object: { [k: string]: any }): dss.RegistrationGetSummaryReq;
-        public static toObject(message: dss.RegistrationGetSummaryReq, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static fromObject(object: { [k: string]: any }): dss.RegistrationListByUserReq;
+        public static toObject(message: dss.RegistrationListByUserReq, options?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
     }
 
-    interface IRegistrationSummary {
-        id?: (string|null);
-        firstName?: (string|null);
-        lastName?: (string|null);
-        email?: (string|null);
-        createdAt?: (string|null);
-        paid?: (boolean|null);
+    interface IRegistrationListByUserRes {
+        registrations?: (dss.IRegistrationInfo[]|null);
     }
 
-    class RegistrationSummary implements IRegistrationSummary {
-        constructor(properties?: dss.IRegistrationSummary);
-        public id: string;
-        public firstName: string;
-        public lastName: string;
-        public email: string;
-        public createdAt: string;
-        public paid: boolean;
-        public static create(properties?: dss.IRegistrationSummary): dss.RegistrationSummary;
-        public static encode(message: dss.IRegistrationSummary, writer?: $protobuf.Writer): $protobuf.Writer;
-        public static encodeDelimited(message: dss.IRegistrationSummary, writer?: $protobuf.Writer): $protobuf.Writer;
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): dss.RegistrationSummary;
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): dss.RegistrationSummary;
+    class RegistrationListByUserRes implements IRegistrationListByUserRes {
+        constructor(properties?: dss.IRegistrationListByUserRes);
+        public registrations: dss.IRegistrationInfo[];
+        public static create(properties?: dss.IRegistrationListByUserRes): dss.RegistrationListByUserRes;
+        public static encode(message: dss.IRegistrationListByUserRes, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: dss.IRegistrationListByUserRes, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): dss.RegistrationListByUserRes;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): dss.RegistrationListByUserRes;
         public static verify(message: { [k: string]: any }): (string|null);
-        public static fromObject(object: { [k: string]: any }): dss.RegistrationSummary;
-        public static toObject(message: dss.RegistrationSummary, options?: $protobuf.IConversionOptions): { [k: string]: any };
-        public toJSON(): { [k: string]: any };
-    }
-
-    interface IRegistrationGetSummaryRes {
-        summaries?: (dss.IRegistrationSummary[]|null);
-    }
-
-    class RegistrationGetSummaryRes implements IRegistrationGetSummaryRes {
-        constructor(properties?: dss.IRegistrationGetSummaryRes);
-        public summaries: dss.IRegistrationSummary[];
-        public static create(properties?: dss.IRegistrationGetSummaryRes): dss.RegistrationGetSummaryRes;
-        public static encode(message: dss.IRegistrationGetSummaryRes, writer?: $protobuf.Writer): $protobuf.Writer;
-        public static encodeDelimited(message: dss.IRegistrationGetSummaryRes, writer?: $protobuf.Writer): $protobuf.Writer;
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): dss.RegistrationGetSummaryRes;
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): dss.RegistrationGetSummaryRes;
-        public static verify(message: { [k: string]: any }): (string|null);
-        public static fromObject(object: { [k: string]: any }): dss.RegistrationGetSummaryRes;
-        public static toObject(message: dss.RegistrationGetSummaryRes, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static fromObject(object: { [k: string]: any }): dss.RegistrationListByUserRes;
+        public static toObject(message: dss.RegistrationListByUserRes, options?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
     }
 

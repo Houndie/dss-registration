@@ -13,8 +13,8 @@ const getServiceMethodName = (fn: any): string => {
 	if (fn === dss.Registration.prototype.get) {
 		return 'Get';
     }
-	if (fn === dss.Registration.prototype.getSummary) {
-		return 'GetSummary';
+	if (fn === dss.Registration.prototype.listByUser) {
+		return 'ListByUser';
     }
 	if (fn === dss.Registration.prototype.prices) {
 		return 'Prices';

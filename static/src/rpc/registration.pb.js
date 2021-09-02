@@ -150,35 +150,35 @@ $root.dss = (function() {
          */
 
         /**
-         * Callback as used by {@link dss.Registration#getSummary}.
+         * Callback as used by {@link dss.Registration#listByUser}.
          * @memberof dss.Registration
-         * @typedef GetSummaryCallback
+         * @typedef ListByUserCallback
          * @type {function}
          * @param {Error|null} error Error, if any
-         * @param {dss.RegistrationGetSummaryRes} [response] RegistrationGetSummaryRes
+         * @param {dss.RegistrationListByUserRes} [response] RegistrationListByUserRes
          */
 
         /**
-         * Calls GetSummary.
-         * @function getSummary
+         * Calls ListByUser.
+         * @function listByUser
          * @memberof dss.Registration
          * @instance
-         * @param {dss.IRegistrationGetSummaryReq} request RegistrationGetSummaryReq message or plain object
-         * @param {dss.Registration.GetSummaryCallback} callback Node-style callback called with the error, if any, and RegistrationGetSummaryRes
+         * @param {dss.IRegistrationListByUserReq} request RegistrationListByUserReq message or plain object
+         * @param {dss.Registration.ListByUserCallback} callback Node-style callback called with the error, if any, and RegistrationListByUserRes
          * @returns {undefined}
          * @variation 1
          */
-        Object.defineProperty(Registration.prototype.getSummary = function getSummary(request, callback) {
-            return this.rpcCall(getSummary, $root.dss.RegistrationGetSummaryReq, $root.dss.RegistrationGetSummaryRes, request, callback);
-        }, "name", { value: "GetSummary" });
+        Object.defineProperty(Registration.prototype.listByUser = function listByUser(request, callback) {
+            return this.rpcCall(listByUser, $root.dss.RegistrationListByUserReq, $root.dss.RegistrationListByUserRes, request, callback);
+        }, "name", { value: "ListByUser" });
 
         /**
-         * Calls GetSummary.
-         * @function getSummary
+         * Calls ListByUser.
+         * @function listByUser
          * @memberof dss.Registration
          * @instance
-         * @param {dss.IRegistrationGetSummaryReq} request RegistrationGetSummaryReq message or plain object
-         * @returns {Promise<dss.RegistrationGetSummaryRes>} Promise
+         * @param {dss.IRegistrationListByUserReq} request RegistrationListByUserReq message or plain object
+         * @returns {Promise<dss.RegistrationListByUserRes>} Promise
          * @variation 2
          */
 
@@ -5217,23 +5217,23 @@ $root.dss = (function() {
         return RegistrationUpdateRes;
     })();
 
-    dss.RegistrationGetSummaryReq = (function() {
+    dss.RegistrationListByUserReq = (function() {
 
         /**
-         * Properties of a RegistrationGetSummaryReq.
+         * Properties of a RegistrationListByUserReq.
          * @memberof dss
-         * @interface IRegistrationGetSummaryReq
+         * @interface IRegistrationListByUserReq
          */
 
         /**
-         * Constructs a new RegistrationGetSummaryReq.
+         * Constructs a new RegistrationListByUserReq.
          * @memberof dss
-         * @classdesc Represents a RegistrationGetSummaryReq.
-         * @implements IRegistrationGetSummaryReq
+         * @classdesc Represents a RegistrationListByUserReq.
+         * @implements IRegistrationListByUserReq
          * @constructor
-         * @param {dss.IRegistrationGetSummaryReq=} [properties] Properties to set
+         * @param {dss.IRegistrationListByUserReq=} [properties] Properties to set
          */
-        function RegistrationGetSummaryReq(properties) {
+        function RegistrationListByUserReq(properties) {
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -5241,60 +5241,60 @@ $root.dss = (function() {
         }
 
         /**
-         * Creates a new RegistrationGetSummaryReq instance using the specified properties.
+         * Creates a new RegistrationListByUserReq instance using the specified properties.
          * @function create
-         * @memberof dss.RegistrationGetSummaryReq
+         * @memberof dss.RegistrationListByUserReq
          * @static
-         * @param {dss.IRegistrationGetSummaryReq=} [properties] Properties to set
-         * @returns {dss.RegistrationGetSummaryReq} RegistrationGetSummaryReq instance
+         * @param {dss.IRegistrationListByUserReq=} [properties] Properties to set
+         * @returns {dss.RegistrationListByUserReq} RegistrationListByUserReq instance
          */
-        RegistrationGetSummaryReq.create = function create(properties) {
-            return new RegistrationGetSummaryReq(properties);
+        RegistrationListByUserReq.create = function create(properties) {
+            return new RegistrationListByUserReq(properties);
         };
 
         /**
-         * Encodes the specified RegistrationGetSummaryReq message. Does not implicitly {@link dss.RegistrationGetSummaryReq.verify|verify} messages.
+         * Encodes the specified RegistrationListByUserReq message. Does not implicitly {@link dss.RegistrationListByUserReq.verify|verify} messages.
          * @function encode
-         * @memberof dss.RegistrationGetSummaryReq
+         * @memberof dss.RegistrationListByUserReq
          * @static
-         * @param {dss.IRegistrationGetSummaryReq} message RegistrationGetSummaryReq message or plain object to encode
+         * @param {dss.IRegistrationListByUserReq} message RegistrationListByUserReq message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        RegistrationGetSummaryReq.encode = function encode(message, writer) {
+        RegistrationListByUserReq.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
             return writer;
         };
 
         /**
-         * Encodes the specified RegistrationGetSummaryReq message, length delimited. Does not implicitly {@link dss.RegistrationGetSummaryReq.verify|verify} messages.
+         * Encodes the specified RegistrationListByUserReq message, length delimited. Does not implicitly {@link dss.RegistrationListByUserReq.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof dss.RegistrationGetSummaryReq
+         * @memberof dss.RegistrationListByUserReq
          * @static
-         * @param {dss.IRegistrationGetSummaryReq} message RegistrationGetSummaryReq message or plain object to encode
+         * @param {dss.IRegistrationListByUserReq} message RegistrationListByUserReq message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        RegistrationGetSummaryReq.encodeDelimited = function encodeDelimited(message, writer) {
+        RegistrationListByUserReq.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a RegistrationGetSummaryReq message from the specified reader or buffer.
+         * Decodes a RegistrationListByUserReq message from the specified reader or buffer.
          * @function decode
-         * @memberof dss.RegistrationGetSummaryReq
+         * @memberof dss.RegistrationListByUserReq
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {dss.RegistrationGetSummaryReq} RegistrationGetSummaryReq
+         * @returns {dss.RegistrationListByUserReq} RegistrationListByUserReq
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        RegistrationGetSummaryReq.decode = function decode(reader, length) {
+        RegistrationListByUserReq.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.dss.RegistrationGetSummaryReq();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.dss.RegistrationListByUserReq();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
@@ -5307,99 +5307,95 @@ $root.dss = (function() {
         };
 
         /**
-         * Decodes a RegistrationGetSummaryReq message from the specified reader or buffer, length delimited.
+         * Decodes a RegistrationListByUserReq message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof dss.RegistrationGetSummaryReq
+         * @memberof dss.RegistrationListByUserReq
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {dss.RegistrationGetSummaryReq} RegistrationGetSummaryReq
+         * @returns {dss.RegistrationListByUserReq} RegistrationListByUserReq
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        RegistrationGetSummaryReq.decodeDelimited = function decodeDelimited(reader) {
+        RegistrationListByUserReq.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a RegistrationGetSummaryReq message.
+         * Verifies a RegistrationListByUserReq message.
          * @function verify
-         * @memberof dss.RegistrationGetSummaryReq
+         * @memberof dss.RegistrationListByUserReq
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        RegistrationGetSummaryReq.verify = function verify(message) {
+        RegistrationListByUserReq.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             return null;
         };
 
         /**
-         * Creates a RegistrationGetSummaryReq message from a plain object. Also converts values to their respective internal types.
+         * Creates a RegistrationListByUserReq message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof dss.RegistrationGetSummaryReq
+         * @memberof dss.RegistrationListByUserReq
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {dss.RegistrationGetSummaryReq} RegistrationGetSummaryReq
+         * @returns {dss.RegistrationListByUserReq} RegistrationListByUserReq
          */
-        RegistrationGetSummaryReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.dss.RegistrationGetSummaryReq)
+        RegistrationListByUserReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.dss.RegistrationListByUserReq)
                 return object;
-            return new $root.dss.RegistrationGetSummaryReq();
+            return new $root.dss.RegistrationListByUserReq();
         };
 
         /**
-         * Creates a plain object from a RegistrationGetSummaryReq message. Also converts values to other types if specified.
+         * Creates a plain object from a RegistrationListByUserReq message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof dss.RegistrationGetSummaryReq
+         * @memberof dss.RegistrationListByUserReq
          * @static
-         * @param {dss.RegistrationGetSummaryReq} message RegistrationGetSummaryReq
+         * @param {dss.RegistrationListByUserReq} message RegistrationListByUserReq
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        RegistrationGetSummaryReq.toObject = function toObject() {
+        RegistrationListByUserReq.toObject = function toObject() {
             return {};
         };
 
         /**
-         * Converts this RegistrationGetSummaryReq to JSON.
+         * Converts this RegistrationListByUserReq to JSON.
          * @function toJSON
-         * @memberof dss.RegistrationGetSummaryReq
+         * @memberof dss.RegistrationListByUserReq
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        RegistrationGetSummaryReq.prototype.toJSON = function toJSON() {
+        RegistrationListByUserReq.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
-        return RegistrationGetSummaryReq;
+        return RegistrationListByUserReq;
     })();
 
-    dss.RegistrationSummary = (function() {
+    dss.RegistrationListByUserRes = (function() {
 
         /**
-         * Properties of a RegistrationSummary.
+         * Properties of a RegistrationListByUserRes.
          * @memberof dss
-         * @interface IRegistrationSummary
-         * @property {string|null} [id] RegistrationSummary id
-         * @property {string|null} [firstName] RegistrationSummary firstName
-         * @property {string|null} [lastName] RegistrationSummary lastName
-         * @property {string|null} [email] RegistrationSummary email
-         * @property {string|null} [createdAt] RegistrationSummary createdAt
-         * @property {boolean|null} [paid] RegistrationSummary paid
+         * @interface IRegistrationListByUserRes
+         * @property {Array.<dss.IRegistrationInfo>|null} [registrations] RegistrationListByUserRes registrations
          */
 
         /**
-         * Constructs a new RegistrationSummary.
+         * Constructs a new RegistrationListByUserRes.
          * @memberof dss
-         * @classdesc Represents a RegistrationSummary.
-         * @implements IRegistrationSummary
+         * @classdesc Represents a RegistrationListByUserRes.
+         * @implements IRegistrationListByUserRes
          * @constructor
-         * @param {dss.IRegistrationSummary=} [properties] Properties to set
+         * @param {dss.IRegistrationListByUserRes=} [properties] Properties to set
          */
-        function RegistrationSummary(properties) {
+        function RegistrationListByUserRes(properties) {
+            this.registrations = [];
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -5407,140 +5403,78 @@ $root.dss = (function() {
         }
 
         /**
-         * RegistrationSummary id.
-         * @member {string} id
-         * @memberof dss.RegistrationSummary
+         * RegistrationListByUserRes registrations.
+         * @member {Array.<dss.IRegistrationInfo>} registrations
+         * @memberof dss.RegistrationListByUserRes
          * @instance
          */
-        RegistrationSummary.prototype.id = "";
+        RegistrationListByUserRes.prototype.registrations = $util.emptyArray;
 
         /**
-         * RegistrationSummary firstName.
-         * @member {string} firstName
-         * @memberof dss.RegistrationSummary
-         * @instance
-         */
-        RegistrationSummary.prototype.firstName = "";
-
-        /**
-         * RegistrationSummary lastName.
-         * @member {string} lastName
-         * @memberof dss.RegistrationSummary
-         * @instance
-         */
-        RegistrationSummary.prototype.lastName = "";
-
-        /**
-         * RegistrationSummary email.
-         * @member {string} email
-         * @memberof dss.RegistrationSummary
-         * @instance
-         */
-        RegistrationSummary.prototype.email = "";
-
-        /**
-         * RegistrationSummary createdAt.
-         * @member {string} createdAt
-         * @memberof dss.RegistrationSummary
-         * @instance
-         */
-        RegistrationSummary.prototype.createdAt = "";
-
-        /**
-         * RegistrationSummary paid.
-         * @member {boolean} paid
-         * @memberof dss.RegistrationSummary
-         * @instance
-         */
-        RegistrationSummary.prototype.paid = false;
-
-        /**
-         * Creates a new RegistrationSummary instance using the specified properties.
+         * Creates a new RegistrationListByUserRes instance using the specified properties.
          * @function create
-         * @memberof dss.RegistrationSummary
+         * @memberof dss.RegistrationListByUserRes
          * @static
-         * @param {dss.IRegistrationSummary=} [properties] Properties to set
-         * @returns {dss.RegistrationSummary} RegistrationSummary instance
+         * @param {dss.IRegistrationListByUserRes=} [properties] Properties to set
+         * @returns {dss.RegistrationListByUserRes} RegistrationListByUserRes instance
          */
-        RegistrationSummary.create = function create(properties) {
-            return new RegistrationSummary(properties);
+        RegistrationListByUserRes.create = function create(properties) {
+            return new RegistrationListByUserRes(properties);
         };
 
         /**
-         * Encodes the specified RegistrationSummary message. Does not implicitly {@link dss.RegistrationSummary.verify|verify} messages.
+         * Encodes the specified RegistrationListByUserRes message. Does not implicitly {@link dss.RegistrationListByUserRes.verify|verify} messages.
          * @function encode
-         * @memberof dss.RegistrationSummary
+         * @memberof dss.RegistrationListByUserRes
          * @static
-         * @param {dss.IRegistrationSummary} message RegistrationSummary message or plain object to encode
+         * @param {dss.IRegistrationListByUserRes} message RegistrationListByUserRes message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        RegistrationSummary.encode = function encode(message, writer) {
+        RegistrationListByUserRes.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.id != null && Object.hasOwnProperty.call(message, "id"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
-            if (message.firstName != null && Object.hasOwnProperty.call(message, "firstName"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.firstName);
-            if (message.lastName != null && Object.hasOwnProperty.call(message, "lastName"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.lastName);
-            if (message.email != null && Object.hasOwnProperty.call(message, "email"))
-                writer.uint32(/* id 4, wireType 2 =*/34).string(message.email);
-            if (message.createdAt != null && Object.hasOwnProperty.call(message, "createdAt"))
-                writer.uint32(/* id 5, wireType 2 =*/42).string(message.createdAt);
-            if (message.paid != null && Object.hasOwnProperty.call(message, "paid"))
-                writer.uint32(/* id 6, wireType 0 =*/48).bool(message.paid);
+            if (message.registrations != null && message.registrations.length)
+                for (var i = 0; i < message.registrations.length; ++i)
+                    $root.dss.RegistrationInfo.encode(message.registrations[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             return writer;
         };
 
         /**
-         * Encodes the specified RegistrationSummary message, length delimited. Does not implicitly {@link dss.RegistrationSummary.verify|verify} messages.
+         * Encodes the specified RegistrationListByUserRes message, length delimited. Does not implicitly {@link dss.RegistrationListByUserRes.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof dss.RegistrationSummary
+         * @memberof dss.RegistrationListByUserRes
          * @static
-         * @param {dss.IRegistrationSummary} message RegistrationSummary message or plain object to encode
+         * @param {dss.IRegistrationListByUserRes} message RegistrationListByUserRes message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        RegistrationSummary.encodeDelimited = function encodeDelimited(message, writer) {
+        RegistrationListByUserRes.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a RegistrationSummary message from the specified reader or buffer.
+         * Decodes a RegistrationListByUserRes message from the specified reader or buffer.
          * @function decode
-         * @memberof dss.RegistrationSummary
+         * @memberof dss.RegistrationListByUserRes
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {dss.RegistrationSummary} RegistrationSummary
+         * @returns {dss.RegistrationListByUserRes} RegistrationListByUserRes
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        RegistrationSummary.decode = function decode(reader, length) {
+        RegistrationListByUserRes.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.dss.RegistrationSummary();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.dss.RegistrationListByUserRes();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.id = reader.string();
-                    break;
-                case 2:
-                    message.firstName = reader.string();
-                    break;
-                case 3:
-                    message.lastName = reader.string();
-                    break;
-                case 4:
-                    message.email = reader.string();
-                    break;
-                case 5:
-                    message.createdAt = reader.string();
-                    break;
-                case 6:
-                    message.paid = reader.bool();
+                    if (!(message.registrations && message.registrations.length))
+                        message.registrations = [];
+                    message.registrations.push($root.dss.RegistrationInfo.decode(reader, reader.uint32()));
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -5551,336 +5485,104 @@ $root.dss = (function() {
         };
 
         /**
-         * Decodes a RegistrationSummary message from the specified reader or buffer, length delimited.
+         * Decodes a RegistrationListByUserRes message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof dss.RegistrationSummary
+         * @memberof dss.RegistrationListByUserRes
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {dss.RegistrationSummary} RegistrationSummary
+         * @returns {dss.RegistrationListByUserRes} RegistrationListByUserRes
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        RegistrationSummary.decodeDelimited = function decodeDelimited(reader) {
+        RegistrationListByUserRes.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a RegistrationSummary message.
+         * Verifies a RegistrationListByUserRes message.
          * @function verify
-         * @memberof dss.RegistrationSummary
+         * @memberof dss.RegistrationListByUserRes
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        RegistrationSummary.verify = function verify(message) {
+        RegistrationListByUserRes.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.id != null && message.hasOwnProperty("id"))
-                if (!$util.isString(message.id))
-                    return "id: string expected";
-            if (message.firstName != null && message.hasOwnProperty("firstName"))
-                if (!$util.isString(message.firstName))
-                    return "firstName: string expected";
-            if (message.lastName != null && message.hasOwnProperty("lastName"))
-                if (!$util.isString(message.lastName))
-                    return "lastName: string expected";
-            if (message.email != null && message.hasOwnProperty("email"))
-                if (!$util.isString(message.email))
-                    return "email: string expected";
-            if (message.createdAt != null && message.hasOwnProperty("createdAt"))
-                if (!$util.isString(message.createdAt))
-                    return "createdAt: string expected";
-            if (message.paid != null && message.hasOwnProperty("paid"))
-                if (typeof message.paid !== "boolean")
-                    return "paid: boolean expected";
-            return null;
-        };
-
-        /**
-         * Creates a RegistrationSummary message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof dss.RegistrationSummary
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {dss.RegistrationSummary} RegistrationSummary
-         */
-        RegistrationSummary.fromObject = function fromObject(object) {
-            if (object instanceof $root.dss.RegistrationSummary)
-                return object;
-            var message = new $root.dss.RegistrationSummary();
-            if (object.id != null)
-                message.id = String(object.id);
-            if (object.firstName != null)
-                message.firstName = String(object.firstName);
-            if (object.lastName != null)
-                message.lastName = String(object.lastName);
-            if (object.email != null)
-                message.email = String(object.email);
-            if (object.createdAt != null)
-                message.createdAt = String(object.createdAt);
-            if (object.paid != null)
-                message.paid = Boolean(object.paid);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a RegistrationSummary message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof dss.RegistrationSummary
-         * @static
-         * @param {dss.RegistrationSummary} message RegistrationSummary
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        RegistrationSummary.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.id = "";
-                object.firstName = "";
-                object.lastName = "";
-                object.email = "";
-                object.createdAt = "";
-                object.paid = false;
-            }
-            if (message.id != null && message.hasOwnProperty("id"))
-                object.id = message.id;
-            if (message.firstName != null && message.hasOwnProperty("firstName"))
-                object.firstName = message.firstName;
-            if (message.lastName != null && message.hasOwnProperty("lastName"))
-                object.lastName = message.lastName;
-            if (message.email != null && message.hasOwnProperty("email"))
-                object.email = message.email;
-            if (message.createdAt != null && message.hasOwnProperty("createdAt"))
-                object.createdAt = message.createdAt;
-            if (message.paid != null && message.hasOwnProperty("paid"))
-                object.paid = message.paid;
-            return object;
-        };
-
-        /**
-         * Converts this RegistrationSummary to JSON.
-         * @function toJSON
-         * @memberof dss.RegistrationSummary
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        RegistrationSummary.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        return RegistrationSummary;
-    })();
-
-    dss.RegistrationGetSummaryRes = (function() {
-
-        /**
-         * Properties of a RegistrationGetSummaryRes.
-         * @memberof dss
-         * @interface IRegistrationGetSummaryRes
-         * @property {Array.<dss.IRegistrationSummary>|null} [summaries] RegistrationGetSummaryRes summaries
-         */
-
-        /**
-         * Constructs a new RegistrationGetSummaryRes.
-         * @memberof dss
-         * @classdesc Represents a RegistrationGetSummaryRes.
-         * @implements IRegistrationGetSummaryRes
-         * @constructor
-         * @param {dss.IRegistrationGetSummaryRes=} [properties] Properties to set
-         */
-        function RegistrationGetSummaryRes(properties) {
-            this.summaries = [];
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * RegistrationGetSummaryRes summaries.
-         * @member {Array.<dss.IRegistrationSummary>} summaries
-         * @memberof dss.RegistrationGetSummaryRes
-         * @instance
-         */
-        RegistrationGetSummaryRes.prototype.summaries = $util.emptyArray;
-
-        /**
-         * Creates a new RegistrationGetSummaryRes instance using the specified properties.
-         * @function create
-         * @memberof dss.RegistrationGetSummaryRes
-         * @static
-         * @param {dss.IRegistrationGetSummaryRes=} [properties] Properties to set
-         * @returns {dss.RegistrationGetSummaryRes} RegistrationGetSummaryRes instance
-         */
-        RegistrationGetSummaryRes.create = function create(properties) {
-            return new RegistrationGetSummaryRes(properties);
-        };
-
-        /**
-         * Encodes the specified RegistrationGetSummaryRes message. Does not implicitly {@link dss.RegistrationGetSummaryRes.verify|verify} messages.
-         * @function encode
-         * @memberof dss.RegistrationGetSummaryRes
-         * @static
-         * @param {dss.IRegistrationGetSummaryRes} message RegistrationGetSummaryRes message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        RegistrationGetSummaryRes.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.summaries != null && message.summaries.length)
-                for (var i = 0; i < message.summaries.length; ++i)
-                    $root.dss.RegistrationSummary.encode(message.summaries[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            return writer;
-        };
-
-        /**
-         * Encodes the specified RegistrationGetSummaryRes message, length delimited. Does not implicitly {@link dss.RegistrationGetSummaryRes.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof dss.RegistrationGetSummaryRes
-         * @static
-         * @param {dss.IRegistrationGetSummaryRes} message RegistrationGetSummaryRes message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        RegistrationGetSummaryRes.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a RegistrationGetSummaryRes message from the specified reader or buffer.
-         * @function decode
-         * @memberof dss.RegistrationGetSummaryRes
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {dss.RegistrationGetSummaryRes} RegistrationGetSummaryRes
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        RegistrationGetSummaryRes.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.dss.RegistrationGetSummaryRes();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                switch (tag >>> 3) {
-                case 1:
-                    if (!(message.summaries && message.summaries.length))
-                        message.summaries = [];
-                    message.summaries.push($root.dss.RegistrationSummary.decode(reader, reader.uint32()));
-                    break;
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a RegistrationGetSummaryRes message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof dss.RegistrationGetSummaryRes
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {dss.RegistrationGetSummaryRes} RegistrationGetSummaryRes
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        RegistrationGetSummaryRes.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a RegistrationGetSummaryRes message.
-         * @function verify
-         * @memberof dss.RegistrationGetSummaryRes
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        RegistrationGetSummaryRes.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.summaries != null && message.hasOwnProperty("summaries")) {
-                if (!Array.isArray(message.summaries))
-                    return "summaries: array expected";
-                for (var i = 0; i < message.summaries.length; ++i) {
-                    var error = $root.dss.RegistrationSummary.verify(message.summaries[i]);
+            if (message.registrations != null && message.hasOwnProperty("registrations")) {
+                if (!Array.isArray(message.registrations))
+                    return "registrations: array expected";
+                for (var i = 0; i < message.registrations.length; ++i) {
+                    var error = $root.dss.RegistrationInfo.verify(message.registrations[i]);
                     if (error)
-                        return "summaries." + error;
+                        return "registrations." + error;
                 }
             }
             return null;
         };
 
         /**
-         * Creates a RegistrationGetSummaryRes message from a plain object. Also converts values to their respective internal types.
+         * Creates a RegistrationListByUserRes message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof dss.RegistrationGetSummaryRes
+         * @memberof dss.RegistrationListByUserRes
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {dss.RegistrationGetSummaryRes} RegistrationGetSummaryRes
+         * @returns {dss.RegistrationListByUserRes} RegistrationListByUserRes
          */
-        RegistrationGetSummaryRes.fromObject = function fromObject(object) {
-            if (object instanceof $root.dss.RegistrationGetSummaryRes)
+        RegistrationListByUserRes.fromObject = function fromObject(object) {
+            if (object instanceof $root.dss.RegistrationListByUserRes)
                 return object;
-            var message = new $root.dss.RegistrationGetSummaryRes();
-            if (object.summaries) {
-                if (!Array.isArray(object.summaries))
-                    throw TypeError(".dss.RegistrationGetSummaryRes.summaries: array expected");
-                message.summaries = [];
-                for (var i = 0; i < object.summaries.length; ++i) {
-                    if (typeof object.summaries[i] !== "object")
-                        throw TypeError(".dss.RegistrationGetSummaryRes.summaries: object expected");
-                    message.summaries[i] = $root.dss.RegistrationSummary.fromObject(object.summaries[i]);
+            var message = new $root.dss.RegistrationListByUserRes();
+            if (object.registrations) {
+                if (!Array.isArray(object.registrations))
+                    throw TypeError(".dss.RegistrationListByUserRes.registrations: array expected");
+                message.registrations = [];
+                for (var i = 0; i < object.registrations.length; ++i) {
+                    if (typeof object.registrations[i] !== "object")
+                        throw TypeError(".dss.RegistrationListByUserRes.registrations: object expected");
+                    message.registrations[i] = $root.dss.RegistrationInfo.fromObject(object.registrations[i]);
                 }
             }
             return message;
         };
 
         /**
-         * Creates a plain object from a RegistrationGetSummaryRes message. Also converts values to other types if specified.
+         * Creates a plain object from a RegistrationListByUserRes message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof dss.RegistrationGetSummaryRes
+         * @memberof dss.RegistrationListByUserRes
          * @static
-         * @param {dss.RegistrationGetSummaryRes} message RegistrationGetSummaryRes
+         * @param {dss.RegistrationListByUserRes} message RegistrationListByUserRes
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        RegistrationGetSummaryRes.toObject = function toObject(message, options) {
+        RegistrationListByUserRes.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
             if (options.arrays || options.defaults)
-                object.summaries = [];
-            if (message.summaries && message.summaries.length) {
-                object.summaries = [];
-                for (var j = 0; j < message.summaries.length; ++j)
-                    object.summaries[j] = $root.dss.RegistrationSummary.toObject(message.summaries[j], options);
+                object.registrations = [];
+            if (message.registrations && message.registrations.length) {
+                object.registrations = [];
+                for (var j = 0; j < message.registrations.length; ++j)
+                    object.registrations[j] = $root.dss.RegistrationInfo.toObject(message.registrations[j], options);
             }
             return object;
         };
 
         /**
-         * Converts this RegistrationGetSummaryRes to JSON.
+         * Converts this RegistrationListByUserRes to JSON.
          * @function toJSON
-         * @memberof dss.RegistrationGetSummaryRes
+         * @memberof dss.RegistrationListByUserRes
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        RegistrationGetSummaryRes.prototype.toJSON = function toJSON() {
+        RegistrationListByUserRes.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
-        return RegistrationGetSummaryRes;
+        return RegistrationListByUserRes;
     })();
 
     dss.RegistrationUploadVaxImageReq = (function() {
