@@ -363,16 +363,29 @@ type PaymentData struct {
 	TShirtPaid          bool
 }
 
-func GetSquarePayments(ctx context.Context, client *square.Client, purchaseItems *PurchaseItems, locationID string, orderIDs []string) (*PaymentData, error) {
-	res, err := client.Orders.BatchRetrieve(ctx, &orders.BatchRetrieveRequest{
-		LocationID: locationID,
-		OrderIDs:   orderIDs,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error fetching orders from square")
+func GetSquarePayments(ctx context.Context, client *square.Client, purchaseItems *PurchaseItems, locationID string, orderIDs map[string][]string) (map[string]*PaymentData, error) {
+	orderIDList := []string{}
+	orderIDMap := map[string]string{}
+	for regID, regOrderIDs := range orderIDs {
+		orderIDList = append(orderIDList, regOrderIDs...)
+		for _, orderID := range regOrderIDs {
+			orderIDMap[orderID] = regID
+		}
 	}
 
-	pd := &PaymentData{}
+	res, err := client.Orders.BatchRetrieve(ctx, &orders.BatchRetrieveRequest{
+		LocationID: locationID,
+		OrderIDs:   orderIDList,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error fetching orders from square: %w", err)
+	}
+
+	pd := map[string]*PaymentData{}
+	for regID, _ := range orderIDs {
+		pd[regID] = &PaymentData{}
+	}
+
 	for _, order := range res.Orders {
 		if order.State != objects.OrderStateCompleted {
 			continue
@@ -380,21 +393,21 @@ func GetSquarePayments(ctx context.Context, client *square.Client, purchaseItems
 		for _, lineItem := range order.LineItems {
 			for _, purchaseItem := range purchaseItems.FullWeekend {
 				if purchaseItem.ID == lineItem.CatalogObjectID {
-					pd.WeekendPassPaid = true
+					pd[orderIDMap[order.ID]].WeekendPassPaid = true
 					break
 				}
 			}
 			switch lineItem.CatalogObjectID {
 			case purchaseItems.DanceOnly.ID:
-				pd.DanceOnlyPaid = true
+				pd[orderIDMap[order.ID]].DanceOnlyPaid = true
 			case purchaseItems.MixAndMatch[storage.MixAndMatchRoleLeader].ID, purchaseItems.MixAndMatch[storage.MixAndMatchRoleFollower].ID:
-				pd.MixAndMatchPaid = true
+				pd[orderIDMap[order.ID]].MixAndMatchPaid = true
 			case purchaseItems.SoloJazz.ID:
-				pd.SoloJazzPaid = true
+				pd[orderIDMap[order.ID]].SoloJazzPaid = true
 			case purchaseItems.TeamCompetition.ID:
-				pd.TeamCompetitionPaid = true
+				pd[orderIDMap[order.ID]].TeamCompetitionPaid = true
 			case purchaseItems.TShirt[storage.TShirtStyleUnisexS].ID, purchaseItems.TShirt[storage.TShirtStyleUnisexM].ID, purchaseItems.TShirt[storage.TShirtStyleUnisexL].ID, purchaseItems.TShirt[storage.TShirtStyleUnisexXL].ID, purchaseItems.TShirt[storage.TShirtStyleUnisex2XL].ID, purchaseItems.TShirt[storage.TShirtStyleUnisex3XL].ID, purchaseItems.TShirt[storage.TShirtStyleBellaS].ID, purchaseItems.TShirt[storage.TShirtStyleBellaM].ID, purchaseItems.TShirt[storage.TShirtStyleBellaL].ID, purchaseItems.TShirt[storage.TShirtStyleBellaXL].ID, purchaseItems.TShirt[storage.TShirtStyleBella2XL].ID:
-				pd.TShirtPaid = true
+				pd[orderIDMap[order.ID]].TShirtPaid = true
 			}
 		}
 	}

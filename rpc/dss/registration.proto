@@ -7,7 +7,7 @@ service Registration {
   rpc Add(RegistrationAddReq) returns (RegistrationAddRes);
   rpc Pay(RegistrationPayReq) returns (RegistrationPayRes);
   rpc Get(RegistrationGetReq) returns (RegistrationGetRes);
-  rpc GetSummary(RegistrationGetSummaryReq) returns (RegistrationGetSummaryRes);
+  rpc ListByUser(RegistrationListByUserReq) returns (RegistrationListByUserRes);
   rpc Prices(RegistrationPricesReq) returns (RegistrationPricesRes);
   rpc Update(RegistrationUpdateReq) returns (RegistrationUpdateRes);
   rpc UploadVaxImage(RegistrationUploadVaxImageReq) returns (RegistrationUploadVaxImageRes);
@@ -156,19 +156,10 @@ message RegistrationUpdateRes {
 	RegistrationInfo registration = 1;
 }
 
-message RegistrationGetSummaryReq {}
+message RegistrationListByUserReq {}
 
-message RegistrationSummary{
-	string id = 1;
-	string first_name = 2;
-	string last_name = 3;
-	string email = 4;
-	string created_at = 5;
-	bool paid = 6;
-}
-
-message RegistrationGetSummaryRes{
-	repeated RegistrationSummary summaries = 1;
+message RegistrationListByUserRes{
+	repeated RegistrationInfo registrations = 1;
 }
 
 message RegistrationUploadVaxImageReq {

@@ -3,6 +3,7 @@ package registration
 import (
 	"time"
 
+	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 )
 
@@ -138,6 +139,52 @@ func fromStorageTShirt(t *storage.TShirt, paid bool) *TShirt {
 	return &TShirt{
 		Style: t.Style,
 		Paid:  paid,
+	}
+}
+
+func toStorageRegistration(r *Info) *storage.Registration {
+	return &storage.Registration{
+		ID:              r.ID,
+		FirstName:       r.FirstName,
+		LastName:        r.LastName,
+		StreetAddress:   r.StreetAddress,
+		City:            r.City,
+		State:           r.State,
+		ZipCode:         r.ZipCode,
+		Email:           r.Email,
+		HomeScene:       r.HomeScene,
+		IsStudent:       r.IsStudent,
+		PassType:        toStoragePassType(r.PassType),
+		MixAndMatch:     toStorageMixAndMatch(r.MixAndMatch),
+		SoloJazz:        toStorageSoloJazz(r.SoloJazz),
+		TeamCompetition: toStorageTeamCompetition(r.TeamCompetition),
+		TShirt:          toStorageTShirt(r.TShirt),
+		Housing:         r.Housing,
+		DiscountCodes:   r.DiscountCodes,
+		CreatedAt:       r.CreatedAt,
+	}
+}
+
+func fromStorageRegistration(r *storage.Registration, pd *common.PaymentData) *Info {
+	return &Info{
+		ID:              r.ID,
+		FirstName:       r.FirstName,
+		LastName:        r.LastName,
+		StreetAddress:   r.StreetAddress,
+		City:            r.City,
+		State:           r.State,
+		ZipCode:         r.ZipCode,
+		Email:           r.Email,
+		HomeScene:       r.HomeScene,
+		IsStudent:       r.IsStudent,
+		PassType:        fromStoragePassType(r.PassType, pd.WeekendPassPaid, pd.DanceOnlyPaid),
+		MixAndMatch:     fromStorageMixAndMatch(r.MixAndMatch, pd.MixAndMatchPaid),
+		SoloJazz:        fromStorageSoloJazz(r.SoloJazz, pd.SoloJazzPaid),
+		TeamCompetition: fromStorageTeamCompetition(r.TeamCompetition, pd.TeamCompetitionPaid),
+		TShirt:          fromStorageTShirt(r.TShirt, pd.TShirtPaid),
+		Housing:         r.Housing,
+		DiscountCodes:   r.DiscountCodes,
+		CreatedAt:       r.CreatedAt,
 	}
 }
 

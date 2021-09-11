@@ -3,6 +3,7 @@ package registration
 import (
 	"context"
 	"os"
+	"reflect"
 	"testing"
 	"time"
 
@@ -13,33 +14,37 @@ import (
 	"github.com/Houndie/square-go"
 	"github.com/Houndie/square-go/locations"
 	"github.com/Houndie/square-go/objects"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
 )
 
-func TestSummaryByUser(t *testing.T) {
-	summary1ID := "summary1"
-	summary2ID := "summary2"
-	expectedSummaries := map[string]*Summary{
-		summary1ID: &Summary{
+func TestListByUser(t *testing.T) {
+	registration1ID := "id1"
+	registration2ID := "id2"
+	expectedRegistrations := map[string]*Info{
+		registration1ID: &Info{
+			ID:        registration1ID,
 			FirstName: "Joe",
 			LastName:  "Dirt",
 			Email:     "joedirt@verizon.net",
 			CreatedAt: time.Now(),
-			Paid:      true,
+			PassType:  &NoPass{},
 		},
-		summary2ID: &Summary{
+		registration2ID: &Info{
+			ID:        registration2ID,
 			FirstName: "John",
 			LastName:  "Deer",
 			Email:     "iliketractors@aol.com",
 			CreatedAt: time.Now(),
-			Paid:      false,
+			PassType:  &NoPass{},
 		},
-		"summary3": &Summary{
+		"registration3": &Info{
+			ID:        "registration3",
 			FirstName: "Joe",
 			LastName:  "Blow",
 			Email:     "gameshows@mtv.com",
 			CreatedAt: time.Now(),
-			Paid:      true,
+			PassType:  &NoPass{},
 		},
 	}
 	expectedToken := "iamauser"
@@ -59,11 +64,6 @@ func TestSummaryByUser(t *testing.T) {
 			ID:    "order3",
 			State: objects.OrderStateOpen,
 		},
-	}
-
-	regToOrderMap := map[string][]string{
-		summary1ID: []string{expectedOrders[0].ID},
-		summary2ID: []string{expectedOrders[1].ID, expectedOrders[2].ID},
 	}
 
 	logger := logrus.New()
@@ -101,22 +101,9 @@ func TestSummaryByUser(t *testing.T) {
 				t.Fatalf("expectedIncorrectUserID")
 			}
 
-			registrations := make([]*storage.Registration, len(expectedSummaries))
-			idx := 0
-			for id, summary := range expectedSummaries {
-				orderIDs := []string{}
-				if o, ok := regToOrderMap[id]; ok {
-					orderIDs = o
-				}
-				registrations[idx] = &storage.Registration{
-					ID:        id,
-					FirstName: summary.FirstName,
-					LastName:  summary.LastName,
-					Email:     summary.Email,
-					CreatedAt: summary.CreatedAt,
-					OrderIDs:  orderIDs,
-				}
-				idx++
+			registrations := make([]*storage.Registration, 0, len(expectedRegistrations))
+			for _, r := range expectedRegistrations {
+				registrations = append(registrations, toStorageRegistration(r))
 			}
 			return registrations, nil
 		},
@@ -124,30 +111,18 @@ func TestSummaryByUser(t *testing.T) {
 
 	service := NewService(true, false, logger, squareClient, commontest.CommonCatalogObjects().SquareData(), authorizer, store, &commontest.MockMailClient{}, nil)
 
-	summaries, err := service.SummaryByUser(context.Background(), expectedToken)
+	registrations, err := service.ListByUser(context.Background(), expectedToken)
 	if err != nil {
 		t.Fatalf("found unexpected error in call to SummaryByUser: %v", err)
 	}
-	for _, summary := range summaries {
-		expectedSummary, ok := expectedSummaries[summary.ID]
+	for _, r := range registrations {
+		expectedRegistration, ok := expectedRegistrations[r.ID]
 		if !ok {
-			t.Fatalf("summary with id %s not found in expected data", summary.ID)
+			t.Fatalf("registration with id %s not found in expected data", r.ID)
 		}
 
-		if expectedSummary.FirstName != summary.FirstName {
-			t.Fatalf("expected summary first name %s, found %s", expectedSummary.FirstName, summary.FirstName)
-		}
-		if expectedSummary.LastName != summary.LastName {
-			t.Fatalf("expected summary last name %s, found %s", expectedSummary.LastName, summary.LastName)
-		}
-		if expectedSummary.Email != summary.Email {
-			t.Fatalf("expected summary email %s, found %s", expectedSummary.Email, summary.Email)
-		}
-		if !expectedSummary.CreatedAt.Equal(summary.CreatedAt) {
-			t.Fatalf("expected summary created at %v, found %v", expectedSummary.CreatedAt, summary.CreatedAt)
-		}
-		if expectedSummary.Paid != summary.Paid {
-			t.Fatalf("expected summary paid %v, found %v", expectedSummary.Paid, summary.Paid)
+		if !reflect.DeepEqual(r, expectedRegistration) {
+			t.Fatalf("found registration %s, expected registration %s", spew.Sdump(r), spew.Sdump(expectedRegistration))
 		}
 	}
 }

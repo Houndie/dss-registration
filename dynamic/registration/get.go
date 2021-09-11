@@ -28,7 +28,7 @@ func (s *Service) Get(ctx context.Context, token, registrationID string) (*Info,
 		return nil, storage.ErrNotFound{Key: registrationID}
 	}
 
-	pd := &common.PaymentData{}
+	pd := map[string]*common.PaymentData{r.ID: &common.PaymentData{}}
 	if len(r.OrderIDs) > 0 {
 		s.logger.Trace("fetching locations from square")
 		locationsListRes, err := s.client.Locations.List(ctx, nil)
@@ -42,30 +42,11 @@ func (s *Service) Get(ctx context.Context, token, registrationID string) (*Info,
 		}
 		s.logger.Tracef("found location %s", locationsListRes.Locations[0].ID)
 
-		pd, err = common.GetSquarePayments(ctx, s.client, s.squareData.PurchaseItems, locationsListRes.Locations[0].ID, r.OrderIDs)
+		pd, err = common.GetSquarePayments(ctx, s.client, s.squareData.PurchaseItems, locationsListRes.Locations[0].ID, map[string][]string{r.ID: r.OrderIDs})
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return &Info{
-		ID:              r.ID,
-		FirstName:       r.FirstName,
-		LastName:        r.LastName,
-		StreetAddress:   r.StreetAddress,
-		City:            r.City,
-		State:           r.State,
-		ZipCode:         r.ZipCode,
-		Email:           r.Email,
-		HomeScene:       r.HomeScene,
-		IsStudent:       r.IsStudent,
-		PassType:        fromStoragePassType(r.PassType, pd.WeekendPassPaid, pd.DanceOnlyPaid),
-		MixAndMatch:     fromStorageMixAndMatch(r.MixAndMatch, pd.MixAndMatchPaid),
-		SoloJazz:        fromStorageSoloJazz(r.SoloJazz, pd.SoloJazzPaid),
-		TeamCompetition: fromStorageTeamCompetition(r.TeamCompetition, pd.TeamCompetitionPaid),
-		TShirt:          fromStorageTShirt(r.TShirt, pd.TShirtPaid),
-		Housing:         r.Housing,
-		DiscountCodes:   r.DiscountCodes,
-		CreatedAt:       r.CreatedAt,
-	}, nil
+	return fromStorageRegistration(r, pd[r.ID]), nil
 }
