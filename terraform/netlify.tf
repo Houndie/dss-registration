@@ -46,6 +46,8 @@ locals {
 		student_discount = tolist(tolist(square_catalog_object.student_discount.discount_data)[0].amount_money)[0].amount
 	}
 
+   json_square_data = jsonencode(local.frontend_square_data)
+
 	frontend_config = {
 		GATSBY_BACKEND="https://${heroku_app.dayton_swing_smackdown.name}.herokuapp.com"
 		GATSBY_FRONTEND="https://test.daytonswingsmackdown.com"
@@ -53,7 +55,7 @@ locals {
 		GATSBY_AUTH0_DOMAIN=var.auth0_domain
 		GATSBY_AUTH0_AUDIENCE=auth0_resource_server.smackdown-website.identifier
 		GATSBY_VERSION=var.deploy_version
-		GATSBY_SQUARE_DATA=jsonencode(local.frontend_square_data)
+		GATSBY_SQUARE_DATA="'${local.json_square_data}'"
 	}
 }
 

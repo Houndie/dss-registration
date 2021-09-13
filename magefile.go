@@ -314,7 +314,7 @@ func (f Frontend) WaitForDeploy(ctx context.Context) error {
 func toEnviron(configVars map[string]string) []string {
 	env := make([]string, 0, len(configVars))
 	for key, value := range configVars {
-		env = append(env, fmt.Sprintf("%s=\"%s\"", strings.ToUpper(strings.ReplaceAll(key, "-", "_")), strings.ReplaceAll(value, "\"", "\\\"")))
+		env = append(env, fmt.Sprintf("%s=\"%s\"", strings.ToUpper(strings.ReplaceAll(key, "-", "_")), strings.ReplaceAll(strings.TrimPrefix(strings.TrimSuffix(value, "'"), "'"), "\"", "\\\"")))
 	}
 
 	return env
