@@ -27,7 +27,9 @@ func (e ErrAlreadyPurchased) Error() string {
 
 var ErrRegistrationDisabled = errors.New("registration found when service is not active")
 
-var ErrNoPaidItems = errors.New("registration contains no paid items")
+var ErrNoPurchaseItems = errors.New("registration contains no purchase items")
+
+var ErrNoUnpaidItems = errors.New("registration contains no unpaid items")
 
 type ErrFileTooBig struct {
 	Filesize int64
