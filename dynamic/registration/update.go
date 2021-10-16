@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 )
 
@@ -117,6 +118,24 @@ func (s *Service) Update(ctx context.Context, token string, registration *Info) 
 		DiscountCodes:   registration.DiscountCodes,
 		OrderIDs:        oldRegistration.OrderIDs,
 	}
+
+	s.logger.Trace("Fetching all locations from square")
+	locationListRes, err := s.client.Locations.List(ctx, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error listing locations from square: %w", err)
+	}
+	if len(locationListRes.Locations) != 1 {
+		return nil, fmt.Errorf("found wrong number of locations %v", len(locationListRes.Locations))
+	}
+	locationID := locationListRes.Locations[0].ID
+
+	pdMap, err := common.GetSquarePayments(ctx, s.client, s.squareData.PurchaseItems, locationID, map[string][]string{registration.ID: oldRegistration.OrderIDs})
+	if err != nil {
+		return nil, err
+	}
+
+	pd := pdMap[registration.ID]
+
 	err = s.store.UpdateRegistration(ctx, storeRegistration)
 	if err != nil {
 		return nil, fmt.Errorf("error updating registration in database: %w", err)
@@ -142,11 +161,11 @@ func (s *Service) Update(ctx context.Context, token string, registration *Info) 
 		returnInfo.PassType = &WeekendPass{
 			Level: p.Level,
 			Tier:  p.Tier,
-			Paid:  p.Paid,
+			Paid:  pd.WeekendPassPaid,
 		}
 	case *DanceOnlyPass:
 		returnInfo.PassType = &DanceOnlyPass{
-			Paid: p.Paid,
+			Paid: pd.DanceOnlyPaid,
 		}
 	case *NoPass:
 		returnInfo.PassType = &NoPass{}
@@ -155,27 +174,27 @@ func (s *Service) Update(ctx context.Context, token string, registration *Info) 
 	if registration.MixAndMatch != nil {
 		returnInfo.MixAndMatch = &MixAndMatch{
 			Role: registration.MixAndMatch.Role,
-			Paid: registration.MixAndMatch.Paid,
+			Paid: pd.MixAndMatchPaid,
 		}
 	}
 
 	if registration.SoloJazz != nil {
 		returnInfo.SoloJazz = &SoloJazz{
-			Paid: registration.SoloJazz.Paid,
+			Paid: pd.SoloJazzPaid,
 		}
 	}
 
 	if registration.TeamCompetition != nil {
 		returnInfo.TeamCompetition = &TeamCompetition{
 			Name: registration.TeamCompetition.Name,
-			Paid: registration.TeamCompetition.Paid,
+			Paid: pd.TeamCompetitionPaid,
 		}
 	}
 
 	if registration.TShirt != nil {
 		returnInfo.TShirt = &TShirt{
 			Style: registration.TShirt.Style,
-			Paid:  registration.TShirt.Paid,
+			Paid:  pd.TShirtPaid,
 		}
 	}
 

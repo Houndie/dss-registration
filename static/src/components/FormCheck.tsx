@@ -11,7 +11,7 @@ export default ({ label, ...props }: FormCheckProps) => {
 	const [field, meta] = useField(props);
 	return (
 		<Col>
-			<Form.Check label={label} isInvalid={meta.touched && !!meta.error} {...field} />
+			<Form.Check label={label} isInvalid={meta.touched && !!meta.error} checked={field.value} {...field} disabled={props.disabled} />
 			<Form.Control.Feedback type='invalid' tooltip>{meta.error}</Form.Control.Feedback>
 		</Col>
 	);

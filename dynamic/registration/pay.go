@@ -10,9 +10,22 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-func containsPaidItems(r *storage.Registration) bool {
+func containsPurchaseItems(r *storage.Registration) bool {
 	_, noPassOk := r.PassType.(*storage.NoPass)
 	return !noPassOk || r.MixAndMatch != nil || r.TeamCompetition != nil || r.TShirt != nil || r.SoloJazz
+}
+
+func containsUnpaidItems(r *storage.Registration, pd *common.PaymentData) bool {
+	unpaid := false
+
+	switch r.PassType.(type) {
+	case *storage.WeekendPass:
+		unpaid = unpaid || !pd.WeekendPassPaid
+	case *storage.DanceOnlyPass:
+		unpaid = unpaid || !pd.DanceOnlyPaid
+	}
+
+	return unpaid || (r.MixAndMatch != nil && !pd.MixAndMatchPaid) || (r.TeamCompetition != nil && !pd.TeamCompetitionPaid) || (r.TShirt != nil && !pd.TShirtPaid) || (r.SoloJazz && !pd.SoloJazzPaid)
 }
 
 func makeLineItems(registration *storage.Registration, squareData *common.SquareData, paymentData *common.PaymentData, discounts map[storage.PurchaseItem][]string) ([]*objects.OrderLineItem, []*objects.OrderLineItemDiscount, error) {
@@ -158,8 +171,8 @@ func (s *Service) Pay(ctx context.Context, id, redirectURL, idempotencyKey, acce
 		return "", fmt.Errorf("error fetching registration from store: %w", err)
 	}
 
-	if !containsPaidItems(registration) {
-		return "", ErrNoPaidItems
+	if !containsPurchaseItems(registration) {
+		return "", ErrNoPurchaseItems
 	}
 
 	s.logger.Trace("generating reference id")
@@ -173,11 +186,6 @@ func (s *Service) Pay(ctx context.Context, id, redirectURL, idempotencyKey, acce
 		return "", err
 	}
 
-	lineItems, lineDiscounts, err := makeLineItems(registration, s.squareData, &common.PaymentData{}, discounts)
-	if err != nil {
-		return "", err
-	}
-
 	s.logger.Trace("Fetching all locations from square")
 	locationListRes, err := s.client.Locations.List(ctx, nil)
 	if err != nil {
@@ -186,25 +194,36 @@ func (s *Service) Pay(ctx context.Context, id, redirectURL, idempotencyKey, acce
 	if len(locationListRes.Locations) != 1 {
 		return "", fmt.Errorf("found wrong number of locations %v", len(locationListRes.Locations))
 	}
+	locationID := locationListRes.Locations[0].ID
+
+	pd, err := common.GetSquarePayments(ctx, s.client, s.squareData.PurchaseItems, locationID, map[string][]string{id: registration.OrderIDs})
+	if err != nil {
+		return "", err
+	}
+
+	if !containsUnpaidItems(registration, pd[id]) {
+		return "", ErrNoUnpaidItems
+	}
+
+	lineItems, lineDiscounts, err := makeLineItems(registration, s.squareData, pd[id], discounts)
+	if err != nil {
+		return "", err
+	}
 
 	order := &objects.CreateOrderRequest{
 		IdempotencyKey: idempotencyKey,
 		Order: &objects.Order{
 			ReferenceID: referenceID.String(),
-			LocationID:  locationListRes.Locations[0].ID,
+			LocationID:  locationID,
 			LineItems:   lineItems,
 			Discounts:   lineDiscounts,
 		},
 	}
 
-	fmt.Println("redirect", redirectURL)
-
 	checkoutURL, orderID, err := common.CreateCheckout(ctx, s.client, locationListRes.Locations[0].ID, idempotencyKey, order, registration.Email, redirectURL)
 	if err != nil {
 		return "", err
 	}
-
-	fmt.Println("checkout", checkoutURL)
 
 	registration.OrderIDs = append(registration.OrderIDs, orderID)
 

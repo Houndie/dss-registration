@@ -3,6 +3,7 @@ package auth0
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"errors"
 
@@ -16,7 +17,7 @@ func (a *Authorizer) GetUserinfo(ctx context.Context, accessToken string) (autho
 	if err != nil {
 		return nil, fmt.Errorf("error fetching jwks: %w", err)
 	}
-	token, err := jwt.ParseString(accessToken, jwt.WithKeySet(jwks), jwt.WithValidate(true))
+	token, err := jwt.ParseString(accessToken, jwt.WithKeySet(jwks), jwt.WithValidate(true), jwt.WithAcceptableSkew(1*time.Minute))
 	if err != nil {
 		return nil, fmt.Errorf("error parsing jwt: %v", err)
 	}

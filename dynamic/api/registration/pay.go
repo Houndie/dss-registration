@@ -21,6 +21,12 @@ func (s *Server) Pay(ctx context.Context, req *pb.RegistrationPayReq) (*pb.Regis
 
 	checkoutURL, err := s.service.Pay(ctx, req.Id, req.RedirectUrl, req.IdempotencyKey, auth)
 	if err != nil {
+		if errors.Is(err, registration.ErrNoPurchaseItems) {
+			return nil, twirp.InvalidArgumentError("id", err.Error())
+		} else if errors.Is(err, registration.ErrNoUnpaidItems) {
+			return nil, twirp.InvalidArgumentError("id", err.Error())
+		}
+
 		var outOfStockErr registration.ErrOutOfStock
 		var noRegistrationErr storage.ErrNoRegistrationForID
 		if errors.As(err, &noRegistrationErr) {
