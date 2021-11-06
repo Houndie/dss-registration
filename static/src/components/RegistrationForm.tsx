@@ -24,13 +24,19 @@ export type RegistrationFormState = {
 	isStudent: boolean,
 	passType: FormWeekendPassOption,
 	level: FormFullWeekendPassLevel,
+	weekendPassOverride: boolean,
+	danceOnlyOverride: boolean,
 	mixAndMatch: boolean,
 	role: FormRole,
+	mixAndMatchOverride: boolean,
 	soloJazz: boolean,
+	soloJazzOverride: boolean,
 	teamCompetition: boolean,
 	teamName: string,
+	teamCompetitionOverride: boolean,
 	tshirt: boolean,
 	style: FormStyle,
+	tshirtOverride: boolean,
 	housing: FormHousingOption,
 	pets: string,
 	quantity: number | Long,
@@ -41,7 +47,7 @@ export type RegistrationFormState = {
 	discounts: string[]
 }
 
-export const toProtoRegistration = (values: RegistrationFormState, tier: number) => {
+export const toProtoRegistration = (values: RegistrationFormState, tier: number, previous?: dss.IRegistrationInfo) => {
 	const clientReg: dss.IRegistrationInfo = {
 		firstName: values.firstName,
 		lastName: values.lastName,
@@ -58,11 +64,16 @@ export const toProtoRegistration = (values: RegistrationFormState, tier: number)
 		case FormWeekendPassOption.fullWeekendPassOption:
 			clientReg.fullWeekendPass = {
 				tier: tier,
-				level: toProtoPassLevel(values.level)
+				level: toProtoPassLevel(values.level),
+				squarePaid: previous?.fullWeekendPass?.squarePaid,
+				adminPaymentOverride: values.weekendPassOverride
 			}
 			break
 		case FormWeekendPassOption.danceOnlyPassOption:
-			clientReg.danceOnlyPass = {}
+			clientReg.danceOnlyPass = {
+				squarePaid: previous?.danceOnlyPass?.squarePaid,
+				adminPaymentOverride: values.weekendPassOverride
+			}
 			break
 		default:
 			clientReg.noPass = {}
@@ -70,19 +81,34 @@ export const toProtoRegistration = (values: RegistrationFormState, tier: number)
 	}
 
 	if (values.mixAndMatch) {
-		clientReg.mixAndMatch = { role: toProtoRole(values.role) }
+		clientReg.mixAndMatch = { 
+			role: toProtoRole(values.role),
+			squarePaid: previous?.mixAndMatch?.squarePaid,
+			adminPaymentOverride: values.mixAndMatchOverride
+		}
 	}
 
 	if (values.soloJazz) {
-		clientReg.soloJazz = {}
+		clientReg.soloJazz = {
+			squarePaid: previous?.soloJazz?.squarePaid,
+			adminPaymentOverride: values.soloJazzOverride
+		}
 	}
 
 	if (values.teamCompetition) {
-		clientReg.teamCompetition = { name: values.teamName }
+		clientReg.teamCompetition = { 
+			name: values.teamName,
+			squarePaid: previous?.teamCompetition?.squarePaid,
+			adminPaymentOverride: values.teamCompetitionOverride
+		}
 	}
 
 	if (values.tshirt) {
-		clientReg.tshirt = { style: toProtoStyle(values.style) }
+		clientReg.tshirt = { 
+			style: toProtoStyle(values.style),
+			squarePaid: previous?.tshirt?.squarePaid,
+			adminPaymentOverride: values.tshirtOverride
+		}
 	}
 
 	switch (values.housing) {
@@ -302,34 +328,26 @@ export const fromProtoTier = (tier: number | Long) => {
 	}
 }
 
-type RegistrationFormDisables = {
-	passType?: boolean
-	mixAndMatch?: boolean
-	soloJazz?: boolean
-	teamCompetition?: boolean
-	tShirt?: boolean
-}
-
 type RegistrationFormProps = {
-	prices: dss.IRegistrationPricesRes,
-	disables?: RegistrationFormDisables
+	weekendPassTier: number
+	previousRegistration?: dss.IRegistrationInfo
+	admin: boolean
 }
 
-export const hasUnpaidItems = (myRegistration: dss.IRegistrationInfo) => {
-	return (myRegistration.fullWeekendPass && !myRegistration.fullWeekendPass.paid) ||
-		(myRegistration.danceOnlyPass && !myRegistration.danceOnlyPass.paid) ||
-		(myRegistration.mixAndMatch && !myRegistration.mixAndMatch.paid) ||
-		(myRegistration.soloJazz && !myRegistration.soloJazz.paid) ||
-		(myRegistration.teamCompetition && !myRegistration.teamCompetition.paid) ||
-		(myRegistration.tshirt && !myRegistration.tshirt.paid)
-}
+export const isPaid = (r: dss.IRegistrationInfo) => 
+	((!r.fullWeekendPass || r.fullWeekendPass.squarePaid || r.fullWeekendPass.adminPaymentOverride) &&
+		(!r.danceOnlyPass || r.danceOnlyPass.squarePaid || r.danceOnlyPass.adminPaymentOverride) &&
+		(!r.soloJazz || r.soloJazz.squarePaid || r.soloJazz.adminPaymentOverride) &&
+		(!r.mixAndMatch || r.mixAndMatch.squarePaid || r.mixAndMatch.adminPaymentOverride) &&
+		(!r.teamCompetition || r.teamCompetition.squarePaid || r.teamCompetition.adminPaymentOverride) &&
+		(!r.tshirt || r.tshirt.squarePaid || r.tshirt.adminPaymentOverride))
 
-export default ({prices, disables}: RegistrationFormProps) => {
+export default ({weekendPassTier, previousRegistration, admin}: RegistrationFormProps) => {
 	const {discount} = useTwirp()
 	const square_data = JSON.parse(`${process.env.GATSBY_SQUARE_DATA}`)
 	const {values, isSubmitting, handleSubmit, setFieldValue} = useFormikContext<RegistrationFormState>()
 
-	if(prices.weekendPassTier === null || prices.weekendPassTier === undefined) {
+	if(weekendPassTier === null || weekendPassTier === undefined) {
 		return null
 	}
 
@@ -413,57 +431,101 @@ export default ({prices, disables}: RegistrationFormProps) => {
 			<fieldset>
 				<h2>Purchase</h2>
 				<Row><Col xs={6}>
-					<FormSelect label="Weekend Pass Type" name="passType" disabled={disables && disables.passType}>
+					<FormSelect label="Weekend Pass Type" name="passType" disabled={Boolean(previousRegistration && (previousRegistration.fullWeekendPass || previousRegistration.danceOnlyPass)) }>
 						<option aria-label="no pass" value={FormWeekendPassOption.noPassOption} />
-						<option value={FormWeekendPassOption.fullWeekendPassOption}>{"Full Weekend Pass - "+dss.FullWeekendPassTier[prices.weekendPassTier]+" ("+parseDollar(square_data.purchase_items.full_weekend_pass[fromProtoTier(prices.weekendPassTier)])+")"}</option>
+						<option value={FormWeekendPassOption.fullWeekendPassOption}>{"Full Weekend Pass - "+dss.FullWeekendPassTier[weekendPassTier]+" ("+parseDollar(square_data.purchase_items.full_weekend_pass[fromProtoTier(weekendPassTier)])+")"}</option>
 						<option value={FormWeekendPassOption.danceOnlyPassOption}>{"Dance Only Pass ("+parseDollar(square_data.purchase_items.dance_only_pass)+")"}</option>
 					</FormSelect>
 				</Col></Row>
 				{values.passType === FormWeekendPassOption.fullWeekendPassOption && (
-					<Row><Col xs={1}></Col><Col xs={6}>
-						<FormSelect label="Level" name="level">
-							<option aria-label="none" value={FormFullWeekendPassLevel.NotSelected} />
-							<option value={FormFullWeekendPassLevel.Level1}>Level 1</option>
-							<option value={FormFullWeekendPassLevel.Level2}>Level 2</option>
-							<option value={FormFullWeekendPassLevel.Level3}>Level 3</option>
-						</FormSelect>
-				</Col></Row>
+					<>
+						<Row><Col xs={1}></Col><Col xs={6}>
+							<FormSelect label="Level" name="level">
+								<option aria-label="none" value={FormFullWeekendPassLevel.NotSelected} />
+								<option value={FormFullWeekendPassLevel.Level1}>Level 1</option>
+								<option value={FormFullWeekendPassLevel.Level2}>Level 2</option>
+								<option value={FormFullWeekendPassLevel.Level3}>Level 3</option>
+							</FormSelect>
+						</Col></Row>
+						{admin && (
+							<Row><Col xs={1}></Col><Col xs={6}>
+								<p>Currently Paid: {Boolean(previousRegistration && previousRegistration.fullWeekendPass && previousRegistration.fullWeekendPass.squarePaid).toString()}</p>
+								<FormCheck label="Admin Free Pass" name="weekendPassOverride" />
+							</Col></Row>
+						)}
+					</>
 				)}
-				<FormCheck name="mixAndMatch" label={"Mix & Match Competition ("+parseDollar(square_data.purchase_items.mix_and_match)+")"} disabled={disables && disables.mixAndMatch}/>
+				{values.passType == FormWeekendPassOption.danceOnlyPassOption && admin && (
+					<Row><Col xs={1}></Col><Col xs={6}>
+						<p>Currently Paid: {Boolean(previousRegistration && previousRegistration.danceOnlyPass && previousRegistration.danceOnlyPass.squarePaid).toString()}</p>
+						<FormCheck label="Admin Free Pass" name="danceOnlyOverride" />
+					</Col></Row>
+				)}
+				<FormCheck name="mixAndMatch" label={"Mix & Match Competition ("+parseDollar(square_data.purchase_items.mix_and_match)+")"} disabled={Boolean(previousRegistration && previousRegistration.mixAndMatch)}/>
 				{values.mixAndMatch && (
+					<>
+						<Row><Col xs={1}></Col><Col xs={6}>
+							<FormSelect label="Role" name="role">
+								<option aria-label="none" value={FormRole.NotSelected} />
+								<option value={FormRole.Follower}>Follower</option>
+								<option value={FormRole.Leader}>Leader</option>
+							</FormSelect>
+						</Col></Row>
+						{admin && (
+							<Row><Col xs={1}></Col><Col xs={6}>
+								<p>Currently Paid: {Boolean(previousRegistration && previousRegistration.mixAndMatch && previousRegistration.mixAndMatch.squarePaid).toString()}</p>
+								<FormCheck label="Admin Free Pass" name="mixAndMatchOverride" />
+							</Col></Row>
+						)}
+					</>
+				)}
+				<FormCheck name="soloJazz" label={"Solo Jazz Competition ("+parseDollar(square_data.purchase_items.solo_jazz)+")"} disabled={Boolean(previousRegistration && previousRegistration.soloJazz)}/>
+				{values.soloJazz && admin && (
 					<Row><Col xs={1}></Col><Col xs={6}>
-						<FormSelect label="Role" name="role">
-							<option aria-label="none" value={FormRole.NotSelected} />
-							<option value={FormRole.Follower}>Follower</option>
-							<option value={FormRole.Leader}>Leader</option>
-						</FormSelect>
+						<p>Currently Paid: {Boolean(previousRegistration && previousRegistration.soloJazz && previousRegistration.soloJazz.squarePaid).toString()}</p>
+						<FormCheck label="Admin Free Pass" name="soloJazzOverride" />
 					</Col></Row>
 				)}
-				<FormCheck name="soloJazz" label={"Solo Jazz Competition ("+parseDollar(square_data.purchase_items.solo_jazz)+")"} disabled={disables && disables.soloJazz}/>
-				<FormCheck name="teamCompetition" label={"Team Competition ("+parseDollar(square_data.purchase_items.team_competition)+")"} disabled={disables && disables.teamCompetition} />
+				<FormCheck name="teamCompetition" label={"Team Competition ("+parseDollar(square_data.purchase_items.team_competition)+")"} disabled={Boolean(previousRegistration && previousRegistration.teamCompetition)} />
 				{values.teamCompetition && (
-					<Row><Col xs={1}></Col><Col xs={6}>
-						<FormField label="Team Name" name="teamName" type="text" />
-					</Col></Row>
+					<>
+						<Row><Col xs={1}></Col><Col xs={6}>
+							<FormField label="Team Name" name="teamName" type="text" />
+						</Col></Row>
+						{admin && (
+							<Row><Col xs={1}></Col><Col xs={6}>
+								<p>Currently Paid: {Boolean(previousRegistration && previousRegistration.teamCompetition && previousRegistration.teamCompetition.squarePaid).toString()}</p>
+								<FormCheck label="Admin Free Pass" name="teamCompetitionOverride" />
+							</Col></Row>
+						)}
+					</>
 				)}
-				<FormCheck name="tshirt" label={"T-Shirt ("+parseDollar(square_data.purchase_items.t_shirt)+")"} disabled={disables && disables.tShirt} />
+				<FormCheck name="tshirt" label={"T-Shirt ("+parseDollar(square_data.purchase_items.t_shirt)+")"} disabled={Boolean(previousRegistration && previousRegistration.tshirt)} />
 				{values.tshirt && (
-					<Row><Col xs={1}></Col><Col xs={6}>
-						<FormSelect label="T-Shirt Size/Style" name="style">
-							<option aria-label="none" value={FormStyle.NotSelected}></option>
-							<option value={FormStyle.UnisexS}>Unisex S</option>
-							<option value={FormStyle.UnisexM}>Unisex M</option>
-							<option value={FormStyle.UnisexL}>Unisex L</option>
-							<option value={FormStyle.UnisexXL}>Unisex XL</option>
-							<option value={FormStyle.Unisex2XL}>Unisex 2XL</option>
-							<option value={FormStyle.Unisex3XL}>Unisex 3XL</option>
-							<option value={FormStyle.BellaS}>Bella S</option>
-							<option value={FormStyle.BellaM}>Bella M</option>
-							<option value={FormStyle.BellaL}>Bella L</option>
-							<option value={FormStyle.BellaXL}>Bella XL</option>
-							<option value={FormStyle.Bella2XL}>Bella 2XL</option>
-						</FormSelect>
-					</Col></Row>
+					<>
+						<Row><Col xs={1}></Col><Col xs={6}>
+							<FormSelect label="T-Shirt Size/Style" name="style">
+								<option aria-label="none" value={FormStyle.NotSelected}></option>
+								<option value={FormStyle.UnisexS}>Unisex S</option>
+								<option value={FormStyle.UnisexM}>Unisex M</option>
+								<option value={FormStyle.UnisexL}>Unisex L</option>
+								<option value={FormStyle.UnisexXL}>Unisex XL</option>
+								<option value={FormStyle.Unisex2XL}>Unisex 2XL</option>
+								<option value={FormStyle.Unisex3XL}>Unisex 3XL</option>
+								<option value={FormStyle.BellaS}>Bella S</option>
+								<option value={FormStyle.BellaM}>Bella M</option>
+								<option value={FormStyle.BellaL}>Bella L</option>
+								<option value={FormStyle.BellaXL}>Bella XL</option>
+								<option value={FormStyle.Bella2XL}>Bella 2XL</option>
+							</FormSelect>
+						</Col></Row>
+						{admin && (
+							<Row><Col xs={1}></Col><Col xs={6}>
+								<p>Currently Paid: {Boolean(previousRegistration && previousRegistration.tshirt && previousRegistration.tshirt.squarePaid).toString()}</p>
+								<FormCheck label="Admin Free Pass" name="tshirtOverride" />
+							</Col></Row>
+						)}
+					</>
 				)}
 				<hr />
 			</fieldset>

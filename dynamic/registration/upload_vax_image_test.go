@@ -5,7 +5,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/object/aws"
 	"github.com/Houndie/dss-registration/dynamic/storage"
@@ -33,7 +32,7 @@ func TestUploadVaxImage(t *testing.T) {
 	}
 
 	authorizer := &commontest.MockAuthorizer{
-		GetUserinfoFunc: commontest.UserinfoFromID(testUserID, []authorizer.Permission{}),
+		GetUserinfoFunc: commontest.UserinfoFromID(testUserID, []string{}),
 	}
 
 	objectClient, err := aws.NewObjectClient("access", "secret", "region", "bucket")
@@ -41,7 +40,7 @@ func TestUploadVaxImage(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	service := NewService(true, true, logger, nil, nil, authorizer, store, nil, objectClient)
+	service := NewService(true, true, logger, nil, nil, authorizer, store, nil, objectClient, testPermissionConfig)
 	_, err = service.UploadVaxImage(context.Background(), testToken, 1234, testID)
 	if err != nil {
 		t.Fatal(err)
@@ -69,7 +68,7 @@ func TestUploadVaxImageNotMyRegistration(t *testing.T) {
 	}
 
 	authorizer := &commontest.MockAuthorizer{
-		GetUserinfoFunc: commontest.UserinfoFromID(testUserID, []authorizer.Permission{}),
+		GetUserinfoFunc: commontest.UserinfoFromID(testUserID, []string{}),
 	}
 
 	objectClient, err := aws.NewObjectClient("access", "secret", "region", "bucket")
@@ -77,7 +76,7 @@ func TestUploadVaxImageNotMyRegistration(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	service := NewService(true, true, logger, nil, nil, authorizer, store, nil, objectClient)
+	service := NewService(true, true, logger, nil, nil, authorizer, store, nil, objectClient, testPermissionConfig)
 	_, err = service.UploadVaxImage(context.Background(), testToken, 1234, testID)
 	if err == nil {
 		t.Fatal("expected error, found none")

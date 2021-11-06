@@ -7,7 +7,7 @@ import {createDiscount} from "../rpc/discount.twirp"
 import { v4 as uuidv4 } from 'uuid';
 import useTwirp from "../components/useTwirp"
 import { useAuth0 } from '@auth0/auth0-react';
-import RegistrationForm, {hasUnpaidItems, FormHousingOption, toProtoRegistration, FormWeekendPassOption, FormFullWeekendPassLevel, FormStyle, FormRole, RegistrationFormState} from "../components/RegistrationForm"
+import RegistrationForm, {isPaid, FormHousingOption, toProtoRegistration, FormWeekendPassOption, FormFullWeekendPassLevel, FormStyle, FormRole, RegistrationFormState} from "../components/RegistrationForm"
 
 const initialState: RegistrationFormState  = {
 	firstName: '', 
@@ -21,12 +21,18 @@ const initialState: RegistrationFormState  = {
 	isStudent: false,
 	passType: FormWeekendPassOption.noPassOption,
 	level: FormFullWeekendPassLevel.NotSelected,
+	weekendPassOverride: false,
+	danceOnlyOverride: false,
 	mixAndMatch: false,
 	role: FormRole.NotSelected,
+	mixAndMatchOverride: false,
 	soloJazz: false,
+	soloJazzOverride: false,
 	teamCompetition: false,
 	teamName: '',
+	teamCompetitionOverride: false,
 	tshirt: false,
+	tshirtOverride: false,
 	style: FormStyle.NotSelected,
 	housing: FormHousingOption.noHousingOption,
 	pets: '',
@@ -109,7 +115,7 @@ const Registration = () => {
 								}).then( r => {
 									const redirectURL = `${process.env.GATSBY_FRONTEND}/registration-complete`
 
-									if (!hasUnpaidItems(r)) {
+									if (isPaid(r)) {
 										return redirectURL
 									}
 
@@ -129,7 +135,7 @@ const Registration = () => {
 						}}
 					>
 					{({values, isSubmitting, handleSubmit, setFieldValue}) => prices != null ? (
-						<RegistrationForm prices={prices}/>
+						<RegistrationForm weekendPassTier={prices.weekendPassTier} admin={false}/>
 					) : null}
 					</Formik>
 				)

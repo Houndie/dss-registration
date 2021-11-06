@@ -22,7 +22,7 @@ func (s *Service) Get(ctx context.Context, token, registrationID string) (*Info,
 	}
 	s.logger.Trace("found registration")
 
-	if r.UserID != userinfo.UserID() {
+	if !userinfo.IsAllowed(s.permissionConfig.List) && r.UserID != userinfo.UserID() {
 		s.logger.WithError(err).Debug("user id does not match that of found registration")
 		s.logger.WithError(err).Tracef("registration provided user id %s, user provided %s", r.UserID, userinfo.UserID())
 		return nil, storage.ErrNotFound{Key: registrationID}

@@ -143,9 +143,14 @@ var rootCmd = &cobra.Command{
 			return fmt.Errorf("error initializing object client: %w", err)
 		}
 
+		permissionConfig := &registration.PermissionConfig{
+			List:   viper.GetString("permissions.list"),
+			Update: viper.GetString("permissions.update"),
+		}
+
 		mux := http.NewServeMux()
 
-		registrationService := registration.NewService(true, viper.GetString("environment") != "production", logger, squareClient, squareData, authorizer, store, sendInBlueClient, objectClient)
+		registrationService := registration.NewService(true, viper.GetString("environment") != "production", logger, squareClient, squareData, authorizer, store, sendInBlueClient, objectClient, permissionConfig)
 		registrationServer := api_registration.NewServer(registrationService)
 		registrationHandler := pb.NewRegistrationServer(registrationServer, errorHook)
 		mux.Handle(pb.RegistrationPathPrefix, registrationHandler)

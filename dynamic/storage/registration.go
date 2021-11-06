@@ -15,7 +15,7 @@ type Registration struct {
 	IsStudent       bool
 	PassType        PassType
 	MixAndMatch     *MixAndMatch
-	SoloJazz        bool
+	SoloJazz        *SoloJazz
 	TeamCompetition *TeamCompetition
 	TShirt          *TShirt
 	Housing         Housing
@@ -45,10 +45,13 @@ type PassType interface {
 	isPassType()
 }
 type WeekendPass struct {
-	Level WeekendPassLevel
-	Tier  WeekendPassTier
+	Level        WeekendPassLevel
+	Tier         WeekendPassTier
+	ManuallyPaid bool
 }
-type DanceOnlyPass struct{}
+type DanceOnlyPass struct {
+	ManuallyPaid bool
+}
 type NoPass struct{}
 
 func (*WeekendPass) isPassType()   {}
@@ -63,11 +66,17 @@ const (
 )
 
 type MixAndMatch struct {
-	Role MixAndMatchRole
+	Role         MixAndMatchRole
+	ManuallyPaid bool
+}
+
+type SoloJazz struct {
+	ManuallyPaid bool
 }
 
 type TeamCompetition struct {
-	Name string
+	Name         string
+	ManuallyPaid bool
 }
 
 type TShirtStyle string
@@ -87,7 +96,8 @@ const (
 )
 
 type TShirt struct {
-	Style TShirtStyle
+	Style        TShirtStyle
+	ManuallyPaid bool
 }
 
 type Housing interface {

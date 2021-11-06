@@ -16,6 +16,9 @@ const getServiceMethodName = (fn: any): string => {
 	if (fn === dss.Registration.prototype.listByUser) {
 		return 'ListByUser';
     }
+	if (fn === dss.Registration.prototype.list) {
+		return 'List';
+    }
 	if (fn === dss.Registration.prototype.prices) {
 		return 'Prices';
     }

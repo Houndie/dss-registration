@@ -183,6 +183,39 @@ $root.dss = (function() {
          */
 
         /**
+         * Callback as used by {@link dss.Registration#list}.
+         * @memberof dss.Registration
+         * @typedef ListCallback
+         * @type {function}
+         * @param {Error|null} error Error, if any
+         * @param {dss.RegistrationListRes} [response] RegistrationListRes
+         */
+
+        /**
+         * Calls List.
+         * @function list
+         * @memberof dss.Registration
+         * @instance
+         * @param {dss.IRegistrationListReq} request RegistrationListReq message or plain object
+         * @param {dss.Registration.ListCallback} callback Node-style callback called with the error, if any, and RegistrationListRes
+         * @returns {undefined}
+         * @variation 1
+         */
+        Object.defineProperty(Registration.prototype.list = function list(request, callback) {
+            return this.rpcCall(list, $root.dss.RegistrationListReq, $root.dss.RegistrationListRes, request, callback);
+        }, "name", { value: "List" });
+
+        /**
+         * Calls List.
+         * @function list
+         * @memberof dss.Registration
+         * @instance
+         * @param {dss.IRegistrationListReq} request RegistrationListReq message or plain object
+         * @returns {Promise<dss.RegistrationListRes>} Promise
+         * @variation 2
+         */
+
+        /**
          * Callback as used by {@link dss.Registration#prices}.
          * @memberof dss.Registration
          * @typedef PricesCallback
@@ -1109,7 +1142,8 @@ $root.dss = (function() {
          * @interface IFullWeekendPass
          * @property {dss.FullWeekendPassTier|null} [tier] FullWeekendPass tier
          * @property {dss.FullWeekendPassLevel|null} [level] FullWeekendPass level
-         * @property {boolean|null} [paid] FullWeekendPass paid
+         * @property {boolean|null} [squarePaid] FullWeekendPass squarePaid
+         * @property {boolean|null} [adminPaymentOverride] FullWeekendPass adminPaymentOverride
          */
 
         /**
@@ -1144,12 +1178,20 @@ $root.dss = (function() {
         FullWeekendPass.prototype.level = 0;
 
         /**
-         * FullWeekendPass paid.
-         * @member {boolean} paid
+         * FullWeekendPass squarePaid.
+         * @member {boolean} squarePaid
          * @memberof dss.FullWeekendPass
          * @instance
          */
-        FullWeekendPass.prototype.paid = false;
+        FullWeekendPass.prototype.squarePaid = false;
+
+        /**
+         * FullWeekendPass adminPaymentOverride.
+         * @member {boolean} adminPaymentOverride
+         * @memberof dss.FullWeekendPass
+         * @instance
+         */
+        FullWeekendPass.prototype.adminPaymentOverride = false;
 
         /**
          * Creates a new FullWeekendPass instance using the specified properties.
@@ -1179,8 +1221,10 @@ $root.dss = (function() {
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.tier);
             if (message.level != null && Object.hasOwnProperty.call(message, "level"))
                 writer.uint32(/* id 2, wireType 0 =*/16).int32(message.level);
-            if (message.paid != null && Object.hasOwnProperty.call(message, "paid"))
-                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.paid);
+            if (message.squarePaid != null && Object.hasOwnProperty.call(message, "squarePaid"))
+                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.squarePaid);
+            if (message.adminPaymentOverride != null && Object.hasOwnProperty.call(message, "adminPaymentOverride"))
+                writer.uint32(/* id 4, wireType 0 =*/32).bool(message.adminPaymentOverride);
             return writer;
         };
 
@@ -1222,7 +1266,10 @@ $root.dss = (function() {
                     message.level = reader.int32();
                     break;
                 case 3:
-                    message.paid = reader.bool();
+                    message.squarePaid = reader.bool();
+                    break;
+                case 4:
+                    message.adminPaymentOverride = reader.bool();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1279,9 +1326,12 @@ $root.dss = (function() {
                 case 2:
                     break;
                 }
-            if (message.paid != null && message.hasOwnProperty("paid"))
-                if (typeof message.paid !== "boolean")
-                    return "paid: boolean expected";
+            if (message.squarePaid != null && message.hasOwnProperty("squarePaid"))
+                if (typeof message.squarePaid !== "boolean")
+                    return "squarePaid: boolean expected";
+            if (message.adminPaymentOverride != null && message.hasOwnProperty("adminPaymentOverride"))
+                if (typeof message.adminPaymentOverride !== "boolean")
+                    return "adminPaymentOverride: boolean expected";
             return null;
         };
 
@@ -1333,8 +1383,10 @@ $root.dss = (function() {
                 message.level = 2;
                 break;
             }
-            if (object.paid != null)
-                message.paid = Boolean(object.paid);
+            if (object.squarePaid != null)
+                message.squarePaid = Boolean(object.squarePaid);
+            if (object.adminPaymentOverride != null)
+                message.adminPaymentOverride = Boolean(object.adminPaymentOverride);
             return message;
         };
 
@@ -1354,14 +1406,17 @@ $root.dss = (function() {
             if (options.defaults) {
                 object.tier = options.enums === String ? "Tier1" : 0;
                 object.level = options.enums === String ? "Level1" : 0;
-                object.paid = false;
+                object.squarePaid = false;
+                object.adminPaymentOverride = false;
             }
             if (message.tier != null && message.hasOwnProperty("tier"))
                 object.tier = options.enums === String ? $root.dss.FullWeekendPassTier[message.tier] : message.tier;
             if (message.level != null && message.hasOwnProperty("level"))
                 object.level = options.enums === String ? $root.dss.FullWeekendPassLevel[message.level] : message.level;
-            if (message.paid != null && message.hasOwnProperty("paid"))
-                object.paid = message.paid;
+            if (message.squarePaid != null && message.hasOwnProperty("squarePaid"))
+                object.squarePaid = message.squarePaid;
+            if (message.adminPaymentOverride != null && message.hasOwnProperty("adminPaymentOverride"))
+                object.adminPaymentOverride = message.adminPaymentOverride;
             return object;
         };
 
@@ -1385,7 +1440,8 @@ $root.dss = (function() {
          * Properties of a DanceOnlyPass.
          * @memberof dss
          * @interface IDanceOnlyPass
-         * @property {boolean|null} [paid] DanceOnlyPass paid
+         * @property {boolean|null} [squarePaid] DanceOnlyPass squarePaid
+         * @property {boolean|null} [adminPaymentOverride] DanceOnlyPass adminPaymentOverride
          */
 
         /**
@@ -1404,12 +1460,20 @@ $root.dss = (function() {
         }
 
         /**
-         * DanceOnlyPass paid.
-         * @member {boolean} paid
+         * DanceOnlyPass squarePaid.
+         * @member {boolean} squarePaid
          * @memberof dss.DanceOnlyPass
          * @instance
          */
-        DanceOnlyPass.prototype.paid = false;
+        DanceOnlyPass.prototype.squarePaid = false;
+
+        /**
+         * DanceOnlyPass adminPaymentOverride.
+         * @member {boolean} adminPaymentOverride
+         * @memberof dss.DanceOnlyPass
+         * @instance
+         */
+        DanceOnlyPass.prototype.adminPaymentOverride = false;
 
         /**
          * Creates a new DanceOnlyPass instance using the specified properties.
@@ -1435,8 +1499,10 @@ $root.dss = (function() {
         DanceOnlyPass.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.paid != null && Object.hasOwnProperty.call(message, "paid"))
-                writer.uint32(/* id 1, wireType 0 =*/8).bool(message.paid);
+            if (message.squarePaid != null && Object.hasOwnProperty.call(message, "squarePaid"))
+                writer.uint32(/* id 1, wireType 0 =*/8).bool(message.squarePaid);
+            if (message.adminPaymentOverride != null && Object.hasOwnProperty.call(message, "adminPaymentOverride"))
+                writer.uint32(/* id 2, wireType 0 =*/16).bool(message.adminPaymentOverride);
             return writer;
         };
 
@@ -1472,7 +1538,10 @@ $root.dss = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.paid = reader.bool();
+                    message.squarePaid = reader.bool();
+                    break;
+                case 2:
+                    message.adminPaymentOverride = reader.bool();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1509,9 +1578,12 @@ $root.dss = (function() {
         DanceOnlyPass.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.paid != null && message.hasOwnProperty("paid"))
-                if (typeof message.paid !== "boolean")
-                    return "paid: boolean expected";
+            if (message.squarePaid != null && message.hasOwnProperty("squarePaid"))
+                if (typeof message.squarePaid !== "boolean")
+                    return "squarePaid: boolean expected";
+            if (message.adminPaymentOverride != null && message.hasOwnProperty("adminPaymentOverride"))
+                if (typeof message.adminPaymentOverride !== "boolean")
+                    return "adminPaymentOverride: boolean expected";
             return null;
         };
 
@@ -1527,8 +1599,10 @@ $root.dss = (function() {
             if (object instanceof $root.dss.DanceOnlyPass)
                 return object;
             var message = new $root.dss.DanceOnlyPass();
-            if (object.paid != null)
-                message.paid = Boolean(object.paid);
+            if (object.squarePaid != null)
+                message.squarePaid = Boolean(object.squarePaid);
+            if (object.adminPaymentOverride != null)
+                message.adminPaymentOverride = Boolean(object.adminPaymentOverride);
             return message;
         };
 
@@ -1545,10 +1619,14 @@ $root.dss = (function() {
             if (!options)
                 options = {};
             var object = {};
-            if (options.defaults)
-                object.paid = false;
-            if (message.paid != null && message.hasOwnProperty("paid"))
-                object.paid = message.paid;
+            if (options.defaults) {
+                object.squarePaid = false;
+                object.adminPaymentOverride = false;
+            }
+            if (message.squarePaid != null && message.hasOwnProperty("squarePaid"))
+                object.squarePaid = message.squarePaid;
+            if (message.adminPaymentOverride != null && message.hasOwnProperty("adminPaymentOverride"))
+                object.adminPaymentOverride = message.adminPaymentOverride;
             return object;
         };
 
@@ -1733,7 +1811,8 @@ $root.dss = (function() {
          * @memberof dss
          * @interface IMixAndMatch
          * @property {dss.MixAndMatch.Role|null} [role] MixAndMatch role
-         * @property {boolean|null} [paid] MixAndMatch paid
+         * @property {boolean|null} [squarePaid] MixAndMatch squarePaid
+         * @property {boolean|null} [adminPaymentOverride] MixAndMatch adminPaymentOverride
          */
 
         /**
@@ -1760,12 +1839,20 @@ $root.dss = (function() {
         MixAndMatch.prototype.role = 0;
 
         /**
-         * MixAndMatch paid.
-         * @member {boolean} paid
+         * MixAndMatch squarePaid.
+         * @member {boolean} squarePaid
          * @memberof dss.MixAndMatch
          * @instance
          */
-        MixAndMatch.prototype.paid = false;
+        MixAndMatch.prototype.squarePaid = false;
+
+        /**
+         * MixAndMatch adminPaymentOverride.
+         * @member {boolean} adminPaymentOverride
+         * @memberof dss.MixAndMatch
+         * @instance
+         */
+        MixAndMatch.prototype.adminPaymentOverride = false;
 
         /**
          * Creates a new MixAndMatch instance using the specified properties.
@@ -1793,8 +1880,10 @@ $root.dss = (function() {
                 writer = $Writer.create();
             if (message.role != null && Object.hasOwnProperty.call(message, "role"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.role);
-            if (message.paid != null && Object.hasOwnProperty.call(message, "paid"))
-                writer.uint32(/* id 2, wireType 0 =*/16).bool(message.paid);
+            if (message.squarePaid != null && Object.hasOwnProperty.call(message, "squarePaid"))
+                writer.uint32(/* id 2, wireType 0 =*/16).bool(message.squarePaid);
+            if (message.adminPaymentOverride != null && Object.hasOwnProperty.call(message, "adminPaymentOverride"))
+                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.adminPaymentOverride);
             return writer;
         };
 
@@ -1833,7 +1922,10 @@ $root.dss = (function() {
                     message.role = reader.int32();
                     break;
                 case 2:
-                    message.paid = reader.bool();
+                    message.squarePaid = reader.bool();
+                    break;
+                case 3:
+                    message.adminPaymentOverride = reader.bool();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1878,9 +1970,12 @@ $root.dss = (function() {
                 case 1:
                     break;
                 }
-            if (message.paid != null && message.hasOwnProperty("paid"))
-                if (typeof message.paid !== "boolean")
-                    return "paid: boolean expected";
+            if (message.squarePaid != null && message.hasOwnProperty("squarePaid"))
+                if (typeof message.squarePaid !== "boolean")
+                    return "squarePaid: boolean expected";
+            if (message.adminPaymentOverride != null && message.hasOwnProperty("adminPaymentOverride"))
+                if (typeof message.adminPaymentOverride !== "boolean")
+                    return "adminPaymentOverride: boolean expected";
             return null;
         };
 
@@ -1906,8 +2001,10 @@ $root.dss = (function() {
                 message.role = 1;
                 break;
             }
-            if (object.paid != null)
-                message.paid = Boolean(object.paid);
+            if (object.squarePaid != null)
+                message.squarePaid = Boolean(object.squarePaid);
+            if (object.adminPaymentOverride != null)
+                message.adminPaymentOverride = Boolean(object.adminPaymentOverride);
             return message;
         };
 
@@ -1926,12 +2023,15 @@ $root.dss = (function() {
             var object = {};
             if (options.defaults) {
                 object.role = options.enums === String ? "Follower" : 0;
-                object.paid = false;
+                object.squarePaid = false;
+                object.adminPaymentOverride = false;
             }
             if (message.role != null && message.hasOwnProperty("role"))
                 object.role = options.enums === String ? $root.dss.MixAndMatch.Role[message.role] : message.role;
-            if (message.paid != null && message.hasOwnProperty("paid"))
-                object.paid = message.paid;
+            if (message.squarePaid != null && message.hasOwnProperty("squarePaid"))
+                object.squarePaid = message.squarePaid;
+            if (message.adminPaymentOverride != null && message.hasOwnProperty("adminPaymentOverride"))
+                object.adminPaymentOverride = message.adminPaymentOverride;
             return object;
         };
 
@@ -1969,7 +2069,8 @@ $root.dss = (function() {
          * Properties of a SoloJazz.
          * @memberof dss
          * @interface ISoloJazz
-         * @property {boolean|null} [paid] SoloJazz paid
+         * @property {boolean|null} [squarePaid] SoloJazz squarePaid
+         * @property {boolean|null} [adminPaymentOverride] SoloJazz adminPaymentOverride
          */
 
         /**
@@ -1988,12 +2089,20 @@ $root.dss = (function() {
         }
 
         /**
-         * SoloJazz paid.
-         * @member {boolean} paid
+         * SoloJazz squarePaid.
+         * @member {boolean} squarePaid
          * @memberof dss.SoloJazz
          * @instance
          */
-        SoloJazz.prototype.paid = false;
+        SoloJazz.prototype.squarePaid = false;
+
+        /**
+         * SoloJazz adminPaymentOverride.
+         * @member {boolean} adminPaymentOverride
+         * @memberof dss.SoloJazz
+         * @instance
+         */
+        SoloJazz.prototype.adminPaymentOverride = false;
 
         /**
          * Creates a new SoloJazz instance using the specified properties.
@@ -2019,8 +2128,10 @@ $root.dss = (function() {
         SoloJazz.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.paid != null && Object.hasOwnProperty.call(message, "paid"))
-                writer.uint32(/* id 1, wireType 0 =*/8).bool(message.paid);
+            if (message.squarePaid != null && Object.hasOwnProperty.call(message, "squarePaid"))
+                writer.uint32(/* id 1, wireType 0 =*/8).bool(message.squarePaid);
+            if (message.adminPaymentOverride != null && Object.hasOwnProperty.call(message, "adminPaymentOverride"))
+                writer.uint32(/* id 2, wireType 0 =*/16).bool(message.adminPaymentOverride);
             return writer;
         };
 
@@ -2056,7 +2167,10 @@ $root.dss = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.paid = reader.bool();
+                    message.squarePaid = reader.bool();
+                    break;
+                case 2:
+                    message.adminPaymentOverride = reader.bool();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -2093,9 +2207,12 @@ $root.dss = (function() {
         SoloJazz.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.paid != null && message.hasOwnProperty("paid"))
-                if (typeof message.paid !== "boolean")
-                    return "paid: boolean expected";
+            if (message.squarePaid != null && message.hasOwnProperty("squarePaid"))
+                if (typeof message.squarePaid !== "boolean")
+                    return "squarePaid: boolean expected";
+            if (message.adminPaymentOverride != null && message.hasOwnProperty("adminPaymentOverride"))
+                if (typeof message.adminPaymentOverride !== "boolean")
+                    return "adminPaymentOverride: boolean expected";
             return null;
         };
 
@@ -2111,8 +2228,10 @@ $root.dss = (function() {
             if (object instanceof $root.dss.SoloJazz)
                 return object;
             var message = new $root.dss.SoloJazz();
-            if (object.paid != null)
-                message.paid = Boolean(object.paid);
+            if (object.squarePaid != null)
+                message.squarePaid = Boolean(object.squarePaid);
+            if (object.adminPaymentOverride != null)
+                message.adminPaymentOverride = Boolean(object.adminPaymentOverride);
             return message;
         };
 
@@ -2129,10 +2248,14 @@ $root.dss = (function() {
             if (!options)
                 options = {};
             var object = {};
-            if (options.defaults)
-                object.paid = false;
-            if (message.paid != null && message.hasOwnProperty("paid"))
-                object.paid = message.paid;
+            if (options.defaults) {
+                object.squarePaid = false;
+                object.adminPaymentOverride = false;
+            }
+            if (message.squarePaid != null && message.hasOwnProperty("squarePaid"))
+                object.squarePaid = message.squarePaid;
+            if (message.adminPaymentOverride != null && message.hasOwnProperty("adminPaymentOverride"))
+                object.adminPaymentOverride = message.adminPaymentOverride;
             return object;
         };
 
@@ -2157,7 +2280,8 @@ $root.dss = (function() {
          * @memberof dss
          * @interface ITeamCompetition
          * @property {string|null} [name] TeamCompetition name
-         * @property {boolean|null} [paid] TeamCompetition paid
+         * @property {boolean|null} [squarePaid] TeamCompetition squarePaid
+         * @property {boolean|null} [adminPaymentOverride] TeamCompetition adminPaymentOverride
          */
 
         /**
@@ -2184,12 +2308,20 @@ $root.dss = (function() {
         TeamCompetition.prototype.name = "";
 
         /**
-         * TeamCompetition paid.
-         * @member {boolean} paid
+         * TeamCompetition squarePaid.
+         * @member {boolean} squarePaid
          * @memberof dss.TeamCompetition
          * @instance
          */
-        TeamCompetition.prototype.paid = false;
+        TeamCompetition.prototype.squarePaid = false;
+
+        /**
+         * TeamCompetition adminPaymentOverride.
+         * @member {boolean} adminPaymentOverride
+         * @memberof dss.TeamCompetition
+         * @instance
+         */
+        TeamCompetition.prototype.adminPaymentOverride = false;
 
         /**
          * Creates a new TeamCompetition instance using the specified properties.
@@ -2217,8 +2349,10 @@ $root.dss = (function() {
                 writer = $Writer.create();
             if (message.name != null && Object.hasOwnProperty.call(message, "name"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
-            if (message.paid != null && Object.hasOwnProperty.call(message, "paid"))
-                writer.uint32(/* id 2, wireType 0 =*/16).bool(message.paid);
+            if (message.squarePaid != null && Object.hasOwnProperty.call(message, "squarePaid"))
+                writer.uint32(/* id 2, wireType 0 =*/16).bool(message.squarePaid);
+            if (message.adminPaymentOverride != null && Object.hasOwnProperty.call(message, "adminPaymentOverride"))
+                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.adminPaymentOverride);
             return writer;
         };
 
@@ -2257,7 +2391,10 @@ $root.dss = (function() {
                     message.name = reader.string();
                     break;
                 case 2:
-                    message.paid = reader.bool();
+                    message.squarePaid = reader.bool();
+                    break;
+                case 3:
+                    message.adminPaymentOverride = reader.bool();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -2297,9 +2434,12 @@ $root.dss = (function() {
             if (message.name != null && message.hasOwnProperty("name"))
                 if (!$util.isString(message.name))
                     return "name: string expected";
-            if (message.paid != null && message.hasOwnProperty("paid"))
-                if (typeof message.paid !== "boolean")
-                    return "paid: boolean expected";
+            if (message.squarePaid != null && message.hasOwnProperty("squarePaid"))
+                if (typeof message.squarePaid !== "boolean")
+                    return "squarePaid: boolean expected";
+            if (message.adminPaymentOverride != null && message.hasOwnProperty("adminPaymentOverride"))
+                if (typeof message.adminPaymentOverride !== "boolean")
+                    return "adminPaymentOverride: boolean expected";
             return null;
         };
 
@@ -2317,8 +2457,10 @@ $root.dss = (function() {
             var message = new $root.dss.TeamCompetition();
             if (object.name != null)
                 message.name = String(object.name);
-            if (object.paid != null)
-                message.paid = Boolean(object.paid);
+            if (object.squarePaid != null)
+                message.squarePaid = Boolean(object.squarePaid);
+            if (object.adminPaymentOverride != null)
+                message.adminPaymentOverride = Boolean(object.adminPaymentOverride);
             return message;
         };
 
@@ -2337,12 +2479,15 @@ $root.dss = (function() {
             var object = {};
             if (options.defaults) {
                 object.name = "";
-                object.paid = false;
+                object.squarePaid = false;
+                object.adminPaymentOverride = false;
             }
             if (message.name != null && message.hasOwnProperty("name"))
                 object.name = message.name;
-            if (message.paid != null && message.hasOwnProperty("paid"))
-                object.paid = message.paid;
+            if (message.squarePaid != null && message.hasOwnProperty("squarePaid"))
+                object.squarePaid = message.squarePaid;
+            if (message.adminPaymentOverride != null && message.hasOwnProperty("adminPaymentOverride"))
+                object.adminPaymentOverride = message.adminPaymentOverride;
             return object;
         };
 
@@ -2367,7 +2512,8 @@ $root.dss = (function() {
          * @memberof dss
          * @interface ITShirt
          * @property {dss.TShirt.Style|null} [style] TShirt style
-         * @property {boolean|null} [paid] TShirt paid
+         * @property {boolean|null} [squarePaid] TShirt squarePaid
+         * @property {boolean|null} [adminPaymentOverride] TShirt adminPaymentOverride
          */
 
         /**
@@ -2394,12 +2540,20 @@ $root.dss = (function() {
         TShirt.prototype.style = 0;
 
         /**
-         * TShirt paid.
-         * @member {boolean} paid
+         * TShirt squarePaid.
+         * @member {boolean} squarePaid
          * @memberof dss.TShirt
          * @instance
          */
-        TShirt.prototype.paid = false;
+        TShirt.prototype.squarePaid = false;
+
+        /**
+         * TShirt adminPaymentOverride.
+         * @member {boolean} adminPaymentOverride
+         * @memberof dss.TShirt
+         * @instance
+         */
+        TShirt.prototype.adminPaymentOverride = false;
 
         /**
          * Creates a new TShirt instance using the specified properties.
@@ -2427,8 +2581,10 @@ $root.dss = (function() {
                 writer = $Writer.create();
             if (message.style != null && Object.hasOwnProperty.call(message, "style"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.style);
-            if (message.paid != null && Object.hasOwnProperty.call(message, "paid"))
-                writer.uint32(/* id 2, wireType 0 =*/16).bool(message.paid);
+            if (message.squarePaid != null && Object.hasOwnProperty.call(message, "squarePaid"))
+                writer.uint32(/* id 2, wireType 0 =*/16).bool(message.squarePaid);
+            if (message.adminPaymentOverride != null && Object.hasOwnProperty.call(message, "adminPaymentOverride"))
+                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.adminPaymentOverride);
             return writer;
         };
 
@@ -2467,7 +2623,10 @@ $root.dss = (function() {
                     message.style = reader.int32();
                     break;
                 case 2:
-                    message.paid = reader.bool();
+                    message.squarePaid = reader.bool();
+                    break;
+                case 3:
+                    message.adminPaymentOverride = reader.bool();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -2521,9 +2680,12 @@ $root.dss = (function() {
                 case 10:
                     break;
                 }
-            if (message.paid != null && message.hasOwnProperty("paid"))
-                if (typeof message.paid !== "boolean")
-                    return "paid: boolean expected";
+            if (message.squarePaid != null && message.hasOwnProperty("squarePaid"))
+                if (typeof message.squarePaid !== "boolean")
+                    return "squarePaid: boolean expected";
+            if (message.adminPaymentOverride != null && message.hasOwnProperty("adminPaymentOverride"))
+                if (typeof message.adminPaymentOverride !== "boolean")
+                    return "adminPaymentOverride: boolean expected";
             return null;
         };
 
@@ -2585,8 +2747,10 @@ $root.dss = (function() {
                 message.style = 10;
                 break;
             }
-            if (object.paid != null)
-                message.paid = Boolean(object.paid);
+            if (object.squarePaid != null)
+                message.squarePaid = Boolean(object.squarePaid);
+            if (object.adminPaymentOverride != null)
+                message.adminPaymentOverride = Boolean(object.adminPaymentOverride);
             return message;
         };
 
@@ -2605,12 +2769,15 @@ $root.dss = (function() {
             var object = {};
             if (options.defaults) {
                 object.style = options.enums === String ? "UnisexS" : 0;
-                object.paid = false;
+                object.squarePaid = false;
+                object.adminPaymentOverride = false;
             }
             if (message.style != null && message.hasOwnProperty("style"))
                 object.style = options.enums === String ? $root.dss.TShirt.Style[message.style] : message.style;
-            if (message.paid != null && message.hasOwnProperty("paid"))
-                object.paid = message.paid;
+            if (message.squarePaid != null && message.hasOwnProperty("squarePaid"))
+                object.squarePaid = message.squarePaid;
+            if (message.adminPaymentOverride != null && message.hasOwnProperty("adminPaymentOverride"))
+                object.adminPaymentOverride = message.adminPaymentOverride;
             return object;
         };
 
@@ -5583,6 +5750,374 @@ $root.dss = (function() {
         };
 
         return RegistrationListByUserRes;
+    })();
+
+    dss.RegistrationListReq = (function() {
+
+        /**
+         * Properties of a RegistrationListReq.
+         * @memberof dss
+         * @interface IRegistrationListReq
+         */
+
+        /**
+         * Constructs a new RegistrationListReq.
+         * @memberof dss
+         * @classdesc Represents a RegistrationListReq.
+         * @implements IRegistrationListReq
+         * @constructor
+         * @param {dss.IRegistrationListReq=} [properties] Properties to set
+         */
+        function RegistrationListReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Creates a new RegistrationListReq instance using the specified properties.
+         * @function create
+         * @memberof dss.RegistrationListReq
+         * @static
+         * @param {dss.IRegistrationListReq=} [properties] Properties to set
+         * @returns {dss.RegistrationListReq} RegistrationListReq instance
+         */
+        RegistrationListReq.create = function create(properties) {
+            return new RegistrationListReq(properties);
+        };
+
+        /**
+         * Encodes the specified RegistrationListReq message. Does not implicitly {@link dss.RegistrationListReq.verify|verify} messages.
+         * @function encode
+         * @memberof dss.RegistrationListReq
+         * @static
+         * @param {dss.IRegistrationListReq} message RegistrationListReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        RegistrationListReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified RegistrationListReq message, length delimited. Does not implicitly {@link dss.RegistrationListReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof dss.RegistrationListReq
+         * @static
+         * @param {dss.IRegistrationListReq} message RegistrationListReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        RegistrationListReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a RegistrationListReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof dss.RegistrationListReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {dss.RegistrationListReq} RegistrationListReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        RegistrationListReq.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.dss.RegistrationListReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a RegistrationListReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof dss.RegistrationListReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {dss.RegistrationListReq} RegistrationListReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        RegistrationListReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a RegistrationListReq message.
+         * @function verify
+         * @memberof dss.RegistrationListReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        RegistrationListReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            return null;
+        };
+
+        /**
+         * Creates a RegistrationListReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof dss.RegistrationListReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {dss.RegistrationListReq} RegistrationListReq
+         */
+        RegistrationListReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.dss.RegistrationListReq)
+                return object;
+            return new $root.dss.RegistrationListReq();
+        };
+
+        /**
+         * Creates a plain object from a RegistrationListReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof dss.RegistrationListReq
+         * @static
+         * @param {dss.RegistrationListReq} message RegistrationListReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        RegistrationListReq.toObject = function toObject() {
+            return {};
+        };
+
+        /**
+         * Converts this RegistrationListReq to JSON.
+         * @function toJSON
+         * @memberof dss.RegistrationListReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        RegistrationListReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return RegistrationListReq;
+    })();
+
+    dss.RegistrationListRes = (function() {
+
+        /**
+         * Properties of a RegistrationListRes.
+         * @memberof dss
+         * @interface IRegistrationListRes
+         * @property {Array.<dss.IRegistrationInfo>|null} [registrations] RegistrationListRes registrations
+         */
+
+        /**
+         * Constructs a new RegistrationListRes.
+         * @memberof dss
+         * @classdesc Represents a RegistrationListRes.
+         * @implements IRegistrationListRes
+         * @constructor
+         * @param {dss.IRegistrationListRes=} [properties] Properties to set
+         */
+        function RegistrationListRes(properties) {
+            this.registrations = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * RegistrationListRes registrations.
+         * @member {Array.<dss.IRegistrationInfo>} registrations
+         * @memberof dss.RegistrationListRes
+         * @instance
+         */
+        RegistrationListRes.prototype.registrations = $util.emptyArray;
+
+        /**
+         * Creates a new RegistrationListRes instance using the specified properties.
+         * @function create
+         * @memberof dss.RegistrationListRes
+         * @static
+         * @param {dss.IRegistrationListRes=} [properties] Properties to set
+         * @returns {dss.RegistrationListRes} RegistrationListRes instance
+         */
+        RegistrationListRes.create = function create(properties) {
+            return new RegistrationListRes(properties);
+        };
+
+        /**
+         * Encodes the specified RegistrationListRes message. Does not implicitly {@link dss.RegistrationListRes.verify|verify} messages.
+         * @function encode
+         * @memberof dss.RegistrationListRes
+         * @static
+         * @param {dss.IRegistrationListRes} message RegistrationListRes message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        RegistrationListRes.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.registrations != null && message.registrations.length)
+                for (var i = 0; i < message.registrations.length; ++i)
+                    $root.dss.RegistrationInfo.encode(message.registrations[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified RegistrationListRes message, length delimited. Does not implicitly {@link dss.RegistrationListRes.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof dss.RegistrationListRes
+         * @static
+         * @param {dss.IRegistrationListRes} message RegistrationListRes message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        RegistrationListRes.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a RegistrationListRes message from the specified reader or buffer.
+         * @function decode
+         * @memberof dss.RegistrationListRes
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {dss.RegistrationListRes} RegistrationListRes
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        RegistrationListRes.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.dss.RegistrationListRes();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    if (!(message.registrations && message.registrations.length))
+                        message.registrations = [];
+                    message.registrations.push($root.dss.RegistrationInfo.decode(reader, reader.uint32()));
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a RegistrationListRes message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof dss.RegistrationListRes
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {dss.RegistrationListRes} RegistrationListRes
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        RegistrationListRes.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a RegistrationListRes message.
+         * @function verify
+         * @memberof dss.RegistrationListRes
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        RegistrationListRes.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.registrations != null && message.hasOwnProperty("registrations")) {
+                if (!Array.isArray(message.registrations))
+                    return "registrations: array expected";
+                for (var i = 0; i < message.registrations.length; ++i) {
+                    var error = $root.dss.RegistrationInfo.verify(message.registrations[i]);
+                    if (error)
+                        return "registrations." + error;
+                }
+            }
+            return null;
+        };
+
+        /**
+         * Creates a RegistrationListRes message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof dss.RegistrationListRes
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {dss.RegistrationListRes} RegistrationListRes
+         */
+        RegistrationListRes.fromObject = function fromObject(object) {
+            if (object instanceof $root.dss.RegistrationListRes)
+                return object;
+            var message = new $root.dss.RegistrationListRes();
+            if (object.registrations) {
+                if (!Array.isArray(object.registrations))
+                    throw TypeError(".dss.RegistrationListRes.registrations: array expected");
+                message.registrations = [];
+                for (var i = 0; i < object.registrations.length; ++i) {
+                    if (typeof object.registrations[i] !== "object")
+                        throw TypeError(".dss.RegistrationListRes.registrations: object expected");
+                    message.registrations[i] = $root.dss.RegistrationInfo.fromObject(object.registrations[i]);
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a RegistrationListRes message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof dss.RegistrationListRes
+         * @static
+         * @param {dss.RegistrationListRes} message RegistrationListRes
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        RegistrationListRes.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults)
+                object.registrations = [];
+            if (message.registrations && message.registrations.length) {
+                object.registrations = [];
+                for (var j = 0; j < message.registrations.length; ++j)
+                    object.registrations[j] = $root.dss.RegistrationInfo.toObject(message.registrations[j], options);
+            }
+            return object;
+        };
+
+        /**
+         * Converts this RegistrationListRes to JSON.
+         * @function toJSON
+         * @memberof dss.RegistrationListRes
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        RegistrationListRes.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return RegistrationListRes;
     })();
 
     dss.RegistrationUploadVaxImageReq = (function() {

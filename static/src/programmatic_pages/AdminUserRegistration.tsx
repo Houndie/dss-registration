@@ -73,20 +73,6 @@ export default ({id}: UserRegistrationProps) => {
 
 				return (
 					<>
-						{!isPaid(myRegistration) && (
-							<Alert variant="warning">
-								<p>You registered for the following items, but haven't paid yet:</p>
-									<ul>
-										{(myRegistration.fullWeekendPass && !myRegistration.fullWeekendPass.squarePaid) && (<li>Full Weekend Pass</li>)}
-										{(myRegistration.danceOnlyPass && !myRegistration.danceOnlyPass.squarePaid) && (<li>Dance Only Pass</li>)}
-										{(myRegistration.mixAndMatch && !myRegistration.mixAndMatch.squarePaid) && (<li>Mix and Match</li>)}
-										{(myRegistration.soloJazz && !myRegistration.soloJazz.squarePaid) && (<li>Solo Jazz</li>)}
-										{(myRegistration.teamCompetition && !myRegistration.teamCompetition.squarePaid) && (<li>Team Competition</li>)}
-										{(myRegistration.tshirt && !myRegistration.tshirt.squarePaid) && (<li>T-Shirt</li>)}
-									</ul>
-								<p>You will be taken to the payment page after updating your registration</p>
-							</Alert>
-						)}
 						{(urlSearchParams && urlSearchParams.has("referenceId")) && (
 							<Alert variant="success">Registration updated successfully!</Alert>
 						)}
@@ -130,7 +116,7 @@ export default ({id}: UserRegistrationProps) => {
 
 								const tier = (myRegistration.fullWeekendPass && myRegistration.fullWeekendPass.tier ? myRegistration.fullWeekendPass.tier : prices.weekendPassTier)
 
-								const clientReg = toProtoRegistration(values, tier)
+								const clientReg = toProtoRegistration(values, tier, myRegistration)
 								clientReg.id = myRegistration.id
 								clientReg.createdAt = myRegistration.createdAt
 
@@ -196,7 +182,7 @@ export default ({id}: UserRegistrationProps) => {
 							<RegistrationForm 
 								weekendPassTier={prices.weekendPassTier}
 								previousRegistration={myRegistration}
-								admin={false}
+								admin={true}
 							/>
 						</Formik>
 					</>

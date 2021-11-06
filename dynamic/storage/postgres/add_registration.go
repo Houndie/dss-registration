@@ -26,13 +26,18 @@ func init() {
 			{{ .PassTypeCol }},
 			{{ .FullWeekendLevelCol }},
 			{{ .FullWeekendTierCol }},
+			{{ .PassManuallyPaidCol }},
 			{{ .MixAndMatchCol }},
 			{{ .MixAndMatchRoleCol }},
+			{{ .MixAndMatchManuallyPaidCol }},
 			{{ .SoloJazzCol }},
+			{{ .SoloJazzManuallyPaidCol }},
 			{{ .TeamCompetitionCol }},
 			{{ .TeamCompetitionNameCol }},
+			{{ .TeamCompetitionManuallyPaidCol }},
 			{{ .TShirtCol }},
 			{{ .TShirtStyleCol }},
+			{{ .TShirtManuallyPaidCol }},
 			{{ .HousingCol }},
 			{{ .ProvideHousingPetsCol }},
 			{{ .ProvideHousingQuantityCol }},
@@ -42,7 +47,7 @@ func init() {
 			{{ .UserIDCol }},
 			{{ .OrderIDsCol }},
 			{{ .DiscountCodesCol }})
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33)
 		RETURNING {{ .IDCol }};`
 
 	tmpl, err := template.New("tmpl").Parse(tmplStmt)
@@ -60,12 +65,13 @@ func init() {
 }
 
 func (s *Store) AddRegistration(ctx context.Context, registration *storage.Registration) (string, error) {
-	passType, fullWeekendLevel, fullWeekendTier, err := toDBPassType(registration.PassType)
+	passType, fullWeekendLevel, fullWeekendTier, passManuallyPaid, err := toDBPassType(registration.PassType)
 	if err != nil {
 		return "", err
 	}
 
 	mixAndMatch := false
+	mixAndMatchManuallyPaid := false
 	var mixAndMatchRole *string
 	if registration.MixAndMatch != nil {
 		mixAndMatch = true
@@ -74,16 +80,27 @@ func (s *Store) AddRegistration(ctx context.Context, registration *storage.Regis
 			return "", fmt.Errorf("unknown mix and match role found: %v", registration.MixAndMatch.Role)
 		}
 		mixAndMatchRole = &mixAndMatchRoleStr
+		mixAndMatchManuallyPaid = registration.MixAndMatch.ManuallyPaid
 	}
 
 	teamCompetition := false
+	teamCompetitionManuallyPaid := false
 	var teamCompetitionName string
 	if registration.TeamCompetition != nil {
 		teamCompetition = true
 		teamCompetitionName = registration.TeamCompetition.Name
+		teamCompetitionManuallyPaid = registration.TeamCompetition.ManuallyPaid
+	}
+
+	soloJazz := false
+	soloJazzManuallyPaid := false
+	if registration.SoloJazz != nil {
+		soloJazz = true
+		soloJazzManuallyPaid = registration.SoloJazz.ManuallyPaid
 	}
 
 	tshirt := false
+	tshirtManuallyPaid := false
 	var tshirtStyle *string
 	if registration.TShirt != nil {
 		tshirt = true
@@ -92,6 +109,7 @@ func (s *Store) AddRegistration(ctx context.Context, registration *storage.Regis
 			return "", fmt.Errorf("unknown tshirt style found: %v", registration.TShirt.Style)
 		}
 		tshirtStyle = &tshirtStyleStr
+		tshirtManuallyPaid = registration.TShirt.ManuallyPaid
 	}
 
 	housing, provideHousingPets, provideHousingQuantity, provideHousingDetails, requireHousingPetAllergies, requireHousingDetails, err := toDBHousingType(registration.Housing)
@@ -123,13 +141,18 @@ func (s *Store) AddRegistration(ctx context.Context, registration *storage.Regis
 		passType,
 		fullWeekendLevel,
 		fullWeekendTier,
+		passManuallyPaid,
 		mixAndMatch,
 		mixAndMatchRole,
-		registration.SoloJazz,
+		mixAndMatchManuallyPaid,
+		soloJazz,
+		soloJazzManuallyPaid,
 		teamCompetition,
 		teamCompetitionName,
+		teamCompetitionManuallyPaid,
 		tshirt,
 		tshirtStyle,
+		tshirtManuallyPaid,
 		housing,
 		provideHousingPets,
 		provideHousingQuantity,

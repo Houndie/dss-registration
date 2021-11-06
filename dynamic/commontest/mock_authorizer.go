@@ -17,18 +17,18 @@ func (m *MockAuthorizer) GetUserinfo(ctx context.Context, accessToken string) (a
 
 type MockUserinfo struct {
 	UserIDFunc    func() string
-	IsAllowedFunc func(permission authorizer.Permission) bool
+	IsAllowedFunc func(permission string) bool
 }
 
 func (m *MockUserinfo) UserID() string {
 	return m.UserIDFunc()
 }
 
-func (m *MockUserinfo) IsAllowed(permission authorizer.Permission) bool {
+func (m *MockUserinfo) IsAllowed(permission string) bool {
 	return m.IsAllowedFunc(permission)
 }
 
-func UserinfoFromIDCheck(t *testing.T, expectedToken string, expectedPermissions []authorizer.Permission, ID string, permissions []authorizer.Permission) func(ctx context.Context, accessToken string) (authorizer.Userinfo, error) {
+func UserinfoFromIDCheck(t *testing.T, expectedToken string, expectedPermissions []string, ID string, permissions []string) func(ctx context.Context, accessToken string) (authorizer.Userinfo, error) {
 	return func(ctx context.Context, accessToken string) (authorizer.Userinfo, error) {
 		if accessToken == "" {
 			t.Fatalf("authorizer called but no accessToken provided")
@@ -38,7 +38,7 @@ func UserinfoFromIDCheck(t *testing.T, expectedToken string, expectedPermissions
 		}
 		return &MockUserinfo{
 			UserIDFunc: func() string { return ID },
-			IsAllowedFunc: func(permission authorizer.Permission) bool {
+			IsAllowedFunc: func(permission string) bool {
 				found := false
 				for _, p := range expectedPermissions {
 					if permission == p {
@@ -60,11 +60,11 @@ func UserinfoFromIDCheck(t *testing.T, expectedToken string, expectedPermissions
 	}
 }
 
-func UserinfoFromID(ID string, permissions []authorizer.Permission) func(ctx context.Context, accessToken string) (authorizer.Userinfo, error) {
+func UserinfoFromID(ID string, permissions []string) func(ctx context.Context, accessToken string) (authorizer.Userinfo, error) {
 	return func(ctx context.Context, accessToken string) (authorizer.Userinfo, error) {
 		return &MockUserinfo{
 			UserIDFunc: func() string { return ID },
-			IsAllowedFunc: func(permission authorizer.Permission) bool {
+			IsAllowedFunc: func(permission string) bool {
 				for _, p := range permissions {
 					if permission == p {
 						return true

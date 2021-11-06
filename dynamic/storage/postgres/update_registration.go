@@ -27,23 +27,28 @@ func init() {
 			{{.PassTypeCol}} = $10,
 			{{.FullWeekendLevelCol}} = $11,
 			{{.FullWeekendTierCol}} = $12,
-			{{.MixAndMatchCol}} = $13,
-			{{.MixAndMatchRoleCol}} = $14,
-			{{.SoloJazzCol}} = $15,
-			{{.TeamCompetitionCol}} = $16,
-			{{.TeamCompetitionNameCol}} = $17,
-			{{.TShirtCol}} = $18,
-			{{.TShirtStyleCol}} = $19,
-			{{.HousingCol}} = $20,
-			{{.ProvideHousingPetsCol}} = $21,
-			{{.ProvideHousingQuantityCol}} = $22,
-			{{.ProvideHousingDetailsCol}} = $23,
-			{{.RequireHousingPetAllergiesCol}} = $24,
-			{{.RequireHousingDetailsCol}} = $25,
-			{{.UserIDCol}} = $26,
-			{{.OrderIDsCol}} = $27,
-			{{.DiscountCodesCol}} = $28
-		WHERE {{.IDCol}} = $29;`
+			{{.PassManuallyPaidCol}} = $13,
+			{{.MixAndMatchCol}} = $14,
+			{{.MixAndMatchRoleCol}} = $15,
+			{{.MixAndMatchManuallyPaidCol}} = $16,
+			{{.SoloJazzCol}} = $17,
+			{{.SoloJazzManuallyPaidCol}} = $18,
+			{{.TeamCompetitionCol}} = $19,
+			{{.TeamCompetitionNameCol}} = $20,
+			{{.TeamCompetitionManuallyPaidCol}} = $21,
+			{{.TShirtCol}} = $22,
+			{{.TShirtStyleCol}} = $23,
+			{{.TShirtManuallyPaidCol}} = $24,
+			{{.HousingCol}} = $25,
+			{{.ProvideHousingPetsCol}} = $26,
+			{{.ProvideHousingQuantityCol}} = $27,
+			{{.ProvideHousingDetailsCol}} = $28,
+			{{.RequireHousingPetAllergiesCol}} = $29,
+			{{.RequireHousingDetailsCol}} = $30,
+			{{.UserIDCol}} = $31,
+			{{.OrderIDsCol}} = $32,
+			{{.DiscountCodesCol}} = $33
+		WHERE {{.IDCol}} = $34;`
 
 	tmpl, err := template.New("tmpl").Parse(tmplStmt)
 	if err != nil {
@@ -64,13 +69,14 @@ func (s *Store) UpdateRegistration(ctx context.Context, registration *storage.Re
 	if err != nil {
 		return storage.ErrNoRegistrationForID{ID: registration.ID}
 	}
-	passType, fullWeekendLevel, fullWeekendTier, err := toDBPassType(registration.PassType)
+	passType, fullWeekendLevel, fullWeekendTier, passManuallyPaid, err := toDBPassType(registration.PassType)
 	if err != nil {
 		return err
 	}
 
 	mixAndMatch := false
 	var mixAndMatchRole *string
+	mixAndMatchManuallyPaid := false
 	if registration.MixAndMatch != nil {
 		mixAndMatch = true
 		mixAndMatchRoleStr, ok := roleToEnum[registration.MixAndMatch.Role]
@@ -78,17 +84,28 @@ func (s *Store) UpdateRegistration(ctx context.Context, registration *storage.Re
 			return fmt.Errorf("unknown mix and match role found: %v", registration.MixAndMatch.Role)
 		}
 		mixAndMatchRole = &mixAndMatchRoleStr
+		mixAndMatchManuallyPaid = registration.MixAndMatch.ManuallyPaid
+	}
+
+	soloJazz := false
+	soloJazzManuallyPaid := false
+	if registration.SoloJazz != nil {
+		soloJazz = true
+		soloJazzManuallyPaid = registration.SoloJazz.ManuallyPaid
 	}
 
 	teamCompetition := false
 	var teamCompetitionName string
+	teamCompetitionManuallyPaid := false
 	if registration.TeamCompetition != nil {
 		teamCompetition = true
 		teamCompetitionName = registration.TeamCompetition.Name
+		teamCompetitionManuallyPaid = registration.TeamCompetition.ManuallyPaid
 	}
 
 	tshirt := false
 	var tshirtStyle *string
+	tshirtManuallyPaid := false
 	if registration.TShirt != nil {
 		tshirt = true
 		tshirtStyleStr, ok := styleToEnum[registration.TShirt.Style]
@@ -96,6 +113,7 @@ func (s *Store) UpdateRegistration(ctx context.Context, registration *storage.Re
 			return fmt.Errorf("unknown tshirt style found: %v", registration.TShirt.Style)
 		}
 		tshirtStyle = &tshirtStyleStr
+		tshirtManuallyPaid = registration.TShirt.ManuallyPaid
 	}
 
 	housing, provideHousingPets, provideHousingQuantity, provideHousingDetails, requireHousingPetAllergies, requireHousingDetails, err := toDBHousingType(registration.Housing)
@@ -126,13 +144,18 @@ func (s *Store) UpdateRegistration(ctx context.Context, registration *storage.Re
 		passType,
 		fullWeekendLevel,
 		fullWeekendTier,
+		passManuallyPaid,
 		mixAndMatch,
 		mixAndMatchRole,
-		registration.SoloJazz,
+		mixAndMatchManuallyPaid,
+		soloJazz,
+		soloJazzManuallyPaid,
 		teamCompetition,
 		teamCompetitionName,
+		teamCompetitionManuallyPaid,
 		tshirt,
 		tshirtStyle,
+		tshirtManuallyPaid,
 		housing,
 		provideHousingPets,
 		provideHousingQuantity,

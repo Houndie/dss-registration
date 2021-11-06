@@ -110,13 +110,15 @@ func fromProtoc(r *pb.RegistrationInfo) (*registration.Info, error) {
 		}
 
 		passType = &registration.WeekendPass{
-			Tier:  tier,
-			Level: level,
-			Paid:  pt.FullWeekendPass.Paid,
+			Tier:                 tier,
+			Level:                level,
+			SquarePaid:           pt.FullWeekendPass.SquarePaid,
+			AdminPaymentOverride: pt.FullWeekendPass.AdminPaymentOverride,
 		}
 	case *pb.RegistrationInfo_DanceOnlyPass:
 		passType = &registration.DanceOnlyPass{
-			Paid: pt.DanceOnlyPass.Paid,
+			SquarePaid:           pt.DanceOnlyPass.SquarePaid,
+			AdminPaymentOverride: pt.DanceOnlyPass.AdminPaymentOverride,
 		}
 	case *pb.RegistrationInfo_NoPass:
 		passType = &registration.NoPass{}
@@ -137,23 +139,26 @@ func fromProtoc(r *pb.RegistrationInfo) (*registration.Info, error) {
 			}
 		}
 		mixAndMatch = &registration.MixAndMatch{
-			Role: role,
-			Paid: r.MixAndMatch.Paid,
+			Role:                 role,
+			SquarePaid:           r.MixAndMatch.SquarePaid,
+			AdminPaymentOverride: r.MixAndMatch.AdminPaymentOverride,
 		}
 	}
 
 	var soloJazz *registration.SoloJazz
 	if r.SoloJazz != nil {
 		soloJazz = &registration.SoloJazz{
-			Paid: r.SoloJazz.Paid,
+			SquarePaid:           r.SoloJazz.SquarePaid,
+			AdminPaymentOverride: r.SoloJazz.AdminPaymentOverride,
 		}
 	}
 
 	var teamCompetition *registration.TeamCompetition
 	if r.TeamCompetition != nil {
 		teamCompetition = &registration.TeamCompetition{
-			Name: r.TeamCompetition.Name,
-			Paid: r.TeamCompetition.Paid,
+			Name:                 r.TeamCompetition.Name,
+			SquarePaid:           r.TeamCompetition.SquarePaid,
+			AdminPaymentOverride: r.TeamCompetition.AdminPaymentOverride,
 		}
 	}
 
@@ -167,8 +172,9 @@ func fromProtoc(r *pb.RegistrationInfo) (*registration.Info, error) {
 			}
 		}
 		tShirt = &registration.TShirt{
-			Style: style,
-			Paid:  r.Tshirt.Paid,
+			Style:                style,
+			SquarePaid:           r.Tshirt.SquarePaid,
+			AdminPaymentOverride: r.Tshirt.AdminPaymentOverride,
 		}
 	}
 
@@ -269,15 +275,17 @@ func toProtoc(r *registration.Info) (*pb.RegistrationInfo, error) {
 		}
 		result.PassType = &pb.RegistrationInfo_FullWeekendPass{
 			FullWeekendPass: &pb.FullWeekendPass{
-				Tier:  tier,
-				Level: level,
-				Paid:  pt.Paid,
+				Tier:                 tier,
+				Level:                level,
+				SquarePaid:           pt.SquarePaid,
+				AdminPaymentOverride: pt.AdminPaymentOverride,
 			},
 		}
 	case *registration.DanceOnlyPass:
 		result.PassType = &pb.RegistrationInfo_DanceOnlyPass{
 			DanceOnlyPass: &pb.DanceOnlyPass{
-				Paid: pt.Paid,
+				SquarePaid:           pt.SquarePaid,
+				AdminPaymentOverride: pt.AdminPaymentOverride,
 			},
 		}
 	case *registration.NoPass:
@@ -294,21 +302,24 @@ func toProtoc(r *registration.Info) (*pb.RegistrationInfo, error) {
 			return nil, fmt.Errorf("unknown role %s", role)
 		}
 		result.MixAndMatch = &pb.MixAndMatch{
-			Role: role,
-			Paid: r.MixAndMatch.Paid,
+			Role:                 role,
+			SquarePaid:           r.MixAndMatch.SquarePaid,
+			AdminPaymentOverride: r.MixAndMatch.AdminPaymentOverride,
 		}
 	}
 
 	if r.SoloJazz != nil {
 		result.SoloJazz = &pb.SoloJazz{
-			Paid: r.SoloJazz.Paid,
+			SquarePaid:           r.SoloJazz.SquarePaid,
+			AdminPaymentOverride: r.SoloJazz.AdminPaymentOverride,
 		}
 	}
 
 	if r.TeamCompetition != nil {
 		result.TeamCompetition = &pb.TeamCompetition{
-			Name: r.TeamCompetition.Name,
-			Paid: r.TeamCompetition.Paid,
+			Name:                 r.TeamCompetition.Name,
+			SquarePaid:           r.TeamCompetition.SquarePaid,
+			AdminPaymentOverride: r.TeamCompetition.AdminPaymentOverride,
 		}
 	}
 

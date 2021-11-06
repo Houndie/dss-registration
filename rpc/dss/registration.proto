@@ -8,6 +8,7 @@ service Registration {
   rpc Pay(RegistrationPayReq) returns (RegistrationPayRes);
   rpc Get(RegistrationGetReq) returns (RegistrationGetRes);
   rpc ListByUser(RegistrationListByUserReq) returns (RegistrationListByUserRes);
+  rpc List(RegistrationListReq) returns (RegistrationListRes);
   rpc Prices(RegistrationPricesReq) returns (RegistrationPricesRes);
   rpc Update(RegistrationUpdateReq) returns (RegistrationUpdateRes);
   rpc UploadVaxImage(RegistrationUploadVaxImageReq) returns (RegistrationUploadVaxImageRes);
@@ -58,11 +59,13 @@ enum FullWeekendPassLevel {
 message FullWeekendPass {
 	FullWeekendPassTier tier = 1;
 	FullWeekendPassLevel level = 2;
-	bool paid = 3;
+	bool squarePaid = 3;
+	bool adminPaymentOverride = 4;
 }
 
 message DanceOnlyPass {
-	bool paid = 1;
+	bool squarePaid = 1;
+	bool adminPaymentOverride = 2;
 }
 
 message NoPass{}
@@ -73,16 +76,19 @@ message MixAndMatch {
 		Leader = 1;
 	}
 	Role role = 1;
-	bool paid = 2;
+	bool squarePaid = 2;
+	bool adminPaymentOverride = 3;
 }
 
 message SoloJazz {
-	bool paid = 1;
+	bool squarePaid = 1;
+	bool adminPaymentOverride = 2;
 }
 
 message TeamCompetition {
 	string name = 1;
-	bool paid = 2;
+	bool squarePaid = 2;
+	bool adminPaymentOverride = 3;
 }
 
 message TShirt {
@@ -100,7 +106,8 @@ message TShirt {
 		Bella2XL = 10;
 	}
 	Style style = 1;
-	bool paid = 2;
+	bool squarePaid = 2;
+	bool adminPaymentOverride = 3;
 }
 
 message ProvideHousing {
@@ -159,6 +166,12 @@ message RegistrationUpdateRes {
 message RegistrationListByUserReq {}
 
 message RegistrationListByUserRes{
+	repeated RegistrationInfo registrations = 1;
+}
+
+message RegistrationListReq {}
+
+message RegistrationListRes{
 	repeated RegistrationInfo registrations = 1;
 }
 

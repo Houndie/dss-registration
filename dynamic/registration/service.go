@@ -20,34 +20,42 @@ type MailClient interface {
 type Store interface {
 	AddRegistration(context.Context, *storage.Registration) (string, error)
 	GetRegistrationsByUser(ctx context.Context, userId string) ([]*storage.Registration, error)
+	ListRegistrations(ctx context.Context) ([]*storage.Registration, error)
 	GetRegistration(ctx context.Context, id string) (*storage.Registration, error)
 	IsAdmin(context.Context, string) (bool, error)
 	UpdateRegistration(ctx context.Context, r *storage.Registration) error
 }
 
-type Service struct {
-	client         *square.Client
-	squareData     *common.SquareData
-	logger         *logrus.Logger
-	active         bool
-	useMailSandbox bool
-	authorizer     Authorizer
-	store          Store
-	mailClient     MailClient
-	objectClient   object.Client
+type PermissionConfig struct {
+	List   string
+	Update string
 }
 
-func NewService(active, useMailSandbox bool, logger *logrus.Logger, client *square.Client, squareData *common.SquareData, authorizer Authorizer, store Store, mailClient MailClient, objectClient object.Client) *Service {
+type Service struct {
+	client           *square.Client
+	squareData       *common.SquareData
+	logger           *logrus.Logger
+	active           bool
+	useMailSandbox   bool
+	authorizer       Authorizer
+	store            Store
+	mailClient       MailClient
+	objectClient     object.Client
+	permissionConfig *PermissionConfig
+}
+
+func NewService(active, useMailSandbox bool, logger *logrus.Logger, client *square.Client, squareData *common.SquareData, authorizer Authorizer, store Store, mailClient MailClient, objectClient object.Client, permissionConfig *PermissionConfig) *Service {
 	return &Service{
-		active:         active,
-		useMailSandbox: useMailSandbox,
-		client:         client,
-		logger:         logger,
-		authorizer:     authorizer,
-		store:          store,
-		mailClient:     mailClient,
-		squareData:     squareData,
-		objectClient:   objectClient,
+		active:           active,
+		useMailSandbox:   useMailSandbox,
+		client:           client,
+		logger:           logger,
+		authorizer:       authorizer,
+		store:            store,
+		mailClient:       mailClient,
+		squareData:       squareData,
+		objectClient:     objectClient,
+		permissionConfig: permissionConfig,
 	}
 }
 

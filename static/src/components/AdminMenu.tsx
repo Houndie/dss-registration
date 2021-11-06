@@ -12,9 +12,8 @@ export default () => (
 			<Navbar.Toggle aria-controls="basic-navbar-nav"/>
 			<Navbar.Collapse className="justify-content-end">
 				<Nav>
-					<NavDropdown title="Discounts" id="menu-discounts">
-						<NavDropdown.Item href="/admin/discounts">List</NavDropdown.Item>
-						<NavDropdown.Item href="/admin/discounts/add">Add</NavDropdown.Item>
+					<NavDropdown title="Registrations" id="menu-discounts">
+						<NavDropdown.Item href="/admin/registrations">List</NavDropdown.Item>
 					</NavDropdown>
 					<LoginLogout/>
 				</Nav>

@@ -38,3 +38,27 @@ type ErrFileTooBig struct {
 func (e ErrFileTooBig) Error() string {
 	return fmt.Sprintf("filesize %d is too big", e.Filesize)
 }
+
+type ErrHasAdminOverride struct {
+	Field string
+}
+
+func (e ErrHasAdminOverride) Error() string {
+	return fmt.Sprintf("%s has payment admin override", e.Field)
+}
+
+type ErrHasSquarePayment struct {
+	Field string
+}
+
+func (e ErrHasSquarePayment) Error() string {
+	return fmt.Sprintf("%s square payment cannot be set", e.Field)
+}
+
+type ErrHasImmutableField struct {
+	Field string
+}
+
+func (e ErrHasImmutableField) Error() string {
+	return fmt.Sprintf("cannot modify field %s", e.Field)
+}
