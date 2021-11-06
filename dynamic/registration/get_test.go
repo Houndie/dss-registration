@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
@@ -34,7 +33,7 @@ func TestGet(t *testing.T) {
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
 	authorizer := &commontest.MockAuthorizer{
-		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, []authorizer.Permission{}, expectedUserID, []authorizer.Permission{}),
+		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, []string{testPermissionConfig.List}, expectedUserID, []string{}),
 	}
 	co := commontest.CommonCatalogObjects()
 	style := storage.TShirtStyleBellaM
@@ -65,22 +64,22 @@ func TestGet(t *testing.T) {
 		HomeScene:     "Fiji",
 		IsStudent:     true,
 		PassType: &WeekendPass{
-			Tier:  storage.Tier2,
-			Level: storage.Level1,
-			Paid:  true,
+			Tier:       storage.Tier2,
+			Level:      storage.Level1,
+			SquarePaid: true,
 		},
 		MixAndMatch: &MixAndMatch{
 			Role: storage.MixAndMatchRoleLeader,
 		},
 		SoloJazz: &SoloJazz{
-			Paid: true,
+			SquarePaid: true,
 		},
 		TeamCompetition: &TeamCompetition{
 			Name: "Cops R Us",
 		},
 		TShirt: &TShirt{
-			Style: style,
-			Paid:  true,
+			Style:      style,
+			SquarePaid: true,
 		},
 		Housing: &storage.ProvideHousing{
 			Quantity: 11,
@@ -133,7 +132,7 @@ func TestGet(t *testing.T) {
 		},
 	}
 
-	service := NewService(true, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, &commontest.MockMailClient{}, nil)
+	service := NewService(true, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, &commontest.MockMailClient{}, nil, testPermissionConfig)
 	r, err := service.Get(context.Background(), expectedToken, expectedRegistrationID)
 	if err != nil {
 		t.Fatalf("error in get registration call: %v", err)
@@ -158,7 +157,7 @@ func TestGetWrongUser(t *testing.T) {
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
 	authorizer := &commontest.MockAuthorizer{
-		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, []authorizer.Permission{}, expectedUserID, []authorizer.Permission{}),
+		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, []string{testPermissionConfig.List}, expectedUserID, []string{}),
 	}
 	style := storage.TShirtStyleBellaM
 	co := commontest.CommonCatalogObjects()
@@ -188,22 +187,22 @@ func TestGetWrongUser(t *testing.T) {
 		HomeScene:     "Fiji",
 		IsStudent:     true,
 		PassType: &WeekendPass{
-			Tier:  storage.Tier2,
-			Level: storage.Level1,
-			Paid:  true,
+			Tier:       storage.Tier2,
+			Level:      storage.Level1,
+			SquarePaid: true,
 		},
 		MixAndMatch: &MixAndMatch{
 			Role: storage.MixAndMatchRoleLeader,
 		},
 		SoloJazz: &SoloJazz{
-			Paid: true,
+			SquarePaid: true,
 		},
 		TeamCompetition: &TeamCompetition{
 			Name: "Cops R Us",
 		},
 		TShirt: &TShirt{
-			Style: style,
-			Paid:  true,
+			Style:      style,
+			SquarePaid: true,
 		},
 		Housing: &storage.ProvideHousing{
 			Quantity: 11,
@@ -272,7 +271,7 @@ func TestGetWrongUser(t *testing.T) {
 				},
 			}
 
-			service := NewService(true, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, &commontest.MockMailClient{}, nil)
+			service := NewService(true, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, &commontest.MockMailClient{}, nil, testPermissionConfig)
 			_, err = service.Get(context.Background(), expectedToken, expectedRegistrationID)
 			if err == nil {
 				t.Fatalf("expected error, found none")

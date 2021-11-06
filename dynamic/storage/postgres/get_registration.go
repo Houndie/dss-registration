@@ -29,13 +29,18 @@ func init() {
 			{{.PassTypeCol}},
 			{{.FullWeekendLevelCol}},
 			{{.FullWeekendTierCol}},
+			{{.PassManuallyPaidCol}},
 			{{.MixAndMatchCol}},
 			{{.MixAndMatchRoleCol}},
+			{{.MixAndMatchManuallyPaidCol}},
 			{{.SoloJazzCol}},
+			{{.SoloJazzManuallyPaidCol}},
 			{{.TeamCompetitionCol}},
 			{{.TeamCompetitionNameCol}},
+			{{.TeamCompetitionManuallyPaidCol}},
 			{{.TShirtCol}},
 			{{.TShirtStyleCol}},
+			{{.TShirtManuallyPaidCol}},
 			{{.HousingCol}},
 			{{.ProvideHousingPetsCol}},
 			{{.ProvideHousingQuantityCol}},
@@ -74,12 +79,18 @@ func (s *Store) GetRegistration(ctx context.Context, id string) (*storage.Regist
 	var passType string
 	var fullWeekendLevel *string
 	var fullWeekendTier *string
+	var passManuallyPaid bool
 	var mixAndMatch bool
 	var mixAndMatchRole *string
+	var mixAndMatchManuallyPaid bool
+	var soloJazz bool
+	var soloJazzManuallyPaid bool
 	var teamCompetition bool
 	var teamCompetitionName string
+	var teamCompetitionManuallyPaid bool
 	var tshirt bool
 	var tshirtStyle *string
+	var tshirtManuallyPaid bool
 	var housing string
 	var provideHousingPets string
 	var provideHousingQuantity int
@@ -100,13 +111,18 @@ func (s *Store) GetRegistration(ctx context.Context, id string) (*storage.Regist
 		&passType,
 		&fullWeekendLevel,
 		&fullWeekendTier,
+		&passManuallyPaid,
 		&mixAndMatch,
 		&mixAndMatchRole,
-		&r.SoloJazz,
+		&mixAndMatchManuallyPaid,
+		&soloJazz,
+		&soloJazzManuallyPaid,
 		&teamCompetition,
 		&teamCompetitionName,
+		&teamCompetitionManuallyPaid,
 		&tshirt,
 		&tshirtStyle,
+		&tshirtManuallyPaid,
 		&housing,
 		&provideHousingPets,
 		&provideHousingQuantity,
@@ -124,7 +140,7 @@ func (s *Store) GetRegistration(ctx context.Context, id string) (*storage.Regist
 		return nil, err
 	}
 
-	r.PassType, err = fromDBPassType(passType, fullWeekendTier, fullWeekendLevel)
+	r.PassType, err = fromDBPassType(passType, fullWeekendTier, fullWeekendLevel, passManuallyPaid)
 	if err != nil {
 		return nil, err
 	}
@@ -134,11 +150,23 @@ func (s *Store) GetRegistration(ctx context.Context, id string) (*storage.Regist
 		if !ok {
 			return nil, fmt.Errorf("unknown mix and match role found: %v", *mixAndMatchRole)
 		}
-		r.MixAndMatch = &storage.MixAndMatch{Role: role}
+		r.MixAndMatch = &storage.MixAndMatch{
+			Role:         role,
+			ManuallyPaid: mixAndMatchManuallyPaid,
+		}
+	}
+
+	if soloJazz {
+		r.SoloJazz = &storage.SoloJazz{
+			ManuallyPaid: soloJazzManuallyPaid,
+		}
 	}
 
 	if teamCompetition {
-		r.TeamCompetition = &storage.TeamCompetition{Name: teamCompetitionName}
+		r.TeamCompetition = &storage.TeamCompetition{
+			Name:         teamCompetitionName,
+			ManuallyPaid: teamCompetitionManuallyPaid,
+		}
 	}
 
 	if tshirt {
@@ -146,7 +174,10 @@ func (s *Store) GetRegistration(ctx context.Context, id string) (*storage.Regist
 		if !ok {
 			return nil, fmt.Errorf("unknown tshirt style found: %v", *tshirtStyle)
 		}
-		r.TShirt = &storage.TShirt{Style: style}
+		r.TShirt = &storage.TShirt{
+			Style:        style,
+			ManuallyPaid: teamCompetitionManuallyPaid,
+		}
 	}
 
 	r.Housing, err = fromDBHousingType(housing, provideHousingPets, provideHousingQuantity, provideHousingDetails, requireHousingPetAllergies, requireHousingDetails)

@@ -7,38 +7,43 @@ import (
 )
 
 const (
-	registrationTable                         = "registrations"
-	registrationCreatedAtCol                  = "created_at"
-	registrationEnabledCol                    = "enabled"
-	registrationFirstNameCol                  = "first_name"
-	registrationLastNameCol                   = "last_name"
-	registrationStreetAddressCol              = "street_address"
-	registrationCityCol                       = "city"
-	registrationStateCol                      = "state"
-	registrationZipCodeCol                    = "zip_code"
-	registrationEmailCol                      = "email"
-	registrationHomeSceneCol                  = "home_scene"
-	registrationIsStudentCol                  = "is_student"
-	registrationPassTypeCol                   = "pass_type"
-	registrationFullWeekendLevelCol           = "full_weekend_level"
-	registrationFullWeekendTierCol            = "full_weekend_tier"
-	registrationMixAndMatchCol                = "mix_and_match"
-	registrationMixAndMatchRoleCol            = "mix_and_match_role"
-	registrationSoloJazzCol                   = "solo_jazz"
-	registrationTeamCompetitionCol            = "team_competition"
-	registrationTeamCompetitionNameCol        = "team_competition_name"
-	registrationTShirtCol                     = "tshirt"
-	registrationTShirtStyleCol                = "tshirt_style"
-	registrationHousingCol                    = "housing"
-	registrationProvideHousingPetsCol         = "provide_housing_pets"
-	registrationProvideHousingQuantityCol     = "provide_housing_quantity"
-	registrationProvideHousingDetailsCol      = "provide_housing_details"
-	registrationRequireHousingPetAllergiesCol = "require_housing_pet_allergies"
-	registrationRequireHousingDetailsCol      = "require_housing_details"
-	registrationUserIDCol                     = "user_id"
-	registrationOrderIDsCol                   = "order_ids"
-	registrationDiscountCodesCol              = "discount_codes"
-	registrationIDCol                         = "id"
+	registrationTable = "registrations"
+	/*registrationCreatedAtCol                   = "created_at"
+	registrationEnabledCol                     = "enabled"
+	registrationFirstNameCol                   = "first_name"
+	registrationLastNameCol                    = "last_name"
+	registrationStreetAddressCol               = "street_address"
+	registrationCityCol                        = "city"
+	registrationStateCol                       = "state"
+	registrationZipCodeCol                     = "zip_code"
+	registrationEmailCol                       = "email"
+	registrationHomeSceneCol                   = "home_scene"
+	registrationIsStudentCol                   = "is_student"
+	registrationPassTypeCol                    = "pass_type"
+	registrationFullWeekendLevelCol            = "full_weekend_level"
+	registrationFullWeekendTierCol             = "full_weekend_tier"
+	registrationPassManuallyPaidCol            = "pass_manually_paid"
+	registrationMixAndMatchCol                 = "mix_and_match"
+	registrationMixAndMatchRoleCol             = "mix_and_match_role"
+	registrationMixAndMatchManuallyPaidCol     = "mix_and_match_manually_paid"
+	registrationSoloJazzCol                    = "solo_jazz"
+	registrationSoloJazzMnauallyPaidCol        = "solo_jazz_manually_paid"
+	registrationTeamCompetitionCol             = "team_competition"
+	registrationTeamCompetitionNameCol         = "team_competition_name"
+	registrationTeamCompetitionManuallyPaidCol = "team_competition_manually_paid"
+	registrationTShirtCol                      = "tshirt"
+	registrationTShirtStyleCol                 = "tshirt_style"
+	registrationTShirtManuallyPaidCol          = "tshirt_manually_paid"
+	registrationHousingCol                     = "housing"
+	registrationProvideHousingPetsCol          = "provide_housing_pets"
+	registrationProvideHousingQuantityCol      = "provide_housing_quantity"
+	registrationProvideHousingDetailsCol       = "provide_housing_details"
+	registrationRequireHousingPetAllergiesCol  = "require_housing_pet_allergies"
+	registrationRequireHousingDetailsCol       = "require_housing_details"
+	registrationUserIDCol                      = "user_id"
+	registrationOrderIDsCol                    = "order_ids"
+	registrationDiscountCodesCol               = "discount_codes"
+	registrationIDCol                          = "id"*/
 
 	fullWeekendPassEnum = "Full Weekend"
 	danceOnlyPassEnum   = "Dance Only"
@@ -50,73 +55,83 @@ const (
 )
 
 type registrationConstsType struct {
-	Table                         string
-	CreatedAtCol                  string
-	EnabledCol                    string
-	FirstNameCol                  string
-	LastNameCol                   string
-	StreetAddressCol              string
-	CityCol                       string
-	StateCol                      string
-	ZipCodeCol                    string
-	EmailCol                      string
-	HomeSceneCol                  string
-	IsStudentCol                  string
-	PassTypeCol                   string
-	FullWeekendLevelCol           string
-	FullWeekendTierCol            string
-	MixAndMatchCol                string
-	MixAndMatchRoleCol            string
-	SoloJazzCol                   string
-	TeamCompetitionCol            string
-	TeamCompetitionNameCol        string
-	TShirtCol                     string
-	TShirtStyleCol                string
-	HousingCol                    string
-	ProvideHousingPetsCol         string
-	ProvideHousingQuantityCol     string
-	ProvideHousingDetailsCol      string
-	RequireHousingPetAllergiesCol string
-	RequireHousingDetailsCol      string
-	UserIDCol                     string
-	OrderIDsCol                   string
-	DiscountCodesCol              string
-	IDCol                         string
+	Table                          string
+	CreatedAtCol                   string
+	EnabledCol                     string
+	FirstNameCol                   string
+	LastNameCol                    string
+	StreetAddressCol               string
+	CityCol                        string
+	StateCol                       string
+	ZipCodeCol                     string
+	EmailCol                       string
+	HomeSceneCol                   string
+	IsStudentCol                   string
+	PassTypeCol                    string
+	FullWeekendLevelCol            string
+	FullWeekendTierCol             string
+	PassManuallyPaidCol            string
+	MixAndMatchCol                 string
+	MixAndMatchRoleCol             string
+	MixAndMatchManuallyPaidCol     string
+	SoloJazzCol                    string
+	SoloJazzManuallyPaidCol        string
+	TeamCompetitionCol             string
+	TeamCompetitionNameCol         string
+	TeamCompetitionManuallyPaidCol string
+	TShirtCol                      string
+	TShirtStyleCol                 string
+	TShirtManuallyPaidCol          string
+	HousingCol                     string
+	ProvideHousingPetsCol          string
+	ProvideHousingQuantityCol      string
+	ProvideHousingDetailsCol       string
+	RequireHousingPetAllergiesCol  string
+	RequireHousingDetailsCol       string
+	UserIDCol                      string
+	OrderIDsCol                    string
+	DiscountCodesCol               string
+	IDCol                          string
 }
 
 var registrationConsts = &registrationConstsType{
-	Table:                         "registrations",
-	CreatedAtCol:                  "created_at",
-	EnabledCol:                    "enabled",
-	FirstNameCol:                  "first_name",
-	LastNameCol:                   "last_name",
-	StreetAddressCol:              "street_address",
-	CityCol:                       "city",
-	StateCol:                      "state",
-	ZipCodeCol:                    "zip_code",
-	EmailCol:                      "email",
-	HomeSceneCol:                  "home_scene",
-	IsStudentCol:                  "is_student",
-	PassTypeCol:                   "pass_type",
-	FullWeekendLevelCol:           "full_weekend_level",
-	FullWeekendTierCol:            "full_weekend_tier",
-	MixAndMatchCol:                "mix_and_match",
-	MixAndMatchRoleCol:            "mix_and_match_role",
-	SoloJazzCol:                   "solo_jazz",
-	TeamCompetitionCol:            "team_competition",
-	TeamCompetitionNameCol:        "team_competition_name",
-	TShirtCol:                     "tshirt",
-	TShirtStyleCol:                "tshirt_style",
-	HousingCol:                    "housing",
-	ProvideHousingPetsCol:         "provide_housing_pets",
-	ProvideHousingQuantityCol:     "provide_housing_quantity",
-	ProvideHousingDetailsCol:      "provide_housing_details",
-	RequireHousingPetAllergiesCol: "require_housing_pet_allergies",
-	RequireHousingDetailsCol:      "require_housing_details",
-	UserIDCol:                     "user_id",
-	OrderIDsCol:                   "order_ids",
-	DiscountCodesCol:              "discount_codes",
-	IDCol:                         "id",
+	Table:                          "registrations",
+	CreatedAtCol:                   "created_at",
+	EnabledCol:                     "enabled",
+	FirstNameCol:                   "first_name",
+	LastNameCol:                    "last_name",
+	StreetAddressCol:               "street_address",
+	CityCol:                        "city",
+	StateCol:                       "state",
+	ZipCodeCol:                     "zip_code",
+	EmailCol:                       "email",
+	HomeSceneCol:                   "home_scene",
+	IsStudentCol:                   "is_student",
+	PassTypeCol:                    "pass_type",
+	FullWeekendLevelCol:            "full_weekend_level",
+	FullWeekendTierCol:             "full_weekend_tier",
+	PassManuallyPaidCol:            "pass_manually_paid",
+	MixAndMatchCol:                 "mix_and_match",
+	MixAndMatchRoleCol:             "mix_and_match_role",
+	MixAndMatchManuallyPaidCol:     "mix_and_match_manually_paid",
+	SoloJazzCol:                    "solo_jazz",
+	SoloJazzManuallyPaidCol:        "solo_jazz_manually_paid",
+	TeamCompetitionCol:             "team_competition",
+	TeamCompetitionNameCol:         "team_competition_name",
+	TeamCompetitionManuallyPaidCol: "team_competition_manually_paid",
+	TShirtCol:                      "tshirt",
+	TShirtStyleCol:                 "tshirt_style",
+	TShirtManuallyPaidCol:          "tshirt_manually_paid",
+	HousingCol:                     "housing",
+	ProvideHousingPetsCol:          "provide_housing_pets",
+	ProvideHousingQuantityCol:      "provide_housing_quantity",
+	ProvideHousingDetailsCol:       "provide_housing_details",
+	RequireHousingPetAllergiesCol:  "require_housing_pet_allergies",
+	RequireHousingDetailsCol:       "require_housing_details",
+	UserIDCol:                      "user_id",
+	OrderIDsCol:                    "order_ids",
+	DiscountCodesCol:               "discount_codes",
+	IDCol:                          "id",
 }
 
 var (
@@ -187,28 +202,28 @@ var (
 	}
 )
 
-func toDBPassType(p storage.PassType) (string, *string, *string, error) {
+func toDBPassType(p storage.PassType) (string, *string, *string, bool, error) {
 	switch pt := p.(type) {
 	case *storage.WeekendPass:
 		level, ok := levelToEnum[pt.Level]
 		if !ok {
-			return "", nil, nil, fmt.Errorf("unknown full weekend pass level found: %v", pt.Level)
+			return "", nil, nil, false, fmt.Errorf("unknown full weekend pass level found: %v", pt.Level)
 		}
 		tier, ok := tierToEnum[pt.Tier]
 		if !ok {
-			return "", nil, nil, fmt.Errorf("unknown full weekend pass tier found: %v", pt.Tier)
+			return "", nil, nil, false, fmt.Errorf("unknown full weekend pass tier found: %v", pt.Tier)
 		}
-		return fullWeekendPassEnum, &level, &tier, nil
+		return fullWeekendPassEnum, &level, &tier, pt.ManuallyPaid, nil
 	case *storage.DanceOnlyPass:
-		return danceOnlyPassEnum, nil, nil, nil
+		return danceOnlyPassEnum, nil, nil, pt.ManuallyPaid, nil
 	case *storage.NoPass:
-		return noPassEnum, nil, nil, nil
+		return noPassEnum, nil, nil, false, nil
 	default:
-		return "", nil, nil, fmt.Errorf("unknown pass type found %T", pt)
+		return "", nil, nil, false, fmt.Errorf("unknown pass type found %T", pt)
 	}
 }
 
-func fromDBPassType(passType string, tierEnum *string, levelEnum *string) (storage.PassType, error) {
+func fromDBPassType(passType string, tierEnum *string, levelEnum *string, manuallyPaid bool) (storage.PassType, error) {
 	switch passType {
 	case fullWeekendPassEnum:
 		level, ok := levelFromEnum[*levelEnum]
@@ -220,11 +235,14 @@ func fromDBPassType(passType string, tierEnum *string, levelEnum *string) (stora
 			return nil, fmt.Errorf("unknown full weekend pass tier enum found: %v", *tierEnum)
 		}
 		return &storage.WeekendPass{
-			Level: level,
-			Tier:  tier,
+			Level:        level,
+			Tier:         tier,
+			ManuallyPaid: manuallyPaid,
 		}, nil
 	case danceOnlyPassEnum:
-		return &storage.DanceOnlyPass{}, nil
+		return &storage.DanceOnlyPass{
+			ManuallyPaid: manuallyPaid,
+		}, nil
 	case noPassEnum:
 		return &storage.NoPass{}, nil
 	default:

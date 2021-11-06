@@ -50,7 +50,7 @@ func TestAddGetRegistration(t *testing.T) {
 				MixAndMatch: &storage.MixAndMatch{
 					Role: storage.MixAndMatchRoleFollower,
 				},
-				SoloJazz: true,
+				SoloJazz: &storage.SoloJazz{},
 				TeamCompetition: &storage.TeamCompetition{
 					Name: "The dirty dirts",
 				},
@@ -138,7 +138,7 @@ func TestAddGetRegistration(t *testing.T) {
 			if testRegistration.IsStudent != test.registration.IsStudent {
 				t.Fatalf("expected registration student status %v, found %v", test.registration.IsStudent, testRegistration.IsStudent)
 			}
-			if testRegistration.SoloJazz != test.registration.SoloJazz {
+			if !reflect.DeepEqual(testRegistration.SoloJazz, test.registration.SoloJazz) {
 				t.Fatalf("expected registration solo jazz status %v, found %v", test.registration.SoloJazz, testRegistration.SoloJazz)
 			}
 			if testRegistration.UserID != test.registration.UserID {

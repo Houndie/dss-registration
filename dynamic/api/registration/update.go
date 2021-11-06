@@ -47,6 +47,8 @@ func (s *Server) Update(ctx context.Context, req *pb.RegistrationUpdateReq) (*pb
 	if err != nil {
 		var noDiscountErr storage.ErrDiscountNotFound
 		var noRegistrationErr storage.ErrNoRegistrationForID
+		var hasSquarePayment registration.ErrHasSquarePayment
+		var hasImmutableField registration.ErrHasImmutableField
 		if errors.As(err, &noDiscountErr) {
 			return nil, twirp.NewError(twirp.NotFound, noDiscountErr.Error()).WithMeta("Code", noDiscountErr.Code)
 		} else if errors.As(err, &noRegistrationErr) {
@@ -55,6 +57,10 @@ func (s *Server) Update(ctx context.Context, req *pb.RegistrationUpdateReq) (*pb
 			return nil, twirp.NewError(twirp.FailedPrecondition, "registration is disabled")
 		} else if errors.Is(err, authorizer.Unauthenticated) {
 			return nil, twirp.NewError(twirp.Unauthenticated, "unauthenticated")
+		} else if errors.As(err, &hasSquarePayment) {
+			return nil, twirp.InvalidArgumentError(hasSquarePayment.Field, hasSquarePayment.Error())
+		} else if errors.As(err, &hasImmutableField) {
+			return nil, twirp.InvalidArgumentError(hasImmutableField.Field, hasImmutableField.Error())
 		}
 		return nil, err
 	}

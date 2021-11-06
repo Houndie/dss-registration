@@ -60,6 +60,8 @@ locals {
 		DSS_SQUAREDATA = jsonencode(local.backend_square_data)
 		DSS_AWS_ACCESSKEY = aws_iam_access_key.backend.id
 		DSS_AWS_VAXBUCKET = aws_s3_bucket.vax.bucket
+		DSS_PERMISSIONS_LIST = local.permissions.list.value
+		DSS_PERMISSIONS_UPDATE = local.permissions.update.value
 	}
 
 	backend_sensitive_config_vars = {

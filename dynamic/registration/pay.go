@@ -12,7 +12,7 @@ import (
 
 func containsPurchaseItems(r *storage.Registration) bool {
 	_, noPassOk := r.PassType.(*storage.NoPass)
-	return !noPassOk || r.MixAndMatch != nil || r.TeamCompetition != nil || r.TShirt != nil || r.SoloJazz
+	return !noPassOk || r.MixAndMatch != nil || r.TeamCompetition != nil || r.TShirt != nil || r.SoloJazz != nil
 }
 
 func containsUnpaidItems(r *storage.Registration, pd *common.PaymentData) bool {
@@ -25,7 +25,7 @@ func containsUnpaidItems(r *storage.Registration, pd *common.PaymentData) bool {
 		unpaid = unpaid || !pd.DanceOnlyPaid
 	}
 
-	return unpaid || (r.MixAndMatch != nil && !pd.MixAndMatchPaid) || (r.TeamCompetition != nil && !pd.TeamCompetitionPaid) || (r.TShirt != nil && !pd.TShirtPaid) || (r.SoloJazz && !pd.SoloJazzPaid)
+	return unpaid || (r.MixAndMatch != nil && !pd.MixAndMatchPaid) || (r.TeamCompetition != nil && !pd.TeamCompetitionPaid) || (r.TShirt != nil && !pd.TShirtPaid) || (r.SoloJazz != nil && !pd.SoloJazzPaid)
 }
 
 func makeLineItems(registration *storage.Registration, squareData *common.SquareData, paymentData *common.PaymentData, discounts map[storage.PurchaseItem][]string) ([]*objects.OrderLineItem, []*objects.OrderLineItemDiscount, error) {
@@ -33,7 +33,7 @@ func makeLineItems(registration *storage.Registration, squareData *common.Square
 	lineDiscounts := []*objects.OrderLineItemDiscount{}
 	switch t := registration.PassType.(type) {
 	case *storage.WeekendPass:
-		if !paymentData.WeekendPassPaid {
+		if !paymentData.WeekendPassPaid && !t.ManuallyPaid {
 			li, ld, err := makeLineItem(squareData.PurchaseItems.FullWeekend[t.Tier].ID, discounts[storage.FullWeekendPurchaseItem])
 			if err != nil {
 				return nil, nil, fmt.Errorf("error making full weekend line item: %w", err)
@@ -83,7 +83,7 @@ func makeLineItems(registration *storage.Registration, squareData *common.Square
 		lineDiscounts = append(lineDiscounts, ld...)
 	}
 
-	if registration.SoloJazz && !paymentData.SoloJazzPaid {
+	if registration.SoloJazz != nil && !paymentData.SoloJazzPaid {
 		li, ld, err := makeLineItem(squareData.PurchaseItems.SoloJazz.ID, discounts[storage.SoloJazzPurchaseItem])
 		if err != nil {
 			return nil, nil, fmt.Errorf("error making solo jazz line item: %w", err)

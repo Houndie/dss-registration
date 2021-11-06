@@ -11,7 +11,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwk"
@@ -35,7 +34,7 @@ func TestUserinfo(t *testing.T) {
 	myEndpoint := "https://endpoint"
 	discoveryDocumentURI := "https://endpoint/.well-known/openid-configuration"
 	keyID := "keyid"
-	permission := authorizer.ListDiscountsPermission
+	permission := "registrations:list"
 
 	signingKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -71,7 +70,7 @@ func TestUserinfo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error adding subject to jwt: %v", err)
 	}
-	err = token.Set("permissions", []authorizer.Permission{permission})
+	err = token.Set("permissions", []string{permission})
 	if err != nil {
 		t.Fatalf("error adding permissions to jwt: %v", err)
 	}

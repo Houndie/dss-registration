@@ -68,6 +68,19 @@ resource "auth0_client" "smackdown-website" {
 	}
 }
 
+locals {
+	permissions = {
+		list = {
+			value = "list:registrations"
+			description = "list registrations"
+		}
+		update = {
+			value = "update:registrations"
+			description = "update registrations"
+		}
+	}
+}
+
 resource "auth0_resource_server" "smackdown-website" {
 	name = "Dayton Swing Smackdown"
 	identifier = "https://dayton-swing-smackdown-testing.herokuapp.com"
@@ -75,10 +88,28 @@ resource "auth0_resource_server" "smackdown-website" {
 	enforce_policies = true
 	token_dialect = "access_token_authz"
 
-	scopes {
-		value = "list:discounts"
-		description = "list discounts"
+	dynamic "scopes" {
+		for_each = [for k, v in local.permissions: v]
+		
+		content {
+			value = scopes.value.value
+			description = scopes.value.description
+		}
 	}
 
 	skip_consent_for_verifiable_first_party_clients = true
+}
+
+resource "auth0_role" "admin" {
+	name = "Admin"
+	description = "Full Admin, can do everything"
+
+	dynamic "permissions" {
+		for_each = [for k, v in local.permissions: v.value]
+
+		content {
+			resource_server_identifier = auth0_resource_server.smackdown-website.identifier
+			name = permissions.value
+		}
+	}
 }

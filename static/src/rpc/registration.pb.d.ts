@@ -12,6 +12,8 @@ export namespace dss {
         public get(request: dss.IRegistrationGetReq): Promise<dss.RegistrationGetRes>;
         public listByUser(request: dss.IRegistrationListByUserReq, callback: dss.Registration.ListByUserCallback): void;
         public listByUser(request: dss.IRegistrationListByUserReq): Promise<dss.RegistrationListByUserRes>;
+        public list(request: dss.IRegistrationListReq, callback: dss.Registration.ListCallback): void;
+        public list(request: dss.IRegistrationListReq): Promise<dss.RegistrationListRes>;
         public prices(request: dss.IRegistrationPricesReq, callback: dss.Registration.PricesCallback): void;
         public prices(request: dss.IRegistrationPricesReq): Promise<dss.RegistrationPricesRes>;
         public update(request: dss.IRegistrationUpdateReq, callback: dss.Registration.UpdateCallback): void;
@@ -29,6 +31,8 @@ export namespace dss {
         type GetCallback = (error: (Error|null), response?: dss.RegistrationGetRes) => void;
 
         type ListByUserCallback = (error: (Error|null), response?: dss.RegistrationListByUserRes) => void;
+
+        type ListCallback = (error: (Error|null), response?: dss.RegistrationListRes) => void;
 
         type PricesCallback = (error: (Error|null), response?: dss.RegistrationPricesRes) => void;
 
@@ -116,14 +120,16 @@ export namespace dss {
     interface IFullWeekendPass {
         tier?: (dss.FullWeekendPassTier|null);
         level?: (dss.FullWeekendPassLevel|null);
-        paid?: (boolean|null);
+        squarePaid?: (boolean|null);
+        adminPaymentOverride?: (boolean|null);
     }
 
     class FullWeekendPass implements IFullWeekendPass {
         constructor(properties?: dss.IFullWeekendPass);
         public tier: dss.FullWeekendPassTier;
         public level: dss.FullWeekendPassLevel;
-        public paid: boolean;
+        public squarePaid: boolean;
+        public adminPaymentOverride: boolean;
         public static create(properties?: dss.IFullWeekendPass): dss.FullWeekendPass;
         public static encode(message: dss.IFullWeekendPass, writer?: $protobuf.Writer): $protobuf.Writer;
         public static encodeDelimited(message: dss.IFullWeekendPass, writer?: $protobuf.Writer): $protobuf.Writer;
@@ -136,12 +142,14 @@ export namespace dss {
     }
 
     interface IDanceOnlyPass {
-        paid?: (boolean|null);
+        squarePaid?: (boolean|null);
+        adminPaymentOverride?: (boolean|null);
     }
 
     class DanceOnlyPass implements IDanceOnlyPass {
         constructor(properties?: dss.IDanceOnlyPass);
-        public paid: boolean;
+        public squarePaid: boolean;
+        public adminPaymentOverride: boolean;
         public static create(properties?: dss.IDanceOnlyPass): dss.DanceOnlyPass;
         public static encode(message: dss.IDanceOnlyPass, writer?: $protobuf.Writer): $protobuf.Writer;
         public static encodeDelimited(message: dss.IDanceOnlyPass, writer?: $protobuf.Writer): $protobuf.Writer;
@@ -171,13 +179,15 @@ export namespace dss {
 
     interface IMixAndMatch {
         role?: (dss.MixAndMatch.Role|null);
-        paid?: (boolean|null);
+        squarePaid?: (boolean|null);
+        adminPaymentOverride?: (boolean|null);
     }
 
     class MixAndMatch implements IMixAndMatch {
         constructor(properties?: dss.IMixAndMatch);
         public role: dss.MixAndMatch.Role;
-        public paid: boolean;
+        public squarePaid: boolean;
+        public adminPaymentOverride: boolean;
         public static create(properties?: dss.IMixAndMatch): dss.MixAndMatch;
         public static encode(message: dss.IMixAndMatch, writer?: $protobuf.Writer): $protobuf.Writer;
         public static encodeDelimited(message: dss.IMixAndMatch, writer?: $protobuf.Writer): $protobuf.Writer;
@@ -198,12 +208,14 @@ export namespace dss {
     }
 
     interface ISoloJazz {
-        paid?: (boolean|null);
+        squarePaid?: (boolean|null);
+        adminPaymentOverride?: (boolean|null);
     }
 
     class SoloJazz implements ISoloJazz {
         constructor(properties?: dss.ISoloJazz);
-        public paid: boolean;
+        public squarePaid: boolean;
+        public adminPaymentOverride: boolean;
         public static create(properties?: dss.ISoloJazz): dss.SoloJazz;
         public static encode(message: dss.ISoloJazz, writer?: $protobuf.Writer): $protobuf.Writer;
         public static encodeDelimited(message: dss.ISoloJazz, writer?: $protobuf.Writer): $protobuf.Writer;
@@ -217,13 +229,15 @@ export namespace dss {
 
     interface ITeamCompetition {
         name?: (string|null);
-        paid?: (boolean|null);
+        squarePaid?: (boolean|null);
+        adminPaymentOverride?: (boolean|null);
     }
 
     class TeamCompetition implements ITeamCompetition {
         constructor(properties?: dss.ITeamCompetition);
         public name: string;
-        public paid: boolean;
+        public squarePaid: boolean;
+        public adminPaymentOverride: boolean;
         public static create(properties?: dss.ITeamCompetition): dss.TeamCompetition;
         public static encode(message: dss.ITeamCompetition, writer?: $protobuf.Writer): $protobuf.Writer;
         public static encodeDelimited(message: dss.ITeamCompetition, writer?: $protobuf.Writer): $protobuf.Writer;
@@ -237,13 +251,15 @@ export namespace dss {
 
     interface ITShirt {
         style?: (dss.TShirt.Style|null);
-        paid?: (boolean|null);
+        squarePaid?: (boolean|null);
+        adminPaymentOverride?: (boolean|null);
     }
 
     class TShirt implements ITShirt {
         constructor(properties?: dss.ITShirt);
         public style: dss.TShirt.Style;
-        public paid: boolean;
+        public squarePaid: boolean;
+        public adminPaymentOverride: boolean;
         public static create(properties?: dss.ITShirt): dss.TShirt;
         public static encode(message: dss.ITShirt, writer?: $protobuf.Writer): $protobuf.Writer;
         public static encodeDelimited(message: dss.ITShirt, writer?: $protobuf.Writer): $protobuf.Writer;
@@ -543,6 +559,40 @@ export namespace dss {
         public static verify(message: { [k: string]: any }): (string|null);
         public static fromObject(object: { [k: string]: any }): dss.RegistrationListByUserRes;
         public static toObject(message: dss.RegistrationListByUserRes, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+    }
+
+    interface IRegistrationListReq {
+    }
+
+    class RegistrationListReq implements IRegistrationListReq {
+        constructor(properties?: dss.IRegistrationListReq);
+        public static create(properties?: dss.IRegistrationListReq): dss.RegistrationListReq;
+        public static encode(message: dss.IRegistrationListReq, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: dss.IRegistrationListReq, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): dss.RegistrationListReq;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): dss.RegistrationListReq;
+        public static verify(message: { [k: string]: any }): (string|null);
+        public static fromObject(object: { [k: string]: any }): dss.RegistrationListReq;
+        public static toObject(message: dss.RegistrationListReq, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+    }
+
+    interface IRegistrationListRes {
+        registrations?: (dss.IRegistrationInfo[]|null);
+    }
+
+    class RegistrationListRes implements IRegistrationListRes {
+        constructor(properties?: dss.IRegistrationListRes);
+        public registrations: dss.IRegistrationInfo[];
+        public static create(properties?: dss.IRegistrationListRes): dss.RegistrationListRes;
+        public static encode(message: dss.IRegistrationListRes, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: dss.IRegistrationListRes, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): dss.RegistrationListRes;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): dss.RegistrationListRes;
+        public static verify(message: { [k: string]: any }): (string|null);
+        public static fromObject(object: { [k: string]: any }): dss.RegistrationListRes;
+        public static toObject(message: dss.RegistrationListRes, options?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
     }
 

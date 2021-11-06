@@ -1,11 +1,18 @@
 import React, {useState, useEffect} from 'react'
-import Page from '../components/Page'
-import useTwirp from "../components/useTwirp"
+import AdminPage from '../../components/AdminPage'
+import useTwirp from "../../components/useTwirp"
 import { useAuth0 } from '@auth0/auth0-react';
-import {dss} from "../rpc/registration.pb"
+import {dss} from "../../rpc/registration.pb"
 import Col from "react-bootstrap/Col"
 import Row from "react-bootstrap/Row"
-import {isPaid} from "../components/RegistrationForm"
+
+const isPaid = (r: dss.IRegistrationInfo) => 
+	((!r.fullWeekendPass || r.fullWeekendPass.squarePaid || r.fullWeekendPass.adminPaymentOverride) &&
+		(!r.danceOnlyPass || r.danceOnlyPass.squarePaid || r.danceOnlyPass.adminPaymentOverride) &&
+		(!r.soloJazz || r.soloJazz.squarePaid || r.soloJazz.adminPaymentOverride) &&
+		(!r.mixAndMatch || r.mixAndMatch.squarePaid || r.mixAndMatch.adminPaymentOverride) &&
+		(!r.teamCompetition || r.teamCompetition.squarePaid || r.teamCompetition.adminPaymentOverride) &&
+		(!r.tshirt || r.tshirt.squarePaid || r.tshirt.adminPaymentOverride))
 
 export default () => {
 	const [myRegistrations, setMyRegistrations] = useState<dss.IRegistrationInfo[]|null>(null)
@@ -19,21 +26,15 @@ export default () => {
 		}
 
 		registration().then(client => {
-			return client.listByUser({})
+			return client.list({})
 		}).then(res => {
 			setMyRegistrations(res.registrations)
 		})
 	}, [isLoading, isAuthenticated])
 
 	return (
-		<Page title="My Registrations">
+		<AdminPage title="My Registrations">
 			{() => {
-				if(isLoading) {
-					return <></>
-				}
-				if( !isAuthenticated ){
-					return <p>You must be logged in to view this page! <a href="#" onClick={() => loginWithRedirect()}>Login Now</a></p>
-				}
 				if( !myRegistrations ){
 					return <></>
 				}
@@ -49,7 +50,7 @@ export default () => {
 							</Row>
 						</b>
 						{ myRegistrations.map(r => (
-							<a href={"/registration/"+r.id} key={r.id}>
+							<a href={"/admin/registration/"+r.id} key={r.id}>
 								<Row>
 									<Col>{(r.createdAt ? (new Date(r.createdAt)).toLocaleString() : null)}</Col>
 									<Col>{r.firstName}</Col>
@@ -62,6 +63,6 @@ export default () => {
 					</>
 				)
 			}}
-		</Page>
+		</AdminPage>
 	)
 }

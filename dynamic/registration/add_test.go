@@ -6,7 +6,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/sendinblue"
 	"github.com/Houndie/dss-registration/dynamic/storage"
@@ -17,6 +16,10 @@ import (
 	"github.com/Houndie/square-go/objects"
 	"github.com/sirupsen/logrus"
 )
+
+var testPermissionConfig = &PermissionConfig{
+	List: "list:registrations",
+}
 
 type itemCheck struct {
 	found bool
@@ -190,7 +193,7 @@ func TestAdd(t *testing.T) {
 	}
 
 	authorizer := &commontest.MockAuthorizer{
-		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedAccessToken, []authorizer.Permission{}, expectedUserID, []authorizer.Permission{}),
+		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedAccessToken, []string{}, expectedUserID, []string{}),
 	}
 
 	for _, test := range tests {
@@ -229,8 +232,15 @@ func TestAdd(t *testing.T) {
 					if r.IsStudent != test.registration.IsStudent {
 						t.Fatalf("expected registration student status %v, found %v", test.registration.IsStudent, r.IsStudent)
 					}
-					if (r.SoloJazz) != (test.registration.SoloJazz != nil) {
-						t.Fatalf("expected registration solo jazz purchase status %v, found %v", test.registration.SoloJazz, r.SoloJazz)
+					if test.registration.SoloJazz != nil {
+						if r.SoloJazz == nil {
+							t.Fatalf("expected registration solo jazz purchase status %v, found %v", test.registration.SoloJazz, r.SoloJazz)
+						}
+
+						if test.registration.SoloJazz.AdminPaymentOverride != r.SoloJazz.ManuallyPaid {
+							t.Fatalf("expected registration solo jazz purchase admin override %v, found %v", test.registration.SoloJazz.AdminPaymentOverride, r.SoloJazz.ManuallyPaid)
+
+						}
 					}
 					switch pt := test.registration.PassType.(type) {
 					case *WeekendPass:
@@ -472,7 +482,7 @@ func TestAdd(t *testing.T) {
 				},
 			}
 
-			service := NewService(active, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, mailClient, nil)
+			service := NewService(active, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, mailClient, nil, testPermissionConfig)
 
 			outputRegistration, err := service.Add(context.Background(), test.registration, expectedAccessToken)
 			if err != nil {
@@ -506,7 +516,7 @@ func TestAddNotActive(t *testing.T) {
 	}
 	logger.SetOutput(devnull)
 
-	service := NewService(active, false, logger, &square.Client{}, commontest.CommonCatalogObjects().SquareData(), &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{}, nil)
+	service := NewService(active, false, logger, &square.Client{}, commontest.CommonCatalogObjects().SquareData(), &commontest.MockAuthorizer{}, &commontest.MockStore{}, &commontest.MockMailClient{}, nil, testPermissionConfig)
 
 	registration := &Info{
 		FirstName: "John",
@@ -571,7 +581,7 @@ func TestAddCostNothing(t *testing.T) {
 	}
 
 	authorizer := &commontest.MockAuthorizer{
-		GetUserinfoFunc: commontest.UserinfoFromID("12345", []authorizer.Permission{}),
+		GetUserinfoFunc: commontest.UserinfoFromID("12345", []string{}),
 	}
 
 	registration := &Info{
@@ -617,7 +627,7 @@ func TestAddCostNothing(t *testing.T) {
 		},
 	}
 
-	service := NewService(active, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, mailClient, nil)
+	service := NewService(active, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, mailClient, nil, testPermissionConfig)
 
 	outputRegistration, err := service.Add(context.Background(), registration, "7")
 	if err != nil {

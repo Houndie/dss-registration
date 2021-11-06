@@ -17,7 +17,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func TestListByUser(t *testing.T) {
+func TestList(t *testing.T) {
 	registration1ID := "id1"
 	registration2ID := "id2"
 	expectedRegistrations := map[string]*Info{
@@ -74,7 +74,7 @@ func TestListByUser(t *testing.T) {
 	logger.AddHook(&test_utility.ErrorHook{T: t})
 
 	authorizer := &commontest.MockAuthorizer{
-		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, []string{}, expectedUserID, []string{}),
+		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, expectedToken, []string{testPermissionConfig.List}, expectedUserID, []string{testPermissionConfig.List}),
 	}
 
 	squareClient := &square.Client{
@@ -95,11 +95,7 @@ func TestListByUser(t *testing.T) {
 	}
 
 	store := &commontest.MockStore{
-		GetRegistrationsByUserFunc: func(ctx context.Context, userID string) ([]*storage.Registration, error) {
-			if userID != expectedUserID {
-				t.Fatalf("expectedIncorrectUserID")
-			}
-
+		ListRegistrationsFunc: func(ctx context.Context) ([]*storage.Registration, error) {
 			registrations := make([]*storage.Registration, 0, len(expectedRegistrations))
 			for _, r := range expectedRegistrations {
 				registrations = append(registrations, toStorageRegistration(r))
@@ -110,7 +106,7 @@ func TestListByUser(t *testing.T) {
 
 	service := NewService(true, false, logger, squareClient, commontest.CommonCatalogObjects().SquareData(), authorizer, store, &commontest.MockMailClient{}, nil, testPermissionConfig)
 
-	registrations, err := service.ListByUser(context.Background(), expectedToken)
+	registrations, err := service.List(context.Background(), expectedToken)
 	if err != nil {
 		t.Fatalf("found unexpected error in call to SummaryByUser: %v", err)
 	}

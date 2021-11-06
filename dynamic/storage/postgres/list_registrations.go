@@ -9,7 +9,7 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/storage"
 )
 
-var getRegistrationsByUserStmt string
+var listRegistrationsStmt string
 
 func init() {
 	tmplStmt := `SELECT
@@ -47,34 +47,32 @@ func init() {
 			{{.RequireHousingDetailsCol}},
 			{{.OrderIDsCol}},
 			{{.DiscountCodesCol}},
-			{{.EnabledCol}}
-		FROM {{.Table}}
-		WHERE {{.UserIDCol}} = $1;`
+			{{.EnabledCol}},
+			{{.UserIDCol}}
+		FROM {{.Table}};`
 	tmpl, err := template.New("tmpl").Parse(tmplStmt)
 	if err != nil {
-		panic(fmt.Sprintf("error parsing get registration by user template: %v", err))
+		panic(fmt.Sprintf("error parsing list registrations template: %v", err))
 	}
 
 	stmt := &bytes.Buffer{}
 	err = tmpl.Execute(stmt, registrationConsts)
 	if err != nil {
-		panic(fmt.Sprintf("error executing get registration by user template: %v", err))
+		panic(fmt.Sprintf("error executing list registrations template: %v", err))
 	}
 
-	getRegistrationsByUserStmt = stmt.String()
+	listRegistrationsStmt = stmt.String()
 }
 
-func (s *Store) GetRegistrationsByUser(ctx context.Context, userID string) ([]*storage.Registration, error) {
-	rows, err := s.pool.Query(ctx, getRegistrationsByUserStmt, userID)
+func (s *Store) ListRegistrations(ctx context.Context) ([]*storage.Registration, error) {
+	rows, err := s.pool.Query(ctx, listRegistrationsStmt)
 	if err != nil {
-		return nil, fmt.Errorf("error querying for registrations by user id: %w", err)
+		return nil, fmt.Errorf("error querying for all registrations: %w", err)
 	}
 	defer rows.Close()
 	registrations := []*storage.Registration{}
 	for rows.Next() {
-		r := &storage.Registration{
-			UserID: userID,
-		}
+		r := &storage.Registration{}
 		var passType string
 		var fullWeekendLevel *string
 		var fullWeekendTier *string
@@ -82,10 +80,10 @@ func (s *Store) GetRegistrationsByUser(ctx context.Context, userID string) ([]*s
 		var mixAndMatch bool
 		var mixAndMatchRole *string
 		var mixAndMatchManuallyPaid bool
-		var teamCompetition bool
-		var teamCompetitionName string
 		var soloJazz bool
 		var soloJazzManuallyPaid bool
+		var teamCompetition bool
+		var teamCompetitionName string
 		var teamCompetitionManuallyPaid bool
 		var tshirt bool
 		var tshirtStyle *string
@@ -131,7 +129,8 @@ func (s *Store) GetRegistrationsByUser(ctx context.Context, userID string) ([]*s
 			&requireHousingDetails,
 			&r.OrderIDs,
 			&r.DiscountCodes,
-			&r.Enabled)
+			&r.Enabled,
+			&r.UserID)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing registration row: %w", err)
 		}

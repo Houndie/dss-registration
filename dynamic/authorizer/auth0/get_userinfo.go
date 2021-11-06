@@ -27,7 +27,7 @@ func (a *Authorizer) GetUserinfo(ctx context.Context, accessToken string) (autho
 		a.logger.Tracef("access token found for user %s", token.Subject())
 		return &userinfo{
 			userID:      token.Subject(),
-			permissions: []authorizer.Permission{},
+			permissions: []string{},
 			logger:      a.logger,
 		}, nil
 	}
@@ -35,15 +35,11 @@ func (a *Authorizer) GetUserinfo(ctx context.Context, accessToken string) (autho
 	if !ok {
 		return nil, errors.New("permissions list not of correct type")
 	}
-	p := make([]authorizer.Permission, len(permissionsList))
+	p := make([]string, len(permissionsList))
 	for i, perm := range permissionsList {
-		str, ok := perm.(string)
+		p[i], ok = perm.(string)
 		if !ok {
 			return nil, errors.New("permission not of correct type")
-		}
-		p[i] = authorizer.Permission(str)
-		if !p[i].IsValid() {
-			return nil, fmt.Errorf("unknown permission assigned to user")
 		}
 	}
 	a.logger.Tracef("access token found for user %s", token.Subject())

@@ -11,12 +11,14 @@ type PassType interface {
 	isPassType()
 }
 type WeekendPass struct {
-	Level storage.WeekendPassLevel
-	Tier  storage.WeekendPassTier
-	Paid  bool
+	Level                storage.WeekendPassLevel
+	Tier                 storage.WeekendPassTier
+	SquarePaid           bool
+	AdminPaymentOverride bool
 }
 type DanceOnlyPass struct {
-	Paid bool
+	SquarePaid           bool
+	AdminPaymentOverride bool
 }
 type NoPass struct{}
 
@@ -28,11 +30,14 @@ func toStoragePassType(passType PassType) storage.PassType {
 	switch p := passType.(type) {
 	case *WeekendPass:
 		return &storage.WeekendPass{
-			Level: p.Level,
-			Tier:  p.Tier,
+			Level:        p.Level,
+			Tier:         p.Tier,
+			ManuallyPaid: p.AdminPaymentOverride,
 		}
 	case *DanceOnlyPass:
-		return &storage.DanceOnlyPass{}
+		return &storage.DanceOnlyPass{
+			ManuallyPaid: p.AdminPaymentOverride,
+		}
 	}
 	return &storage.NoPass{}
 }
@@ -41,21 +46,25 @@ func fromStoragePassType(passType storage.PassType, paidWeekend, paidDance bool)
 	switch p := passType.(type) {
 	case *storage.WeekendPass:
 		return &WeekendPass{
-			Level: p.Level,
-			Tier:  p.Tier,
-			Paid:  paidWeekend,
+			Level:                p.Level,
+			Tier:                 p.Tier,
+			SquarePaid:           paidWeekend,
+			AdminPaymentOverride: p.ManuallyPaid,
 		}
 	case *storage.DanceOnlyPass:
+
 		return &DanceOnlyPass{
-			Paid: paidDance,
+			SquarePaid:           paidDance,
+			AdminPaymentOverride: p.ManuallyPaid,
 		}
 	}
 	return &NoPass{}
 }
 
 type MixAndMatch struct {
-	Role storage.MixAndMatchRole
-	Paid bool
+	Role                 storage.MixAndMatchRole
+	SquarePaid           bool
+	AdminPaymentOverride bool
 }
 
 func toStorageMixAndMatch(m *MixAndMatch) *storage.MixAndMatch {
@@ -63,40 +72,52 @@ func toStorageMixAndMatch(m *MixAndMatch) *storage.MixAndMatch {
 		return nil
 	}
 	return &storage.MixAndMatch{
-		Role: m.Role,
+		Role:         m.Role,
+		ManuallyPaid: m.AdminPaymentOverride,
 	}
 }
 
-func fromStorageMixAndMatch(m *storage.MixAndMatch, paid bool) *MixAndMatch {
+func fromStorageMixAndMatch(m *storage.MixAndMatch, squarePaid bool) *MixAndMatch {
 	if m == nil {
 		return nil
 	}
+
 	return &MixAndMatch{
-		Role: m.Role,
-		Paid: paid,
+		Role:                 m.Role,
+		SquarePaid:           squarePaid,
+		AdminPaymentOverride: m.ManuallyPaid,
 	}
 }
 
 type SoloJazz struct {
-	Paid bool
+	SquarePaid           bool
+	AdminPaymentOverride bool
 }
 
-func toStorageSoloJazz(s *SoloJazz) bool {
-	return s != nil
-}
-
-func fromStorageSoloJazz(s bool, paid bool) *SoloJazz {
-	if !s {
+func toStorageSoloJazz(s *SoloJazz) *storage.SoloJazz {
+	if s == nil {
 		return nil
 	}
+	return &storage.SoloJazz{
+		ManuallyPaid: s.AdminPaymentOverride,
+	}
+}
+
+func fromStorageSoloJazz(s *storage.SoloJazz, squarePaid bool) *SoloJazz {
+	if s == nil {
+		return nil
+	}
+
 	return &SoloJazz{
-		Paid: paid,
+		SquarePaid:           squarePaid,
+		AdminPaymentOverride: s.ManuallyPaid,
 	}
 }
 
 type TeamCompetition struct {
-	Name string
-	Paid bool
+	Name                 string
+	SquarePaid           bool
+	AdminPaymentOverride bool
 }
 
 func toStorageTeamCompetition(t *TeamCompetition) *storage.TeamCompetition {
@@ -104,23 +125,27 @@ func toStorageTeamCompetition(t *TeamCompetition) *storage.TeamCompetition {
 		return nil
 	}
 	return &storage.TeamCompetition{
-		Name: t.Name,
+		Name:         t.Name,
+		ManuallyPaid: t.AdminPaymentOverride,
 	}
 }
 
-func fromStorageTeamCompetition(t *storage.TeamCompetition, paid bool) *TeamCompetition {
+func fromStorageTeamCompetition(t *storage.TeamCompetition, squarePaid bool) *TeamCompetition {
 	if t == nil {
 		return nil
 	}
+
 	return &TeamCompetition{
-		Name: t.Name,
-		Paid: paid,
+		Name:                 t.Name,
+		SquarePaid:           squarePaid,
+		AdminPaymentOverride: t.ManuallyPaid,
 	}
 }
 
 type TShirt struct {
-	Style storage.TShirtStyle
-	Paid  bool
+	Style                storage.TShirtStyle
+	SquarePaid           bool
+	AdminPaymentOverride bool
 }
 
 func toStorageTShirt(t *TShirt) *storage.TShirt {
@@ -128,17 +153,20 @@ func toStorageTShirt(t *TShirt) *storage.TShirt {
 		return nil
 	}
 	return &storage.TShirt{
-		Style: t.Style,
+		Style:        t.Style,
+		ManuallyPaid: t.AdminPaymentOverride,
 	}
 }
 
-func fromStorageTShirt(t *storage.TShirt, paid bool) *TShirt {
+func fromStorageTShirt(t *storage.TShirt, squarePaid bool) *TShirt {
 	if t == nil {
 		return nil
 	}
+
 	return &TShirt{
-		Style: t.Style,
-		Paid:  paid,
+		Style:                t.Style,
+		SquarePaid:           squarePaid,
+		AdminPaymentOverride: t.ManuallyPaid,
 	}
 }
 

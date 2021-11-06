@@ -1,13 +1,12 @@
 package auth0
 
 import (
-	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/sirupsen/logrus"
 )
 
 type userinfo struct {
 	userID      string
-	permissions []authorizer.Permission
+	permissions []string
 	logger      *logrus.Logger
 }
 
@@ -15,7 +14,7 @@ func (u *userinfo) UserID() string {
 	return u.userID
 }
 
-func (u *userinfo) IsAllowed(permission authorizer.Permission) bool {
+func (u *userinfo) IsAllowed(permission string) bool {
 
 	for _, listPermission := range u.permissions {
 		if listPermission == permission {
