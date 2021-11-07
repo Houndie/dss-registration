@@ -150,7 +150,7 @@ var rootCmd = &cobra.Command{
 
 		mux := http.NewServeMux()
 
-		registrationService := registration.NewService(true, viper.GetString("environment") != "production", logger, squareClient, squareData, authorizer, store, sendInBlueClient, objectClient, permissionConfig)
+		registrationService := registration.NewService(viper.GetBool("active"), viper.GetString("environment") != "production", logger, squareClient, squareData, authorizer, store, sendInBlueClient, objectClient, permissionConfig)
 		registrationServer := api_registration.NewServer(registrationService)
 		registrationHandler := pb.NewRegistrationServer(registrationServer, errorHook)
 		mux.Handle(pb.RegistrationPathPrefix, registrationHandler)

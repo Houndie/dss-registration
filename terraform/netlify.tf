@@ -54,6 +54,7 @@ locals {
 		GATSBY_AUTH0_AUDIENCE=auth0_resource_server.smackdown-website.identifier
 		GATSBY_VERSION=var.deploy_version
 		GATSBY_SQUARE_DATA=jsonencode(local.frontend_square_data)
+		GATSBY_ACTIVE=var.active
 	}
 }
 

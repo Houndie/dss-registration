@@ -59,12 +59,7 @@ func parseConfigVars(input interface{}) (map[string]string, error) {
 
 	output := map[string]string{}
 	for key, value := range vars {
-		stringValue, ok := value.(string)
-		if !ok {
-			return nil, fmt.Errorf("config var value for %s is not string", key)
-		}
-
-		output[key] = stringValue
+		output[key] = fmt.Sprintf("%v", value)
 	}
 
 	return output, nil
