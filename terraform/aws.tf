@@ -8,13 +8,13 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "vax" {
-	bucket = "dayton-swing-smackdown-testing-vaccines"
+	bucket = "dayton-swing-smackdown-${var.workspace}-vaccines"
 	acl = "private"
 
 	cors_rule {
 		allowed_headers = ["*"]
 		allowed_methods = ["PUT", "POST", "GET"]
-		allowed_origins = ["https://test.daytonswingsmackdown.com", "http://localhost:8081"]
+		allowed_origins = local.sites
 		expose_headers  = ["ETag"]
 		max_age_seconds = 3000
 	}

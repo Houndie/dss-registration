@@ -48,7 +48,7 @@ locals {
 
 	frontend_config = {
 		GATSBY_BACKEND="https://${heroku_app.dayton_swing_smackdown.name}.herokuapp.com"
-		GATSBY_FRONTEND="https://test.daytonswingsmackdown.com"
+		GATSBY_FRONTEND=local.domain
 		GATSBY_CLIENT_ID=auth0_client.smackdown-website.client_id
 		GATSBY_AUTH0_DOMAIN=var.auth0_domain
 		GATSBY_AUTH0_AUDIENCE=auth0_resource_server.smackdown-website.identifier
@@ -60,7 +60,7 @@ locals {
 
 resource "netlify_site" "dayton_swing_smackdown" {
 	name = "dayton-swing-smackdown-${var.workspace}"
-	custom_domain = "test.daytonswingsmackdown.com"
+	custom_domain = local.address
 
 	repo {
 		repo_branch   = github_branch.netlify_deploy.branch
