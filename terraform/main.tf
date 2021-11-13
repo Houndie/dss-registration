@@ -46,6 +46,13 @@ terraform {
 	}
 }
 
+locals {
+	address=(var.workspace == "testing" ? "test.daytonswingsmackdown.com" :  "daytonswingsmackdown.com") 
+	domain = "https://${local.address}"
+
+	sites =  (var.workspace == "testing" ? [local.domain, "http://localhost:8081"] : [local.domain])
+}
+
 provider "auth0" {
 	domain        = var.auth0_domain
 	client_id     = var.auth0_client_id
@@ -56,9 +63,9 @@ resource "auth0_client" "smackdown-website" {
 	name                = "Dayton Swing Smackdown"
 	description         = "Dayton Swing Smackdown"
 	app_type            = "spa"
-	callbacks           = ["http://localhost:8081"]
-	allowed_logout_urls = ["http://localhost:8081"]
-	web_origins         = ["http://localhost:8081"]
+	callbacks           = local.sites
+	allowed_logout_urls = local.sites
+	web_origins         = local.sites
 	oidc_conformant = true
 	grant_types = ["authorization_code"]
 	token_endpoint_auth_method = "none"
@@ -83,7 +90,7 @@ locals {
 
 resource "auth0_resource_server" "smackdown-website" {
 	name = "Dayton Swing Smackdown"
-	identifier = "https://dayton-swing-smackdown-testing.herokuapp.com"
+	identifier = local.domain
 	signing_alg = "RS256"
 	enforce_policies = true
 	token_dialect = "access_token_authz"

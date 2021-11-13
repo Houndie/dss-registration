@@ -3,6 +3,7 @@ variable "deploy_version" {}
 variable "workspace" {}
 variable "sendinblue_token" {}
 variable "recaptcha_token" {}
+variable "active" {}
 
 provider "heroku" {
 	api_key = var.heroku_api_key
@@ -53,7 +54,7 @@ locals {
 	}
 
 	backend_config_vars = {
-		DSS_FRONTEND = "https://test.daytonswingsmackdown.com"
+		DSS_FRONTEND = local.domain
 		DSS_AUTHENDPOINT = "https://${var.auth0_domain}"
 		DSS_ENVIRONMENT = "development"
 		DSS_VERSION = var.deploy_version
@@ -62,6 +63,7 @@ locals {
 		DSS_AWS_VAXBUCKET = aws_s3_bucket.vax.bucket
 		DSS_PERMISSIONS_LIST = local.permissions.list.value
 		DSS_PERMISSIONS_UPDATE = local.permissions.update.value
+		DSS_ACTIVE = var.active
 	}
 
 	backend_sensitive_config_vars = {

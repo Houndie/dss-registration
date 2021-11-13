@@ -63,6 +63,9 @@ const Registration = () => {
 	return (
 		<Page title="Registration">
 			{() =>  {
+				if(process.env.GATSBY_ACTIVE !== 'true') {
+					return <p>Registration is not open yet!</p>
+				}
 				if(isLoading) {
 					return <></>
 				}
