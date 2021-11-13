@@ -98,7 +98,7 @@ jobs:
           name: Build Frontend Image
           command: cd src/static && npx gatsby build
 
-  push_backend_image:
+  push_backend_image_testing:
     docker:
       - image: circleci/golang:1.16
         environment:
@@ -119,7 +119,7 @@ jobs:
           name: Push To Heroku Registry
           command: cd src && DEPLOY_VERSION=$CIRCLE_TAG ../bin/mage -v backend:deploy
 
-  update_terraform_deploy_version:
+  update_terraform_deploy_version_testing:
     docker:
       - image: circleci/golang:1.16
         environment:
@@ -132,7 +132,7 @@ jobs:
           name: Set Terraform Deploy Version
           command: cd src && DEPLOY_VERSION=$CIRCLE_TAG ../bin/mage -v terraform:setdeployversion
 
-  deploy:
+  deploy_testing:
     docker:
       - image: circleci/golang:1.16
         environment:
@@ -145,7 +145,7 @@ jobs:
           name: Terraform Apply
           command: cd src && ../bin/mage -v terraform:apply
 
-  wait_for_backend_deployment:
+  wait_for_backend_deployment_testing:
     docker:
       - image: circleci/golang:1.16
         environment:
@@ -158,11 +158,84 @@ jobs:
           name: Wait for Backend Deployment
           command: cd src && DEPLOY_VERSION=$CIRCLE_TAG ../bin/mage -v backend:waitfordeploy
 
-  wait_for_frontend_deployment:
+  wait_for_frontend_deployment_testing:
     docker:
       - image: circleci/golang:1.16
         environment:
           WORKSPACE: testing
+    steps:
+      - attach_workspace:
+          at: .
+
+      - run:
+          name: Wait for Frontend Deployment
+          command: cd src && DEPLOY_VERSION=$CIRCLE_TAG ../bin/mage -v frontend:waitfordeploy
+
+  push_backend_image_prod:
+    docker:
+      - image: circleci/golang:1.16
+        environment:
+          WORKSPACE: production
+          DOCKER_CACHE: ../cache/docker.cache
+    steps:
+      - attach_workspace:
+          at: .
+
+      - setup_remote_docker:
+          version: 20.10.2
+
+      - run:
+          name: Load Backend Image
+          command: cd src && ../bin/mage -v backend:load
+
+      - run:
+          name: Push To Heroku Registry
+          command: cd src && DEPLOY_VERSION=$CIRCLE_TAG ../bin/mage -v backend:deploy
+
+  update_terraform_deploy_version_prod:
+    docker:
+      - image: circleci/golang:1.16
+        environment:
+          WORKSPACE: production
+    steps:
+      - attach_workspace:
+          at: .
+
+      - run:
+          name: Set Terraform Deploy Version
+          command: cd src && DEPLOY_VERSION=$CIRCLE_TAG ../bin/mage -v terraform:setdeployversion
+
+  deploy_prod:
+    docker:
+      - image: circleci/golang:1.16
+        environment:
+          WORKSPACE: production
+    steps:
+      - attach_workspace:
+          at: .
+
+      - run:
+          name: Terraform Apply
+          command: cd src && ../bin/mage -v terraform:apply
+
+  wait_for_backend_deployment_prod:
+    docker:
+      - image: circleci/golang:1.16
+        environment:
+          WORKSPACE: production
+    steps:
+      - attach_workspace:
+          at: .
+
+      - run:
+          name: Wait for Backend Deployment
+          command: cd src && DEPLOY_VERSION=$CIRCLE_TAG ../bin/mage -v backend:waitfordeploy
+
+  wait_for_frontend_deployment_prod:
+    docker:
+      - image: circleci/golang:1.16
+        environment:
+          WORKSPACE: production
     steps:
       - attach_workspace:
           at: .
@@ -209,7 +282,7 @@ workflows:
               branches:
                  ignore: netlify-deploy-testing
 
-      - push_backend_image:
+      - push_backend_image_testing:
            requires:
               - go_test
               - build_backend
@@ -221,7 +294,7 @@ workflows:
                  ignore: /.*/
 
 
-      - update_terraform_deploy_version:
+      - update_terraform_deploy_version_testing:
            requires:
               - go_test
               - build_backend
@@ -232,28 +305,83 @@ workflows:
               branches:
                  ignore: /.*/
 
-      - deploy:
+      - deploy_testing:
            requires:
-              - push_backend_image
-              - update_terraform_deploy_version
+              - push_backend_image_testing
+              - update_terraform_deploy_version_testing
            filters:
               tags:
                  only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
               branches:
                  ignore: /.*/
 
-      - wait_for_backend_deployment:
+      - wait_for_backend_deployment_testing:
            requires:
-              - deploy
+              - deploy_testing
            filters:
               tags:
                  only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
               branches:
                  ignore: /.*/
 
-      - wait_for_frontend_deployment:
+      - wait_for_frontend_deployment_testing:
            requires:
-              - deploy
+              - deploy_testing
+           filters:
+              tags:
+                 only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+              branches:
+                 ignore: /.*/
+
+      - approve_production:
+          type: approval
+          requires:
+            - wait_for_backend_deployment_testing
+            - wait_for_frontend_deployment_testing
+
+      - push_backend_image_prod:
+           requires:
+              - approve_production
+           filters:
+              tags:
+                 only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+              branches:
+                 ignore: /.*/
+
+
+      - update_terraform_deploy_version_prod:
+           requires:
+              - go_test
+              - build_backend
+              - build_frontend
+           filters:
+              tags:
+                 only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+              branches:
+                 ignore: /.*/
+
+      - deploy_prod:
+           requires:
+              - push_backend_image_prod
+              - update_terraform_deploy_version_prod
+           filters:
+              tags:
+                 only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+              branches:
+                 ignore: /.*/
+
+      - wait_for_backend_deployment_prod:
+           requires:
+              - deploy_prod
+           filters:
+              tags:
+                 only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+              branches:
+                 ignore: /.*/
+
+      - wait_for_frontend_deployment_prod:
+           requires:
+              - deploy_prod
            filters:
               tags:
                  only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
