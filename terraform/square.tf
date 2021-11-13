@@ -1,5 +1,6 @@
 provider "square" {
 	access_token = var.square_access_token
+	environment = (var.workspace == "prod" ? "production" : "sandbox")
 }
 
 resource "square_catalog_object" "team_competition" {

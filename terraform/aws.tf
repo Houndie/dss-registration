@@ -21,11 +21,11 @@ resource "aws_s3_bucket" "vax" {
 }
 
 resource "aws_iam_user" "backend" {
-	name = "backend"
+	name = "backend-${var.workspace}"
 }
 
 resource "aws_iam_policy" "backend_vax" {
-	name = "backend_vax"
+	name = "backend_vax-${var.workspace}"
 	
 	policy = jsonencode({
 		Version = "2012-10-17"
