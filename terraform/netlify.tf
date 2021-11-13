@@ -75,15 +75,3 @@ EOT
 		repo_path     = "Houndie/dss-registration"
 	}
 }
-
-resource "github_repository_webhook" "netlify_push" {
-	repository = "dss-registration"
-	events     = ["push", "create"]
-
-	configuration {
-		content_type = "json"
-		url          = "https://api.netlify.com/hooks/github"
-	}
-
-	depends_on = [netlify_site.dayton_swing_smackdown]
-}
