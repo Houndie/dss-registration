@@ -39,6 +39,12 @@ var (
 				Deploy: "var-oywYeVGkALz94upp",
 			},
 		},
+		Production: &TerraformVarType{
+			Workspace: "ws-ETquxJerUhVMXsdm",
+			Input: &TerraformInputVars{
+				Deploy: "var-HN7R27iv2YX6vGks",
+			},
+		},
 	}
 
 	terraformOutputs = &TerraformOutputVars{

@@ -19,11 +19,17 @@ import (
 )
 
 var HerokuProject = map[mage.WorkspaceType]string{
-	"testing": "dayton-swing-smackdown-testing",
+	"testing":    "dayton-swing-smackdown-testing",
+	"production": "dayton-swing-smackdown",
 }
 
 func Build(ctx context.Context) error {
-	return mage.DockerBuild(ctx, "dynamic", "docker/Dockerfile.deploy", HerokuProject[mage.Workspace()], mage.DeployVersion())
+	values := make([]string, 0, len(HerokuProject))
+	for _, value := range HerokuProject {
+		values = append(values, value)
+	}
+
+	return mage.DockerBuild(ctx, "dynamic", "docker/Dockerfile.deploy", values, mage.DeployVersion())
 }
 
 func Deploy(ctx context.Context) error {
@@ -56,7 +62,12 @@ func Save(ctx context.Context) error {
 		return fmt.Errorf("error opening %s for saving: %w", mage.DockerCache(), err)
 	}
 
-	res, err := mage.DockerClient().ImageSave(ctx, []string{mage.DockerImageName(HerokuProject[mage.Workspace()], mage.DeployVersion())})
+	tags := make([]string, 0, len(HerokuProject))
+	for _, project := range HerokuProject {
+		tags = append(tags, mage.DockerImageName(project, mage.DeployVersion()))
+	}
+
+	res, err := mage.DockerClient().ImageSave(ctx, tags)
 	if err != nil {
 		return fmt.Errorf("error saving docker image: %w", err)
 	}

@@ -52,7 +52,6 @@ jobs:
     docker:
       - image: circleci/golang:1.16
         environment:
-          WORKSPACE: testing
           DOCKER_CACHE: ../cache/docker.cache
     steps:
       - attach_workspace:

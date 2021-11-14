@@ -15,7 +15,7 @@ import (
 	"github.com/moby/term"
 )
 
-func DockerBuild(ctx context.Context, root, dockerfile, name, tag string) error {
+func DockerBuild(ctx context.Context, root, dockerfile string, names []string, tag string) error {
 	mg.Deps(InitDockerClient)
 
 	ignoreFile := filepath.Join(root, ".dockerignore")
@@ -41,8 +41,13 @@ func DockerBuild(ctx context.Context, root, dockerfile, name, tag string) error 
 		return fmt.Errorf("error creating build context: %w", err)
 	}
 
+	tags := make([]string, len(names))
+	for i, name := range names {
+		tags[i] = DockerImageName(name, tag)
+	}
+
 	res, err := DockerClient().ImageBuild(ctx, buildCtx, types.ImageBuildOptions{
-		Tags:       []string{DockerImageName(name, tag)},
+		Tags:       tags,
 		Dockerfile: dockerfile,
 	})
 	if err != nil {
