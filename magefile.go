@@ -240,6 +240,8 @@ func (Frontend) HealthCheck(ctx context.Context) error {
 		u = "http://localhost:8081"
 	case mage.Testing:
 		u = "http://test.daytonswingsmackdown.com"
+	case mage.Production:
+		u = "http://daytonswingsmackdown.com"
 	default:
 		return fmt.Errorf("unknown workspace: %s", mage.Workspace())
 	}
@@ -256,6 +258,8 @@ func (Frontend) VersionCheck(ctx context.Context) error {
 		u = "http://localhost:8081"
 	case mage.Testing:
 		u = "http://test.daytonswingsmackdown.com"
+	case mage.Production:
+		u = "http://daytonswingsmackdown.com"
 	default:
 		return fmt.Errorf("unknown workspace: %s", mage.Workspace())
 	}
