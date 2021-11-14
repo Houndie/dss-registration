@@ -334,10 +334,15 @@ workflows:
                  ignore: /.*/
 
       - approve_production:
-          type: approval
-          requires:
-            - wait_for_backend_deployment_testing
-            - wait_for_frontend_deployment_testing
+           type: approval
+           requires:
+              - wait_for_backend_deployment_testing
+              - wait_for_frontend_deployment_testing
+           filters:
+              tags:
+                 only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+              branches:
+                 ignore: /.*/
 
       - push_backend_image_prod:
            requires:
