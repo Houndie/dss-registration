@@ -20,7 +20,7 @@ import (
 
 var HerokuProject = map[mage.WorkspaceType]string{
 	"testing":    "dayton-swing-smackdown-testing",
-	"production": "dayton-swing-smackdown",
+	"production": "dayton-swing-smackdown-prod",
 }
 
 func Build(ctx context.Context) error {
