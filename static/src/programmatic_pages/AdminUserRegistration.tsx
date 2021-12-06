@@ -10,6 +10,7 @@ import RegistrationForm, {isPaid, RegistrationFormState, toProtoRegistration, fo
 import {Formik} from 'formik'
 import {VaccineInfoEnum, VaccineInfo, fromProtoVaccine} from "../components/vaccine"
 import LoadingPage from "../components/LoadingPage"
+import PleaseVerifyEmail from "../components/PleaseVerifyEmail"
 
 type UserRegistrationProps = {
 	id: string
@@ -21,7 +22,7 @@ export default ({id}: UserRegistrationProps) => {
 	const [myRegistration, setMyRegistration] = useState<dss.IRegistrationInfo | null>(null)
 	const [myVaccine, setMyVaccine] = useState<VaccineInfo | null>(null)
 	const {registration, vaccine} = useTwirp()
-	const { isLoading, isAuthenticated, loginWithRedirect } = useAuth0()
+	const { isLoading, isAuthenticated, loginWithRedirect, user } = useAuth0()
 
 	useEffect(() => {
 		registration().then(client => {
@@ -34,7 +35,7 @@ export default ({id}: UserRegistrationProps) => {
 	}, [])
 
 	useEffect(() => {
-		if(isLoading || !isAuthenticated){
+		if(isLoading || !isAuthenticated || !user?.email_verified){
 			setMyRegistration(null)
 			return
 		}
@@ -52,10 +53,10 @@ export default ({id}: UserRegistrationProps) => {
 		}, err => {
 			console.error(err);
 		});
-	}, [isLoading, isAuthenticated])
+	}, [isLoading, isAuthenticated, user])
 
 	useEffect(() => {
-		if(isLoading || !isAuthenticated){
+		if(isLoading || !isAuthenticated || !user?.email_verified){
 			setMyVaccine(null)
 			return
 		}
@@ -69,7 +70,7 @@ export default ({id}: UserRegistrationProps) => {
 		}, err => {
 			console.error(err);
 		});
-	}, [isLoading, isAuthenticated])
+	}, [isLoading, isAuthenticated, user])
 
 	const urlSearchParams = (typeof window !== "undefined" ? new URLSearchParams(window.location.search) : undefined);
 
@@ -86,6 +87,9 @@ export default ({id}: UserRegistrationProps) => {
 
 				if( !isAuthenticated ){
 					return <p>You must be logged in to view this page! <a href="#" onClick={() => loginWithRedirect()}>Login Now</a></p>
+				}
+				if(!user?.email_verified) {
+					return <PleaseVerifyEmail/>
 				}
 
 				if (!myRegistration) {

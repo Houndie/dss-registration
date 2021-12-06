@@ -9,6 +9,7 @@ import useTwirp from "../components/useTwirp"
 import { useAuth0 } from '@auth0/auth0-react';
 import LoadingPage from "../components/LoadingPage"
 import RegistrationForm, {isPaid, FormHousingOption, toProtoRegistration, FormWeekendPassOption, FormFullWeekendPassLevel, FormStyle, FormRole, RegistrationFormState} from "../components/RegistrationForm"
+import PleaseVerifyEmail from "../components/PleaseVerifyEmail"
 
 const initialState: RegistrationFormState  = {
 	firstName: '', 
@@ -59,7 +60,7 @@ const Registration = () => {
 		});
 	}, [])
 
-	const { isLoading, isAuthenticated, loginWithRedirect } = useAuth0()
+	const { isLoading, isAuthenticated, loginWithRedirect, user } = useAuth0()
 
 	return (
 		<Page title="Registration">
@@ -75,6 +76,9 @@ const Registration = () => {
 				}
 				if( !isAuthenticated ){
 					return <p>You must be logged in to register! <a href="#" onClick={() => loginWithRedirect()}>Login Now</a></p>
+				}
+				if(!user?.email_verified) {
+					return <PleaseVerifyEmail/>
 				}
 				return (
 					<Formik
