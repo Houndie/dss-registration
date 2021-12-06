@@ -132,3 +132,15 @@ resource "auth0_role" "admin" {
 		}
 	}
 }
+
+resource "auth0_tenant" "smackdown" {
+	friendly_name = "Dayton Swing Smackdown"
+	picture_url = "${local.domain}/images/logo.png"
+	support_email = "info@daytonswingsmackdown.com"
+}
+
+resource "auth0_rule" "send-verification-email" {
+	name = "Send Email Verification"
+	script = file("${path.module}/rules/send_verification_email.js")
+	enabled = true
+}
