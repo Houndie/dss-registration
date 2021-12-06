@@ -131,8 +131,8 @@ func (c *Client) SendSMTPEmail(ctx context.Context, params *SMTPEmailParams) (st
 	if err != nil {
 		return "", fmt.Errorf("error mashaling request body: %w", err)
 	}
-	fmt.Println(string(jsonBody))
 	bodyBuf := bytes.NewBuffer(jsonBody)
+	fmt.Println(bodyBuf.String())
 
 	req, err := http.NewRequest("POST", c.endpoint("smtp/email").String(), bodyBuf)
 	if err != nil {
@@ -148,6 +148,8 @@ func (c *Client) SendSMTPEmail(ctx context.Context, params *SMTPEmailParams) (st
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusCreated {
+		bytes, _ := ioutil.ReadAll(resp.Body)
+		fmt.Println(string(bytes))
 		return "", fmt.Errorf("unexpected status code: %v", resp.StatusCode)
 	}
 	bytes, err := ioutil.ReadAll(resp.Body)

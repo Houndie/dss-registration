@@ -1,4 +1,4 @@
-package registration
+package vaccine
 
 import (
 	"context"
@@ -10,6 +10,12 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/sirupsen/logrus"
 )
+
+var testPermissionConfig = &PermissionConfig{
+	Approve: "approve:vaccine",
+	Get:     "get:vaccine",
+	Upload:  "upload:vaccine",
+}
 
 func TestUploadVaxImage(t *testing.T) {
 	logger := logrus.New()
@@ -29,6 +35,14 @@ func TestUploadVaxImage(t *testing.T) {
 				UserID: testUserID,
 			}, nil
 		},
+
+		GetVaccineFunc: func(ctx context.Context, id string) (bool, error) {
+			if id != testID {
+				t.Fatalf("unexpected id %s", id)
+			}
+
+			return false, nil
+		},
 	}
 
 	authorizer := &commontest.MockAuthorizer{
@@ -40,8 +54,8 @@ func TestUploadVaxImage(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	service := NewService(true, true, logger, nil, nil, authorizer, store, nil, objectClient, testPermissionConfig)
-	_, err = service.UploadVaxImage(context.Background(), testToken, 1234, testID)
+	service := NewService(logger, authorizer, store, objectClient, nil, testPermissionConfig)
+	_, err = service.Upload(context.Background(), testToken, 1234, testID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -76,8 +90,8 @@ func TestUploadVaxImageNotMyRegistration(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	service := NewService(true, true, logger, nil, nil, authorizer, store, nil, objectClient, testPermissionConfig)
-	_, err = service.UploadVaxImage(context.Background(), testToken, 1234, testID)
+	service := NewService(logger, authorizer, store, objectClient, nil, testPermissionConfig)
+	_, err = service.Upload(context.Background(), testToken, 1234, testID)
 	if err == nil {
 		t.Fatal("expected error, found none")
 	}
@@ -89,5 +103,44 @@ func TestUploadVaxImageNotMyRegistration(t *testing.T) {
 
 	if e.Key != testID {
 		t.Fatalf("unxpected id %s", e.Key)
+	}
+}
+
+func TestUploadVaxImageAlreadyApproved(t *testing.T) {
+	logger := logrus.New()
+
+	testID := "testid"
+	testUserID := "test_user_id"
+	testToken := "token"
+
+	store := &commontest.MockStore{
+		GetRegistrationFunc: func(ctx context.Context, id string) (*storage.Registration, error) {
+			if id != testID {
+				t.Fatalf("unexpected id %s", id)
+			}
+
+			return &storage.Registration{
+				ID:     id,
+				UserID: testUserID,
+			}, nil
+		},
+
+		GetVaccineFunc: func(ctx context.Context, id string) (bool, error) {
+			if id != testID {
+				t.Fatalf("unexpected id %s", id)
+			}
+
+			return true, nil
+		},
+	}
+
+	authorizer := &commontest.MockAuthorizer{
+		GetUserinfoFunc: commontest.UserinfoFromID(testUserID, []string{}),
+	}
+
+	service := NewService(logger, authorizer, store, nil, nil, testPermissionConfig)
+	_, err := service.Upload(context.Background(), testToken, 1234, testID)
+	if err == nil {
+		t.Fatal("expected error")
 	}
 }

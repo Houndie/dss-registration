@@ -1,9 +1,7 @@
 import {createDiscount as twirpCreateDiscount} from "../rpc/discount.twirp"
-import {dss as dssDiscount} from "../rpc/discount.pb"
 import {createRegistration as twirpCreateRegistration} from "../rpc/registration.twirp"
-import {dss as dssRegistration} from "../rpc/registration.pb"
 import {createForms as twirpCreateForms} from "../rpc/forms.twirp"
-import {dss as dssForms} from "../rpc/forms.pb"
+import {createVaccine as twirpCreateVaccine} from "../rpc/vaccine.twirp"
 import { useAuth0 } from '@auth0/auth0-react';
 
 type BackendFunc<T> = (baseURL: string, options?: any) => T
@@ -28,6 +26,7 @@ export default () => {
 	return {
 		discount: () => create(twirpCreateDiscount, isAuthenticated, getAccessTokenSilently),
 		registration: () => create(twirpCreateRegistration, isAuthenticated, getAccessTokenSilently),
-		forms: () => create(twirpCreateForms, isAuthenticated, getAccessTokenSilently)
+		forms: () => create(twirpCreateForms, isAuthenticated, getAccessTokenSilently),
+		vaccine: () => create(twirpCreateVaccine, isAuthenticated, getAccessTokenSilently)
 	}
 }

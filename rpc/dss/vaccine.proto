@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package dss;
+option go_package = "rpc/dss";
+
+service Vaccine {
+  rpc Upload(VaccineUploadReq) returns (VaccineUploadRes);
+  rpc Get(VaccineGetReq) returns (VaccineGetRes);
+  rpc Approve(VaccineApproveReq) returns (VaccineApproveRes);
+  rpc Reject(VaccineRejectReq) returns (VaccineRejectRes);
+}
+
+message VaxApproved {}
+message VaxApprovalPending {
+	string url = 1;
+}
+message NoVaxProofSupplied{}
+
+message VaccineUploadReq {
+	string id = 1;
+	int64 filesize = 2;
+}
+
+message VaccineUploadRes {
+	string url = 1;
+}
+
+message VaccineGetReq {
+	string id = 1;
+}
+
+message VaccineGetRes {
+	oneof info {
+		VaxApproved vax_approved = 1;
+		VaxApprovalPending vax_approval_pending = 2;
+		NoVaxProofSupplied no_vax_proof_supplied = 3;
+	}
+}
+
+message VaccineApproveReq {
+	string id = 1;
+}
+
+message VaccineApproveRes {}
+
+message VaccineRejectReq {
+	string id = 1;
+	string reason = 2;
+}
+
+message VaccineRejectRes {}

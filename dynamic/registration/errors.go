@@ -31,14 +31,6 @@ var ErrNoPurchaseItems = errors.New("registration contains no purchase items")
 
 var ErrNoUnpaidItems = errors.New("registration contains no unpaid items")
 
-type ErrFileTooBig struct {
-	Filesize int64
-}
-
-func (e ErrFileTooBig) Error() string {
-	return fmt.Sprintf("filesize %d is too big", e.Filesize)
-}
-
 type ErrHasAdminOverride struct {
 	Field string
 }

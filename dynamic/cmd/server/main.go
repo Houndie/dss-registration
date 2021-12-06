@@ -13,6 +13,7 @@ import (
 	api_forms "github.com/Houndie/dss-registration/dynamic/api/forms"
 	api_info "github.com/Houndie/dss-registration/dynamic/api/info"
 	api_registration "github.com/Houndie/dss-registration/dynamic/api/registration"
+	api_vaccine "github.com/Houndie/dss-registration/dynamic/api/vaccine"
 	"github.com/Houndie/dss-registration/dynamic/authorizer/auth0"
 	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/discount"
@@ -24,6 +25,7 @@ import (
 	pb "github.com/Houndie/dss-registration/dynamic/rpc/dss"
 	"github.com/Houndie/dss-registration/dynamic/sendinblue"
 	"github.com/Houndie/dss-registration/dynamic/storage/postgres"
+	"github.com/Houndie/dss-registration/dynamic/vaccine"
 	"github.com/Houndie/square-go"
 	"github.com/Houndie/square-go/objects"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -143,14 +145,19 @@ var rootCmd = &cobra.Command{
 			return fmt.Errorf("error initializing object client: %w", err)
 		}
 
-		permissionConfig := &registration.PermissionConfig{
-			List:   viper.GetString("permissions.list"),
-			Update: viper.GetString("permissions.update"),
+		registrationPermissionConfig := &registration.PermissionConfig{
+			List:   viper.GetString("permissions.registration.list"),
+			Update: viper.GetString("permissions.registration.update"),
+		}
+		vaccinePermissionConfig := &vaccine.PermissionConfig{
+			Approve: viper.GetString("permissions.vaccine.approve"),
+			Get:     viper.GetString("permissions.vaccine.get"),
+			Upload:  viper.GetString("permissions.vaccine.upload"),
 		}
 
 		mux := http.NewServeMux()
 
-		registrationService := registration.NewService(viper.GetBool("active"), viper.GetString("environment") != "production", logger, squareClient, squareData, authorizer, store, sendInBlueClient, objectClient, permissionConfig)
+		registrationService := registration.NewService(viper.GetBool("active"), viper.GetString("environment") != "production", logger, squareClient, squareData, authorizer, store, sendInBlueClient, registrationPermissionConfig)
 		registrationServer := api_registration.NewServer(registrationService)
 		registrationHandler := pb.NewRegistrationServer(registrationServer, errorHook)
 		mux.Handle(pb.RegistrationPathPrefix, registrationHandler)
@@ -167,6 +174,11 @@ var rootCmd = &cobra.Command{
 		formsServer := api_forms.NewServer(formsService)
 		formsHandler := pb.NewFormsServer(formsServer, errorHook)
 		mux.Handle(pb.FormsPathPrefix, formsHandler)
+
+		vaccineService := vaccine.NewService(logger, authorizer, store, objectClient, sendInBlueClient, vaccinePermissionConfig)
+		vaccineServer := api_vaccine.NewServer(vaccineService)
+		vaccineHandler := pb.NewVaccineServer(vaccineServer, errorHook)
+		mux.Handle(pb.VaccinePathPrefix, vaccineHandler)
 
 		infoService := info.NewService(pool, viper.GetString("version"))
 		infoServer := api_info.NewServer(infoService)

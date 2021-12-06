@@ -223,7 +223,7 @@ func TestUpdateAdmin(t *testing.T) {
 				},
 			}
 
-			service := NewService(true, true, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, nil, nil, testPermissionConfig)
+			service := NewService(true, true, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, nil, testPermissionConfig)
 
 			_, err = service.Update(context.Background(), token, tt.updateRegistration)
 			if err != nil {
@@ -384,7 +384,7 @@ func TestUpdateNoAdminOverride(t *testing.T) {
 				},
 			}
 
-			service := NewService(true, true, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, nil, nil, testPermissionConfig)
+			service := NewService(true, true, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, nil, testPermissionConfig)
 
 			_, err = service.Update(context.Background(), token, tt.updateRegistration)
 			if err == nil {

@@ -22,6 +22,8 @@ type MockStore struct {
 	ListRegistrationsFunc      func(context.Context) ([]*storage.Registration, error)
 	IsAdminFunc                func(context.Context, string) (bool, error)
 	UpdateRegistrationFunc     func(ctx context.Context, r *storage.Registration) error
+	GetVaccineFunc             func(context.Context, string) (bool, error)
+	ApproveVaccineFunc         func(context.Context, string, bool) error
 }
 
 func (m *MockStore) AddRegistration(ctx context.Context, registration *storage.Registration) (string, error) {
@@ -46,4 +48,12 @@ func (m *MockStore) GetRegistration(ctx context.Context, userID string) (*storag
 
 func (m *MockStore) UpdateRegistration(ctx context.Context, r *storage.Registration) error {
 	return m.UpdateRegistrationFunc(ctx, r)
+}
+
+func (m *MockStore) GetVaccine(ctx context.Context, id string) (bool, error) {
+	return m.GetVaccineFunc(ctx, id)
+}
+
+func (m *MockStore) ApproveVaccine(ctx context.Context, id string, approval bool) error {
+	return m.ApproveVaccineFunc(ctx, id, approval)
 }
