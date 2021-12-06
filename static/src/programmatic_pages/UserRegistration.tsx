@@ -9,6 +9,7 @@ import {dss} from "../rpc/registration.pb"
 import RegistrationForm, {isPaid, RegistrationFormState, toProtoRegistration, formWeekendPassOptionFromProto, fromProtoHousingOption, FormFullWeekendPassLevel, FormRole, FormStyle, fromProtoPassLevel, fromProtoRole, fromProtoStyle} from "../components/RegistrationForm"
 import {VaccineInfoEnum, VaccineInfo, fromProtoVaccine} from "../components/vaccine"
 import {Formik} from 'formik'
+import LoadingPage from "../components/LoadingPage"
 
 type UserRegistrationProps = {
 	id: string
@@ -76,11 +77,11 @@ export default ({id}: UserRegistrationProps) => {
 		<Page title="Registration">{() => (
 			<WithAlert>{(setResponse) => {
 				if (!prices) {
-					return <></>
+					return <LoadingPage/>
 				}
 
 				if(isLoading) {
-					return <></>
+					return <LoadingPage/>
 				}
 
 				if( !isAuthenticated ){
@@ -88,11 +89,11 @@ export default ({id}: UserRegistrationProps) => {
 				}
 
 				if (!myRegistration) {
-					return <></>
+					return <LoadingPage/>
 				}
 
 				if (!myVaccine) {
-					return <></>
+					return <LoadingPage/>
 				}
 
 				return (

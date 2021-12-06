@@ -5,6 +5,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import {dss} from "../rpc/registration.pb"
 import Col from "react-bootstrap/Col"
 import Row from "react-bootstrap/Row"
+import LoadingPage from "../components/LoadingPage"
 import {isPaid} from "../components/RegistrationForm"
 
 export default () => {
@@ -29,13 +30,13 @@ export default () => {
 		<Page title="My Registrations">
 			{() => {
 				if(isLoading) {
-					return <></>
+					return <LoadingPage/>
 				}
 				if( !isAuthenticated ){
 					return <p>You must be logged in to view this page! <a href="#" onClick={() => loginWithRedirect()}>Login Now</a></p>
 				}
 				if( !myRegistrations ){
-					return <></>
+					return <LoadingPage/>
 				}
 				return (
 					<>

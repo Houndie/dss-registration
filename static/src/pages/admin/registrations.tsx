@@ -5,6 +5,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import {dss} from "../../rpc/registration.pb"
 import Col from "react-bootstrap/Col"
 import Row from "react-bootstrap/Row"
+import LoadingPage from "../../components/LoadingPage"
 
 const isPaid = (r: dss.IRegistrationInfo) => 
 	((!r.fullWeekendPass || r.fullWeekendPass.squarePaid || r.fullWeekendPass.adminPaymentOverride) &&
@@ -35,8 +36,14 @@ export default () => {
 	return (
 		<AdminPage title="My Registrations">
 			{() => {
+				if(isLoading) {
+					return <LoadingPage/>
+				}
+				if( !isAuthenticated ){
+					return <p>You must be logged in to view this page! <a href="#" onClick={() => loginWithRedirect()}>Login Now</a></p>
+				}
 				if( !myRegistrations ){
-					return <></>
+					return <LoadingPage/>
 				}
 				return (
 					<>
