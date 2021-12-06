@@ -48,5 +48,10 @@ func (s *Service) Get(ctx context.Context, token, registrationID string) (*Info,
 		}
 	}
 
-	return fromStorageRegistration(r, pd[r.ID]), nil
+	returnRegistration := fromStorageRegistration(r, pd[r.ID])
+	if err != nil {
+		return nil, err
+	}
+
+	return returnRegistration, nil
 }

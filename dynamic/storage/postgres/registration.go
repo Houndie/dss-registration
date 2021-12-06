@@ -92,6 +92,7 @@ type registrationConstsType struct {
 	OrderIDsCol                    string
 	DiscountCodesCol               string
 	IDCol                          string
+	VaxApprovedCol                 string
 }
 
 var registrationConsts = &registrationConstsType{
@@ -132,6 +133,7 @@ var registrationConsts = &registrationConstsType{
 	OrderIDsCol:                    "order_ids",
 	DiscountCodesCol:               "discount_codes",
 	IDCol:                          "id",
+	VaxApprovedCol:                 "vax_approved",
 }
 
 var (

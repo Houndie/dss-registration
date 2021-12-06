@@ -14,7 +14,6 @@ type RegistrationService interface {
 	Populate(ctx context.Context) (storage.WeekendPassTier, error)
 	ListByUser(ctx context.Context, token string) ([]*registration.Info, error)
 	List(ctx context.Context, token string) ([]*registration.Info, error)
-	UploadVaxImage(ctx context.Context, token string, filesize int64, id string) (string, error)
 	Update(ctx context.Context, token string, registration *registration.Info) (*registration.Info, error)
 	Pay(ctx context.Context, id, redirectURL, idempotencyKey, token string) (string, error)
 }

@@ -35,7 +35,7 @@ terraform {
 		}
 		aws = {
 			source = "hashicorp/aws"
-			version = "3.55.0"
+			version = "3.67.0"
 		}
 	}
 	backend "remote" {
@@ -77,13 +77,25 @@ resource "auth0_client" "smackdown-website" {
 
 locals {
 	permissions = {
-		list = {
+		registrationList = {
 			value = "list:registrations"
 			description = "list registrations"
 		}
-		update = {
+		registrationUpdate = {
 			value = "update:registrations"
 			description = "update registrations"
+		}
+		vaccineGet = {
+			value = "get:vaccine"
+			description = "get proof of vaccine"
+		}
+		vaccineApprove = {
+			value = "approve:vaccine"
+			description = "approve proof of vaccine"
+		}
+		vaccineUpload = {
+			value = "upload:vaccine"
+			description = "upload proof of vaccine"
 		}
 	}
 }

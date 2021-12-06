@@ -61,8 +61,11 @@ locals {
 		DSS_SQUAREDATA = jsonencode(local.backend_square_data)
 		DSS_AWS_ACCESSKEY = aws_iam_access_key.backend.id
 		DSS_AWS_VAXBUCKET = aws_s3_bucket.vax.bucket
-		DSS_PERMISSIONS_LIST = local.permissions.list.value
-		DSS_PERMISSIONS_UPDATE = local.permissions.update.value
+		DSS_PERMISSIONS_REGISTRATION_LIST = local.permissions.registrationList.value
+		DSS_PERMISSIONS_REGISTRATION_UPDATE = local.permissions.registrationUpdate.value
+		DSS_PERMISSIONS_VACCINE_APPROVE = local.permissions.vaccineApprove.value
+		DSS_PERMISSIONS_VACCINE_GET = local.permissions.vaccineGet.value
+		DSS_PERMISSIONS_VACCINE_UPLOAD = local.permissions.vaccineUpload.value
 		DSS_ACTIVE = var.active
 	}
 

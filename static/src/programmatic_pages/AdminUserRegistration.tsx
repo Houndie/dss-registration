@@ -8,15 +8,18 @@ import { v4 as uuidv4 } from 'uuid';
 import {dss} from "../rpc/registration.pb"
 import RegistrationForm, {isPaid, RegistrationFormState, toProtoRegistration, formWeekendPassOptionFromProto, fromProtoHousingOption, FormFullWeekendPassLevel, FormRole, FormStyle, fromProtoPassLevel, fromProtoRole, fromProtoStyle} from "../components/RegistrationForm"
 import {Formik} from 'formik'
+import {VaccineInfoEnum, VaccineInfo, fromProtoVaccine} from "../components/vaccine"
 
 type UserRegistrationProps = {
 	id: string
 }
 
 export default ({id}: UserRegistrationProps) => { 
+	const vaccineRef = React.useRef<HTMLInputElement>()
 	const [prices, setPrices] = useState<dss.RegistrationPricesRes | null>(null)
 	const [myRegistration, setMyRegistration] = useState<dss.IRegistrationInfo | null>(null)
-	const {registration} = useTwirp()
+	const [myVaccine, setMyVaccine] = useState<VaccineInfo | null>(null)
+	const {registration, vaccine} = useTwirp()
 	const { isLoading, isAuthenticated, loginWithRedirect } = useAuth0()
 
 	useEffect(() => {
@@ -50,6 +53,23 @@ export default ({id}: UserRegistrationProps) => {
 		});
 	}, [isLoading, isAuthenticated])
 
+	useEffect(() => {
+		if(isLoading || !isAuthenticated){
+			setMyVaccine(null)
+			return
+		}
+
+		vaccine().then(client => {
+			return client.get({
+				id: id
+			})
+		}).then(res => {
+			setMyVaccine(fromProtoVaccine(res))
+		}, err => {
+			console.error(err);
+		});
+	}, [isLoading, isAuthenticated])
+
 	const urlSearchParams = (typeof window !== "undefined" ? new URLSearchParams(window.location.search) : undefined);
 
 	return (
@@ -68,6 +88,10 @@ export default ({id}: UserRegistrationProps) => {
 				}
 
 				if (!myRegistration) {
+					return <></>
+				}
+
+				if (!myVaccine) {
 					return <></>
 				}
 
@@ -111,7 +135,7 @@ export default ({id}: UserRegistrationProps) => {
 								vaccine: undefined,
 								discounts: (myRegistration.discountCodes ? myRegistration.discountCodes : [])
 							}}
-							onSubmit={(values: RegistrationFormState, {setSubmitting}) => {
+							onSubmit={(values: RegistrationFormState, {setSubmitting, setFieldValue}) => {
 								setResponse(null)
 
 								const tier = (myRegistration.fullWeekendPass && myRegistration.fullWeekendPass.tier ? myRegistration.fullWeekendPass.tier : prices.weekendPassTier)
@@ -132,9 +156,11 @@ export default ({id}: UserRegistrationProps) => {
 											return createRes.registration
 										}
 
-										return client.uploadVaxImage({
-											id: createRes.registration.id,
-											filesize: values.vaccine.size
+										return vaccine().then(client => {
+											return client.upload({
+												id: createRes.registration?.id,
+												filesize: values.vaccine?.size
+											})
 										}).then(uploadRes => {
 											if(!uploadRes.url) {
 												throw "No upload url returned"
@@ -144,7 +170,11 @@ export default ({id}: UserRegistrationProps) => {
 												method: "PUT",
 												body: values.vaccine
 											})
-										}).then(() => {
+										}).then((res) => {
+											if(!res.ok) {
+												throw "error uploading vaccine card:  " + res.statusText
+											}
+
 											if( !createRes.registration) {
 												throw "No registration returned";
 											}
@@ -155,11 +185,23 @@ export default ({id}: UserRegistrationProps) => {
 										const redirectURL = `${process.env.GATSBY_FRONTEND}/registration/${r.id}`
 
 										if (isPaid(r)) {
+											setFieldValue("vaccine", undefined)
+											if(vaccineRef.current){
+												vaccineRef.current.value = ""
+											}
+
 											setResponse({
 												kind: ResponseKind.Good,
 												message: "Registration updated successfully!"
 											})
-											return
+
+											return vaccine().then(client => {
+												return client.get({
+													id: id
+												})
+											}).then(res => {
+												setMyVaccine(fromProtoVaccine(res))
+											})
 										}
 
 										return client.pay({
@@ -183,6 +225,9 @@ export default ({id}: UserRegistrationProps) => {
 								weekendPassTier={prices.weekendPassTier}
 								previousRegistration={myRegistration}
 								admin={true}
+								vaccineUpload={myVaccine}
+								vaccineRef={vaccineRef}
+								setMyVaccine={setMyVaccine}
 							/>
 						</Formik>
 					</>

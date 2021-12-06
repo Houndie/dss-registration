@@ -1,5 +1,6 @@
-import React from 'react'
-import {dss} from "../rpc/registration.pb"
+import React, {useState, useEffect} from 'react'
+import {dss as twirpRegistration} from "../rpc/registration.pb"
+import {dss as twirpVaccine} from "../rpc/vaccine.pb"
 import parseDollar from "../components/parseDollar"
 import Form from "react-bootstrap/Form"
 import {Formik, useFormikContext} from 'formik'
@@ -11,6 +12,7 @@ import FormFile from '../components/FormFile'
 import FormSelect from '../components/FormSelect'
 import FormCheck from '../components/FormCheck'
 import useTwirp from "../components/useTwirp"
+import {VaccineInfoEnum, VaccineInfo, fromProtoVaccine} from "../components/vaccine"
 
 export type RegistrationFormState = {
 	firstName: string, 
@@ -47,8 +49,8 @@ export type RegistrationFormState = {
 	discounts: string[]
 }
 
-export const toProtoRegistration = (values: RegistrationFormState, tier: number, previous?: dss.IRegistrationInfo) => {
-	const clientReg: dss.IRegistrationInfo = {
+export const toProtoRegistration = (values: RegistrationFormState, tier: number, previous?: twirpRegistration.IRegistrationInfo) => {
+	const clientReg: twirpRegistration.IRegistrationInfo = {
 		firstName: values.firstName,
 		lastName: values.lastName,
 		streetAddress: values.streetAddress,
@@ -141,7 +143,7 @@ export enum FormWeekendPassOption {
 	noPassOption = "None"
 }
 
-export const formWeekendPassOptionFromProto = (r: dss.IRegistrationInfo) => {
+export const formWeekendPassOptionFromProto = (r: twirpRegistration.IRegistrationInfo) => {
 	if(r.fullWeekendPass) {
 		return FormWeekendPassOption.fullWeekendPassOption
 	}
@@ -161,7 +163,7 @@ export enum FormHousingOption {
 	noHousingOption = "None"
 }
 
-export const fromProtoHousingOption = (r: dss.IRegistrationInfo) => {
+export const fromProtoHousingOption = (r: twirpRegistration.IRegistrationInfo) => {
 	if(r.provideHousing) {
 		return FormHousingOption.provideOption
 	}
@@ -184,13 +186,13 @@ export enum FormFullWeekendPassLevel {
 	Level3 = "level_3"
 }
 
-export const fromProtoPassLevel = (level: dss.FullWeekendPassLevel) => {
+export const fromProtoPassLevel = (level: twirpRegistration.FullWeekendPassLevel) => {
 	switch(level){
-		case dss.FullWeekendPassLevel.Level1:
+		case twirpRegistration.FullWeekendPassLevel.Level1:
 			return FormFullWeekendPassLevel.Level1
-		case dss.FullWeekendPassLevel.Level2:
+		case twirpRegistration.FullWeekendPassLevel.Level2:
 			return FormFullWeekendPassLevel.Level2
-		case dss.FullWeekendPassLevel.Level3:
+		case twirpRegistration.FullWeekendPassLevel.Level3:
 			return FormFullWeekendPassLevel.Level3
 		default:
 			throw 'cannot convert level to form type'
@@ -200,11 +202,11 @@ export const fromProtoPassLevel = (level: dss.FullWeekendPassLevel) => {
 export const toProtoPassLevel = (level: FormFullWeekendPassLevel) => {
 	switch(level){
 		case FormFullWeekendPassLevel.Level1:
-			return dss.FullWeekendPassLevel.Level1
+			return twirpRegistration.FullWeekendPassLevel.Level1
 		case FormFullWeekendPassLevel.Level2:
-			return dss.FullWeekendPassLevel.Level2
+			return twirpRegistration.FullWeekendPassLevel.Level2
 		case FormFullWeekendPassLevel.Level3:
-			return dss.FullWeekendPassLevel.Level3
+			return twirpRegistration.FullWeekendPassLevel.Level3
 		default:
 			throw "cannot convert unselected pass level"
 	}
@@ -219,19 +221,19 @@ export enum FormRole {
 export const toProtoRole = (role: FormRole) => {
 	switch(role){
 		case FormRole.Leader:
-			return dss.MixAndMatch.Role.Leader
+			return twirpRegistration.MixAndMatch.Role.Leader
 		case FormRole.Follower:
-			return dss.MixAndMatch.Role.Follower
+			return twirpRegistration.MixAndMatch.Role.Follower
 		default:
 			throw "cannot convert unselected role"
 	}
 }
 
-export const fromProtoRole = (role: dss.MixAndMatch.Role) => {
+export const fromProtoRole = (role: twirpRegistration.MixAndMatch.Role) => {
 	switch(role){
-		case dss.MixAndMatch.Role.Leader:
+		case twirpRegistration.MixAndMatch.Role.Leader:
 			return FormRole.Leader
-		case dss.MixAndMatch.Role.Follower:
+		case twirpRegistration.MixAndMatch.Role.Follower:
 			return FormRole.Follower
 		default:
 			throw "cannot convert proto role"
@@ -256,55 +258,55 @@ export enum FormStyle {
 export const toProtoStyle = (style: FormStyle) => {
 	switch(style){
 		case FormStyle.UnisexS:
-			return dss.TShirt.Style.UnisexS
+			return twirpRegistration.TShirt.Style.UnisexS
 		case FormStyle.UnisexM:
-			return dss.TShirt.Style.UnisexM
+			return twirpRegistration.TShirt.Style.UnisexM
 		case FormStyle.UnisexL:
-			return dss.TShirt.Style.UnisexL
+			return twirpRegistration.TShirt.Style.UnisexL
 		case FormStyle.UnisexXL:
-			return dss.TShirt.Style.UnisexXL
+			return twirpRegistration.TShirt.Style.UnisexXL
 		case FormStyle.Unisex2XL:
-			return dss.TShirt.Style.Unisex2XL
+			return twirpRegistration.TShirt.Style.Unisex2XL
 		case FormStyle.Unisex3XL:
-			return dss.TShirt.Style.Unisex3XL
+			return twirpRegistration.TShirt.Style.Unisex3XL
 		case FormStyle.BellaS:
-			return dss.TShirt.Style.BellaS
+			return twirpRegistration.TShirt.Style.BellaS
 		case FormStyle.BellaM:
-			return dss.TShirt.Style.BellaM
+			return twirpRegistration.TShirt.Style.BellaM
 		case FormStyle.BellaL:
-			return dss.TShirt.Style.BellaL
+			return twirpRegistration.TShirt.Style.BellaL
 		case FormStyle.BellaXL:
-			return dss.TShirt.Style.BellaXL
+			return twirpRegistration.TShirt.Style.BellaXL
 		case FormStyle.Bella2XL:
-			return dss.TShirt.Style.Bella2XL
+			return twirpRegistration.TShirt.Style.Bella2XL
 		default:
 			throw "cannot convert unselected style"
 	}
 }
 
-export const fromProtoStyle = (style: dss.TShirt.Style) => {
+export const fromProtoStyle = (style: twirpRegistration.TShirt.Style) => {
 	switch(style) {
-		case dss.TShirt.Style.UnisexS:
+		case twirpRegistration.TShirt.Style.UnisexS:
 			return FormStyle.UnisexS
-		case dss.TShirt.Style.UnisexM:
+		case twirpRegistration.TShirt.Style.UnisexM:
 			return FormStyle.UnisexM
-		case dss.TShirt.Style.UnisexL:
+		case twirpRegistration.TShirt.Style.UnisexL:
 			return FormStyle.UnisexL
-		case dss.TShirt.Style.UnisexXL:
+		case twirpRegistration.TShirt.Style.UnisexXL:
 			return FormStyle.UnisexXL
-		case dss.TShirt.Style.Unisex2XL:
+		case twirpRegistration.TShirt.Style.Unisex2XL:
 			return FormStyle.Unisex2XL
-		case dss.TShirt.Style.Unisex3XL:
+		case twirpRegistration.TShirt.Style.Unisex3XL:
 			return FormStyle.Unisex3XL
-		case dss.TShirt.Style.BellaS:
+		case twirpRegistration.TShirt.Style.BellaS:
 			return FormStyle.BellaS
-		case dss.TShirt.Style.BellaM:
+		case twirpRegistration.TShirt.Style.BellaM:
 			return FormStyle.BellaM
-		case dss.TShirt.Style.BellaL:
+		case twirpRegistration.TShirt.Style.BellaL:
 			return FormStyle.BellaL
-		case dss.TShirt.Style.BellaXL:
+		case twirpRegistration.TShirt.Style.BellaXL:
 			return FormStyle.BellaXL
-		case dss.TShirt.Style.Bella2XL:
+		case twirpRegistration.TShirt.Style.Bella2XL:
 			return FormStyle.Bella2XL
 		default:
 			throw 'unable to convert proto style'
@@ -330,11 +332,14 @@ export const fromProtoTier = (tier: number | Long) => {
 
 type RegistrationFormProps = {
 	weekendPassTier: number
-	previousRegistration?: dss.IRegistrationInfo
+	previousRegistration?: twirpRegistration.IRegistrationInfo
 	admin: boolean
+	vaccineUpload?: VaccineInfo
+	vaccineRef?: React.MutableRefObject<HTMLInputElement|undefined>
+	setMyVaccine?: (arg0: VaccineInfo) => void
 }
 
-export const isPaid = (r: dss.IRegistrationInfo) => 
+export const isPaid = (r: twirpRegistration.IRegistrationInfo) => 
 	((!r.fullWeekendPass || r.fullWeekendPass.squarePaid || r.fullWeekendPass.adminPaymentOverride) &&
 		(!r.danceOnlyPass || r.danceOnlyPass.squarePaid || r.danceOnlyPass.adminPaymentOverride) &&
 		(!r.soloJazz || r.soloJazz.squarePaid || r.soloJazz.adminPaymentOverride) &&
@@ -342,7 +347,7 @@ export const isPaid = (r: dss.IRegistrationInfo) =>
 		(!r.teamCompetition || r.teamCompetition.squarePaid || r.teamCompetition.adminPaymentOverride) &&
 		(!r.tshirt || r.tshirt.squarePaid || r.tshirt.adminPaymentOverride))
 
-export default ({weekendPassTier, previousRegistration, admin}: RegistrationFormProps) => {
+export default ({weekendPassTier, previousRegistration, admin, vaccineUpload, vaccineRef, setMyVaccine}: RegistrationFormProps) => {
 	const {discount} = useTwirp()
 	const square_data = JSON.parse(`${process.env.GATSBY_SQUARE_DATA}`)
 	const {values, isSubmitting, handleSubmit, setFieldValue} = useFormikContext<RegistrationFormState>()
@@ -433,7 +438,7 @@ export default ({weekendPassTier, previousRegistration, admin}: RegistrationForm
 				<Row><Col xs={6}>
 					<FormSelect label="Weekend Pass Type" name="passType" disabled={Boolean(previousRegistration && (previousRegistration.fullWeekendPass || previousRegistration.danceOnlyPass)) }>
 						<option aria-label="no pass" value={FormWeekendPassOption.noPassOption} />
-						<option value={FormWeekendPassOption.fullWeekendPassOption}>{"Full Weekend Pass - "+dss.FullWeekendPassTier[weekendPassTier]+" ("+parseDollar(square_data.purchase_items.full_weekend_pass[fromProtoTier(weekendPassTier)])+")"}</option>
+						<option value={FormWeekendPassOption.fullWeekendPassOption}>{"Full Weekend Pass - "+twirpRegistration.FullWeekendPassTier[weekendPassTier]+" ("+parseDollar(square_data.purchase_items.full_weekend_pass[fromProtoTier(weekendPassTier)])+")"}</option>
 						<option value={FormWeekendPassOption.danceOnlyPassOption}>{"Dance Only Pass ("+parseDollar(square_data.purchase_items.dance_only_pass)+")"}</option>
 					</FormSelect>
 				</Col></Row>
@@ -586,11 +591,172 @@ export default ({weekendPassTier, previousRegistration, admin}: RegistrationForm
 			<hr/>
 			<fieldset>
 				<h2>Vaccination Card</h2>
-				<p>Dayton Swing Smackdown is an event only for dancers who have the Covid-19 Vaccine.  You can upload an image of your vaccine card now in order to provide proof of vaccination.  This image will only be stored as long as it takes to verify your vaccine information, and will be subsequently deleted.</p>
-				<p>If you do not wish to upload an image of your vaccine card, or do not yet have one, you can also present your vaccine information at the door.  Keep in mind that if you do not have your card (or an image of your card) you will be turned away and a refund will NOT be offerred</p>
-				<FormFile label="Add Vaccine Card" name="vaccine" />
+				<VaccineBlock 
+					registrationID={previousRegistration?.id} 
+					vaccineUpload={vaccineUpload} 
+					vaccineRef={vaccineRef}
+					setMyVaccine={setMyVaccine}
+					admin={admin}
+				/>
 			</fieldset>
+			<hr />
+			<h2>Submit Registration</h2>
 			<Button type="submit" disabled={isSubmitting}>Submit</Button>
 		</Form>
+	)
+}
+
+type VaccineBlockProps = {
+	registrationID: string | null | undefined
+	vaccineUpload?: VaccineInfo
+	vaccineRef?: React.MutableRefObject<HTMLInputElement|undefined>
+	setMyVaccine?: (arg0: VaccineInfo) => void
+	admin?: boolean
+}
+
+enum VaccineBlockFormAction {
+	approveAction = "approve",
+	rejectAction = "reject",
+	noAction = "none"
+}
+
+const VaccineBlock = ({registrationID, vaccineUpload, vaccineRef, setMyVaccine, admin}: VaccineBlockProps) => {
+	const {vaccine} = useTwirp()
+	const approve = () => {
+		vaccine().then(client => {
+			if(!registrationID) {
+				throw "no registration id"
+			}
+
+			return client.approve({
+				id: registrationID
+			}).then(() => {
+				if(!registrationID) {
+					throw "no registration id"
+				}
+				
+				return client.get({
+					id: registrationID
+				})
+			})
+		}).then(newVaccine => {
+			if(!setMyVaccine) {
+				throw "vaccine setter not set"
+			}
+
+			setMyVaccine(fromProtoVaccine(newVaccine))
+		}).catch(err => {
+			console.log(err)
+		})
+	}
+
+	const reject = (reason: string) => {
+		vaccine().then(client => {
+			if(!registrationID) {
+				throw "no registration id"
+			}
+
+			return client.reject({
+				id: registrationID,
+				reason: reason
+			}).then(() => {
+				if(!registrationID) {
+					throw "no registration id"
+				}
+				
+				return client.get({
+					id: registrationID
+				})
+			})
+		}).then(newVaccine => {
+			if(!setMyVaccine) {
+				throw "vaccine setter not set"
+			}
+
+			setMyVaccine(fromProtoVaccine(newVaccine))
+		}).catch(err => {
+			console.log(err)
+		})
+	}
+
+	return (
+		<>
+			{
+				(() => {
+					if(!vaccineUpload || vaccineUpload.type === VaccineInfoEnum.NoVaxProofSuppliedEnum) {
+						return (
+							<>
+								<p>Dayton Swing Smackdown is an event only for dancers who have the Covid-19 Vaccine.  You can upload an image of your vaccine card now in order to provide proof of vaccination.  This image will only be stored as long as it takes to verify your vaccine information, and will be subsequently deleted.</p>
+								<p>If you do not wish to upload an image of your vaccine card, or do not yet have one, you can also present your vaccine information at the door.  Keep in mind that if you do not have your card (or an image of your card) you will be turned away</p>
+								<FormFile label="Add Vaccine Card" name="vaccine" />
+							</>
+						)
+					}
+
+
+					if (vaccineUpload.type === VaccineInfoEnum.VaxApprovalPendingEnum) {
+						return (
+							<>
+								<p>Your vaccine information is uploaded and pending approval.</p>
+								<a href={vaccineUpload.URL}><img src={vaccineUpload.URL} width={300} /></a>
+								<p>Upload different information:</p>
+								<FormFile label="Add Vaccine Card" name="vaccine" myref={vaccineRef}/>
+							</>
+						)
+					}
+
+					return <p>Your vaccine information has been approved!</p>
+				})()
+			}
+			{admin && (
+				<Formik
+					initialValues={{
+						reason: "",
+						action: VaccineBlockFormAction.noAction
+					}}
+					onSubmit={(values, {setSubmitting, setFieldValue}) => {
+						switch(values.action) {
+						case VaccineBlockFormAction.approveAction:
+							approve()
+							break;
+						case VaccineBlockFormAction.rejectAction:
+							reject(values.reason)
+							break;
+						default:
+							console.log( "no action selected")
+						}
+
+						setFieldValue("reason", "")
+						setFieldValue("action", VaccineBlockFormAction.noAction)
+						setSubmitting(false)
+					}} 
+				>
+					{({values, isSubmitting, submitForm, setFieldValue}) => {
+						useEffect(() => {
+							if(values.action != VaccineBlockFormAction.noAction){
+								submitForm()
+							}
+						}, [values.action])
+
+						return (
+							<>
+								<br/>
+								<FormField as="textarea" label="Rejection Reason" name="reason" />
+								<br/>
+								<Row><Col>
+									<Button disabled={isSubmitting} onClick={() => {
+										setFieldValue("action", VaccineBlockFormAction.approveAction)
+									}}>Approve</Button>
+								</Col><Col>
+									<Button disabled={isSubmitting} onClick={() => {
+										setFieldValue("action", VaccineBlockFormAction.rejectAction)
+									}}>Reject</Button>
+								</Col></Row>
+							</>
+						)
+					}}
+				</Formik>
+			)}
+		</>
 	)
 }

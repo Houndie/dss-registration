@@ -1,4 +1,4 @@
-package registration
+package vaccine
 
 import (
 	"context"
@@ -8,8 +8,8 @@ import (
 	"github.com/Houndie/dss-registration/dynamic/storage"
 )
 
-func (s *Service) UploadVaxImage(ctx context.Context, token string, filesize int64, id string) (string, error) {
-	s.logger.Trace("upload vax image service")
+func (s *Service) Upload(ctx context.Context, token string, filesize int64, id string) (string, error) {
+	s.logger.Trace("vaccine upload service")
 	userinfo, err := s.authorizer.GetUserinfo(ctx, token)
 	if err != nil {
 		return "", fmt.Errorf("could not authorize user: %w", err)
@@ -22,10 +22,19 @@ func (s *Service) UploadVaxImage(ctx context.Context, token string, filesize int
 	}
 	s.logger.Trace("found registration")
 
-	if r.UserID != userinfo.UserID() {
+	if r.UserID != userinfo.UserID() && !userinfo.IsAllowed(s.permissionConfig.Upload) {
 		s.logger.WithError(err).Debug("user id does not match that of found registration")
 		s.logger.WithError(err).Tracef("registration provided user id %s, user provided %s", r.UserID, userinfo.UserID())
 		return "", storage.ErrNotFound{Key: id}
+	}
+
+	approved, err := s.store.GetVaccine(ctx, id)
+	if err != nil {
+		return "", fmt.Errorf("error getting status of vaccine approval from store: %w", err)
+	}
+
+	if approved {
+		return "", ErrAlreadyApproved
 	}
 
 	if filesize > object.PutMaxSize {

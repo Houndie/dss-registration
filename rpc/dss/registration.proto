@@ -11,7 +11,6 @@ service Registration {
   rpc List(RegistrationListReq) returns (RegistrationListRes);
   rpc Prices(RegistrationPricesReq) returns (RegistrationPricesRes);
   rpc Update(RegistrationUpdateReq) returns (RegistrationUpdateRes);
-  rpc UploadVaxImage(RegistrationUploadVaxImageReq) returns (RegistrationUploadVaxImageRes);
 }
 
 message RegistrationInfo {
@@ -173,13 +172,4 @@ message RegistrationListReq {}
 
 message RegistrationListRes{
 	repeated RegistrationInfo registrations = 1;
-}
-
-message RegistrationUploadVaxImageReq {
-	string id = 1;
-	int64 filesize = 2;
-}
-
-message RegistrationUploadVaxImageRes {
-	string url = 1;
 }

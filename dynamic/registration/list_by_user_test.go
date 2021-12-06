@@ -108,7 +108,7 @@ func TestListByUser(t *testing.T) {
 		},
 	}
 
-	service := NewService(true, false, logger, squareClient, commontest.CommonCatalogObjects().SquareData(), authorizer, store, &commontest.MockMailClient{}, nil, testPermissionConfig)
+	service := NewService(true, false, logger, squareClient, commontest.CommonCatalogObjects().SquareData(), authorizer, store, &commontest.MockMailClient{}, testPermissionConfig)
 
 	registrations, err := service.ListByUser(context.Background(), expectedToken)
 	if err != nil {

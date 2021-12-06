@@ -5,11 +5,12 @@ import Col from "react-bootstrap/Col"
 
 type FormFileProps = {
 	label: string
+	myref?: React.MutableRefObject<HTMLInputElement|undefined>
 	as?: 'input' | 'textarea' | 'select'
 	children?: React.ReactNode
 } & FieldHookConfig<any>
 
-export default ({label, ...props}: FormFileProps) => {
+export default ({label, myref, ...props}: FormFileProps) => {
 	const [field, meta, helper] = useField(props);
 	return (
 		<Col>
@@ -21,6 +22,7 @@ export default ({label, ...props}: FormFileProps) => {
 				name={field.name}
 				as={props.as} 
 				children={props.children} 
+				ref={myref}
 				onChange={(event: React.ChangeEvent<HTMLInputElement>) => { 
 					if (event.currentTarget.files == null || event.currentTarget.files.length == 0) {
 						helper.setValue(undefined)

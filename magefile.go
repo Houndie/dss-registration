@@ -38,7 +38,12 @@ type Protoc mg.Namespace
 func (Protoc) Generate() error {
 	mg.Deps(Tools)
 	fmt.Println("generating protocs")
-	for _, file := range []string{"registration", "discount", "forms", "health"} {
+	cmd, err := toolbox.Command("protoc", "--proto_path", "rpc/dss", "--twirp_out=dynamic/", "--go_out=dynamic/", "--twirp_typescript_out=library=pbjs:static/src/rpc", "registration.proto", "discount.proto", "forms.proto", "health.proto", "vaccine.proto")
+	if err != nil {
+		return err
+	}
+
+	for _, file := range []string{"registration", "discount", "forms", "health", "vaccine"} {
 		pbjs := exec.Command("npx", "pbjs", "-t", "static-module", "-w", "commonjs", "-l", eslint, "-r", file, "-o", "static/src/rpc/"+file+".pb.js", "rpc/dss/"+file+".proto")
 		pbjs.Stderr = os.Stderr
 		err := pbjs.Run()
@@ -51,10 +56,6 @@ func (Protoc) Generate() error {
 		if err != nil {
 			return err
 		}
-	}
-	cmd, err := toolbox.Command("protoc", "--proto_path", "rpc/dss", "--twirp_out=dynamic/", "--go_out=dynamic/", "--twirp_typescript_out=library=pbjs:static/src/rpc", "registration.proto", "discount.proto", "forms.proto", "health.proto")
-	if err != nil {
-		return err
 	}
 
 	cmd.Stderr = os.Stderr

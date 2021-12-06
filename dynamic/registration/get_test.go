@@ -132,7 +132,7 @@ func TestGet(t *testing.T) {
 		},
 	}
 
-	service := NewService(true, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, &commontest.MockMailClient{}, nil, testPermissionConfig)
+	service := NewService(true, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, &commontest.MockMailClient{}, testPermissionConfig)
 	r, err := service.Get(context.Background(), expectedToken, expectedRegistrationID)
 	if err != nil {
 		t.Fatalf("error in get registration call: %v", err)
@@ -271,7 +271,7 @@ func TestGetWrongUser(t *testing.T) {
 				},
 			}
 
-			service := NewService(true, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, &commontest.MockMailClient{}, nil, testPermissionConfig)
+			service := NewService(true, false, logger, client, commontest.CommonCatalogObjects().SquareData(), authorizer, store, &commontest.MockMailClient{}, testPermissionConfig)
 			_, err = service.Get(context.Background(), expectedToken, expectedRegistrationID)
 			if err == nil {
 				t.Fatalf("expected error, found none")

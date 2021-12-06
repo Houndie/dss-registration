@@ -46,7 +46,7 @@ const initialState: RegistrationFormState  = {
 
 const Registration = () => {
 	const [prices, setPrices] = useState<dss.RegistrationPricesRes | null>(null)
-	const {registration} = useTwirp()
+	const {registration, vaccine} = useTwirp()
 
 	useEffect(() => {
 		registration().then(client => {
@@ -96,9 +96,11 @@ const Registration = () => {
 										return createRes.registration
 									}
 
-									return client.uploadVaxImage({
-										id: createRes.registration.id,
-										filesize: values.vaccine.size
+									return vaccine().then(vaxClient => {
+										return vaxClient.upload({
+											id: createRes.registration?.id,
+											filesize: values.vaccine?.size
+										})
 									}).then(uploadRes => {
 										if(!uploadRes.url) {
 											throw "No upload url returned"
@@ -108,7 +110,11 @@ const Registration = () => {
 											method: "PUT",
 											body: values.vaccine
 										})
-									}).then(() => {
+									}).then((res) => {
+										if(!res.ok) {
+											throw "error uploading vaccine card:  " + res.statusText
+										}
+
 										if( !createRes.registration) {
 											throw "No registration returned";
 										}
