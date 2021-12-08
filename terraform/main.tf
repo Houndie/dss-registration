@@ -144,3 +144,9 @@ resource "auth0_rule" "send-verification-email" {
 	script = file("${path.module}/rules/send_verification_email.js")
 	enabled = true
 }
+
+resource "auth0_rule" "access-token-email-verified" {
+	name = "Access Token Email Verified"
+	script = templatefile("${path.module}/rules/access_token_email_verified.js", { namespace = auth0_resource_server.smackdown-website.identifier })
+	enabled = true
+}

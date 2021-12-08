@@ -18,8 +18,9 @@ import (
 )
 
 type Authorizer struct {
-	jwks   *cachedJWKS
-	logger *logrus.Logger
+	jwks     *cachedJWKS
+	logger   *logrus.Logger
+	audience string
 }
 
 type cachedDiscoveryDocument struct {
@@ -180,7 +181,7 @@ func maxAge(res *http.Response) time.Duration {
 	return 0
 }
 
-func NewAuthorizer(endpoint string, client *http.Client, logger *logrus.Logger) (*Authorizer, error) {
+func NewAuthorizer(endpoint, audience string, client *http.Client, logger *logrus.Logger) (*Authorizer, error) {
 	u, err := url.Parse(endpoint)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing endpoint: %w", err)
@@ -201,7 +202,8 @@ func NewAuthorizer(endpoint string, client *http.Client, logger *logrus.Logger) 
 		dd:      dd,
 	}
 	return &Authorizer{
-		jwks:   jwks,
-		logger: logger,
+		jwks:     jwks,
+		logger:   logger,
+		audience: audience,
 	}, nil
 }
