@@ -17,9 +17,23 @@ func (a *Authorizer) GetUserinfo(ctx context.Context, accessToken string) (autho
 	if err != nil {
 		return nil, fmt.Errorf("error fetching jwks: %w", err)
 	}
-	token, err := jwt.ParseString(accessToken, jwt.WithKeySet(jwks), jwt.WithValidate(true), jwt.WithAcceptableSkew(1*time.Minute))
+	token, err := jwt.ParseString(accessToken, jwt.WithKeySet(jwks), jwt.WithAudience(a.audience), jwt.WithValidate(true), jwt.WithAcceptableSkew(1*time.Minute))
 	if err != nil {
 		return nil, fmt.Errorf("error parsing jwt: %v", err)
+	}
+
+	emailVerified, ok := token.Get(a.audience + "/email_verified")
+	if !ok {
+		return nil, errors.New("could not find status of email verification")
+	}
+
+	emailVerifiedBool, ok := emailVerified.(bool)
+	if !ok {
+		return nil, errors.New("email verified is not boolean")
+	}
+
+	if !emailVerifiedBool {
+		return nil, authorizer.Unauthorized
 	}
 
 	permissions, ok := token.Get("permissions")

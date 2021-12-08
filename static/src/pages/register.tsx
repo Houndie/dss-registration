@@ -7,7 +7,9 @@ import {createDiscount} from "../rpc/discount.twirp"
 import { v4 as uuidv4 } from 'uuid';
 import useTwirp from "../components/useTwirp"
 import { useAuth0 } from '@auth0/auth0-react';
+import LoadingPage from "../components/LoadingPage"
 import RegistrationForm, {isPaid, FormHousingOption, toProtoRegistration, FormWeekendPassOption, FormFullWeekendPassLevel, FormStyle, FormRole, RegistrationFormState} from "../components/RegistrationForm"
+import PleaseVerifyEmail from "../components/PleaseVerifyEmail"
 
 const initialState: RegistrationFormState  = {
 	firstName: '', 
@@ -58,7 +60,7 @@ const Registration = () => {
 		});
 	}, [])
 
-	const { isLoading, isAuthenticated, loginWithRedirect } = useAuth0()
+	const { isLoading, isAuthenticated, loginWithRedirect, user } = useAuth0()
 
 	return (
 		<Page title="Registration">
@@ -67,10 +69,16 @@ const Registration = () => {
 					return <p>Registration is not open yet!</p>
 				}
 				if(isLoading) {
-					return <></>
+					return <LoadingPage/>
+				}
+				if(!prices) {
+					return <LoadingPage/>
 				}
 				if( !isAuthenticated ){
 					return <p>You must be logged in to register! <a href="#" onClick={() => loginWithRedirect()}>Login Now</a></p>
+				}
+				if(!user?.email_verified) {
+					return <PleaseVerifyEmail/>
 				}
 				return (
 					<Formik
@@ -143,9 +151,9 @@ const Registration = () => {
 							});
 						}}
 					>
-					{({values, isSubmitting, handleSubmit, setFieldValue}) => prices != null ? (
+					{({values, isSubmitting, handleSubmit, setFieldValue}) => (
 						<RegistrationForm weekendPassTier={prices.weekendPassTier} admin={false}/>
-					) : null}
+					)}
 					</Formik>
 				)
 			}}

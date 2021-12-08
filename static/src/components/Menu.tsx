@@ -33,8 +33,6 @@ export default () => (
 						<NavDropdown.Item href="/competition-results/2017">2017 Competition Results</NavDropdown.Item>
 						<NavDropdown.Item href="/competition-results/2018">2018 Competition Results</NavDropdown.Item>
 						<NavDropdown.Item href="/competition-results/2019">2019 Competition Results</NavDropdown.Item>
-						<NavDropdown.Item href="/competition-results/2020">2020 Competition Results</NavDropdown.Item>
-						<NavDropdown.Item href="/competition-results/2021">2021 Competition Results</NavDropdown.Item>
 					</NavDropdown>
 					<NavDropdown title="Venues" id="menu-venues">
 						<NavDropdown.Item href="/event-venues">Event Venues</NavDropdown.Item>

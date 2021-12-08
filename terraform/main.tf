@@ -132,3 +132,21 @@ resource "auth0_role" "admin" {
 		}
 	}
 }
+
+resource "auth0_tenant" "smackdown" {
+	friendly_name = "Dayton Swing Smackdown"
+	picture_url = "${local.domain}/images/logo.png"
+	support_email = "info@daytonswingsmackdown.com"
+}
+
+resource "auth0_rule" "send-verification-email" {
+	name = "Send Email Verification"
+	script = file("${path.module}/rules/send_verification_email.js")
+	enabled = true
+}
+
+resource "auth0_rule" "access-token-email-verified" {
+	name = "Access Token Email Verified"
+	script = templatefile("${path.module}/rules/access_token_email_verified.js", { namespace = auth0_resource_server.smackdown-website.identifier })
+	enabled = true
+}

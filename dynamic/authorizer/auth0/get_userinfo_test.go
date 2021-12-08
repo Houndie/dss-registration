@@ -29,6 +29,7 @@ func (m *mockRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
 func TestUserinfo(t *testing.T) {
 	testJWKSEndpoint := "https://endpoint/jwks"
 	testUserID := "12345"
+	testAudience := "https://example.com"
 	discoveryDocumentCount := 0
 	jwksCount := 0
 	myEndpoint := "https://endpoint"
@@ -73,6 +74,14 @@ func TestUserinfo(t *testing.T) {
 	err = token.Set("permissions", []string{permission})
 	if err != nil {
 		t.Fatalf("error adding permissions to jwt: %v", err)
+	}
+	err = token.Set(jwt.AudienceKey, []string{testAudience})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = token.Set(testAudience+"/email_verified", true)
+	if err != nil {
+		t.Fatal(err)
 	}
 	tokenBytes, err := jwt.Sign(token, jwa.RS256, jwkPrivateKey)
 	if err != nil {
@@ -140,7 +149,7 @@ func TestUserinfo(t *testing.T) {
 	}
 	logger.SetOutput(devnull)
 	logger.AddHook(&test_utility.ErrorHook{T: t})
-	authorizer, err := NewAuthorizer(myEndpoint, client, logger)
+	authorizer, err := NewAuthorizer(myEndpoint, testAudience, client, logger)
 	if err != nil {
 		t.Fatalf("error creating authorizer: %v", err)
 	}

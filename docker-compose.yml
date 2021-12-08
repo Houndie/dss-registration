@@ -31,6 +31,7 @@ services:
       - DSS_TEST_POSTGRESURL=postgres://dbuser:dbpass@test_db:5432/dbuser?sslmode=disable
       - DSS_ENVIRONMENT=development
       - DSS_AUTHENDPOINT
+      - DSS_AUTHAUDIENCE
       - DSS_AWS_ACCESSKEY
       - DSS_AWS_SECRETKEY
       - DSS_AWS_VAXBUCKET
