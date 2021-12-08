@@ -173,7 +173,7 @@ func (Terraform) Apply(ctx context.Context) error {
 		return fmt.Errorf("error creating terraform run: %w", err)
 	}
 
-	timeoutCtx2, cancel2 := context.WithTimeout(ctx, 2*time.Minute)
+	timeoutCtx2, cancel2 := context.WithTimeout(ctx, 5*time.Minute)
 	defer cancel2()
 	for {
 		if mg.Verbose() {
