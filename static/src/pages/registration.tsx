@@ -22,7 +22,8 @@ export default () => {
 	const { isLoading, isAuthenticated, loginWithRedirect, user } = useAuth0()
 	var id: string | null = null
 	useEffect(() => {
-		id = window.location.href.split("/registration/")[1]
+		const params = new URLSearchParams(window.location.search)
+		id = params.get("id")
 	})
 
 	useEffect(() => {
