@@ -57,7 +57,7 @@ locals {
 		DSS_FRONTEND = local.domain
 		DSS_AUTHENDPOINT = "https://${var.auth0_domain}"
 		DSS_AUTHAUDIENCE = auth0_resource_server.smackdown-website.identifier
-		DSS_ENVIRONMENT = "development"
+		DSS_ENVIRONMENT = (var.workspace == "testing" ? "development" : "production")
 		DSS_VERSION = var.deploy_version
 		DSS_SQUAREDATA = jsonencode(local.backend_square_data)
 		DSS_AWS_ACCESSKEY = aws_iam_access_key.backend.id
