@@ -17,6 +17,14 @@ const Instructors = () => (
 					<Col className="col-4"><img src="/images/instructors/Jon.jpg" width="100%" object-fit="scale-down"/></Col>
 				</Row>
 				<h2>Jon Holmstrom & Kerry Kapaku</h2>
+				<Row className="align-items-center">
+					<Col className="col-4"><img src="/images/instructors/John.jpg" width="100%" object-fit="scale-down"/></Col>
+					<Col><p>John Holmstrom discovered Lindy Hop in Chicago in 2005. After college in Champaign-Urbana where he served as President of the Illini Swing Society, he returned to Chicago in 2010 and fully immersed himself in the Lindy Hop community teaching at Big City Swing, DJing, and organizing, founding Traffic Jam Swing and Second City Swingout. John has performed at various events for muggles and Lindy Hoppers alike from historic Chicago venues like Ravinia and the Double Door to Lindy Focus. John is an avid team competitor, coach and choreographer with wins at Dayton Swing Smackdown (2010 - Hoosier Hotshots), Hawkeye Swing Festival, Southern Swing Challenge, and Camp Jitterbug. As a teacher, John loves to focus on the technical elements in his classes, giving students similar moves with crucial differences for a choose your own adventure experience.</p></Col>
+				</Row>
+				<Row className="align-items-center">
+					<Col><p>Kerry Kapaku comes from a long history of training, performing, and teaching ballet and contemporary dance professionally, and holds a BFA in Dance Performance and Education from The Ohio State University. Kerry was introduced to the wonderful world of lindy hop while attending OSU, and has been teaching, competing, and performing across the US since. In the classroom, Kerry strives to cultivate an upbeat and encouraging environment for all of her students, while emphasizing the importance of efficient muscular engagement, physical and musical connection, and self expression.  Kerry holds competitive titles from events such as ILHC, Nevermore Jazz Ball, and Lindy Focus, Camp Hollywood, and more. At home, Kerry serves as an instructor for Naptown Stomp, and is the owner and director of DanceWorks Indy, Indianapolis's only dance and fitness studio for adults of all ages and abilities.</p></Col>
+					<Col className="col-4"><img src="/images/instructors/Kerry.jpg" width="100%" object-fit="scale-down"/></Col>
+				</Row>
 				<h2>Aliceann Talley & Kemper Talley</h2>
 				<Row className="align-items-center">
 					<Col className="col-4"><img src="/images/instructors/Aliceann.jpg" width="100%" object-fit="scale-down"/></Col>
