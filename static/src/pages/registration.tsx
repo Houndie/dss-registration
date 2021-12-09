@@ -11,18 +11,19 @@ import {VaccineInfoEnum, VaccineInfo, fromProtoVaccine} from "../components/vacc
 import {Formik} from 'formik'
 import LoadingPage from "../components/LoadingPage"
 import PleaseVerifyEmail from "../components/PleaseVerifyEmail"
+import {Router} from "@reach/router"
 
-type UserRegistrationProps = {
-	id: string
-}
-
-export default ({id}: UserRegistrationProps) => { 
+export default () => { 
 	const vaccineRef = React.useRef<HTMLInputElement>()
 	const [prices, setPrices] = useState<dss.RegistrationPricesRes | null>(null)
 	const [myRegistration, setMyRegistration] = useState<dss.IRegistrationInfo | null>(null)
 	const [myVaccine, setMyVaccine] = useState<VaccineInfo | null>(null)
 	const {registration, vaccine} = useTwirp()
 	const { isLoading, isAuthenticated, loginWithRedirect, user } = useAuth0()
+	var id: string | null = null
+	useEffect(() => {
+		id = window.location.href.split("/registration/")[1]
+	})
 
 	useEffect(() => {
 		registration().then(client => {
@@ -35,7 +36,7 @@ export default ({id}: UserRegistrationProps) => {
 	}, [])
 
 	useEffect(() => {
-		if(isLoading || !isAuthenticated || !user?.email_verified){
+		if(isLoading || !isAuthenticated || !user?.email_verified || !id){
 			setMyRegistration(null)
 			return
 		}

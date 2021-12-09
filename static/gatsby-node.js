@@ -11,11 +11,11 @@ exports.onPostBuild = () => {
 }
 
 exports.createPages = ({actions}) => {
-	actions.createPage({
+	/*actions.createPage({
 		path: "/registration/:id",
 		matchPath: "/registration/:id",
 		component: path.resolve("./src/programmatic_pages/UserRegistration.tsx")
-	})
+	})*/
 	actions.createPage({
 		path: "/admin/registration/:id",
 		matchPath: "/admin/registration/:id",
