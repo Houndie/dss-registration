@@ -43,6 +43,7 @@
     "axios": "^0.21.1",
     "bootstrap": "^5.0.2",
     "formik": "^2.2.9",
+    "gatsby-plugin-netlify": "^3.14.0",
     "google-protobuf": "^3.17.3",
     "pbjs-twirp": "^1.1.0",
     "react": "^17.0.2",
