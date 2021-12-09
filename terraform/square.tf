@@ -141,11 +141,11 @@ resource "square_catalog_object" "t_shirt_variation" {
 
 locals {
 	full_weekend_variants = {
-		"Tier 1": 5500,
-		"Tier 2": 6500,
-		"Tier 3": 7500,
-		"Tier 4": 8500,
-		"Tier 5": 9500,
+		"Tier 1": 6500,
+		"Tier 2": 7500,
+		"Tier 3": 8500,
+		"Tier 4": 9500,
+		"Tier 5": 10500,
 	}
 }
 

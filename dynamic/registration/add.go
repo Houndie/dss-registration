@@ -152,12 +152,12 @@ func (s *Service) Add(ctx context.Context, registration *Info, accessToken strin
 				Email: registration.Email,
 			},
 		},
-		BCC: []*sendinblue.EmailPerson{
+		/*BCC: []*sendinblue.EmailPerson{
 			{
 				Name:  "Dayton Swing Smackdown",
 				Email: "info@daytonswingsmackdown.com",
 			},
-		},
+		},*/
 		Params:     mailParams,
 		TemplateID: 3,
 	})

@@ -49,12 +49,12 @@ func (s *Service) Reject(ctx context.Context, token, id, reason string) error {
 				Email: registration.Email,
 			},
 		},
-		BCC: []*sendinblue.EmailPerson{
+		/*BCC: []*sendinblue.EmailPerson{
 			{
 				Name:  "Dayton Swing Smackdown",
 				Email: "info@daytonswingsmackdown.com",
 			},
-		},
+		},*/
 		Params: struct {
 			ID     string `json:"id"`
 			Reason string `json:"reason"`

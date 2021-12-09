@@ -42,12 +42,12 @@ func (s *Service) Approve(ctx context.Context, token string, id string) error {
 				Email: registration.Email,
 			},
 		},
-		BCC: []*sendinblue.EmailPerson{
+		/*BCC: []*sendinblue.EmailPerson{
 			{
 				Name:  "Dayton Swing Smackdown",
 				Email: "info@daytonswingsmackdown.com",
 			},
-		},
+		},*/
 		TemplateID: 4,
 	})
 	if err != nil {
