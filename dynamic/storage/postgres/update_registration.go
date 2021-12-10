@@ -47,8 +47,9 @@ func init() {
 			{{.RequireHousingDetailsCol}} = $30,
 			{{.UserIDCol}} = $31,
 			{{.OrderIDsCol}} = $32,
-			{{.DiscountCodesCol}} = $33
-		WHERE {{.IDCol}} = $34;`
+			{{.DiscountCodesCol}} = $33,
+			{{.EnabledCol}} = $34
+		WHERE {{.IDCol}} = $35;`
 
 	tmpl, err := template.New("tmpl").Parse(tmplStmt)
 	if err != nil {
@@ -165,6 +166,7 @@ func (s *Store) UpdateRegistration(ctx context.Context, registration *storage.Re
 		registration.UserID,
 		orderIDs,
 		discountCodes,
+		registration.Enabled,
 		id)
 	if err != nil {
 		return fmt.Errorf("error adding new registration to database: %w", err)

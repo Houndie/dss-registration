@@ -312,6 +312,7 @@ $root.dss = (function() {
          * @property {dss.INoHousing|null} [noHousing] RegistrationInfo noHousing
          * @property {Array.<string>|null} [discountCodes] RegistrationInfo discountCodes
          * @property {string|null} [createdAt] RegistrationInfo createdAt
+         * @property {boolean|null} [enabled] RegistrationInfo enabled
          */
 
         /**
@@ -506,6 +507,14 @@ $root.dss = (function() {
          */
         RegistrationInfo.prototype.createdAt = "";
 
+        /**
+         * RegistrationInfo enabled.
+         * @member {boolean} enabled
+         * @memberof dss.RegistrationInfo
+         * @instance
+         */
+        RegistrationInfo.prototype.enabled = false;
+
         // OneOf field names bound to virtual getters and setters
         var $oneOfFields;
 
@@ -600,6 +609,8 @@ $root.dss = (function() {
                     writer.uint32(/* id 21, wireType 2 =*/170).string(message.discountCodes[i]);
             if (message.createdAt != null && Object.hasOwnProperty.call(message, "createdAt"))
                 writer.uint32(/* id 22, wireType 2 =*/178).string(message.createdAt);
+            if (message.enabled != null && Object.hasOwnProperty.call(message, "enabled"))
+                writer.uint32(/* id 23, wireType 0 =*/184).bool(message.enabled);
             return writer;
         };
 
@@ -701,6 +712,9 @@ $root.dss = (function() {
                     break;
                 case 22:
                     message.createdAt = reader.string();
+                    break;
+                case 23:
+                    message.enabled = reader.bool();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -854,6 +868,9 @@ $root.dss = (function() {
             if (message.createdAt != null && message.hasOwnProperty("createdAt"))
                 if (!$util.isString(message.createdAt))
                     return "createdAt: string expected";
+            if (message.enabled != null && message.hasOwnProperty("enabled"))
+                if (typeof message.enabled !== "boolean")
+                    return "enabled: boolean expected";
             return null;
         };
 
@@ -948,6 +965,8 @@ $root.dss = (function() {
             }
             if (object.createdAt != null)
                 message.createdAt = String(object.createdAt);
+            if (object.enabled != null)
+                message.enabled = Boolean(object.enabled);
             return message;
         };
 
@@ -982,6 +1001,7 @@ $root.dss = (function() {
                 object.teamCompetition = null;
                 object.tshirt = null;
                 object.createdAt = "";
+                object.enabled = false;
             }
             if (message.id != null && message.hasOwnProperty("id"))
                 object.id = message.id;
@@ -1048,6 +1068,8 @@ $root.dss = (function() {
             }
             if (message.createdAt != null && message.hasOwnProperty("createdAt"))
                 object.createdAt = message.createdAt;
+            if (message.enabled != null && message.hasOwnProperty("enabled"))
+                object.enabled = message.enabled;
             return object;
         };
 

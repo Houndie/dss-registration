@@ -231,6 +231,7 @@ func fromProtoc(r *pb.RegistrationInfo) (*registration.Info, error) {
 		Housing:         housing,
 		DiscountCodes:   r.DiscountCodes,
 		CreatedAt:       createdAt,
+		Enabled:         r.Enabled,
 	}, nil
 }
 
@@ -261,6 +262,7 @@ func toProtoc(r *registration.Info) (*pb.RegistrationInfo, error) {
 		IsStudent:     r.IsStudent,
 		DiscountCodes: r.DiscountCodes,
 		CreatedAt:     r.CreatedAt.Format(time.RFC3339),
+		Enabled:       r.Enabled,
 	}
 
 	switch pt := r.PassType.(type) {

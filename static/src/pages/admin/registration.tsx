@@ -140,7 +140,8 @@ export default () => {
 								petAllergies: (myRegistration.requireHousing && myRegistration.requireHousing.petAllergies ? myRegistration.requireHousing.petAllergies : ""),
 								requireDetails: (myRegistration.requireHousing && myRegistration.requireHousing.details ? myRegistration.requireHousing.details : ""),
 								vaccine: undefined,
-								discounts: (myRegistration.discountCodes ? myRegistration.discountCodes : [])
+								discounts: (myRegistration.discountCodes ? myRegistration.discountCodes : []),
+								enabled: Boolean(myRegistration.enabled)
 							}}
 							validate={formValidate}
 							onSubmit={(values: RegistrationFormState, {setSubmitting, setFieldValue}) => {

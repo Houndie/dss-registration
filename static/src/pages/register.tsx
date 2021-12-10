@@ -43,7 +43,8 @@ const initialState: RegistrationFormState  = {
 	petAllergies: '',
 	requireDetails: '',
 	vaccine: undefined,
-	discounts: []
+	discounts: [],
+	enabled: true
 }
 
 const Registration = () => {

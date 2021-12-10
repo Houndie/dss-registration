@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/common"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 )
@@ -118,6 +119,10 @@ func (s *Service) Update(ctx context.Context, token string, registration *Info) 
 
 	if err := paymentCheck(registration, isAdmin, oldRegistration, pd); err != nil {
 		return nil, err
+	}
+
+	if registration.Enabled != oldRegistration.Enabled && !isAdmin {
+		return nil, authorizer.Unauthorized
 	}
 
 	if oldRegistration.CreatedAt.Sub(registration.CreatedAt) >= 1*time.Second {

@@ -60,6 +60,7 @@ export namespace dss {
         noHousing?: (dss.INoHousing|null);
         discountCodes?: (string[]|null);
         createdAt?: (string|null);
+        enabled?: (boolean|null);
     }
 
     class RegistrationInfo implements IRegistrationInfo {
@@ -86,6 +87,7 @@ export namespace dss {
         public noHousing?: (dss.INoHousing|null);
         public discountCodes: string[];
         public createdAt: string;
+        public enabled: boolean;
         public passType?: ("fullWeekendPass"|"danceOnlyPass"|"noPass");
         public housing?: ("provideHousing"|"requireHousing"|"noHousing");
         public static create(properties?: dss.IRegistrationInfo): dss.RegistrationInfo;

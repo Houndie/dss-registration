@@ -40,6 +40,7 @@ message RegistrationInfo {
 	}
 	repeated string discount_codes = 21;
 	string created_at = 22;
+	bool enabled = 23;
 }
 
 enum FullWeekendPassTier {
