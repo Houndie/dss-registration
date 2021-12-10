@@ -664,9 +664,15 @@ const totalUnpaid = (values: RegistrationFormState, tier: string, existingRegist
 	if(existingRegistration?.fullWeekendPass){
 		if(!existingRegistration.fullWeekendPass.squarePaid && !existingRegistration.fullWeekendPass.adminPaymentOverride) {
 			total += square_data.purchase_items.full_weekend_pass[tier]
+			if(existingRegistration?.isStudent || values.isStudent) {
+				total -= square_data.student_discount
+			}
 		}
 	} else if(values.passType == FormWeekendPassOption.fullWeekendPassOption) {
 		total += square_data.purchase_items.full_weekend_pass[tier]
+		if(existingRegistration?.isStudent || values.isStudent) {
+			total -= square_data.student_discount
+		}
 	}
 
 	if(existingRegistration?.danceOnlyPass){
