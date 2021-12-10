@@ -15,6 +15,40 @@ import FormCheck from '../components/FormCheck'
 import useTwirp from "../components/useTwirp"
 import {VaccineInfoEnum, VaccineInfo, fromProtoVaccine} from "../components/vaccine"
 
+export const formValidate = (values: RegistrationFormState) => {
+	const errors: RegistrationFormErrors = {}
+
+	if(values.firstName === ""){
+		errors.firstName = "Required"
+	}
+
+	if(values.lastName === ""){
+		errors.lastName = "Required"
+	}
+
+	if(values.email === ""){
+		errors.email = "Required"
+	}
+
+	if(values.mixAndMatch && values.role === FormRole.NotSelected){
+		errors.role = "Required"
+	}
+
+	if(values.passType == FormWeekendPassOption.fullWeekendPassOption && values.level === FormFullWeekendPassLevel.NotSelected ){
+		errors.level = "Required"
+	}
+
+	if(values.teamCompetition && values.teamName === ""){
+		errors.teamName = "Required"
+	}
+
+	if(values.tshirt && values.style === FormStyle.NotSelected) {
+		errors.style = "Required"
+	}
+
+	return errors
+}
+
 export type RegistrationFormState = {
 	firstName: string, 
 	lastName: string,
@@ -48,6 +82,15 @@ export type RegistrationFormState = {
 	requireDetails: string,
 	vaccine: File|undefined,
 	discounts: string[]
+}
+export type RegistrationFormErrors = {
+	firstName?: string, 
+	lastName?: string,
+	email?: string,
+	level?: string,
+	role?: string,
+	teamName?: string,
+	style?: string
 }
 
 export const toProtoRegistration = (values: RegistrationFormState, tier: number, previous?: twirpRegistration.IRegistrationInfo) => {

@@ -6,7 +6,7 @@ import useTwirp from "../../components/useTwirp"
 import { useAuth0 } from '@auth0/auth0-react';
 import { v4 as uuidv4 } from 'uuid';
 import {dss} from "../../rpc/registration.pb"
-import RegistrationForm, {isPaid, RegistrationFormState, toProtoRegistration, formWeekendPassOptionFromProto, fromProtoHousingOption, FormFullWeekendPassLevel, FormRole, FormStyle, fromProtoPassLevel, fromProtoRole, fromProtoStyle} from "../../components/RegistrationForm"
+import RegistrationForm, {isPaid, RegistrationFormState, toProtoRegistration, formWeekendPassOptionFromProto, fromProtoHousingOption, FormFullWeekendPassLevel, FormRole, FormStyle, fromProtoPassLevel, fromProtoRole, fromProtoStyle, formValidate} from "../../components/RegistrationForm"
 import {Formik} from 'formik'
 import {VaccineInfoEnum, VaccineInfo, fromProtoVaccine} from "../../components/vaccine"
 import LoadingPage from "../../components/LoadingPage"
@@ -142,6 +142,7 @@ export default () => {
 								vaccine: undefined,
 								discounts: (myRegistration.discountCodes ? myRegistration.discountCodes : [])
 							}}
+							validate={formValidate}
 							onSubmit={(values: RegistrationFormState, {setSubmitting, setFieldValue}) => {
 								setResponse(null)
 

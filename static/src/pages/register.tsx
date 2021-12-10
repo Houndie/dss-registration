@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import useTwirp from "../components/useTwirp"
 import { useAuth0 } from '@auth0/auth0-react';
 import LoadingPage from "../components/LoadingPage"
-import RegistrationForm, {isPaid, FormHousingOption, toProtoRegistration, FormWeekendPassOption, FormFullWeekendPassLevel, FormStyle, FormRole, RegistrationFormState} from "../components/RegistrationForm"
+import RegistrationForm, {isPaid, FormHousingOption, toProtoRegistration, FormWeekendPassOption, FormFullWeekendPassLevel, FormStyle, FormRole, RegistrationFormState, formValidate} from "../components/RegistrationForm"
 import PleaseVerifyEmail from "../components/PleaseVerifyEmail"
 
 const initialState: RegistrationFormState  = {
@@ -86,6 +86,7 @@ const Registration = () => {
 				return (
 					<Formik
 						initialValues={initialState}
+						validate={formValidate}
 						onSubmit={(values, { setSubmitting }) => {
 							if(!prices) {
 								console.error("prices is null?")
