@@ -51,29 +51,45 @@ export default () => {
 				}
 				return (
 					<>
-						<b>
-							<Row>
-								<Col>Registered At</Col>
-								<Col>First Name</Col>
-								<Col>Last Name</Col>
-								<Col>Email</Col>
-								<Col>Paid</Col>
-							</Row>
-						</b>
-						{ myRegistrations.map(r => (
-							<a href={"/admin/registration?id="+r.id} key={r.id}>
-								<Row>
-									<Col>{(r.createdAt ? (new Date(r.createdAt)).toLocaleString() : null)}</Col>
-									<Col>{r.firstName}</Col>
-									<Col>{r.lastName}</Col>
-									<Col>{r.email}</Col>
-									<Col>{(isPaid(r) ? "yes" : "no")}</Col>
-								</Row>
-							</a>
-						))}
+						<RegistrationBlock title="Active" filter={r => Boolean(r.enabled)} myRegistrations={myRegistrations}/>
+						<RegistrationBlock title="Disabled" filter={r => Boolean(!r.enabled)} myRegistrations={myRegistrations}/>
 					</>
 				)
 			}}
 		</AdminPage>
 	)
 }
+
+type RegistrationBlockProps = {
+	title: string
+	filter: (arg0: dss.IRegistrationInfo) => boolean
+	myRegistrations: dss.IRegistrationInfo[]
+}
+
+const RegistrationBlock = ({title, filter, myRegistrations}: RegistrationBlockProps) => (
+	<>
+		<h1>{title}</h1>
+		<b>
+			<Row>
+				<Col>Registered At</Col>
+				<Col>First Name</Col>
+				<Col>Last Name</Col>
+				<Col>Email</Col>
+				<Col>Paid</Col>
+			</Row>
+		</b>
+		{ myRegistrations.filter(filter).map(r => {
+			console.log(r)
+			return (
+			<a href={"/admin/registration?id="+r.id} key={r.id}>
+				<Row>
+					<Col>{(r.createdAt ? (new Date(r.createdAt)).toLocaleString() : null)}</Col>
+					<Col>{r.firstName}</Col>
+					<Col>{r.lastName}</Col>
+					<Col>{r.email}</Col>
+					<Col>{(isPaid(r) ? "yes" : "no")}</Col>
+				</Row>
+			</a>
+		)})}
+	</>
+)

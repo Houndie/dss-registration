@@ -103,6 +103,10 @@ export default () => {
 					return <LoadingPage/>
 				}
 
+				if (!myRegistration.enabled)  {
+					return <p>This registration is disabled.</p>
+				}
+
 				return (
 					<>
 						{!isPaid(myRegistration) && (
@@ -154,7 +158,8 @@ export default () => {
 								provideDetails: (myRegistration.provideHousing && myRegistration.provideHousing.details ? myRegistration.provideHousing.details : ""),
 								petAllergies: (myRegistration.requireHousing && myRegistration.requireHousing.petAllergies ? myRegistration.requireHousing.petAllergies : ""), requireDetails: (myRegistration.requireHousing && myRegistration.requireHousing.details ? myRegistration.requireHousing.details : ""), 
 								vaccine: undefined,
-								discounts: (myRegistration.discountCodes ? myRegistration.discountCodes : [])
+								discounts: (myRegistration.discountCodes ? myRegistration.discountCodes : []),
+								enabled: Boolean(myRegistration.enabled)
 							}}
 							validate={formValidate}
 							onSubmit={(values: RegistrationFormState, {setSubmitting, setFieldValue}) => {

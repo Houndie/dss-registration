@@ -41,31 +41,32 @@ func (s *Service) Reject(ctx context.Context, token, id, reason string) error {
 			return fmt.Errorf("error deleting vaccine proof: %w", err)
 		}
 	}
-
-	_, err = s.mailClient.SendSMTPEmail(ctx, &sendinblue.SMTPEmailParams{
-		To: []*sendinblue.EmailPerson{
-			{
-				Name:  fmt.Sprintf("%s %s", registration.FirstName, registration.LastName),
-				Email: registration.Email,
+	if registration.Enabled {
+		_, err = s.mailClient.SendSMTPEmail(ctx, &sendinblue.SMTPEmailParams{
+			To: []*sendinblue.EmailPerson{
+				{
+					Name:  fmt.Sprintf("%s %s", registration.FirstName, registration.LastName),
+					Email: registration.Email,
+				},
 			},
-		},
-		/*BCC: []*sendinblue.EmailPerson{
-			{
-				Name:  "Dayton Swing Smackdown",
-				Email: "info@daytonswingsmackdown.com",
+			/*BCC: []*sendinblue.EmailPerson{
+				{
+					Name:  "Dayton Swing Smackdown",
+					Email: "info@daytonswingsmackdown.com",
+				},
+			},*/
+			Params: struct {
+				ID     string `json:"id"`
+				Reason string `json:"reason"`
+			}{
+				ID:     id,
+				Reason: reason,
 			},
-		},*/
-		Params: struct {
-			ID     string `json:"id"`
-			Reason string `json:"reason"`
-		}{
-			ID:     id,
-			Reason: reason,
-		},
-		TemplateID: 5,
-	})
-	if err != nil {
-		return fmt.Errorf("error sending vaccine approved email: %w", err)
+			TemplateID: 5,
+		})
+		if err != nil {
+			return fmt.Errorf("error sending vaccine approved email: %w", err)
+		}
 	}
 
 	return nil

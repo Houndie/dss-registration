@@ -53,7 +53,7 @@ export default () => {
 								<Col>Paid</Col>
 							</Row>
 						</b>
-						{ myRegistrations.map(r => (
+						{ myRegistrations.filter(r => r.enabled).map(r => (
 							<a href={"/registration?id="+r.id} key={r.id}>
 								<Row>
 									<Col>{(r.createdAt ? (new Date(r.createdAt)).toLocaleString() : null)}</Col>

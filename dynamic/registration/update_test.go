@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Houndie/dss-registration/dynamic/authorizer"
 	"github.com/Houndie/dss-registration/dynamic/commontest"
 	"github.com/Houndie/dss-registration/dynamic/storage"
 	"github.com/Houndie/dss-registration/dynamic/test_utility"
@@ -395,5 +396,59 @@ func TestUpdateNoAdminOverride(t *testing.T) {
 				t.Fatal(err)
 			}
 		})
+	}
+}
+
+func TestUpdateRegistrationNoAdminEnabled(t *testing.T) {
+	token := "token"
+	userID := "userID"
+	logger := logrus.New()
+	devnull, err := os.OpenFile(os.DevNull, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+	if err != nil {
+		t.Fatalf("error opening null: %v", err)
+	}
+	logger.SetOutput(devnull)
+	logger.AddHook(&test_utility.ErrorHook{T: t})
+
+	a := &commontest.MockAuthorizer{
+		GetUserinfoFunc: commontest.UserinfoFromIDCheck(t, token, []string{testPermissionConfig.Update}, userID, []string{}),
+	}
+
+	store := &commontest.MockStore{
+		GetRegistrationFunc: func(ctx context.Context, id string) (*storage.Registration, error) {
+			return &storage.Registration{
+				Enabled: true,
+				UserID:  userID,
+			}, nil
+		},
+	}
+	client := &square.Client{
+		Locations: &commontest.MockSquareLocationsClient{
+			ListFunc: func(context.Context, *locations.ListRequest) (*locations.ListResponse, error) {
+				return &locations.ListResponse{
+					Locations: []*objects.Location{{ID: "7"}},
+				}, nil
+			},
+		},
+		Orders: &commontest.MockSquareOrdersClient{
+			BatchRetrieveFunc: func(context.Context, *orders.BatchRetrieveRequest) (*orders.BatchRetrieveResponse, error) {
+				return &orders.BatchRetrieveResponse{
+					Orders: []*objects.Order{},
+				}, nil
+
+			},
+		},
+	}
+
+	service := NewService(true, true, logger, client, commontest.CommonCatalogObjects().SquareData(), a, store, nil, testPermissionConfig)
+
+	_, err = service.Update(context.Background(), token, &Info{
+		Enabled: false,
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if !errors.Is(err, authorizer.Unauthorized) {
+		t.Fatal(err)
 	}
 }

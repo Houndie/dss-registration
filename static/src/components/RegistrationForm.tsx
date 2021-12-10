@@ -81,7 +81,8 @@ export type RegistrationFormState = {
 	petAllergies: string,
 	requireDetails: string,
 	vaccine: File|undefined,
-	discounts: string[]
+	discounts: string[],
+	enabled: boolean,
 }
 export type RegistrationFormErrors = {
 	firstName?: string, 
@@ -103,7 +104,8 @@ export const toProtoRegistration = (values: RegistrationFormState, tier: number,
 		zipCode: values.zipCode,
 		email: values.email,
 		homeScene: values.homeScene,
-		isStudent: values.isStudent
+		isStudent: values.isStudent,
+		enabled: values.enabled
 	}
 
 	switch (values.passType) {
@@ -645,6 +647,13 @@ export default ({weekendPassTier, previousRegistration, admin, vaccineUpload, va
 					admin={admin}
 				/>
 			</fieldset>
+			{(admin && (
+				<>
+					<hr />
+					<h2>Admin</h2>
+					<FormCheck label="Enabled" name="enabled" />
+				</>
+			))}
 			<hr />
 			<h2>Submit Registration</h2>
 			<Row>

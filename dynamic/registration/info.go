@@ -190,6 +190,7 @@ func toStorageRegistration(r *Info) *storage.Registration {
 		Housing:         r.Housing,
 		DiscountCodes:   r.DiscountCodes,
 		CreatedAt:       r.CreatedAt,
+		Enabled:         r.Enabled,
 	}
 }
 
@@ -213,6 +214,7 @@ func fromStorageRegistration(r *storage.Registration, pd *common.PaymentData) *I
 		Housing:         r.Housing,
 		DiscountCodes:   r.DiscountCodes,
 		CreatedAt:       r.CreatedAt,
+		Enabled:         r.Enabled,
 	}
 }
 
@@ -235,4 +237,5 @@ type Info struct {
 	Housing         storage.Housing
 	DiscountCodes   []string
 	CreatedAt       time.Time
+	Enabled         bool
 }
