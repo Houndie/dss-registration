@@ -6,7 +6,7 @@ import useTwirp from "../components/useTwirp"
 import { useAuth0 } from '@auth0/auth0-react';
 import { v4 as uuidv4 } from 'uuid';
 import {dss} from "../rpc/registration.pb"
-import RegistrationForm, {isPaid, RegistrationFormState, toProtoRegistration, formWeekendPassOptionFromProto, fromProtoHousingOption, FormFullWeekendPassLevel, FormRole, FormStyle, fromProtoPassLevel, fromProtoRole, fromProtoStyle} from "../components/RegistrationForm"
+import RegistrationForm, {isPaid, RegistrationFormState, toProtoRegistration, formWeekendPassOptionFromProto, fromProtoHousingOption, FormFullWeekendPassLevel, FormRole, FormStyle, fromProtoPassLevel, fromProtoRole, fromProtoStyle, formValidate} from "../components/RegistrationForm"
 import {VaccineInfoEnum, VaccineInfo, fromProtoVaccine} from "../components/vaccine"
 import {Formik} from 'formik'
 import LoadingPage from "../components/LoadingPage"
@@ -134,19 +134,19 @@ export default () => {
 								homeScene: (myRegistration.homeScene ? myRegistration.homeScene : ""),
 								isStudent: (myRegistration.isStudent ? myRegistration.isStudent : false),
 								passType: formWeekendPassOptionFromProto(myRegistration),
-								level: (myRegistration.fullWeekendPass && myRegistration.fullWeekendPass.level ? fromProtoPassLevel(myRegistration.fullWeekendPass.level) : FormFullWeekendPassLevel.NotSelected),
+								level: (myRegistration.fullWeekendPass && myRegistration.fullWeekendPass.level != null ? fromProtoPassLevel(myRegistration.fullWeekendPass.level) : FormFullWeekendPassLevel.NotSelected),
 								weekendPassOverride: Boolean(myRegistration.fullWeekendPass && myRegistration.fullWeekendPass.adminPaymentOverride),
 								danceOnlyOverride: Boolean(myRegistration.danceOnlyPass && myRegistration.danceOnlyPass.adminPaymentOverride),
 								mixAndMatch: Boolean(myRegistration.mixAndMatch),
-								role: (myRegistration.mixAndMatch && myRegistration.mixAndMatch.role ? fromProtoRole(myRegistration.mixAndMatch.role) : FormRole.NotSelected),
+								role: (myRegistration.mixAndMatch && myRegistration.mixAndMatch.role != null? fromProtoRole(myRegistration.mixAndMatch.role) : FormRole.NotSelected),
 								mixAndMatchOverride: Boolean(myRegistration.mixAndMatch && myRegistration.mixAndMatch.adminPaymentOverride),
 								soloJazz: Boolean(myRegistration.soloJazz),
 								soloJazzOverride: Boolean(myRegistration.soloJazz && myRegistration.soloJazz.adminPaymentOverride),
 								teamCompetition: Boolean(myRegistration.teamCompetition),
-								teamName: (myRegistration.teamCompetition && myRegistration.teamCompetition.name ? myRegistration.teamCompetition.name : ''),
+								teamName: (myRegistration.teamCompetition && myRegistration.teamCompetition.name != null ? myRegistration.teamCompetition.name : ''),
 								teamCompetitionOverride: Boolean(myRegistration.teamCompetition && myRegistration.teamCompetition.adminPaymentOverride),
 								tshirt: Boolean(myRegistration.tshirt),
-								style: (myRegistration.tshirt && myRegistration.tshirt.style ? fromProtoStyle(myRegistration.tshirt.style) : FormStyle.NotSelected),
+								style: (myRegistration.tshirt && myRegistration.tshirt.style != null ? fromProtoStyle(myRegistration.tshirt.style) : FormStyle.NotSelected),
 								tshirtOverride: Boolean(myRegistration.tshirt && myRegistration.tshirt.adminPaymentOverride),
 								housing: fromProtoHousingOption(myRegistration),
 								pets: (myRegistration.provideHousing && myRegistration.provideHousing.pets ? myRegistration.provideHousing.pets : ""),
@@ -156,6 +156,7 @@ export default () => {
 								vaccine: undefined,
 								discounts: (myRegistration.discountCodes ? myRegistration.discountCodes : [])
 							}}
+							validate={formValidate}
 							onSubmit={(values: RegistrationFormState, {setSubmitting, setFieldValue}) => {
 								setResponse(null)
 
