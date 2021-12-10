@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react'
+import Spinner from "react-bootstrap/Spinner"
 import {dss as twirpRegistration} from "../rpc/registration.pb"
 import {dss as twirpVaccine} from "../rpc/vaccine.pb"
 import parseDollar from "../components/parseDollar"
@@ -601,7 +602,7 @@ export default ({weekendPassTier, previousRegistration, admin, vaccineUpload, va
 			</fieldset>
 			<hr />
 			<h2>Submit Registration</h2>
-			<Button type="submit" disabled={isSubmitting}>Submit</Button>
+			<Button type="submit" disabled={isSubmitting}>Submit</Button>{(isSubmitting && (<Spinner animation="border" role="status" />))}
 		</Form>
 	)
 }
