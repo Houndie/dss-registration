@@ -296,8 +296,8 @@ func (p *PurchaseItems) UnmarshalJSON(b []byte) error {
 }
 
 type Discounts struct {
-	StudentDiscount *Discount
-	CodeDiscounts   map[string][]*Discount
+	StudentDiscount *Discount              `json:"student"`
+	CodeDiscounts   map[string][]*Discount `json:"code"`
 }
 
 type SquareData struct {
