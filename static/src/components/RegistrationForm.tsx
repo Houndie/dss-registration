@@ -357,6 +357,8 @@ export default ({weekendPassTier, previousRegistration, admin, vaccineUpload, va
 		return null
 	}
 
+	const tier = fromProtoTier(weekendPassTier)
+
 	return (
 		<Form onSubmit={handleSubmit}>
 			<fieldset>
@@ -438,8 +440,8 @@ export default ({weekendPassTier, previousRegistration, admin, vaccineUpload, va
 				<h2>Purchase</h2>
 				<Row><Col xs={6}>
 					<FormSelect label="Weekend Pass Type" name="passType" disabled={Boolean(previousRegistration && (previousRegistration.fullWeekendPass || previousRegistration.danceOnlyPass)) }>
-						<option aria-label="no pass" value={FormWeekendPassOption.noPassOption} />
-						<option value={FormWeekendPassOption.fullWeekendPassOption}>{"Full Weekend Pass - "+twirpRegistration.FullWeekendPassTier[weekendPassTier]+" ("+parseDollar(square_data.purchase_items.full_weekend_pass[fromProtoTier(weekendPassTier)])+")"}</option>
+						<option aria-label="no pass" value={FormWeekendPassOption.noPassOption}>No Pass (pay at the door)</option>
+						<option value={FormWeekendPassOption.fullWeekendPassOption}>{"Full Weekend Pass - "+twirpRegistration.FullWeekendPassTier[weekendPassTier]+" ("+parseDollar(square_data.purchase_items.full_weekend_pass[tier])+")"}</option>
 						<option value={FormWeekendPassOption.danceOnlyPassOption}>{"Dance Only Pass ("+parseDollar(square_data.purchase_items.dance_only_pass)+")"}</option>
 					</FormSelect>
 				</Col></Row>
@@ -602,9 +604,69 @@ export default ({weekendPassTier, previousRegistration, admin, vaccineUpload, va
 			</fieldset>
 			<hr />
 			<h2>Submit Registration</h2>
-			<Button type="submit" disabled={isSubmitting}>Submit</Button>{(isSubmitting && (<Spinner animation="border" role="status" />))}
+			<Row>
+				<Col><b>Total Unpaid: {parseDollar(totalUnpaid(values, tier, previousRegistration))}</b></Col>
+			</Row>
+			<Row>
+				<Col><Button type="submit" disabled={isSubmitting}>Submit</Button>{(isSubmitting && (<Spinner animation="border" role="status" />))}</Col>
+			</Row>
 		</Form>
 	)
+}
+
+const totalUnpaid = (values: RegistrationFormState, tier: string, existingRegistration?: twirpRegistration.IRegistrationInfo) => {
+	let total = 0
+	const square_data = JSON.parse(`${process.env.GATSBY_SQUARE_DATA}`)
+
+	if(existingRegistration?.fullWeekendPass){
+		if(!existingRegistration.fullWeekendPass.squarePaid && !existingRegistration.fullWeekendPass.adminPaymentOverride) {
+			total += square_data.purchase_items.full_weekend_pass[tier]
+		}
+	} else if(values.passType == FormWeekendPassOption.fullWeekendPassOption) {
+		total += square_data.purchase_items.full_weekend_pass[tier]
+	}
+
+	if(existingRegistration?.danceOnlyPass){
+		if(!existingRegistration.danceOnlyPass.squarePaid && !existingRegistration.danceOnlyPass.adminPaymentOverride) {
+			total += square_data.purchase_items.dance_only_pass
+		}
+	} else if(values.passType == FormWeekendPassOption.danceOnlyPassOption) {
+		total += square_data.purchase_items.dance_only_pass
+	}
+
+	if(existingRegistration?.soloJazz){
+		if(!existingRegistration.soloJazz.squarePaid && !existingRegistration.soloJazz.adminPaymentOverride) {
+			total += square_data.purchase_items.solo_jazz
+		}
+	} else if(values.soloJazz){
+		total += square_data.purchase_items.solo_jazz
+	}
+
+	if(existingRegistration?.mixAndMatch){
+		if(!existingRegistration.mixAndMatch.squarePaid && !existingRegistration.mixAndMatch.adminPaymentOverride) {
+			total += square_data.purchase_items.mix_and_match
+		}
+	} else if(values.mixAndMatch){
+		total += square_data.purchase_items.mix_and_match
+	}
+
+	if(existingRegistration?.teamCompetition){
+		if(!existingRegistration.teamCompetition.squarePaid && !existingRegistration.teamCompetition.adminPaymentOverride) {
+			total += square_data.purchase_items.team_competition
+		}
+	} else if(values.teamCompetition){
+		total += square_data.purchase_items.team_competition
+	}
+
+	if(existingRegistration?.tshirt){
+		if(!existingRegistration.tshirt.squarePaid && !existingRegistration.tshirt.adminPaymentOverride) {
+			total += square_data.purchase_items.t_shirt
+		}
+	} else if(values.tshirt){
+		total += square_data.purchase_items.t_shirt
+	}
+
+	return total
 }
 
 type VaccineBlockProps = {
