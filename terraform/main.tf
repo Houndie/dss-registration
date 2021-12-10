@@ -150,3 +150,10 @@ resource "auth0_rule" "access-token-email-verified" {
 	script = templatefile("${path.module}/rules/access_token_email_verified.js", { namespace = auth0_resource_server.smackdown-website.identifier })
 	enabled = true
 }
+
+resource "auth0_custom_domain" "smackdown" {
+  count = var.workspace == "testing" ? 0 : 1
+  domain = "auth.daytonswingsmackdown.com"
+  type = "auth0_managed_certs"
+  verification_method = "txt"
+}
