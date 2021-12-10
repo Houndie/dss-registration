@@ -61,7 +61,7 @@ export default () => {
 							</Row>
 						</b>
 						{ myRegistrations.map(r => (
-							<a href={"/admin/registration/"+r.id} key={r.id}>
+							<a href={"/admin/registration?id="+r.id} key={r.id}>
 								<Row>
 									<Col>{(r.createdAt ? (new Date(r.createdAt)).toLocaleString() : null)}</Col>
 									<Col>{r.firstName}</Col>

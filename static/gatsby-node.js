@@ -16,9 +16,9 @@ exports.createPages = ({actions}) => {
 		matchPath: "/registration/:id",
 		component: path.resolve("./src/programmatic_pages/UserRegistration.tsx")
 	})*/
-	actions.createPage({
+	/*actions.createPage({
 		path: "/admin/registration/:id",
 		matchPath: "/admin/registration/:id",
 		component: path.resolve("./src/programmatic_pages/AdminUserRegistration.tsx")
-	})
+	})*/
 }

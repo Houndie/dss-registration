@@ -75,7 +75,10 @@ const Registration = () => {
 					return <LoadingPage/>
 				}
 				if( !isAuthenticated ){
-					return <p>You must be logged in to register! <a href="#" onClick={() => loginWithRedirect()}>Login Now</a></p>
+					return (<>
+						<p>You must be logged in to register! <a href="#" onClick={() => loginWithRedirect()}>Login Now</a></p>
+						<p>Note: If you have having issues logging in on the safari browser, please try using chrome or firefox.</p>
+						</>)
 				}
 				if(!user?.email_verified) {
 					return <PleaseVerifyEmail/>

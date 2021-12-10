@@ -1,28 +1,30 @@
 import React, {useEffect, useState} from 'react'
-import Page from '../components/Page'
+import Page from '../../components/Page'
 import Alert from 'react-bootstrap/Alert'
-import WithAlert, {ResponseKind} from '../components/WithAlert'
-import useTwirp from "../components/useTwirp"
+import WithAlert, {ResponseKind} from '../../components/WithAlert'
+import useTwirp from "../../components/useTwirp"
 import { useAuth0 } from '@auth0/auth0-react';
 import { v4 as uuidv4 } from 'uuid';
-import {dss} from "../rpc/registration.pb"
-import RegistrationForm, {isPaid, RegistrationFormState, toProtoRegistration, formWeekendPassOptionFromProto, fromProtoHousingOption, FormFullWeekendPassLevel, FormRole, FormStyle, fromProtoPassLevel, fromProtoRole, fromProtoStyle} from "../components/RegistrationForm"
+import {dss} from "../../rpc/registration.pb"
+import RegistrationForm, {isPaid, RegistrationFormState, toProtoRegistration, formWeekendPassOptionFromProto, fromProtoHousingOption, FormFullWeekendPassLevel, FormRole, FormStyle, fromProtoPassLevel, fromProtoRole, fromProtoStyle} from "../../components/RegistrationForm"
 import {Formik} from 'formik'
-import {VaccineInfoEnum, VaccineInfo, fromProtoVaccine} from "../components/vaccine"
-import LoadingPage from "../components/LoadingPage"
-import PleaseVerifyEmail from "../components/PleaseVerifyEmail"
+import {VaccineInfoEnum, VaccineInfo, fromProtoVaccine} from "../../components/vaccine"
+import LoadingPage from "../../components/LoadingPage"
+import PleaseVerifyEmail from "../../components/PleaseVerifyEmail"
 
-type UserRegistrationProps = {
-	id: string
-}
-
-export default ({id}: UserRegistrationProps) => { 
+export default () => { 
 	const vaccineRef = React.useRef<HTMLInputElement>()
 	const [prices, setPrices] = useState<dss.RegistrationPricesRes | null>(null)
 	const [myRegistration, setMyRegistration] = useState<dss.IRegistrationInfo | null>(null)
 	const [myVaccine, setMyVaccine] = useState<VaccineInfo | null>(null)
 	const {registration, vaccine} = useTwirp()
 	const { isLoading, isAuthenticated, loginWithRedirect, user } = useAuth0()
+	var id: string | null = null
+
+	useEffect(() => {
+		const params = new URLSearchParams(window.location.search)
+		id = params.get("id")
+	})
 
 	useEffect(() => {
 		registration().then(client => {
@@ -35,7 +37,7 @@ export default ({id}: UserRegistrationProps) => {
 	}, [])
 
 	useEffect(() => {
-		if(isLoading || !isAuthenticated || !user?.email_verified){
+		if(isLoading || !isAuthenticated || !user?.email_verified || !id){
 			setMyRegistration(null)
 			return
 		}
