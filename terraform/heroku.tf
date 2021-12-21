@@ -55,7 +55,7 @@ locals {
 
 	backend_config_vars = {
 		DSS_FRONTEND = local.domain
-		DSS_AUTHENDPOINT = "https://${var.auth0_domain}"
+		DSS_AUTHENDPOINT = var.workspace == "testing" ? "https://${var.auth0_domain}" : "https://${auth0_custom_domain.smackdown[0].domain}"
 		DSS_AUTHAUDIENCE = auth0_resource_server.smackdown-website.identifier
 		DSS_ENVIRONMENT = (var.workspace == "testing" ? "development" : "production")
 		DSS_VERSION = var.deploy_version
