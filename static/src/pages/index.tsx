@@ -55,6 +55,9 @@ const Home = () => (
 		<Menu/>
 		<Hero image='ViktorJump.jpg' height='450px' title='Dayton Swing Smackdown' />
 		<Container className="my-5">
+			<h2>February 25 - February 27, 2022</h2>
+		</Container>
+		<Container className="my-5">
 			<Row><Col xs="5">
 				<Image src="tri_city.jpg" fluid/>
 			</Col><Col className="align-self-center">
