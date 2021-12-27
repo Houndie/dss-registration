@@ -193,34 +193,24 @@ export default () => {
 									}).then( r => {
 										const redirectURL = `${process.env.GATSBY_FRONTEND}/registration/${r.id}`
 
-										if (isPaid(r)) {
-											setFieldValue("vaccine", undefined)
-											if(vaccineRef.current){
-												vaccineRef.current.value = ""
-											}
-
-											setResponse({
-												kind: ResponseKind.Good,
-												message: "Registration updated successfully!"
-											})
-
-											return vaccine().then(client => {
-												return client.get({
-													id: id
-												})
-											}).then(res => {
-												setMyVaccine(fromProtoVaccine(res))
-											})
+										setFieldValue("vaccine", undefined)
+										if(vaccineRef.current){
+											vaccineRef.current.value = ""
 										}
 
-										return client.pay({
-											id: r.id,
-											idempotencyKey: uuidv4(),
-											redirectUrl: redirectURL,
-										}).then(res => {
-											window.location.href = res.checkoutUrl
-											return
+										setResponse({
+											kind: ResponseKind.Good,
+											message: "Registration updated successfully!"
 										})
+
+										return vaccine().then(client => {
+											return client.get({
+												id: r.id
+											})
+										}).then(res => {
+											setMyVaccine(fromProtoVaccine(res))
+										})
+
 									})
 								}).catch(err => {
 									setResponse({

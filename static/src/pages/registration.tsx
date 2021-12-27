@@ -224,7 +224,7 @@ export default () => {
 
 											return vaccine().then(client => {
 												return client.get({
-													id: id
+													id: r.id
 												})
 											}).then(res => {
 												setMyVaccine(fromProtoVaccine(res))
