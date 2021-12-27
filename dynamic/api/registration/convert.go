@@ -325,6 +325,18 @@ func toProtoc(r *registration.Info) (*pb.RegistrationInfo, error) {
 		}
 	}
 
+	if r.TShirt != nil {
+		style, ok := styleToProtoc[r.TShirt.Style]
+		if !ok {
+			return nil, fmt.Errorf("unknown style %s", style)
+		}
+		result.Tshirt = &pb.TShirt{
+			Style:                style,
+			SquarePaid:           r.TShirt.SquarePaid,
+			AdminPaymentOverride: r.TShirt.AdminPaymentOverride,
+		}
+	}
+
 	switch h := r.Housing.(type) {
 	case *storage.ProvideHousing:
 		result.Housing = &pb.RegistrationInfo_ProvideHousing{
