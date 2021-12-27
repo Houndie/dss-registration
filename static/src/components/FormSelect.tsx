@@ -15,7 +15,7 @@ export default ({label, ...props}: FormSelectProps) => {
 		<Col>
 			<Form.Label htmlFor={props.id || props.name}>{label}</Form.Label>
 			<br />
-			<Form.Select isInvalid={meta.touched && !!meta.error} {...field} as={props.as} children={props.children}/>
+			<Form.Select isInvalid={meta.touched && !!meta.error} {...field} disabled={props.disabled} as={props.as} children={props.children}/>
 			<Form.Control.Feedback type='invalid' tooltip>{meta.error}</Form.Control.Feedback>
 		</Col>
 	);
