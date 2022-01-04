@@ -24,6 +24,7 @@ resource "square_catalog_object" "team_competition_variation" {
 			currency = "USD"
 		}
 	}
+
 }
 
 locals {
@@ -172,6 +173,9 @@ resource "square_catalog_object" "full_weekend_pass_variation" {
 			amount = each.value
 			currency = "USD"
 		}
+	}
+	lifecycle {
+		ignore_changes = all
 	}
 }
 
