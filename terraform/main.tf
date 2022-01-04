@@ -11,7 +11,7 @@ terraform {
 		}
 		square = {
 			source = "houndie/square"
-			version = "0.1.1"
+			version = "0.1.5"
 		}
 		heroku = {
 			source = "heroku/heroku"
@@ -35,7 +35,7 @@ terraform {
 		}
 		aws = {
 			source = "hashicorp/aws"
-			version = "3.67.0"
+			version = "3.70.0"
 		}
 	}
 	backend "remote" {
