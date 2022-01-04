@@ -44,6 +44,7 @@ func TestPopulate(t *testing.T) {
 				inventoryCounts[idx] = &objects.InventoryCount{
 					CatalogObjectID: co.WeekendPassID[tier],
 					Quantity:        count,
+					State:           objects.InventoryStateInStock,
 				}
 				idx++
 			}

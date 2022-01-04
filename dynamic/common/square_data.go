@@ -334,6 +334,10 @@ func LowestInStockTier(ctx context.Context, s map[storage.WeekendPassTier]*Purch
 	for res.Counts.Next() {
 		count := res.Counts.Value().Count
 
+		if count.State != objects.InventoryStateInStock {
+			continue
+		}
+
 		quantity, err := strconv.ParseFloat(count.Quantity, 64)
 		if err != nil {
 			return 0, 0, fmt.Errorf("could not convert quantity %s to float: %w", count.Quantity, err)
