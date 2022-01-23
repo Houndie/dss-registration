@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import Spinner from "react-bootstrap/Spinner"
 import {dss as twirpRegistration} from "../rpc/registration.pb"
+import {dss as twirpDiscount} from "../rpc/discount.pb"
 import {dss as twirpVaccine} from "../rpc/vaccine.pb"
 import parseDollar from "../components/parseDollar"
 import Form from "react-bootstrap/Form"
@@ -13,6 +14,7 @@ import FormFile from '../components/FormFile'
 import FormSelect from '../components/FormSelect'
 import FormCheck from '../components/FormCheck'
 import useTwirp from "../components/useTwirp"
+import WithAlert, {ResponseKind} from '../components/WithAlert'
 import {VaccineInfoEnum, VaccineInfo, fromProtoVaccine} from "../components/vaccine"
 
 export const formValidate = (values: RegistrationFormState) => {
@@ -81,7 +83,7 @@ export type RegistrationFormState = {
 	petAllergies: string,
 	requireDetails: string,
 	vaccine: File|undefined,
-	discounts: string[],
+	discounts: { [name: string]: twirpDiscount.ISingleDiscount[] },
 	enabled: boolean,
 }
 export type RegistrationFormErrors = {
@@ -105,7 +107,8 @@ export const toProtoRegistration = (values: RegistrationFormState, tier: number,
 		email: values.email,
 		homeScene: values.homeScene,
 		isStudent: values.isStudent,
-		enabled: values.enabled
+		enabled: values.enabled,
+		discountCodes: Object.keys(values.discounts)
 	}
 
 	switch (values.passType) {
@@ -242,6 +245,25 @@ export const fromProtoPassLevel = (level: twirpRegistration.FullWeekendPassLevel
 			return FormFullWeekendPassLevel.Level3
 		default:
 			throw 'cannot convert level to form type'
+	}
+}
+
+export const fromProtoPurchaseItem = (item: twirpDiscount.PurchaseItem) => {
+	switch(item) {
+		case twirpDiscount.PurchaseItem.FullWeekendPassPurchaseItem:
+			return "Full Weekend Pass"
+		case twirpDiscount.PurchaseItem.DanceOnlyPassPurchaseItem:
+			return "Dance Only Pass"
+		case twirpDiscount.PurchaseItem.MixAndMatchPurchaseItem:
+			return "Mix and Match"
+		case twirpDiscount.PurchaseItem.SoloJazzPurchaseItem:
+			return "Solo Jazz"
+		case twirpDiscount.PurchaseItem.TeamCompetitionPurchaseItem:
+			return "Team Competition"
+		case twirpDiscount.PurchaseItem.TShirtPurchaseItem:
+			return "T-Shirt"
+		default:
+			throw "cannot convert purchase item"
 	}
 }
 
@@ -608,33 +630,57 @@ export default ({weekendPassTier, previousRegistration, admin, vaccineUpload, va
 			</fieldset>
 			<hr/>
 			<fieldset>
-				<h2>Discounts</h2>
-				<Formik
-					initialValues={{
-						newDiscount: ""
-					}}
-					onSubmit={(innerValues, { setSubmitting }) => {
-						discount().then(client => {
-							return client.get({
-								code: innerValues.newDiscount
-							})
-						}).then((res) => {
-							setFieldValue('discounts', [...values.discounts, res.bundle])
-							setSubmitting(false)
-						}).catch((e) => {
-							console.log(e)
-							setSubmitting(false)
-						})
-					}}
-				>
-					{(innerProps) => (
-						<Row><Col>
-							<FormField label="Add Discount Code" name="newDiscount" type="text" />
-						</Col><Col xs={1}>
-							<br style={{"lineHeight": "200%"}} /><Button disabled={innerProps.isSubmitting} onClick={innerProps.submitForm}>Add</Button>
-						</Col></Row>
-					)}
-				</Formik>
+				<WithAlert>{(setDiscountResponse) => (
+					<>
+						<h2>Discounts</h2>
+						<Formik
+							initialValues={{
+								newDiscount: ""
+							}}
+							onSubmit={(innerValues, { setSubmitting }) => {
+								discount().then(client => {
+									return client.get({
+										code: innerValues.newDiscount
+									})
+								}).then((res) => {
+									if(res.bundle?.code && res.bundle?.discounts) {
+										setFieldValue('discounts', {
+											...values.discounts, 
+											[res.bundle.code]: res.bundle.discounts
+										})
+									}
+									setDiscountResponse(null)
+									setSubmitting(false)
+								}).catch((e) => {
+									setDiscountResponse({
+										kind: ResponseKind.Bad,
+										message: e.toString()
+									})
+									setSubmitting(false)
+								})
+							}}
+						>
+							{(innerProps) => (
+								<Row><Col>
+									<FormField label="Add Discount Code" name="newDiscount" type="text" />
+								</Col><Col xs={1}>
+									<br style={{"lineHeight": "200%"}} /><Button disabled={innerProps.isSubmitting} onClick={innerProps.submitForm}>Add</Button>
+								</Col></Row>
+							)}
+						</Formik>
+					</>
+				)}</WithAlert>
+				<table><tbody>
+					{Object.entries(values.discounts).map(([code, discounts]) => (
+						<tr key={code}><td>
+							<h3>{code}</h3>
+							{discounts?.map(discount => {
+								return (
+								<p key={discount.appliedTo}><b>{fromProtoPurchaseItem((discount.appliedTo ? discount.appliedTo:-1))}:</b>  {discount.amount?.dollar ? parseDollar(discount.amount?.dollar ? discount.amount?.dollar : 0) + " off": discount.amount?.percent?.toString() + "% off"}</p>
+							)})}
+						</td></tr>
+					))}
+				</tbody></table>
 			</fieldset>
 			<hr/>
 			<fieldset>
@@ -666,62 +712,81 @@ export default ({weekendPassTier, previousRegistration, admin, vaccineUpload, va
 	)
 }
 
+const applyDiscounts = (amount: number, discounts: twirpDiscount.ISingleDiscount[]) => {
+	return discounts.reduce<number>((total, discount) => {
+		if(discount?.amount?.dollar){
+			return total - Number(discount.amount.dollar)
+		}
+
+		if(discount?.amount?.percent){
+			return total - total * parseFloat(discount.amount.percent)/100
+		}
+
+		return total
+	}, amount)
+}
+
 const totalUnpaid = (values: RegistrationFormState, tier: string, existingRegistration?: twirpRegistration.IRegistrationInfo) => {
 	let total = 0
 	const square_data = JSON.parse(`${process.env.GATSBY_SQUARE_DATA}`)
+	const discounts = Object.values(values.discounts).reduce<twirpDiscount.ISingleDiscount[]>((list, sd) => [...list, ...sd], [])
 
 	if(existingRegistration?.fullWeekendPass){
 		if(!existingRegistration.fullWeekendPass.squarePaid && !existingRegistration.fullWeekendPass.adminPaymentOverride) {
-			total += square_data.purchase_items.full_weekend_pass[tier]
+			let fwDiscounts = discounts.filter(discount => discount.appliedTo === twirpDiscount.PurchaseItem.FullWeekendPassPurchaseItem)
 			if(existingRegistration?.isStudent || values.isStudent) {
-				total -= square_data.student_discount
+				fwDiscounts = [...fwDiscounts, { amount: {dollar: square_data.student_discount}}]
 			}
+
+			total += applyDiscounts(square_data.purchase_items.full_weekend_pass[tier], fwDiscounts)
 		}
 	} else if(values.passType == FormWeekendPassOption.fullWeekendPassOption) {
-		total += square_data.purchase_items.full_weekend_pass[tier]
+		let fwDiscounts = discounts.filter(discount => discount.appliedTo === twirpDiscount.PurchaseItem.FullWeekendPassPurchaseItem)
 		if(existingRegistration?.isStudent || values.isStudent) {
-			total -= square_data.student_discount
+			fwDiscounts = [...fwDiscounts, { amount: {dollar: square_data.student_discount}}]
 		}
+
+		total += applyDiscounts(square_data.purchase_items.full_weekend_pass[tier], fwDiscounts)
 	}
 
 	if(existingRegistration?.danceOnlyPass){
 		if(!existingRegistration.danceOnlyPass.squarePaid && !existingRegistration.danceOnlyPass.adminPaymentOverride) {
-			total += square_data.purchase_items.dance_only_pass
+			total += applyDiscounts(square_data.purchase_items.dance_only_pass, discounts.filter(discount => discount.appliedTo === twirpDiscount.PurchaseItem.DanceOnlyPassPurchaseItem))
 		}
 	} else if(values.passType == FormWeekendPassOption.danceOnlyPassOption) {
-		total += square_data.purchase_items.dance_only_pass
+		total += applyDiscounts(square_data.purchase_items.dance_only_pass, discounts.filter(discount => discount.appliedTo === twirpDiscount.PurchaseItem.DanceOnlyPassPurchaseItem))
 	}
 
 	if(existingRegistration?.soloJazz){
 		if(!existingRegistration.soloJazz.squarePaid && !existingRegistration.soloJazz.adminPaymentOverride) {
-			total += square_data.purchase_items.solo_jazz
+			total += applyDiscounts(square_data.purchase_items.solo_jazz, discounts.filter(discount => discount.appliedTo === twirpDiscount.PurchaseItem.SoloJazzPurchaseItem))
 		}
 	} else if(values.soloJazz){
-		total += square_data.purchase_items.solo_jazz
+		total += applyDiscounts(square_data.purchase_items.solo_jazz, discounts.filter(discount => discount.appliedTo === twirpDiscount.PurchaseItem.SoloJazzPurchaseItem))
 	}
 
 	if(existingRegistration?.mixAndMatch){
 		if(!existingRegistration.mixAndMatch.squarePaid && !existingRegistration.mixAndMatch.adminPaymentOverride) {
-			total += square_data.purchase_items.mix_and_match
+			total += applyDiscounts(square_data.purchase_items.mix_and_match, discounts.filter(discount => discount.appliedTo === twirpDiscount.PurchaseItem.MixAndMatchPurchaseItem))
 		}
 	} else if(values.mixAndMatch){
-		total += square_data.purchase_items.mix_and_match
+		total += applyDiscounts(square_data.purchase_items.mix_and_match, discounts.filter(discount => discount.appliedTo === twirpDiscount.PurchaseItem.MixAndMatchPurchaseItem))
 	}
 
 	if(existingRegistration?.teamCompetition){
 		if(!existingRegistration.teamCompetition.squarePaid && !existingRegistration.teamCompetition.adminPaymentOverride) {
-			total += square_data.purchase_items.team_competition
+			total += applyDiscounts(square_data.purchase_items.team_competition, discounts.filter(discount => discount.appliedTo === twirpDiscount.PurchaseItem.TeamCompetitionPurchaseItem))
 		}
 	} else if(values.teamCompetition){
-		total += square_data.purchase_items.team_competition
+		total += applyDiscounts(square_data.purchase_items.team_competition, discounts.filter(discount => discount.appliedTo === twirpDiscount.PurchaseItem.TeamCompetitionPurchaseItem))
 	}
 
 	if(existingRegistration?.tshirt){
 		if(!existingRegistration.tshirt.squarePaid && !existingRegistration.tshirt.adminPaymentOverride) {
-			total += square_data.purchase_items.t_shirt
+			total += applyDiscounts(square_data.purchase_items.tshirt, discounts.filter(discount => discount.appliedTo === twirpDiscount.PurchaseItem.TShirtPurchaseItem))
 		}
 	} else if(values.tshirt){
-		total += square_data.purchase_items.t_shirt
+		total += applyDiscounts(square_data.purchase_items.tshirt, discounts.filter(discount => discount.appliedTo === twirpDiscount.PurchaseItem.TShirtPurchaseItem))
 	}
 
 	return total

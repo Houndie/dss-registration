@@ -90,21 +90,23 @@ $root.dss = (function() {
      * PurchaseItem enum.
      * @name dss.PurchaseItem
      * @enum {number}
-     * @property {number} FullWeekendPassPurchaseItem=0 FullWeekendPassPurchaseItem value
-     * @property {number} DanceOnlyPassPurchaseItem=1 DanceOnlyPassPurchaseItem value
-     * @property {number} MixAndMatchPurchaseItem=2 MixAndMatchPurchaseItem value
-     * @property {number} SoloJazzPurchaseItem=3 SoloJazzPurchaseItem value
-     * @property {number} TeamCompetitionPurchaseItem=4 TeamCompetitionPurchaseItem value
-     * @property {number} TShirtPurchaseItem=5 TShirtPurchaseItem value
+     * @property {number} Unknown=0 Unknown value
+     * @property {number} FullWeekendPassPurchaseItem=1 FullWeekendPassPurchaseItem value
+     * @property {number} DanceOnlyPassPurchaseItem=2 DanceOnlyPassPurchaseItem value
+     * @property {number} MixAndMatchPurchaseItem=3 MixAndMatchPurchaseItem value
+     * @property {number} SoloJazzPurchaseItem=4 SoloJazzPurchaseItem value
+     * @property {number} TeamCompetitionPurchaseItem=5 TeamCompetitionPurchaseItem value
+     * @property {number} TShirtPurchaseItem=6 TShirtPurchaseItem value
      */
     dss.PurchaseItem = (function() {
         var valuesById = {}, values = Object.create(valuesById);
-        values[valuesById[0] = "FullWeekendPassPurchaseItem"] = 0;
-        values[valuesById[1] = "DanceOnlyPassPurchaseItem"] = 1;
-        values[valuesById[2] = "MixAndMatchPurchaseItem"] = 2;
-        values[valuesById[3] = "SoloJazzPurchaseItem"] = 3;
-        values[valuesById[4] = "TeamCompetitionPurchaseItem"] = 4;
-        values[valuesById[5] = "TShirtPurchaseItem"] = 5;
+        values[valuesById[0] = "Unknown"] = 0;
+        values[valuesById[1] = "FullWeekendPassPurchaseItem"] = 1;
+        values[valuesById[2] = "DanceOnlyPassPurchaseItem"] = 2;
+        values[valuesById[3] = "MixAndMatchPurchaseItem"] = 3;
+        values[valuesById[4] = "SoloJazzPurchaseItem"] = 4;
+        values[valuesById[5] = "TeamCompetitionPurchaseItem"] = 5;
+        values[valuesById[6] = "TShirtPurchaseItem"] = 6;
         return values;
     })();
 
@@ -510,6 +512,7 @@ $root.dss = (function() {
                 case 3:
                 case 4:
                 case 5:
+                case 6:
                     break;
                 }
             return null;
@@ -533,29 +536,33 @@ $root.dss = (function() {
                 message.amount = $root.dss.DiscountAmount.fromObject(object.amount);
             }
             switch (object.appliedTo) {
-            case "FullWeekendPassPurchaseItem":
+            case "Unknown":
             case 0:
                 message.appliedTo = 0;
                 break;
-            case "DanceOnlyPassPurchaseItem":
+            case "FullWeekendPassPurchaseItem":
             case 1:
                 message.appliedTo = 1;
                 break;
-            case "MixAndMatchPurchaseItem":
+            case "DanceOnlyPassPurchaseItem":
             case 2:
                 message.appliedTo = 2;
                 break;
-            case "SoloJazzPurchaseItem":
+            case "MixAndMatchPurchaseItem":
             case 3:
                 message.appliedTo = 3;
                 break;
-            case "TeamCompetitionPurchaseItem":
+            case "SoloJazzPurchaseItem":
             case 4:
                 message.appliedTo = 4;
                 break;
-            case "TShirtPurchaseItem":
+            case "TeamCompetitionPurchaseItem":
             case 5:
                 message.appliedTo = 5;
+                break;
+            case "TShirtPurchaseItem":
+            case 6:
+                message.appliedTo = 6;
                 break;
             }
             return message;
@@ -576,7 +583,7 @@ $root.dss = (function() {
             var object = {};
             if (options.defaults) {
                 object.amount = null;
-                object.appliedTo = options.enums === String ? "FullWeekendPassPurchaseItem" : 0;
+                object.appliedTo = options.enums === String ? "Unknown" : 0;
             }
             if (message.amount != null && message.hasOwnProperty("amount"))
                 object.amount = $root.dss.DiscountAmount.toObject(message.amount, options);

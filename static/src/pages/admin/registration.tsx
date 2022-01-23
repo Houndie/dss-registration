@@ -5,7 +5,8 @@ import WithAlert, {ResponseKind} from '../../components/WithAlert'
 import useTwirp from "../../components/useTwirp"
 import { useAuth0 } from '@auth0/auth0-react';
 import { v4 as uuidv4 } from 'uuid';
-import {dss} from "../../rpc/registration.pb"
+import {dss as twirpRegistration} from "../../rpc/registration.pb"
+import {dss as twirpDiscount} from "../../rpc/discount.pb"
 import RegistrationForm, {isPaid, RegistrationFormState, toProtoRegistration, formWeekendPassOptionFromProto, fromProtoHousingOption, FormFullWeekendPassLevel, FormRole, FormStyle, fromProtoPassLevel, fromProtoRole, fromProtoStyle, formValidate} from "../../components/RegistrationForm"
 import {Formik} from 'formik'
 import {VaccineInfoEnum, VaccineInfo, fromProtoVaccine} from "../../components/vaccine"
@@ -14,10 +15,11 @@ import PleaseVerifyEmail from "../../components/PleaseVerifyEmail"
 
 export default () => { 
 	const vaccineRef = React.useRef<HTMLInputElement>()
-	const [prices, setPrices] = useState<dss.RegistrationPricesRes | null>(null)
-	const [myRegistration, setMyRegistration] = useState<dss.IRegistrationInfo | null>(null)
+	const [prices, setPrices] = useState<twirpRegistration.RegistrationPricesRes | null>(null)
+	const [myRegistration, setMyRegistration] = useState<twirpRegistration.IRegistrationInfo | null>(null)
+	const [myDiscounts, setMyDiscounts] = useState<{ [name: string]: twirpDiscount.ISingleDiscount[] } | null>(null)
 	const [myVaccine, setMyVaccine] = useState<VaccineInfo | null>(null)
-	const {registration, vaccine} = useTwirp()
+	const {registration, vaccine, discount} = useTwirp()
 	const { isLoading, isAuthenticated, loginWithRedirect, user } = useAuth0()
 	var id: string | null = null
 
@@ -52,7 +54,29 @@ export default () => {
 				return
 			}
 			setMyRegistration(res.registration);
-		}, err => {
+
+			return discount().then(client => {
+				const codes = res.registration?.discountCodes
+				if (!codes) {
+					throw "no codes?"
+				}
+				return Promise.all(codes.map(code => {
+					return client.get({
+						code: code
+					})
+				}))
+			})
+		}).then(responses => {
+			if(!responses) {
+				throw "no discount response"
+			}
+			setMyDiscounts(responses.reduce<{[name: string]: twirpDiscount.ISingleDiscount[] }>((a, res) => {
+				if(!res.bundle || !res.bundle.code || !res.bundle.discounts){
+					throw "no bundle"
+				}
+				return { ...a, [res.bundle.code]: res.bundle.discounts}
+			}, {}))
+		}).catch(err => {
 			console.error(err);
 		});
 	}, [isLoading, isAuthenticated, user])
@@ -140,7 +164,7 @@ export default () => {
 								petAllergies: (myRegistration.requireHousing && myRegistration.requireHousing.petAllergies ? myRegistration.requireHousing.petAllergies : ""),
 								requireDetails: (myRegistration.requireHousing && myRegistration.requireHousing.details ? myRegistration.requireHousing.details : ""),
 								vaccine: undefined,
-								discounts: (myRegistration.discountCodes ? myRegistration.discountCodes : []),
+								discounts: (myDiscounts ? myDiscounts : {}),
 								enabled: Boolean(myRegistration.enabled)
 							}}
 							validate={formValidate}
