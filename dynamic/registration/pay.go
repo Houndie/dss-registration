@@ -2,6 +2,7 @@ package registration
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/Houndie/dss-registration/dynamic/common"
@@ -127,6 +128,7 @@ func makeLineItem(catalogID string, discountIDs []string) (*objects.OrderLineIte
 			orderDiscounts[i] = &objects.OrderLineItemDiscount{
 				CatalogObjectID: d,
 				UID:             uid.String(),
+				Scope:           objects.OrderLineItemDiscountScopeLineItem,
 			}
 
 			appliedDiscounts[i] = &objects.OrderLineItemAppliedDiscount{
@@ -222,6 +224,19 @@ func (s *Service) Pay(ctx context.Context, id, redirectURL, idempotencyKey, acce
 
 	checkoutURL, orderID, err := common.CreateCheckout(ctx, s.client, locationListRes.Locations[0].ID, idempotencyKey, order, registration.Email, redirectURL)
 	if err != nil {
+		var sqErr *objects.Error
+		if errors.As(err, &sqErr) && sqErr.Category == objects.ErrorCategoryInvalidRequestError && sqErr.Code == objects.ErrorCodeValueTooLow {
+			return redirectURL, nil
+		}
+
+		var sqErrList *objects.ErrorList
+		if errors.As(err, &sqErrList) {
+			for _, sqErr := range sqErrList.Errors {
+				if sqErr.Category == objects.ErrorCategoryInvalidRequestError && sqErr.Code == objects.ErrorCodeValueTooLow {
+					return redirectURL, nil
+				}
+			}
+		}
 		return "", err
 	}
 
