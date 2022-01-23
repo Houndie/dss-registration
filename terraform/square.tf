@@ -191,3 +191,46 @@ resource "square_catalog_object" "student_discount" {
 		}
 	}
 }
+
+resource "square_catalog_object" "dj_pass" {
+	type = "DISCOUNT"
+	
+	discount_data {
+		name = "DJ Pass"
+		discount_type = "FIXED_PERCENTAGE"
+		percentage = "100"
+	}
+}
+
+resource "square_catalog_object" "dj_plus_one_dance" {
+	type = "DISCOUNT"
+	
+	discount_data {
+		name = "DJ Plus One Dance Pass"
+		discount_type = "FIXED_PERCENTAGE"
+		percentage = "100"
+	}
+}
+
+resource "square_catalog_object" "dj_plus_one_full_weekend" {
+	type = "DISCOUNT"
+	
+	discount_data {
+		name = "DJ Plus One Dance Pass"
+		discount_type = "FIXED_AMOUNT"
+		amount_money {
+			amount = 4500
+			currency = "USD"	
+		}
+	}
+}
+
+resource "square_catalog_object" "team_comp" {
+	type = "DISCOUNT"
+	
+	discount_data {
+		name = "Last years team competitor"
+		discount_type = "FIXED_PERCENTAGE"
+		percentage = 100
+	}
+}

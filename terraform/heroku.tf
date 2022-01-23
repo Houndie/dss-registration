@@ -4,6 +4,9 @@ variable "workspace" {}
 variable "sendinblue_token" {}
 variable "recaptcha_token" {}
 variable "active" {}
+variable "dj_pass_code" {}
+variable "dj_plus_one_code" {}
+variable "team_comp_code" {}
 
 provider "heroku" {
 	api_key = var.heroku_api_key
@@ -49,6 +52,34 @@ locals {
 				amount = tolist(tolist(square_catalog_object.student_discount.discount_data)[0].amount_money)[0].amount
 				discount_type = tolist(square_catalog_object.student_discount.discount_data)[0].discount_type
 				applied_to = "Full Weekend"
+			}
+			code = {
+				(var.dj_pass_code): [{
+					id = square_catalog_object.dj_pass.id
+					percentage = tolist(square_catalog_object.dj_pass.discount_data)[0].percentage
+					discount_type = tolist(square_catalog_object.dj_pass.discount_data)[0].discount_type
+					applied_to = "Full Weekend"
+				}]
+				(var.dj_plus_one_code): [
+					{
+						id = square_catalog_object.dj_plus_one_dance.id
+						percentage = tolist(square_catalog_object.dj_plus_one_dance.discount_data)[0].percentage
+						discount_type = tolist(square_catalog_object.dj_plus_one_dance.discount_data)[0].discount_type
+						applied_to = "Dance Only"
+					},
+					{
+						id = square_catalog_object.dj_plus_one_full_weekend.id
+						amount = tolist(tolist(square_catalog_object.dj_plus_one_full_weekend.discount_data)[0].amount_money)[0].amount
+						discount_type = tolist(square_catalog_object.dj_plus_one_full_weekend.discount_data)[0].discount_type
+						applied_to = "Full Weekend"
+					},
+				]
+				(var.team_comp_code): [{
+					id = square_catalog_object.team_comp.id
+					percentage = tolist(square_catalog_object.team_comp.discount_data)[0].percentage
+					discount_type = tolist(square_catalog_object.team_comp.discount_data)[0].discount_type
+					applied_to = "Full Weekend"
+				}]
 			}
 		}
 	}

@@ -14,12 +14,13 @@ export namespace dss {
     }
 
     enum PurchaseItem {
-        FullWeekendPassPurchaseItem = 0,
-        DanceOnlyPassPurchaseItem = 1,
-        MixAndMatchPurchaseItem = 2,
-        SoloJazzPurchaseItem = 3,
-        TeamCompetitionPurchaseItem = 4,
-        TShirtPurchaseItem = 5
+        Unknown = 0,
+        FullWeekendPassPurchaseItem = 1,
+        DanceOnlyPassPurchaseItem = 2,
+        MixAndMatchPurchaseItem = 3,
+        SoloJazzPurchaseItem = 4,
+        TeamCompetitionPurchaseItem = 5,
+        TShirtPurchaseItem = 6
     }
 
     interface IDiscountAmount {
