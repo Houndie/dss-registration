@@ -575,11 +575,12 @@ export default ({weekendPassTier, previousRegistration, admin, vaccineUpload, va
 						)}
 					</>
 				)}
-				<FormCheck name="tshirt" label={"T-Shirt ("+parseDollar(square_data.purchase_items.t_shirt)+")"} disabled={Boolean(previousRegistration && previousRegistration.tshirt)} />
+				<FormCheck name="tshirt" label={"T-Shirt ("+parseDollar(square_data.purchase_items.t_shirt)+")"} disabled={true} />
+				<p><b>T-Shirts are no longer for sale</b></p>
 				{values.tshirt && (
 					<>
 						<Row><Col xs={1}></Col><Col xs={6}>
-							<FormSelect label="T-Shirt Size/Style" name="style">
+							<FormSelect label="T-Shirt Size/Style" name="style" disabled={true}>
 								<option aria-label="none" value={FormStyle.NotSelected}></option>
 								<option value={FormStyle.UnisexS}>Unisex S</option>
 								<option value={FormStyle.UnisexM}>Unisex M</option>
@@ -606,8 +607,9 @@ export default ({weekendPassTier, previousRegistration, admin, vaccineUpload, va
 			</fieldset>
 			<fieldset>
 				<h2>Housing</h2>
+				<p><b>Housing is currently closed!</b></p>
 				<Row><Col>
-					<FormSelect label="Housing Status" name="housing">
+					<FormSelect label="Housing Status" name="housing" disabled={true}>
 						<option value={FormHousingOption.noHousingOption}>I neither require nor can provide housing</option>
 						<option value={FormHousingOption.provideOption}>I can provide housing</option>
 						<option value={FormHousingOption.requireOption}>I require housing</option>
@@ -616,14 +618,14 @@ export default ({weekendPassTier, previousRegistration, admin, vaccineUpload, va
 				<Row><Col xs={1}></Col><Col>
 					{values.housing === "Provide" ? (
 						<>
-						<FormField label="I have the following pets (cats, dogs, etc)" name="pets" type="text" />
-						<FormField label="I can house this many people" name="quantity" type="number" />
-						<FormField as="textarea" label="Any other details the organizers should know about my house" name="provideDetails" />
+						<FormField label="I have the following pets (cats, dogs, etc)" name="pets" type="text" disabled={true}/>
+						<FormField label="I can house this many people" name="quantity" type="number" disabled={true}/>
+						<FormField as="textarea" label="Any other details the organizers should know about my house" name="provideDetails" disabled={true}/>
 						</>
 					) : (values.housing === "Require" && (
 						<>
-						<FormField label="I am allergic to the following pets" name="petAllergies" type="text" />
-						<FormField as="textarea" label="Anything else I would like to say about my housing request" name="requireDetails" />
+						<FormField label="I am allergic to the following pets" name="petAllergies" type="text" disabled={true}/>
+						<FormField as="textarea" label="Anything else I would like to say about my housing request" name="requireDetails" disabled={true}/>
 						</>
 					))}
 				</Col></Row>
