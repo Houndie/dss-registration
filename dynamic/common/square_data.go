@@ -377,12 +377,22 @@ func GetSquarePayments(ctx context.Context, client *square.Client, purchaseItems
 		}
 	}
 
-	res, err := client.Orders.BatchRetrieve(ctx, &orders.BatchRetrieveRequest{
-		LocationID: locationID,
-		OrderIDs:   orderIDList,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error fetching orders from square: %w", err)
+	ordersList := make([]*objects.Order, 0, len(orderIDList))
+	for i := 0; i < len(orderIDList); i += 100 {
+		chunkEnd := i + 100
+		if chunkEnd > len(orderIDList) {
+			chunkEnd = len(orderIDList)
+		}
+
+		res, err := client.Orders.BatchRetrieve(ctx, &orders.BatchRetrieveRequest{
+			LocationID: locationID,
+			OrderIDs:   orderIDList[i:chunkEnd],
+		})
+		if err != nil {
+			return nil, fmt.Errorf("error fetching orders from square: %w", err)
+		}
+
+		ordersList = append(ordersList, res.Orders...)
 	}
 
 	pd := map[string]*PaymentData{}
@@ -390,7 +400,7 @@ func GetSquarePayments(ctx context.Context, client *square.Client, purchaseItems
 		pd[regID] = &PaymentData{}
 	}
 
-	for _, order := range res.Orders {
+	for _, order := range ordersList {
 		if order.State != objects.OrderStateCompleted {
 			continue
 		}
