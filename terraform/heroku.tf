@@ -7,6 +7,7 @@ variable "active" {}
 variable "dj_pass_code" {}
 variable "dj_plus_one_code" {}
 variable "team_comp_code" {}
+variable "volunteer_code" {}
 
 provider "heroku" {
 	api_key = var.heroku_api_key
@@ -78,6 +79,12 @@ locals {
 					id = square_catalog_object.team_comp.id
 					percentage = tolist(square_catalog_object.team_comp.discount_data)[0].percentage
 					discount_type = tolist(square_catalog_object.team_comp.discount_data)[0].discount_type
+					applied_to = "Full Weekend"
+				}]
+				(var.volunteer_code): [{
+					id = square_catalog_object.volunteer.id
+					percentage = tolist(square_catalog_object.volunteer.discount_data)[0].percentage
+					discount_type = tolist(square_catalog_object.volunteer.discount_data)[0].discount_type
 					applied_to = "Full Weekend"
 				}]
 			}

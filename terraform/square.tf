@@ -234,3 +234,13 @@ resource "square_catalog_object" "team_comp" {
 		percentage = 100
 	}
 }
+
+resource "square_catalog_object" "volunteer" {
+	type = "DISCOUNT"
+	
+	discount_data {
+		name = "Volunteer"
+		discount_type = "FIXED_PERCENTAGE"
+		percentage = 100
+	}
+}
