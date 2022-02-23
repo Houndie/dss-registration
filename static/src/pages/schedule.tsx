@@ -52,7 +52,7 @@ export default () => (
 				<tr><td>7:30p</td><td>Mix and Match Prelims</td></tr>
 				<tr><td>8:00p</td><td>DJed Music</td></tr>
 				<tr><td>9:30p</td><td>Team Competition</td></tr>
-				<tr><td>11:45p</td><td>Mix and Match Finals</td></tr>
+				<tr><td>11:40p</td><td>Mix and Match Finals</td></tr>
 				<tr><td>12:00a</td><td>End of dance...everyone go to late night!</td></tr>
 			</table>
 			<br/>
