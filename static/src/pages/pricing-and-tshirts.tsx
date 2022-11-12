@@ -3,7 +3,7 @@ import Page from "../components/Page"
 import Table from "react-bootstrap/Table"
 
 export default () => (
-	<Page title="Pricing and T-Shirts">
+	<Page title="Pricing">
 		{() => (
 			<>
 				<h2>Main Event Pricing</h2>
@@ -38,41 +38,14 @@ export default () => (
 				</ul>
 				<h2>Competitions:</h2>
 				<ul>
-					<li>Team Competition Entry Fee — $55.00/team. Deadline 13 February 2016</li>
+					<li>Team Competition Entry Fee — $55.00/team. Deadline 1 February 2023</li>
 					<li>Mix and Match Entry Fee — $5.00</li>
 					<li>Solo Charleston Entry Fee — $5.00</li>
 				</ul>
-				<h2>T-Shirts</h2>
-				<p>All T-Shirts are $15.</p>
-				<h3>T-Shirt Sizing Information</h3>
-				<h4>Canvas – Unisex Greenwich Short Sleeve Crewneck T-Shirt</h4>
-				<p><b>STYLE#: 3001</b></p>
-				<p>Body conscious jersey is tailored for a custom contoured fit. 4.2 oz., DEEP TEAL pre-shrunk 100% combed ringspun cotton, 30 singles Coverstitched collar and hemmed sleeves</p>
-				<p>Measurements</p>
-				<Table>
-					<thead>
-						<tr><th> </th><th>XS</th><th>S</th><th>M</th><th>L</th><th>XL</th><th>2XL</th><th>3XL</th></tr>
-					</thead>
-					<tbody>
-						<tr><td>Chest Width</td><td>17</td><td>18.5</td><td>20</td><td>21.5</td><td>23</td><td>24.5</td><td>26</td></tr>
-						*<tr><td>Total Length</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td>32</td><td>33</td></tr>
-					</tbody>
-				</Table>
-				<h4>Bella – Ladies’ The Favorite Tee</h4>
-				<p><b>Style#: 6004</b></p>
-				<p>6004 Bella + Canvas The Favorite Tee. 4.2 oz. DEEP TEAL 100% 30 single combed ring-spun cotton. Super soft baby jersey knit with shoulder taping. Longer, contoured fit with side seams</p>
-				<p>Measurements</p>
-				<Table>
-					<thead>
-						<tr><th></th><th>S</th><th>M</th><th>L</th><th>XL</th><th>2XL</th></tr>
-					</thead>
-					<tbody>
-						<tr><td>Shirt Length</td><td>26 1/4</td><td>26 3/4</td><td>27 3/8</td><td>28</td><td>28 5/8</td></tr>
-						<tr><td>Shirt Length Tolerance</td><td>3/8</td><td>3/8</td><td>3/8</td><td>3/8</td><td>3/8</td></tr>|
-						<tr><td>Shirt Width</td><td>16</td><td>16 3/4</td><td>17 3/4</td><td>18 3/4</td><td>19 3/4</td></tr>
-						<tr><td>Shirt Width Tolerance</td><td>1/2</td><td>1/2</td><td>1/2</td><td>1/2</td><td>1/2</td></tr>
-					</tbody>
-				</Table>
+				<h2>Jackets</h2>
+				<p>We are going with jackets (instead of tshirts) this year! The design will be available soon.</p>
+				<p>All jackets will be $30</p>
+				<p>See style and sizing information <a href="https://www.sportswearcollection.com/p/bella/3939?site=QDXTDOOVIQ">here</a>.</p>
 			</>
 		)}
 	</Page>

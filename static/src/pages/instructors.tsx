@@ -7,38 +7,40 @@ const Instructors = () => (
 	<Page title="Instructors">
 		{() => (
 			<>
-				<h2>Gaby Cook & Jon Tigert</h2>
+				<h2>Natalia Eristavi & Christian Frommelt</h2>
 				<Row className="align-items-center">
-					<Col className="col-4"><img src="/images/instructors/Gaby.jpg" width="100%" object-fit="scale-down"/></Col>
-					<Col><p>Gaby Cook is an esteemed, active professional in the global lindy hop community. For nearly 20 years, she has established her career, teaching and performing worldwide for events such as Herräng Dance Camp, Paris Jazz Roots and Lindy Focus. In the classroom, she is playful, informative and honest. She prioritizes equality for followers and leaders in the classroom space — and has championed a movement first approach to teaching partnered dance content.</p></Col>
+					<Col className="col-4"><img src="/images/instructors/Natalia.jpg" width="100%" object-fit="scale-down"/></Col>
+					<Col><p>Natalia (she/her) is a visual artist, jazz dancer, teacher and performer based in San Diego, California. Her swing and jazz adventures began in late 2010 although she had been dancing since the age of 4 and considers movement to music akin to breathing. Since her first steps into the professional swing dance circuit around 2012, she has taught, competed and performed at many notable national and international dance events, acquiring numerous awards along the way.</p>
+					<p>While performing and teaching are a great source of passion for her, Natalia feels the most fulfilled when creating meaningful connections with her students and colleagues on the social dance floor.</p></Col>
 				</Row>
 				<Row className="align-items-center">
-					<Col><p>Jon Tigert found swing dancing at the tender age of 15 and never looked back. Nowsomewhat older than 15, Jon shares his knowledge of the dance all over the United States and the World. You may know him from his roles at events such as Lindy Focus, Lindy Fest, The Canadian Swing Dance Championships, The Chinese Lindy Hop Championships, Herrang Dance Camp, The International Lindy Hop Championships and many more. Known for his concise language, historical knowledge and and infinite supply of dad jokes, Jon's classes are immensely informative and entertaining. Beyond teaching, Jon is often seen behind the microphone as a well known MC and host, behind the computer as a DJ, or behind the drum kit playing and singing with various musical groups, including the Corner Pocket Jazz Band!</p></Col>
-					<Col className="col-4"><img src="/images/instructors/Jon.jpg" width="100%" object-fit="scale-down"/></Col>
+					<Col><p><b>Hello, I’m Christian Frommelt</b> (he/him/his), a swing dancer and musician from St. Louis, Missouri. As a teacher, organizer, and social dancer, I’ve dedicated much of my life to bringing people together through music and dance. The African-American vernacular dance values of spontaneity, rhythmic propulsion, and communal improvisation captivated me as a teenager, and I’ve been bent on learning jazz-based artforms ever since. It has become a privilege to also share the stories, sounds, and skills I’ve gained along the way as a teacher, writer, and performer.</p> 
+					<p>I’m proud to have been recognized with competitive accolades at the Ultimate Lindy Hop Showdown and the International Lindy Hop Championships, which include awards for choreography with Jenny Shirar. For nine years I served as co-organizer of the renowned Nevermore Jazz Ball & St. Louis Swing Dance Festival and Cherokee Street Jazz Crawl in the effort of collective expression. I’ve played piano for the Gaslight Squares jazz band since 2019. </p></Col>
+					<Col className="col-4"><img src="/images/instructors/Christian.jpg" width="100%" object-fit="scale-down"/></Col>
 				</Row>
-				<h2>Jon Holmstrom & Kerry Kapaku</h2>
+				<h2>Kerry Kapaku & Shannon Varner</h2>
 				<Row className="align-items-center">
-					<Col className="col-4"><img src="/images/instructors/John.jpg" width="100%" object-fit="scale-down"/></Col>
-					<Col><p>John Holmstrom discovered Lindy Hop in Chicago in 2005. After college in Champaign-Urbana where he served as President of the Illini Swing Society, he returned to Chicago in 2010 and fully immersed himself in the Lindy Hop community teaching at Big City Swing, DJing, and organizing, founding Traffic Jam Swing and Second City Swingout. John has performed at various events for muggles and Lindy Hoppers alike from historic Chicago venues like Ravinia and the Double Door to Lindy Focus. John is an avid team competitor, coach and choreographer with wins at Dayton Swing Smackdown (2010 - Hoosier Hotshots), Hawkeye Swing Festival, Southern Swing Challenge, and Camp Jitterbug. As a teacher, John loves to focus on the technical elements in his classes, giving students similar moves with crucial differences for a choose your own adventure experience.</p></Col>
-				</Row>
-				<Row className="align-items-center">
-					<Col><p>Kerry Kapaku comes from a long history of training, performing, and teaching ballet and contemporary dance professionally, and holds a BFA in Dance Performance and Education from The Ohio State University. Kerry was introduced to the wonderful world of lindy hop while attending OSU, and has been teaching, competing, and performing across the US since. In the classroom, Kerry strives to cultivate an upbeat and encouraging environment for all of her students, while emphasizing the importance of efficient muscular engagement, physical and musical connection, and self expression.  Kerry holds competitive titles from events such as ILHC, Nevermore Jazz Ball, and Lindy Focus, Camp Hollywood, and more. At home, Kerry serves as an instructor for Naptown Stomp, and is the owner and director of DanceWorks Indy, Indianapolis's only dance and fitness studio for adults of all ages and abilities.</p></Col>
 					<Col className="col-4"><img src="/images/instructors/Kerry.jpg" width="100%" object-fit="scale-down"/></Col>
+					<Col><p>Kerry Kapaku comes from a long history of training, performing, and teaching ballet and contemporary dance professionally, and holds a BFA in Dance Performance and Education from The Ohio State University. Kerry was introduced to the wonderful world of lindy hop while attending OSU, and has been teaching, competing, and performing across the US since. In the classroom, Kerry strives to cultivate an upbeat and encouraging environment for all of her students, while emphasizing the importance of efficient muscular engagement, physical and musical connection, and self expression.  Kerry holds competitive titles from events such as ILHC, Nevermore Jazz Ball, and Lindy Focus, Camp Hollywood, and more. At home, Kerry serves as an instructor for Naptown Stomp, and is the owner and director of DanceWorks Indy, Indianapolis's only dance and fitness studio for adults of all ages and abilities.</p></Col>
 				</Row>
-				<h2>Aliceann Talley & Kemper Talley</h2>
 				<Row className="align-items-center">
-					<Col className="col-4"><img src="/images/instructors/Aliceann.jpg" width="100%" object-fit="scale-down"/></Col>
+					<Col><p>Shannon Varner discovered Lindy Hop while living in New York City ages ago. Since then she been fortunate to live in Lindy Hop-centric cities ever since. Whether Washington DC, Chicago, or Columbus, OH, they all have provided rich opportunities to hone her dance skills, and influence her dance styles. She enjoys sharing her passion for these dances with others and truly believes dancing is for everyone.</p>
+					<p>Shannon has won numerous awards, placing in such competitions as the American Lindy Hop Championships, Beantown Dance Camp, Nevermore Jazz Ball, SwingIN, Southern Swing Challenge, and Midsummer Night Swing in NYC.</p>
+					<p>Shannon also co-founded the award-winning competitive dance team SwingColumbus and served as co-choreographer from 2008 – 2017.</p></Col>
+					<Col className="col-4"><img src="/images/instructors/Shannon.jpg" width="100%" object-fit="scale-down"/></Col>
+				</Row>
+				<h2>Dave Berry & Mimi Liu</h2>
+				<Row className="align-items-center">
+					<Col className="col-4"><img src="/images/instructors/Dave.jpg" width="100%" object-fit="scale-down"/></Col>
 					<Col>
-						<p>Aliceann is as passionate about her students as she is about her dancing, and is constantly working on new ways to help them learn - whether through teaching weekly lessons, hosting house practices, or coaching/choreographing for her performance team.  She believes learning to dance should be fun, and that you don't need to master a particular set of moves in order to become a swing dancer.</p>
-						<p>Aliceann started dancing in 2001 before eventually falling in love with swing dancing, Carolina shag, and other vernacular dances.  She strives to grow swing dancing on and off the dance floor through her classes, organizing lessons in Knoxville, and her event, Hard Knox.</p>
+						<p>Dave hasn't said no to a dance since finding Lindy Hop in 2012 (seriously). As a teacher, Dave focuses on simple, driving rhythms and deep applicability of foundational concepts. His classes place high value on dynamic following, and inclusive reactions from leaders with body mechanics always at the root of his lead/ follow focus. At home in Atlanta Dave gives warm homes to wayward CDs and records.</p>
 					</Col>
 				</Row>
 				<Row className="align-items-center">
 					<Col>
-						<p>Kemper has been studying and dancing Lindy Hop since the summer of 2011. He is as passionate about the music and history of the swing era as he is about the dance, and his passion for teaching comes from his lifelong obsession with learning and growing. Kemper believes dancing is a form of personal expression, and hopes to help others better express themselves by empowering them with technical skills and providing an environment of exploration.</p>
-						<p>Outside of teaching, you can find Kemper behind the DJ booth, organizing events, or leading his swing band, the Jump Shop Sextet.</p>
+						<p>Ever since she was a wee baby in a stroller, Mimi has been moving and bopping to the beats, but it took until 2010 to find her true dance love, Lindy Hop, in a riverside bar in Cambodia. She loves playful and musical dances and exploring weird ideas. Her favorite part of teaching is helping students, especially followers, get creative on the dance floor while being grounded on solid and comfy partner connection.</p>
 					</Col>
-					<Col className="col-4"><img src="/images/instructors/Kemper.jpg" width="100%" object-fit="scale-down"/></Col>
+					<Col className="col-4"><img src="/images/instructors/Mimi.jpg" width="100%" object-fit="scale-down"/></Col>
 				</Row>
 			</>
 		)

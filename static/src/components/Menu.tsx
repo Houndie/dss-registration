@@ -3,7 +3,6 @@ import Navbar from "react-bootstrap/Navbar"
 import NavDropdown from "react-bootstrap/NavDropdown"
 import Nav from "react-bootstrap/Nav"
 import Container from "react-bootstrap/Container"
-import LoginLogout from './LoginLogout'
 
 export default () => (
 	<Container>
@@ -13,12 +12,9 @@ export default () => (
 			<Navbar.Collapse className="justify-content-end">
 				<Nav>
 					<NavDropdown title="Registration" id="menu-registration">
-						{process.env.GATSBY_ACTIVE === 'true' && (
-							<NavDropdown.Item href="/register">Register Now</NavDropdown.Item>
-						)}
-						<NavDropdown.Item href="/pricing-and-tshirts">Pricing & T-Shirts</NavDropdown.Item>
+						<NavDropdown.Item href="/register">Register Now</NavDropdown.Item>
+						<NavDropdown.Item href="/pricing-and-tshirts">Pricing</NavDropdown.Item>
 						<NavDropdown.Item href="/housing">Housing</NavDropdown.Item>
-						<NavDropdown.Item href="/volunteer">Volunteer</NavDropdown.Item>
 					</NavDropdown>
 					<Nav.Link href="/classes">Classes</Nav.Link>
 					<Nav.Link href="/instructors">Instructors</Nav.Link>
@@ -40,8 +36,10 @@ export default () => (
 					</NavDropdown>
 					<Nav.Link href="/music">Music</Nav.Link>
 					<Nav.Link href="/schedule">Schedule</Nav.Link>
-					<Nav.Link href="/safety">Safety</Nav.Link>
-					<LoginLogout/>
+					<NavDropdown title="Safety" id="menu-safety">
+						<NavDropdown.Item href="/covid">Covid</NavDropdown.Item>
+						<NavDropdown.Item href="/safety">Safety</NavDropdown.Item>
+					</NavDropdown>
 				</Nav>
 			</Navbar.Collapse>
 		</Navbar>

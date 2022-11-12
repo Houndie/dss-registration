@@ -32,16 +32,16 @@ export default () => (
 				<tr><td>9:00a</td><Tdc colSpan={3}>Doors Open at The Baum Opera House</Tdc></tr>
 				<tr><td>9:20a</td><Tdc colSpan={3}>Level Test</Tdc></tr>
 				<tr><td></td><Tdc><b>Level 1 (Baum Opera House Upstairs)</b></Tdc><Tdc><b>Level 2 (Baum Opera House Downstairs)</b></Tdc><Tdc><b>Level 3 (B&B Riverfront Hall)</b></Tdc></tr>
-				<tr><td>10:00a</td><Tdc>John & Kerry</Tdc><Tdc>Gaby & Jon</Tdc><Tdc>Aliceann & Kemper</Tdc></tr>
+				<tr><td>10:00a</td><Tdc>Class 1</Tdc><Tdc>Class 1</Tdc><Tdc>Class 1</Tdc></tr>
 				<tr><td>11:00a</td><Tdc colSpan={3}>Midmorning Break</Tdc></tr>
-				<tr><td>11:15a</td><Tdc>Gaby & Jon</Tdc><Tdc>Aliceann & Kemper</Tdc><Tdc>John & Kerry</Tdc></tr>
+				<tr><td>11:15a</td><Tdc>Class 2</Tdc><Tdc>Class 2</Tdc><Tdc>Class 2</Tdc></tr>
 				<tr><td>12:15p</td><Tdc colSpan={3}>Lunch Break</Tdc></tr>
-				<tr><td>1:30p</td><Tdc>Aliceann & Kemper</Tdc><Tdc>John & Kerry</Tdc><Tdc>Gaby & Jon</Tdc></tr>
+				<tr><td>1:30p</td><Tdc>Class 3</Tdc><Tdc>Class 3</Tdc><Tdc>Class 3</Tdc></tr>
 				<tr><td>2:30p</td><Tdc colSpan={3}>Afternoon Break 1</Tdc></tr>
-				<tr><td>2:45p</td><Tdc>Aliceann & Kemper</Tdc><Tdc>John & Kerry</Tdc><Tdc>Gaby & Jon</Tdc></tr>
+				<tr><td>2:45p</td><Tdc>Class 4</Tdc><Tdc>Class 4</Tdc><Tdc>Class 4</Tdc></tr>
 				<tr><td>3:45p</td><Tdc colSpan={3}>Afternoon Break 2</Tdc></tr>
 				<tr><td></td><Tdc><b>Elective (Baum Opera House Upstairs)</b></Tdc><Tdc><b>Elective (Baum Opera House Downstairs)</b></Tdc><Tdc><b>Elective (B&B Riverfront Hall)</b></Tdc></tr>
-				<tr><td>4:00p</td><Tdc>Gaby & Jon</Tdc><Tdc>John & Kerry</Tdc><Tdc>Aliceann & Kemper</Tdc></tr>
+				<tr><td>4:00p</td><Tdc>Elective</Tdc><Tdc>Elective</Tdc><Tdc>Elective</Tdc></tr>
 				<tr><td>5:00p</td><Tdc colSpan={3}>Dinner Break</Tdc></tr>
 				<tr><td>5:00p</td><Tdc colSpan={3}>Team Floor Trials (Ballroom Closed)</Tdc></tr>
 			</table>

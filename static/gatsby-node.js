@@ -10,15 +10,3 @@ exports.onPostBuild = () => {
 	fs.writeFileSync(`${infoPath}/version.json`, JSON.stringify({Version: process.env.GATSBY_VERSION}))
 }
 
-exports.createPages = ({actions}) => {
-	/*actions.createPage({
-		path: "/registration/:id",
-		matchPath: "/registration/:id",
-		component: path.resolve("./src/programmatic_pages/UserRegistration.tsx")
-	})*/
-	/*actions.createPage({
-		path: "/admin/registration/:id",
-		matchPath: "/admin/registration/:id",
-		component: path.resolve("./src/programmatic_pages/AdminUserRegistration.tsx")
-	})*/
-}
