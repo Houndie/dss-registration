@@ -27,9 +27,9 @@ const Instructors = () => (
 					<Col><p>Shannon Varner discovered Lindy Hop while living in New York City ages ago. Since then she been fortunate to live in Lindy Hop-centric cities ever since. Whether Washington DC, Chicago, or Columbus, OH, they all have provided rich opportunities to hone her dance skills, and influence her dance styles. She enjoys sharing her passion for these dances with others and truly believes dancing is for everyone.</p>
 					<p>Shannon has won numerous awards, placing in such competitions as the American Lindy Hop Championships, Beantown Dance Camp, Nevermore Jazz Ball, SwingIN, Southern Swing Challenge, and Midsummer Night Swing in NYC.</p>
 					<p>Shannon also co-founded the award-winning competitive dance team SwingColumbus and served as co-choreographer from 2008 – 2017.</p></Col>
-					<Col className="col-4"><img src="/images/instructors/Shannon.jpg" width="100%" object-fit="scale-down"/></Col>
+					<Col className="col-4"><img src="/images/instructors/Shannon.png" width="100%" object-fit="scale-down"/></Col>
 				</Row>
-				<h2>Dave Berry & Mimi Liu</h2>
+				<h2>Dave Barry & Mimi Liu</h2>
 				<Row className="align-items-center">
 					<Col className="col-4"><img src="/images/instructors/Dave.jpg" width="100%" object-fit="scale-down"/></Col>
 					<Col>
