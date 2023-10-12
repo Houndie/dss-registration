@@ -43,7 +43,8 @@ export default () => (
 					<li>Solo Charleston Entry Fee — $5.00</li>
 				</ul>
 				<h2>Jackets</h2>
-				<p>We are going with jackets (instead of tshirts) this year! The design will be available soon.</p>
+				<img src="/images/2023_jacket.png" height="300px"/>
+				<p>We are going with jackets (instead of tshirts) this year!</p>
 				<p>All jackets will be $30</p>
 				<p>See style and sizing information <a href="https://www.sportswearcollection.com/p/bella/3939?site=QDXTDOOVIQ">here</a>.</p>
 			</>

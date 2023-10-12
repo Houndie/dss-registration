@@ -15,7 +15,7 @@ export default () => (
 			<table>
 				<tr><td>8:00p</td><td>Doors Open at the Baum Opera House</td></tr>
 				<tr><td>8:00p</td><td>DJed Music</td></tr>
-				<tr><td>9:00p</td><td>Live Band: Dave Greer and His Classic Jazz Stompers</td></tr>
+				<tr><td>9:00p</td><td>Live Band: The Midwest All-Stars!</td></tr>
 				<tr><td>3rd Band Break (est 11:00p)</td><td>Solo Jazz Prelims and Finals</td></tr>
 				<tr><td>12:00a</td><td>End of dance...everyone go to late night!</td></tr>
 			</table>
@@ -31,17 +31,17 @@ export default () => (
 			<table>
 				<tr><td>9:00a</td><Tdc colSpan={3}>Doors Open at The Baum Opera House</Tdc></tr>
 				<tr><td>9:20a</td><Tdc colSpan={3}>Level Test</Tdc></tr>
-				<tr><td></td><Tdc><b>Level 1 (Baum Opera House Upstairs)</b></Tdc><Tdc><b>Level 2 (Baum Opera House Downstairs)</b></Tdc><Tdc><b>Level 3 (B&B Riverfront Hall)</b></Tdc></tr>
-				<tr><td>10:00a</td><Tdc>Class 1</Tdc><Tdc>Class 1</Tdc><Tdc>Class 1</Tdc></tr>
+				<tr><td></td><Tdc><b>Level 1 (Baum Opera House Upstairs)</b></Tdc><Tdc><b>Level 2 (Baum Opera House Downstairs)</b></Tdc><Tdc><b>Level 3 (Dayton Dance Centre)</b></Tdc></tr>
+				<tr><td>10:00a</td><Tdc>Kerry & Shannon</Tdc><Tdc>Natalia & Christian</Tdc><Tdc>Dave & Mimi</Tdc></tr>
 				<tr><td>11:00a</td><Tdc colSpan={3}>Midmorning Break</Tdc></tr>
-				<tr><td>11:15a</td><Tdc>Class 2</Tdc><Tdc>Class 2</Tdc><Tdc>Class 2</Tdc></tr>
+				<tr><td>11:15a</td><Tdc>Natalia & Christian</Tdc><Tdc>Dave & Mimi</Tdc><Tdc>Kerry & Shannon</Tdc></tr>
 				<tr><td>12:15p</td><Tdc colSpan={3}>Lunch Break</Tdc></tr>
-				<tr><td>1:30p</td><Tdc>Class 3</Tdc><Tdc>Class 3</Tdc><Tdc>Class 3</Tdc></tr>
+				<tr><td>1:30p</td><Tdc>Dave & Mimi</Tdc><Tdc>Kerry & Shannon</Tdc><Tdc>Natalia & Christian</Tdc></tr>
 				<tr><td>2:30p</td><Tdc colSpan={3}>Afternoon Break 1</Tdc></tr>
-				<tr><td>2:45p</td><Tdc>Class 4</Tdc><Tdc>Class 4</Tdc><Tdc>Class 4</Tdc></tr>
+				<tr><td>2:45p</td><Tdc>Dave & Mimi</Tdc><Tdc>Kerry & Shannon</Tdc><Tdc>Natalia & Christian</Tdc></tr>
 				<tr><td>3:45p</td><Tdc colSpan={3}>Afternoon Break 2</Tdc></tr>
-				<tr><td></td><Tdc><b>Elective (Baum Opera House Upstairs)</b></Tdc><Tdc><b>Elective (Baum Opera House Downstairs)</b></Tdc><Tdc><b>Elective (B&B Riverfront Hall)</b></Tdc></tr>
-				<tr><td>4:00p</td><Tdc>Elective</Tdc><Tdc>Elective</Tdc><Tdc>Elective</Tdc></tr>
+				<tr><td></td><Tdc><b>Elective (Baum Opera House Upstairs)</b></Tdc><Tdc><b>Elective (Baum Opera House Downstairs)</b></Tdc><Tdc><b>Elective (Dayton Dance Centre)</b></Tdc></tr>
+				<tr><td>4:00p</td><Tdc>Natalia & Christian</Tdc><Tdc>Kerry & Shannon</Tdc><Tdc>Dave & Mimi</Tdc></tr>
 				<tr><td>5:00p</td><Tdc colSpan={3}>Dinner Break</Tdc></tr>
 				<tr><td>5:00p</td><Tdc colSpan={3}>Team Floor Trials (Ballroom Closed)</Tdc></tr>
 			</table>
