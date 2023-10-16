@@ -21,36 +21,25 @@
     "url": "https://github.com/gatsbyjs/gatsby/issues"
   },
   "devDependencies": {
-    "@types/google-protobuf": "^3.15.2",
-    "@types/react-dom": "^17.0.7",
-    "@types/react-recaptcha": "^2.3.3",
-    "@types/uuid": "^8.3.0",
-    "@types/yup": "^0.29.11",
-    "gatsby": "^3.7.2",
-    "gatsby-plugin-sass": "^4.7.1",
-    "gatsby-plugin-ts": "^3.0.0",
+    "@types/react-dom": "^18.2.13",
+    "@types/react-recaptcha": "^2.3.4",
+    "@types/uuid": "^9.0.5",
+    "gatsby": "^5.12.6",
+    "gatsby-plugin-netlify": "^5.1.1",
+    "gatsby-plugin-sass": "^6.12.1",
     "gatsby-plugin-ts-checker": "^1.1.0",
-    "prettier": "^2.3.1",
-    "sass": "^1.35.1",
-    "typescript": "^4.3.4"
+    "prettier": "^3.0.3",
+    "sass": "^1.69.3",
+    "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@auth0/auth0-react": "^1.5.0",
-    "@fortawesome/fontawesome-svg-core": "^1.2.35",
-    "@fortawesome/free-brands-svg-icons": "^5.15.3",
-    "@fortawesome/free-solid-svg-icons": "^5.15.3",
-    "@fortawesome/react-fontawesome": "^0.1.14",
-    "axios": "^0.21.1",
-    "bootstrap": "^5.0.2",
-    "formik": "^2.2.9",
-    "gatsby-plugin-netlify": "^3.14.0",
-    "google-protobuf": "^3.17.3",
-    "pbjs-twirp": "^1.1.0",
-    "react": "^17.0.2",
-    "react-bootstrap": "^2.0.0-beta.4",
-    "react-dom": "^17.0.2",
-    "react-recaptcha": "^2.3.10",
-    "twirp": "^0.0.7",
-    "yup": "^0.32.9"
+    "@fortawesome/fontawesome-svg-core": "^6.4.2",
+    "@fortawesome/free-brands-svg-icons": "^6.4.2",
+    "@fortawesome/free-solid-svg-icons": "^6.4.2",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "bootstrap": "^5.3.2",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.9.0",
+    "react-dom": "^18.2.0"
   }
 }
