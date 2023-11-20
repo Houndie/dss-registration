@@ -8,11 +8,11 @@ export default () => (
 	<Container>
 		<Navbar expand="lg">
 			<Navbar.Brand href="/">Dayton Swing Smackdown</Navbar.Brand>
-			<Navbar.Toggle aria-controls="basic-navbar-nav"/>
+			<Navbar.Toggle aria-controls="basic-navbar-nav" />
 			<Navbar.Collapse className="justify-content-end">
 				<Nav>
 					<NavDropdown title="Registration" id="menu-registration">
-						<NavDropdown.Item href="https://dayton-swing-smackdown-2023.dancecamps.org/">Register Now</NavDropdown.Item>
+						<NavDropdown.Item href="https://dayton-swing-smackdown-2024.dancecamps.org/">Register Now</NavDropdown.Item>
 						<NavDropdown.Item href="/pricing-and-tshirts">Pricing</NavDropdown.Item>
 						<NavDropdown.Item href="/housing">Housing</NavDropdown.Item>
 					</NavDropdown>

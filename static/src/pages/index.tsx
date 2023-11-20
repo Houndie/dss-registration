@@ -32,6 +32,7 @@ const Home = () => (
 		<Menu />
 		<Hero image='ViktorJump.jpg' height='450px' title='Dayton Swing Smackdown' />
 		<Container className="my-5">
+			<h2><a href="https://dayton-swing-smackdown-2024.dancecamps.org">Registration is open now!</a></h2>
 			<h2>February 23 - February 25, 2024</h2>
 		</Container>
 		<Container className="my-5">
