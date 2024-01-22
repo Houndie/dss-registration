@@ -44,5 +44,30 @@ export default () => (
 		<h2>T-Shirts</h2>
 		<img src="/images/tshirt.png" width="200px" />
 		<p>All t-shirts will be $17</p>
+		<h3>T-Shirt Sizing Information</h3>
+		<h4>Unisex</h4>
+		<p>Measurements</p>
+		<Table>
+			<thead>
+				<tr><th> </th><th>XS</th><th>S</th><th>M</th><th>L</th><th>XL</th><th>2XL</th><th>3XL</th></tr>
+			</thead>
+			<tbody>
+				<tr><td>Chest Width</td><td>17</td><td>18.5</td><td>20</td><td>21.5</td><td>23</td><td>24.5</td><td>26</td></tr>
+				<tr><td>Total Length</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td>32</td><td>33</td></tr>
+			</tbody>
+		</Table>
+		<h4>Bella</h4>
+		<p>Measurements</p>
+		<Table>
+			<thead>
+				<tr><th></th><th>S</th><th>M</th><th>L</th><th>XL</th><th>2XL</th></tr>
+			</thead>
+			<tbody>
+				<tr><td>Shirt Length</td><td>26 1/4</td><td>26 3/4</td><td>27 3/8</td><td>28</td><td>28 5/8</td></tr>
+				<tr><td>Shirt Length Tolerance</td><td>3/8</td><td>3/8</td><td>3/8</td><td>3/8</td><td>3/8</td></tr>
+				<tr><td>Shirt Width</td><td>16</td><td>16 3/4</td><td>17 3/4</td><td>18 3/4</td><td>19 3/4</td></tr>
+				<tr><td>Shirt Width Tolerance</td><td>1/2</td><td>1/2</td><td>1/2</td><td>1/2</td><td>1/2</td></tr>
+			</tbody>
+		</Table>
 	</Page>
 )
