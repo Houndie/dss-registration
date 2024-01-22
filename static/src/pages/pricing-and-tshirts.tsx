@@ -42,7 +42,7 @@ export default () => (
 			<li>Solo Charleston Entry Fee — $5.00</li>
 		</ul>
 		<h2>T-Shirts</h2>
-		<p>T-Shirt design available soon!</p>
+		<img src="/images/tshirt.png" width="200px" />
 		<p>All t-shirts will be $17</p>
 	</Page>
 )
