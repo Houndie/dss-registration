@@ -32,11 +32,9 @@ const Instructors = () => {
 		[{
 			name: "Kate Hedin (She/Her)",
 			picture: "/images/instructors/Kate Hedin.jpg",
-			bio: `Following in the path of her great ancestor, Swedish explorer Sven Hedin, Kate has traveled to the greatest unknown regions of following and footwork. Aside from a love of classically inspired Lindy Hop, she is most known for her unique and elegant style of Balboa.
+			bio: `For almost two decades Kate Hedin has taught Balboa and Lindy Hop around the world and holds almost every major championship title in the modern Balboa era. As a teacher, Kate is passionate about pedagogy, lead/follow mechanics as a way of expression, and follower voice as an integrated part of the dance. She is the creator of several groundbreaking DVDs on Balboa Followers Technique and Aesthetics, as well as other online lessons, which can be found at www.onlinebalboa.com, and is one of the scene's top Jewel McGowan experts.  She is also a highly sought-after judge and DJ.
 
-The result is an impressive resume. Kate holds championship titles in almost every major competition, including the American Classic Balboa Championships, the International Lindy Hop Championships, the Euro Balboa Cup, and more. She is also a highly sought-after competition judge. In 2012, she released two highly praised DVDs specifically for Balboa followers on technique and aesthetics. As a teacher, Kate is known and loved for her logic-based language, her unique methods of teaching technique, and, overall, never leaving student followers disappointed.
-
-She is proud to have held, along with her friends at Get Hep Swing in Cleveland, the Guinness World Record for longest dance party ever (52 hours, 3 minutes). Her fashion is admired by many, her lines desired as far as the Orient. She also does trapeze.`
+When she is not teaching dance, she leads a secret double life as a Twitch streamer, that focuses on video games as art, education, entertainment, and human connection. She is *always* ready to geek out about dance, classical music (she has a degree in viola), trapeze, and video games, so please don't be intimidated by her quiet demeanor and asymmetrical hair and ask her anything!`
 		}, {
 			name: "Bobby White (He/Him)",
 			picture: "/images/instructors/Bobby White.jpg",
