@@ -1,5 +1,6 @@
 import React from 'react'
 import Page from '../components/Page'
+import GoogleMap from '../components/GoogleMap'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -26,7 +27,7 @@ const Venue = ({ title, address, days, google, children, image }: VenueProps) =>
 					<Image src={image} width="200px" />
 				</Col></Row>
 		</Container>
-		<iframe title={title} className="embed-responsive-item" src={google} width="800" height="450" frameBorder="0" style={{ border: 0 }} allowFullScreen />
+		<GoogleMap title={title} link={google} />
 	</>
 )
 
