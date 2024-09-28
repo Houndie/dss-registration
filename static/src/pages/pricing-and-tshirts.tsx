@@ -4,7 +4,7 @@ import Table from "react-bootstrap/Table"
 
 export default () => (
 	<Page title="Pricing">
-		<h2><a href="https://dayton-swing-smackdown-2024.dancecamps.org">Registration is open now!</a></h2>
+		//<h2><a href="https://dayton-swing-smackdown-2024.dancecamps.org">Registration is open now!</a></h2>
 		<h2>Main Event Pricing</h2>
 		<p>The tiered pricing structure in the below table is for a Full Weekend Pass. The Full Weekend Pass includes access to all dances and workshop classes. It does not include competition fees (see competition entry fee prices below).</p>
 		<p>This year we are capping our ticket sales at 200 full weekend passes!  Make sure to sign up early!</p>
@@ -24,6 +24,7 @@ export default () => (
 		<ul>
 			<li>Dance Only Pass (no workshops): $45.00</li>
 			<li>Student Discount: -$5 on a Full Weekend Pass!</li>
+			<li>Collegiate Team Discount: Collegiate Teams may register all of their members at the Tier 1 Rate!  Contact us at <a href="mailto:info@daytonswingsmackdown.com">info@daytonsamckdown.com</a> for details</li>
 		</ul>
 		<h2>A la Carte: Sold at the door only</h2>
 		<ul>
@@ -42,7 +43,8 @@ export default () => (
 			<li>Solo Charleston Entry Fee — $5.00</li>
 		</ul>
 		<h2>T-Shirts</h2>
-		<img src="/images/tshirt.png" width="200px" />
+		//<img src="/images/tshirt.png" width="200px" />
+		<p>T-Shirt image will be avialable in January!</p>
 		<p>All t-shirts will be $17</p>
 		<h3>T-Shirt Sizing Information</h3>
 		<h4>Unisex</h4>

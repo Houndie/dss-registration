@@ -28,7 +28,7 @@ const InstructorsCards: React.FC<{
 
 
 const Instructors = () => {
-	const instructors = [
+	/*const instructors = [
 		[{
 			name: "Kate Hedin (She/Her)",
 			picture: "/images/instructors/Kate Hedin.jpg",
@@ -62,15 +62,16 @@ From the very beginning, Jony has always had very unique ideas when it comes to 
 
 Solo movement of every kind has been a staple in Jony’s dancing since they began.  Their first love was Charleston, then grew into more of the solo jazz dances.  Their love for movement did not stop at jazz, They also cross-trained in tap, ballet, modern, salsa, bachata, and hip-hop, mostly in college courses.  Jony encourages everyone to come get weird with him as we explore all the possibilities jazz has to offer.`,
 		}]
-	]
+	]*/
 
 	return (
 		<Page title="Instructors">
-			{instructors
+			/*{instructors
 				.map(([instructor1, instructor2]) =>
 					(<InstructorsCards instructor1={instructor1} instructor2={instructor2} />)
 				)
-			}
+			}*/
+			<p>Instructors will be announced soon!</p>
 		</Page >
 	)
 }

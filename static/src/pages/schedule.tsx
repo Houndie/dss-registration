@@ -2,7 +2,8 @@ import React from 'react'
 import Page from '../components/Page'
 
 export default () => (
-	<Page title="Schedule">
+	<Page title="Tenative Schedule">
+		<p>Details subject to change as we get closer to the event!</p>
 		<style>{`
 				table, tr, td {
 					border: 1px solid black;
@@ -30,17 +31,17 @@ export default () => (
 			<tr><td>9:00a</td><Tdc colSpan={3}>Doors Open at The Baum Opera House</Tdc></tr>
 			<tr><td>9:20a</td><Tdc colSpan={3}>Level Test</Tdc></tr>
 			<tr><td></td><Tdc><b>Level 1 (Baum Opera House Upstairs)</b></Tdc><Tdc><b>Level 2 (Baum Opera House Downstairs)</b></Tdc><Tdc><b>Level 3 (Star City Social Hall)</b></Tdc></tr>
-			<tr><td>10:00a</td><Tdc>Dave & Mandy</Tdc><Tdc>Kate & Bobby</Tdc><Tdc>Christina & Jony</Tdc></tr>
+			<tr><td>10:00a</td><Tdc>TBD</Tdc><Tdc>TBD</Tdc><Tdc>TBD</Tdc></tr>
 			<tr><td>11:00a</td><Tdc colSpan={3}>Midmorning Break</Tdc></tr>
-			<tr><td>11:15a</td><Tdc>Kate & Bobby</Tdc><Tdc>Christina & Jony</Tdc><Tdc>Dave & Mandy</Tdc></tr>
+			<tr><td>11:15a</td><Tdc>TBD</Tdc><Tdc>TBD</Tdc><Tdc>TBD</Tdc></tr>
 			<tr><td>12:15p</td><Tdc colSpan={3}>Lunch Break</Tdc></tr>
 			<tr><td>12:15p</td><Tdc colSpan={3}>Team Floor Trials (Ballroom Closed)</Tdc></tr>
-			<tr><td>1:30p</td><Tdc>Christina & Jony</Tdc><Tdc>Dave & Mandy</Tdc><Tdc>Kate & Bobby</Tdc></tr>
+			<tr><td>1:30p</td><Tdc>TBD</Tdc><Tdc>TBD</Tdc><Tdc>TBD</Tdc></tr>
 			<tr><td>2:30p</td><Tdc colSpan={3}>Afternoon Break 1</Tdc></tr>
-			<tr><td>2:45p</td><Tdc>Christina & Jony</Tdc><Tdc>Dave & Mandy</Tdc><Tdc>Kate & Bobby</Tdc></tr>
+			<tr><td>2:45p</td><Tdc>TBD</Tdc><Tdc>TBD</Tdc><Tdc>TBD</Tdc></tr>
 			<tr><td>3:45p</td><Tdc colSpan={3}>Afternoon Break 2</Tdc></tr>
 			<tr><td></td><Tdc><b>Elective (Baum Opera House Upstairs)</b></Tdc><Tdc><b>Elective (Baum Opera House Downstairs)</b></Tdc><Tdc><b>Elective (Star City Social Hall)</b></Tdc></tr>
-			<tr><td>4:00p</td><Tdc>Kate & Bobby</Tdc><Tdc>Dave & Mandy</Tdc><Tdc>Christina & Jony</Tdc></tr>
+			<tr><td>4:00p</td><Tdc>TBD</Tdc><Tdc>TBD</Tdc><Tdc>TBD</Tdc></tr>
 			<tr><td>5:00p</td><Tdc colSpan={3}>Dinner Break</Tdc></tr>
 			<tr><td>5:00p</td><Tdc colSpan={3}>Team Floor Trials (Ballroom Closed)</Tdc></tr>
 		</table>

@@ -39,7 +39,7 @@ const DJCard: React.FC<{
 }
 
 export default () => {
-	const djs = [
+	/*const djs = [
 		{
 			name: "Mark Calkins",
 			picture: "/images/DJs/mark.jpg",
@@ -64,22 +64,20 @@ At live music events Naomi’s been known to say “I love this song!!” roughl
 			name: "Rachel Kreher",
 			picture: "/images/DJs/rachel.jpg",
 			bio: `Rachel fell in love with swing dancing at her very first lesson in 2012, and has since spent incalculable weekends traveling to learn, compete, and meet new friends from all over the country. Best described as an exuberant, not-so-mildly awkward teacher, Rachel loves to share her passion for dance with anyone willing to learn. As a DJ, she loves to play the jump blues vibes of her hometown right alongside her favorite Count Basie classics while highlighting the modern bands you can still see live at events. Whatever it is -- you can count on her to bring the energy to the floor!`
-		}]
+		}]*/
 
 	return (
 		<Page title="Music">
-			{ djs.map((dj, idx) => {
-				console.log("HERE")
-				console.log(idx % 2)
+			/*{ djs.map((dj, idx) => {
 				const side = idx % 2 ? Side.LEFT : Side.RIGHT
-				console.log(side)
 				return (
 					<>
 						<DJCard key={idx} dj={dj} side={side}/>
 						<br/>
 					</>
 				)
-			})}
+			})}*/
+			<p>DJs and Bands will be announced soon!</p>
 		</Page>
 	)
 }
