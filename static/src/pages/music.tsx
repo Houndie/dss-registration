@@ -25,12 +25,12 @@ const DJCard: React.FC<{
 		<>
 			<h2>{dj.name}</h2>
 			<Row className="align-items-center">
-				{ (() => {
-					switch(side) {
-					case Side.LEFT:
-						return (<>{picture}{bio}</>)
-					case Side.RIGHT:
-						return (<>{bio}{picture}</>)
+				{(() => {
+					switch (side) {
+						case Side.LEFT:
+							return (<>{picture}{bio}</>)
+						case Side.RIGHT:
+							return (<>{bio}{picture}</>)
 					}
 				})()}
 			</Row>
@@ -68,15 +68,6 @@ At live music events Naomi’s been known to say “I love this song!!” roughl
 
 	return (
 		<Page title="Music">
-			/*{ djs.map((dj, idx) => {
-				const side = idx % 2 ? Side.LEFT : Side.RIGHT
-				return (
-					<>
-						<DJCard key={idx} dj={dj} side={side}/>
-						<br/>
-					</>
-				)
-			})}*/
 			<p>DJs and Bands will be announced soon!</p>
 		</Page>
 	)

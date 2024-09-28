@@ -66,11 +66,6 @@ Solo movement of every kind has been a staple in Jony’s dancing since they beg
 
 	return (
 		<Page title="Instructors">
-			/*{instructors
-				.map(([instructor1, instructor2]) =>
-					(<InstructorsCards instructor1={instructor1} instructor2={instructor2} />)
-				)
-			}*/
 			<p>Instructors will be announced soon!</p>
 		</Page >
 	)
