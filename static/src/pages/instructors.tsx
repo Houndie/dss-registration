@@ -28,45 +28,58 @@ const InstructorsCards: React.FC<{
 
 
 const Instructors = () => {
-	/*const instructors = [
+	const instructors = [
 		[{
-			name: "Kate Hedin (She/Her)",
-			picture: "/images/instructors/Kate Hedin.jpg",
-			bio: `For almost two decades Kate Hedin has taught Balboa and Lindy Hop around the world and holds almost every major championship title in the modern Balboa era. As a teacher, Kate is passionate about pedagogy, lead/follow mechanics as a way of expression, and follower voice as an integrated part of the dance. She is the creator of several groundbreaking DVDs on Balboa Followers Technique and Aesthetics, as well as other online lessons, which can be found at www.onlinebalboa.com, and is one of the scene's top Jewel McGowan experts.  She is also a highly sought-after judge and DJ.
+			name: "Irina Amzashvili",
+			picture: "/images/instructors/Irina Amzashvili.jpg",
+			bio: `Dancing in all forms has been a lifelong passion for Irina (she/her). In 2009, at the age of 15, she stumbled upon Swing dancing and it took only one night of social dancing for her to fall head over heels in love with it. Though Lindy Hop was her gateway into the world of Swing, Irina's passion quickly expanded to include Balboa, Collegiate Shag, and solo jazz. She is proud to have spent her formative years of dancing in Southern California, home to some of the best Swing dancers, teachers, and music in the world. Irina has since received numerous accolades from events such as Camp Hollywood, The International Lindy Hop Championships, and Lindy Focus and has taught these dances all across the U.S., Asia, Europe, and Australia. Additionally, she is honored to have been inducted into the Camp Hollywood Hall of Fame in 2019 and the California Swing Dance Hall of Fame in 2022.
 
-When she is not teaching dance, she leads a secret double life as a Twitch streamer, that focuses on video games as art, education, entertainment, and human connection. She is *always* ready to geek out about dance, classical music (she has a degree in viola), trapeze, and video games, so please don't be intimidated by her quiet demeanor and asymmetrical hair and ask her anything!`
+Irina's teaching style can best be described as patient and encouraging. Her goal is to guide her students through building solid foundations while inspiring individuality in personal movement, as well as helping build confidence through dance.
+
+Photo by Jerry Almonte (http://jsalmonteproductions.com/)`,
 		}, {
-			name: "Bobby White (He/Him)",
-			picture: "/images/instructors/Bobby White.jpg",
-			bio: `Bobby teaches traditional swing dances around the world, and holds championship titles and placements in Balboa, Lindy Hop, and Solo Jazz. With each, Bobby strives to innovate and create a new voice, while still capturing the spirit of the original dancers. He is the co-director of the Lindy Hop performance group the Harvest Moon Hoppers, which specialize in dancing in the performance style of Whitey's Lindy Hoppers. He is the author of the popular swing dance blog Swungover*, and the book "Practice Swing."  As a dancer, he is widely recognized for his floppy hair, and as a teacher, by his sound effects.`,
+			name: "Rafal Pustelny",
+			picture: "/images/instructors/Rafal Pustelny.jpg",
+			bio: `Rafal Pustelny is a vibrant dancer and instructor who is passionate about traditional dances from all around the world! Rafal moved to NYC in 2010 and there studied American Jazz dance forms, including Lindy Hop, Charleston, and Balboa. He quickly established himself as one of the top dancers in NYC, and has since earned acclaim in the international swing dance community.
+
+His wide knowledge and skill in various styles has helped him win top placements in international competitions and has created opportunities for him to teach around the world. Rafal’s expertise and passion for dance shine in the classroom; he uses his technical prowess, upbeat sense of humor, and innate ability to connect with people to distill high-level content into accessible pieces that elevate multiple aspects of his students’ dancing.
+
+Rafal continues his own dance education by studying Tap, Clogging, Hungarian folk dances, and Polish folk dances. As a performer, he works with several regional groups, including “Gatsby Entertainment,” “The Vanaver Caravan,” “Project Connect”, and “Harvest Moon Hoppers”, as well as community events and corporate parties. A Frankie Manning Foundation Ambassador, he teaches and performs locally with “You Should Be Dancing” studios. You can also find him at international events where he works with dance communities across the globe.`
 		}],
 		[{
-			name: "Dave Barry (He/Him)",
-			picture: "/images/instructors/David Barry.jpg",
-			bio: `Dave hasn't said no to a dance since finding Lindy Hop in 2012 (seriously). As a teacher, Dave focuses on simple, driving rhythms and deep applicability of foundational concepts. His classes place high value on dynamic following, and inclusive listening from leaders with body mechanics always at the root of his lead/ follow focus. Musically driven with an expansive knowledge of early jazz, RnB, and blues, Dave’s classes incorporate structural musical concepts into every step. Dave has won or placed in major competitions at national and international events including ILHC, Lindyfest, ULHS, Midwest Lindyfest, Arctic Lindy Exchange, and Atlanta Varsity Showdown. At home in Atlanta Dave gives warm homes to wayward CDs and records.`
+			name: "Ana Lisa Sutherland",
+			picture: "/images/instructors/Ana Lisa Sutherland.jpg",
+			bio: `Ana Lisa Sutherland (she/they) is a powerhouse of energy packed into a short frame, and she brings it all to the dance floor! She began her dance journey early in life in California, where she competed in Ballroom and Hip Hop before (accidentally) falling in love with Lindy Hop. She started as a scrappy newbie pestering her dance idols for knowledge and grew to a scrappy quirky professional and wild card in the dance scene. Since 2008, she has traveled across the country to compete and learn swing dancing from original legends and current-day champions. Ana Lisa holds multiple titles from prestigious weekend events like Northwest Balboa Fest, Lindy Bout, Camp Jitterbug, Lindy Focus, and Lindy On The Rocks. Some of her favorite performance highlights include Lincoln Center’s Midsummer Night Swing and local cabaret shows in her current city of Seattle.
+
+Ana Lisa believes that swing dancing is a cultural experience that allows participants to connect with the roots of this African American historical dance, contribute to its legacy, and shine. There truly is a place for everyone within it. Consequently, she loves drawing inspiration from historical sources and the legends that have paved the way, while also incorporating newer dance forms from her ongoing explorations in the world of dance. She is a competitor, a performer, a budding street dancer, a retired Latin ballroom champion, a showgirl...she is a kaleidoscope of the swing dance world.
+
+In the classroom, she strives to inspire other dancers to authentically express themselves on the floor and encourages everyone to embrace their uniqueness. Ana Lisa helps her students approach each dance and class with the mindset that anything could happen, unlocking the unique conversation they can have with their partner and the music.`
 		}, {
-			name: "Mandy Hogan (She/Her)",
-			picture: "/images/instructors/Mandy Hogan.jpg",
-			bio: `Mandy Hogan began her swing dancing journey at the Anderson University’s swing club in 2007. Over the years, she has traveled all over the Midwest and beyond attending workshops, social dancing, performing, competing, and teaching. On the social dance floor, she is known for her connection, playful energy, and creativity. As an instructor, she currently specializes in Lindy hop, Charleston, vernacular solo jazz and St. Louis Shag.`,
+			name: "Jon Tigert",
+			picture: "/images/instructors/Jon Tigert.jpg",
+			bio: `Jon Tigert is a world recognized Swing Dancer and musician. Specializing in Vintage dances such as Lindy Hop, Balboa, Blues, and Charleston, he has won titles from the International Lindy Hop Championships, The Canadian Swing Dance Championships, Lindy Focus,  and many more. Swing Dancing since 2005, Jon has made a home in the swing community as a teacher, an MC, a performer, an organizer, and a musician.  As a teacher, Jon is well known for his historical and musical knowledge, clear and concise communication, and endless supply of terrible dad jokes.
+
+Jon now lives in Baltimore where he teaches at the Mobtown Ballroom and sings and plays drums with The Corner Pocket Jazz Band.`
 		}],
 		[{
-			name: "Christina Cacciatore (She/Her/Hers)",
-			picture: "/images/instructors/Christina Cacciatore.jpg",
-			bio: `Christina's dance adventure started in her Nani and Papa's kitchen long before she can remember. When she found Lindy Hop (again) in college, she found joy in connecting with her peers and more deeply with her family history. In the 12 years that have passed since her first formal lesson, Christina has continued to find connection and belonging in the dance - as well as a true love for teaching. Christina's primary focus is in teaching first time dancers and inspiring them to learn, explore, and play more in the dance. Her primary focus as a dancer is creating conversation within partnered dance and moving authentically while dancing solo. Let's explore and play in class!`
+			name: "Doug Bae",
+			picture: "/images/instructors/Doug Bae.jpg",
+			bio: `Doug Bae (he/him) stumbled into Lindy Hop in 2016 and it quickly became an enormous part of his life, traveling across the country to learn, teach, and dance! Now in Pittsburgh he is an organizer for PittStop as well the local scene as Doug loves nothing more than to share the joy he experiences while dancing. As a teacher he focuses on connection and energy, responding to your partner, and delving into core body mechanics in both solo and partnered movement.
+
+On the social floor (where you’ll most easily find him), Doug is constantly exploring playful, musical, and comfortable dances with anyone and everyone. He’s also an avid baker and is always interested to hear good bakery or recipe recommendations!`
 		}, {
-			name: "Jony Navarro (He/They)",
-			picture: "/images/instructors/Jony Navarro.jpg",
-			bio: `Jony fell in love with jazz in early 2011 and has since never been the same.  He has a constant drive to make art completely his own, which is fueled by a desire for learning.  His fascination began with dancing, moved onto jazz music, then continued to black history and culture and beyond.
+			name: "Val Kutchko",
+			picture: "/images/instructors/Val Kutchko.jpg",
+			bio: `Val Kutchko (they/she) started swingin' out 9 years ago in jazzy Kansas City. Val quickly became enamored by the energy and rhythms of jazz music and Lindy Hop. Val has since moved to Pittsburgh, PA, where they teach, organize, and DJ, sometimes playing multiple versions of a song in the same night to see how folks' dancing changes with each version.
 
-From the very beginning, Jony has always had very unique ideas when it comes to making art.  He excels at inspiring others to think about dance in a different way than they’re used to, often expanding on familiar topics.  While conceptual learning drives a lot of his classes, movement and technique play a large part in the learning environment he creates.
-
-Solo movement of every kind has been a staple in Jony’s dancing since they began.  Their first love was Charleston, then grew into more of the solo jazz dances.  Their love for movement did not stop at jazz, They also cross-trained in tap, ballet, modern, salsa, bachata, and hip-hop, mostly in college courses.  Jony encourages everyone to come get weird with him as we explore all the possibilities jazz has to offer.`,
+Val delights in both following and leading, and their favorite dances are full of laughter. Informed by their enjoyment of both roles, as an instructor Val emphasizes communication, comfort, and playfully disrupting gendered dynamics of leading and following.`
 		}]
-	]*/
-
+	]
 	return (
 		<Page title="Instructors">
-			<p>Instructors will be announced soon!</p>
+			{instructors.map(instructorPair => (
+				<InstructorsCards instructor1={instructorPair[0]} instructor2={instructorPair[1]} />
+			))}
 		</Page >
 	)
 }
