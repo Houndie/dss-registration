@@ -39,21 +39,11 @@ const DJCard: React.FC<{
 }
 
 export default () => {
-	/*const djs = [
+	const djs = [
 		{
 			name: "Mark Calkins",
 			picture: "/images/DJs/mark.jpg",
-			bio: `Mark’s DJing was once described as wonderfully whimsical (or tipsy) by a Yale faculty member. With 20 years of experience as a Swing DJ, he strives to provide the best virtuosos and deep-cut selections to inspire the dancers on the dance floor. He is thrilled to be part of the DJ team once again and is no stranger to Dayton Swing Smackdown as he has served as DJ, judge, and instructor for many years and returns this year as a co-choreographer along with Shannon Varner for Team SwingColumbus! Cbus Ho!`
-		}, {
-			name: "Naomi Carmeli-Shabtay",
-			picture: "/images/DJs/naomi.jpg",
-			bio: `Naomi Carmeli-Shabtay began dancing lindy hop and blues in 2014. Since 2018 she has DJed at events around the Midwest from Milwaukee to St Louis, including at Whistle Stop & CincyHop, and appears regularly at dances in Chicago. 
-
-At live music events Naomi’s been known to say “I love this song!!” roughly every other song. It’s always true, and as a DJ she strives to elicit the same response from the dance floor. Naomi has a love for vocals, guitar, and pulling out an oddball song or two that you might just fall in love with.`
-		}, {
-			name: "Emma Durham",
-			picture: "/images/DJs/emma.jpg",
-			bio: `Emma Durham started swing dancing at a college club at Savannah College of Art & Design in Georgia in 2008 and fell in love with the movement and then the music. She continued while living in Atlanta and New Orleans before moving back to her hometown of Cincinnati, where she started DJing at local and regional events, including Smackdown, School of Hard Knox, CincyHop, and LaFLX. She has a soft spot for drummer-led bands, female vocalists, and anything that really makes her want to swing out. If she’s at the DJ table, chances are good there’s a Pomeranian named Cheezit on the table too.`
+			bio: `Mark’s DJing was once described as wonderfully whimsical (or tipsy) by a Yale faculty member. With 20 years of experience as a Swing DJ he strives to provide the best virtuosos and deep-cut selections to inspire dancers on and off the floor. He is excited to be part of the Dayton Swing Smackdown DJ team, this year as one of the competition DJs!`,
 		}, {
 			name: "Shelby Johnson",
 			picture: "/images/DJs/shelby.jpg",
@@ -64,11 +54,29 @@ At live music events Naomi’s been known to say “I love this song!!” roughl
 			name: "Rachel Kreher",
 			picture: "/images/DJs/rachel.jpg",
 			bio: `Rachel fell in love with swing dancing at her very first lesson in 2012, and has since spent incalculable weekends traveling to learn, compete, and meet new friends from all over the country. Best described as an exuberant, not-so-mildly awkward teacher, Rachel loves to share her passion for dance with anyone willing to learn. As a DJ, she loves to play the jump blues vibes of her hometown right alongside her favorite Count Basie classics while highlighting the modern bands you can still see live at events. Whatever it is -- you can count on her to bring the energy to the floor!`
-		}]*/
+		}, {
+			name: "Aliceann Talley",
+			picture: "/images/DJs/aliceann.png",
+			bio: `Aliceann has been playing music and partner dancing for most of her life, and is always inspired in new ways by the music.  Believing the music is what drives these dances, she continues to dive into the history of vintage jazz and blues to collect new music that inspires dancers to move. 
+
+She keeps two things in mind while DJing - there should be enough variation that everyone will want to dance throughout the night, and everyone should have enough time to finish hugging before the next song starts.`,
+		}, {
+			name: "Kemper Talley",
+			picture: "/images/DJs/kemper.png",
+			bio: `Kemper favors music that has authentic, historic roots in the Swing Era. He loves to play music from swing's early days to modern recreations, but heavily favors
+the small combos and big bands of the 1930s and 40s. Outside of DJing, he enjoys leading his classic swing small combo, the Jump Shop Sextet, as well as teaching local and regional dancers more about this thing we call swing.`
+		}, {
+			name: "Sam Zorich",
+			picture: "/images/DJs/sam.jpg",
+			bio: `Sam Zorich is thrilled to be part of the DJ team at Dayton this year! She began dancing in college, but fell in love with swing era and later jazz music in middle school when she started playing saxophone. Since then, she has DJd at home in Chicago and at regional lindy hop (and balboa!) events around the Midwest. While she's not much of a musician anymore, she loves to highlight the saxophone while playing music that makes people get on the floor and stay there!`,
+		}
+	]
 
 	return (
 		<Page title="Music">
-			<p>DJs and Bands will be announced soon!</p>
+			{djs.map((dj, index) => (
+				<DJCard dj={dj} side={index % 2 == 0 ? Side.LEFT : Side.RIGHT} />
+			))}
 		</Page>
 	)
 }
