@@ -72,7 +72,7 @@ export default () => (
 		<br />
 		<h3>Sunday Afternoon</h3>
 		<table>
-			<tr><td>1:00p</td><td>Doors Open at Elegance and Dance</td></tr>
+			<tr><td>1:00p</td><td>Doors Open at Arbor Hall</td></tr>
 			<tr><td>1:00p</td><td>Class 1 (All Levels)</td></tr>
 			<tr><td>2:00p</td><td>Class 2 (All Levels)</td></tr>
 			<tr><td>3:00p</td><td>DJed Music</td></tr>

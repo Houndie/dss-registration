@@ -12,6 +12,6 @@ export default () => (
 			<li>Harassment of any kind is strictly prohibited.</li>
 		</ul>
 		<h2>Report a Violation</h2>
-		<p>If any attendee feels there is a violation of the code of conduct, feels unsafe or harassed, or has any other safety concerns, they are encouraged to report it!  Please bring any concerns to a Dayton Swing Smackdown staff member.  If you don’t feel comfortable talking to a staff member, <a href="/safety-report">you can submit a report here</a>.</p>
+		<p>If any attendee feels there is a violation of the code of conduct, feels unsafe or harassed, or has any other safety concerns, they are encouraged to report it!  Please bring any concerns to a Dayton Swing Smackdown staff member.  If you don’t feel comfortable talking to a staff member, send us an email at <a href="mailto:safety@daytonswingsmackdown.com">safety@daytonswingsmackdown.com</a>.</p>
 	</Page>
 )

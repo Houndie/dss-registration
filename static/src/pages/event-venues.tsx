@@ -63,7 +63,6 @@ export default () => (
 			days={[
 				"Friday Late Night",
 				"Saturday Late Night",
-				"Sunday Afternoon"
 			]}
 			address={["8967 Kingsridge Drive", "Miamisburg, OH 45342"]}
 			image="/images/elegance.jpg"
@@ -71,6 +70,17 @@ export default () => (
 		>
 			<p>Elegance in Dance has been a staple in the Dayton swing dance scene for years.  With a large, sprung hardwood floor, a raised DJ booth and a bar (BYOB), it’s the perfect intimate setting. For more information, <a href="http://www.eleganceindance.com/">check out their website</a>. The studio is located at the end of the strip mall. Near Marion’s Pizza.</p>
 			<p>Parking is available in front of the building.</p>
+		</Venue>
+		<Venue
+			title="Arbor Hall"
+			days={[
+				"Sunday Afternoon"
+			]}
+			address={["2150 Arbor Blvd", "Moraine, OH 45439"]}
+			image="/images/elegance.jpg"
+			google="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3068.626256612197!2d-84.21334422402302!3d39.725581271559065!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x884086ecee03a1fb%3A0xba1d22cc6642e91e!2sArbor%20Hall!5e0!3m2!1sen!2sus!4v1739724805825!5m2!1sen!2sus"
+		>
+			<p>A new venue in 2025!  With it's large ballroom, we're experimenting with this venue on Sunday Afternoon to provide more room for classes</p>
 		</Venue>
 	</Page>
 )
