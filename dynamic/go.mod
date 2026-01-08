@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/Houndie/square-go v0.0.0-20210729172638-ac71bb623143
-	github.com/aws/aws-sdk-go v1.31.6
+	github.com/aws/aws-sdk-go v1.34.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang/protobuf v1.5.2
